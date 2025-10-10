@@ -1,216 +1,162 @@
 <!DOCTYPE html>
-<html class="no-js css-menubar" lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
-        <meta name="description" content="bootstrap material admin template">
-        <meta name="author" content="">
+<!-- saved from url=(0020)https://digitepp.id/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>SIJAMU</title>
+    <meta name="description" content="SIJAMU, sistem penjamin mutu di stik siti khadijah">
+    <meta name="keyword" content="Sistem audit stik siti khadijah">
+    <meta name="author" content="STIK SITI KHADIJAH">
+    <link href="<?php echo base_url("/assets/assets/images/logostik.png");?>" rel="icon" type="image/x-icon">
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <!-- CSS Landing Page -->
+    <link rel="stylesheet" href="./assets/desain/landing.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+    <link href="./assets/desain/css2" rel="stylesheet"> 
 
-        <title>Dinas Pendidikan Provinsi Sumatera Selatan</title>
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
 
-        <link rel="apple-touch-icon" href="<?php echo asset_url();?>/assets/images/logorsud.png">
-    <link rel="shortcut icon" href="<?php echo asset_url();?>/assets/images/logorsud.png">
+      <!-- Google tag (gtag.js) -->
+      <script async="" src="./assets/desain/js"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
 
-        <!-- Stylesheets -->
-        <link
-            rel="stylesheet"
-            href="<?php echo asset_url();?>global/css/bootstrap.min.css">
-        <link
-            rel="stylesheet"
-            href="<?php echo asset_url();?>global/css/bootstrap-extend.min.css">
-        <link rel="stylesheet" href="<?php echo asset_url();?>assets/css/site.min.css">
+        gtag('config', 'G-S75WL5XL9T');
+      </script>
 
-        <!-- Plugins -->
-        <link
-            rel="stylesheet"
-            href="<?php echo asset_url();?>global/vendor/animsition/animsition.css">
-        <link
-            rel="stylesheet"
-            href="<?php echo asset_url();?>global/vendor/asscrollable/asScrollable.css">
-        <link
-            rel="stylesheet"
-            href="<?php echo asset_url();?>global/vendor/switchery/switchery.css">
-        <link
-            rel="stylesheet"
-            href="<?php echo asset_url();?>global/vendor/intro-js/introjs.css">
-        <link
-            rel="stylesheet"
-            href="<?php echo asset_url();?>global/vendor/slidepanel/slidePanel.css">
-        <link
-            rel="stylesheet"
-            href="<?php echo asset_url();?>global/vendor/jquery-mmenu/jquery-mmenu.css">
-        <link
-            rel="stylesheet"
-            href="<?php echo asset_url();?>global/vendor/flag-icon-css/flag-icon.css">
-        <link
-            rel="stylesheet"
-            href="<?php echo asset_url();?>global/vendor/waves/waves.css">
-        <link
-            rel="stylesheet"
-            href="<?php echo asset_url();?>assets/examples/css/pages/email.css">
-
-        <!-- Fonts -->
-        <link
-            rel="stylesheet"
-            href="<?php echo asset_url();?>global/fonts/material-design/material-design.min.css">
-        <link
-            rel="stylesheet"
-            href="<?php echo asset_url();?>global/fonts/brand-icons/brand-icons.min.css">
-        <link
-            rel='stylesheet'
-            href='http://fonts.googleapis.com/css?family=Roboto:300,400,500,300italic'>
-
-        <!--[if lt IE 9]> <script src="<?php echo
-        asset_url();?>global/vendor/html5shiv/html5shiv.min.js"></script> <![endif]-->
-
-        <!--[if lt IE 10]> <script src="<?php echo
-        asset_url();?>global/vendor/media-match/media.match.min.js"></script> <script
-        src="<?php echo asset_url();?>global/vendor/respond/respond.min.js"></script>
-        <![endif]-->
-
-        <!-- Scripts -->
-        <script src="<?php echo asset_url();?>global/vendor/breakpoints/breakpoints.js"></script>
-        <script>
-            Breakpoints();
-        </script>
     </head>
-    <body
-        class="animsition page-email page-email-welcome layout-full"
-        style='background-image: url("<?php echo asset_url();?>/assets/examples/images/home.jpg");background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-size: 100% 100%;'>
-        <!--[if lt IE 8]> <p class="browserupgrade">You are using an
-        <strong>outdated</strong> browser. Please <a
-        href="http://browsehappy.com/">upgrade your browser</a> to improve your
-        experience.</p> <![endif]-->
+ 
+<body>
 
-        <!-- Page -->
-        <div class="page">
-            <div class="page-content">
-                <!-- Panel -->
-                <div class="panel">
-                    <div class="panel-body container-fluid">
-                        <div class="email-title">
-                            <img
-                                class="brand-img"
-                                src="<?php echo asset_url();?>/assets/images/logorsud.png"
-                                alt="DINAS PENDIDIKAN SUMSEL"
-                                width="120px">
-                        </div>
-                        <div class="card welcome-content">
-                            <div class="card-block pl-40 pr-40  mt-30 mb-30">
-                                <h2>Dinas Pendidikan Sumatera Selatan Seksi Kurikulum</h2>
-                                <!-- <p>
-                                    Selamat datang di situs resmi dinas pendidikan sumatera selatan bidang
-                                    kurikulum, situs ini memberikan layanan terkait bidang kurikulum
-                                </p> -->
-                                <a class="btn btn-round btn-danger card-link" href="<?php echo base_url('login');?>">Sign In</a>
-                            </div>
-                            <div class="card-block">
-                                <h2>Layanan Kami!</h2>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="card card-shadow border">
-                                            <div class="card-header cover">
-                                                <img
-                                                    class="cover-image"
-                                                    src="<?php echo asset_url();?>assets/examples/images/konsultasi.png"
-                                                    alt="...">
-                                            </div>
-                                            
-                                            <div class="card-block">
-                                                <a href="<?php echo base_url('konsultasi');?>" class="btn btn-round btn-success card-link">Konsultasi</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="card card-shadow border">
-                                            <div class="card-header cover">
-                                                <img
-                                                    class="cover-image"
-                                                    src="<?php echo asset_url();?>assets/examples/images/surat.png"
-                                                    alt="...">
-                                            </div>
-                                            
-                                            <div class="card-block">
-                                                <a href="<?php echo base_url('izinpenelitian');?>" class="btn btn-round btn-success">Ijin Penelitian</a>
-                                                
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-
-                    </div>
+    
+    <header class="main-header fixed-top">
+        <nav class="navbar navbar-expand-lg bg-white shadow-lg rounded-5 px-lg-4 mx-lg-5 mt-3 mt-lg-5">
+            <div class="container-fluid">
+                <a class="navbar-brand px-0" href="<?php echo base_url();?>">
+                    <img src="<?php echo asset_url();?>/assets/images/sijamu.png" alt="STIK SITI KHADIJAH Logo" height="80">
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuUtama" aria-controls="menuUtama" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="menuUtama">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link py-3 px-4 active" aria-current="page" href="<?php echo base_url();?>">Beranda</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link py-3 px-4" href="<?php echo base_url();?>#fitur">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link py-3 px-4" href="<?php echo base_url();?>#kontak">Kontak</a>
+                        </li>
+                    </ul>
                 </div>
-                <!-- End Panel -->
+            </div>
+        </nav>
+    </header>
+ 
+    <section id="hero" class="py-5 bg-primary green-gradasi">
+        <div class="container py-5 mt-4">
+            <div class="row pt-5 justify-content-center align-items-center">
+                <div class="col-lg-5">
+                    <img srcset="<?php echo base_url("/assets/assets/images/doctorfix.png");?> 2x" src="<?php echo base_url("/assets/assets/images/doctorfix.png");?>" alt="SIJAMU" class="img-fluid mt-5">
+                </div>
+                <div class="col-lg-7">
+                    <h1 class="text-lg-end mt-5 mb-5"><strong>SIJAMU </strong></h1>
+                    <p class="text-lg-end mt-5 mb-5">Sistem Penjamin Mutu (SIJAMU) ini dikembangkan dengan tujuan untuk mempermudah, mempercepat &amp; mewakili seluruh proses audit di lingkungan STIK SITI KHADIJAH</p>
+                    <p class="text-lg-end"><a class="btn btn-warning btn-lg px-5 py-3 rounded-5" href="<?php echo base_url();?>#fitur" role="button">Pelajari lebih lanjut</a></p>
+                </div>
             </div>
         </div>
-        <!-- End Page -->
+    </section>
 
-        <script
-            src="<?php echo asset_url();?>global/vendor/babel-external-helpers/babel-external-helpers.js"></script>
-        <script src="<?php echo asset_url();?>global/vendor/jquery/jquery.js"></script>
-        <script
-            src="<?php echo asset_url();?>global/vendor/popper-js/umd/popper.min.js"></script>
-        <script src="<?php echo asset_url();?>global/vendor/bootstrap/bootstrap.js"></script>
-        <script src="<?php echo asset_url();?>global/vendor/animsition/animsition.js"></script>
-        <script
-            src="<?php echo asset_url();?>global/vendor/mousewheel/jquery.mousewheel.js"></script>
-        <script
-            src="<?php echo asset_url();?>global/vendor/asscrollbar/jquery-asScrollbar.js"></script>
-        <script
-            src="<?php echo asset_url();?>global/vendor/asscrollable/jquery-asScrollable.js"></script>
-        <script src="<?php echo asset_url();?>global/vendor/waves/waves.js"></script>
+    <main id="konten" class="pb-5 position-relative">
+        <section id="fitur" class="py-5">
+            <div class="container py-5">
+                <div class="row py-5">
+                    <div class="col-lg-4 d-flex flex-column justify-content-start mb-5 text-center">
+                        <img srcset="./assets/desain/img-kep.png 2x" src="./assets/desain/img-kep.png" alt="LPM" class="mb-3">
+                        <h1 class="mb-2">PPM</h1>
+                        <p class="mb-3">Pusat Penjamin Mutu</p>
+                        <br/>
+                        <p>
+                            <a href="<?php echo base_url("login");?>" class="mt-3 px-5 rounded-5 btn btn-lg green-gradasi text-white align-self-baseline">Login sebagai PPM</a>
+                        </p>
+                    </div>
+                    <div class="col-lg-4 d-flex flex-column justify-content-start mb-5 text-center">
+                        <img srcset="./assets/desain/img-penelaah.png 2x" src="./assets/desain/img-penelaah.png" alt="auditor" class="mb-3">
+                        <h1 class="mb-2">Auditor</h1>
+                        <p class="mb-3">Anggota PPM untuk melakukan audit protokol yang masuk</p>
+                        <p><a href="<?php echo base_url("login");?>" class="mt-3 px-5 rounded-5 btn btn-lg yellow-gradasi text-white align-self-baseline">Login sebagai Auditor</a></p>
+                    </div>
+                    <div class="col-lg-4 d-flex flex-column justify-content-start mb-5 text-center">
+                        <img srcset="./assets/desain/img-pengusul.png 2x" src="./assets/desain/img-pengusul.png" alt="auditee" class="mb-3">
+                        <h1 class="mb-2">Auditee</h1>
+                        <p class="mb-3">Anggota PPM yang dilakukan audit</p>
+                        <br/>
+                        <p>
+                            <a href="<?php echo base_url("login");?>" class="mt-3 px-5 rounded-5 btn btn-lg red-gradasi text-white align-self-baseline">Login sebagai Auditee</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-        <!-- Plugins -->
-        <script
-            src="<?php echo asset_url();?>global/vendor/jquery-mmenu/jquery.mmenu.min.all.js"></script>
-        <script src="<?php echo asset_url();?>global/vendor/switchery/switchery.js"></script>
-        <script src="<?php echo asset_url();?>global/vendor/intro-js/intro.js"></script>
-        <script src="<?php echo asset_url();?>global/vendor/screenfull/screenfull.js"></script>
-        <script
-            src="<?php echo asset_url();?>global/vendor/slidepanel/jquery-slidePanel.js"></script>
+        <section id="kontak" class="py-5">
+            <div class="container py-5">
+                <div class="row py-5 justify-content-center align-items-center">
+                    <div class="col-12">
+                        <h1 class="text-center my-5">Kontak</h1>
+                    </div>
+                    <div class="col-12 text-center">
+                        <img srcset="<?php echo asset_url();?>/assets/images/logostik.png 2x" src="<?php echo asset_url();?>/assets/images/logostik.png" alt="STIK SITI KHADIJAH" class="img-fluid mb-4">
+                    </div>
+                    <div class="col-md-8 text-center">
+                        <h3 class="mb-4">STIK SITI KHADIJAH</h3>
+                        <p>
+                            JL. Demang Lebar Daun Kelurahan Lorok Pakjo Kecamatan Ilir Barat 1 Kota Palembang Provinsi Sumatera Selatan Kode Pos : 30137 <br>
+                            (0711) 315010&nbsp; <br>
+                            spmi@stik-sitikhadijah.ac.id <br>
+                            <a href="https://stik-sitikhadijah.ac.id">stik-sitikhadijah.ac.id</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-        <!-- Scripts -->
-        <script src="<?php echo asset_url();?>global/js/Component.js"></script>
-        <script src="<?php echo asset_url();?>global/js/Plugin.js"></script>
-        <script src="<?php echo asset_url();?>global/js/Base.js"></script>
-        <script src="<?php echo asset_url();?>global/js/Config.js"></script>
+        <footer class="shadow-lg rounded-5 my-5 mx-5">
+            <div class="container py-3">
+                <div class="row">
+                    <div class="col-12">
+                        <p class="text-center m-0">Dikembangkan oleh <a href="https://stik-sitikhadijah.ac.id">STIK SITI KHADIJAH</a></p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <button class="btn btn-sm btn-outline-dark px-3 position-absolute" title="Scroll to Top" onclick="animateScroll()" style="bottom:15px; right:15px;z-index:3;">⤒</button>
+    </main>
 
-        <script src="<?php echo asset_url();?>assets/js/Section/Menubar.js"></script>
-        <script src="<?php echo asset_url();?>assets/js/Section/Sidebar.js"></script>
-        <script src="<?php echo asset_url();?>assets/js/Section/PageAside.js"></script>
-        <script src="<?php echo asset_url();?>assets/js/Section/GridMenu.js"></script>
 
-        <!-- Config -->
-        <script src="<?php echo asset_url();?>global/js/config/colors.js"></script>
-        <script src="<?php echo asset_url();?>assets/js/config/tour.js"></script>
-        <script>
-            Config.set('assets', '<?php echo asset_url();?>assets');
-        </script>
+    <script src="./assets/desain/manifest.js.download"></script>
+    <script src="./assets/desain/vendor.js.download"></script>
+    <script src="./assets/desain/app.js.download"></script>
+    <script>
+        function animateScroll() {
+            window.scroll({ top: 0, behavior: 'smooth' });
+        }
+    </script>
 
-        <!-- Page -->
-        <script src="<?php echo asset_url();?>assets/js/Site.js"></script>
-        <script src="<?php echo asset_url();?>global/js/Plugin/asscrollable.js"></script>
-        <script src="<?php echo asset_url();?>global/js/Plugin/slidepanel.js"></script>
-        <script src="<?php echo asset_url();?>global/js/Plugin/switchery.js"></script>
 
-        <script>
-            (function (document, window, $) {
-                'use strict';
 
-                var Site = window.Site;
-                $(document).ready(function () {
-                    Site.run();
-                });
-            })(document, window, jQuery);
-        </script>
 
-    </body>
-</html>
+</body></html>
