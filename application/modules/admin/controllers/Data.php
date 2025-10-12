@@ -5,30 +5,65 @@ class Data extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'admin';
-        $this->load->js(base_url("assets/app/admin/data.js"));
+        $this->load->js(base_url("assets/app/admin/data.js?v=1.11"));
         $this->load->model('DataModel', 'datamodel');
 
         $role = $this->session->userdata('role');
-        if (!isset($role) || $role != 'LPM') {
+        if (!isset($role) || $role != 'PPM') {
             redirect(base_url());
         }
     }
 
     public function index() {
         $this->data['content'] = 'data';
-        $this->data['title'] = 'Data';
+        $this->data['title'] = 'Dokumen Mutu';
         $this->data['js'] = $this->load->get_js_files();
         $this->data['data'] = 'active';
+        $this->data['semua'] = 'active';
         $this->data['dokument'] = 'active';
         $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
         $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
         $this->template($this->data, $this->module);
     }
 
-    public function editdata() {
-        $submitdata = $this->input->post('submitdata');
-        $id = $this->input->get('id');
-        if (isset($submitdata)) {
+    public function tambah() {
+                $data = array();
+                $config['upload_path'] = 'filedata';
+                $config['allowed_types'] = '*';
+                $config['encrypt_name'] = TRUE;
+
+                $this->load->library('upload', $config);
+                $this->upload->initialize($config);
+                
+                if ($this->upload->do_upload('upload_file')) {
+                    $datagambar['upload_file'] = $this->upload->data();
+                    $link = $datagambar['upload_file']['file_name'];
+                    $data['data_file'] =  $link;
+
+                    $data['data_uraian']  = strtoupper($this->input->post('data_uraian'));
+                    $data['data_keterangan'] = strtoupper($this->input->post('data_keterangan'));
+                    $data['data_kategori'] = trim($this->input->post('data_kategori'));
+
+                    if($this->datamodel->add($data)){
+                        $query = array("status" => true, "pesan" => "Berhasil");
+                    }else{
+                        $query = array("status" => false, "pesan" => "Gagal");
+                    }
+
+                    header('Access-Control-Allow-Origin: *');
+                    header('Content-Type: application/json');
+                    echo json_encode($query);
+                }else{
+                    $query = array("status" => false, "pesan" => "Silahkan Tambahkan File Data");
+                    header('Access-Control-Allow-Origin: *');
+                    header('Content-Type: application/json');
+                    echo json_encode($query);
+                } 
+    }
+
+    public function edit() {
+        $data_id = $this->input->post('data_id');
+        if($data_id){
             $data = array();
             $config['upload_path'] = 'filedata';
             $config['allowed_types'] = '*';
@@ -42,70 +77,45 @@ class Data extends MY_Controller {
                 $link = $datagambar['upload_file']['file_name'];
                 $data['data_file'] =  $link;
             }
-            $data['data_id'] = $id;
+            $data['data_id'] = $data_id;
             $data['data_uraian'] = strtoupper($this->input->post('data_uraian'));
             $data['data_keterangan'] = strtoupper($this->input->post('data_keterangan'));
             $data['data_kategori'] = trim($this->input->post('data_kategori'));
             
             if($this->datamodel->edit($data)){
-                $msg = 'Berhasil';
-                $this->session->set_flashdata('pesanberhasil', $msg);
+                $query = array("status" => true, "pesan" => "Berhasil");
             }else{
-                $msg = 'Gagal, Data Saksi telah ada';
-                $this->session->set_flashdata('pesanerror', $msg);
+                $query = array("status" => false, "pesan" => "Gagal");
             }
-            redirect(base_url($this->module.'/data'));
-        } else {
-            $this->data['content'] = 'edit_data';
-            $this->data['title'] = 'Data';
-            $this->data['data'] = 'active';
-            $this->data['dokument'] = 'active';
-            $this->data['result'] = $this->datamodel->getData($id);
-            $this->data['js'] = $this->load->get_js_files();
-            $this->template($this->data, $this->module);
+
+            header('Access-Control-Allow-Origin: *');
+            header('Content-Type: application/json');
+            echo json_encode($query);
+
+        }else{
+            $query = array("status" => false, "pesan" => "Akses Ditolak");
+                    header('Access-Control-Allow-Origin: *');
+                    header('Content-Type: application/json');
+                    echo json_encode($query);
+        } 
+    }
+
+    public function getData($id) {
+        if(isset($id)){
+            $query = $this->datamodel->getData($id);
+            $query['status'] = true;
+            header('Access-Control-Allow-Origin: *');
+            header('Content-Type: application/json');
+            echo json_encode($query);
+        }else{
+            $query = array("status"=>false);
+            header('Access-Control-Allow-Origin: *');
+            header('Content-Type: application/json');
+            echo json_encode($query); 
         }
     }
 
-    public function tambahdata() {
-        $submitdata = $this->input->post('submitdata');
-        if (isset($submitdata)) {
-            $data = array();
-            $config['upload_path'] = 'filedata';
-            $config['allowed_types'] = '*';
-            $config['encrypt_name'] = TRUE;
-
-            $this->load->library('upload', $config);
-            $this->upload->initialize($config);
-            
-            if ($this->upload->do_upload('upload_file')) {
-                $datagambar['upload_file'] = $this->upload->data();
-                $link = $datagambar['upload_file']['file_name'];
-                $data['data_file'] =  $link;
-            }
-            $data['data_uraian'] = strtoupper($this->input->post('data_uraian'));
-            $data['data_keterangan'] = strtoupper($this->input->post('data_keterangan'));
-            $data['data_kategori'] = trim($this->input->post('data_kategori'));
-
-            if( $this->datamodel->add($data)){
-                $msg = 'Berhasil';
-                $this->session->set_flashdata('pesanberhasil', $msg);
-            }else{
-                $msg = 'Gagal, Dokument Gagal Tersimpan';
-                $this->session->set_flashdata('pesanerror', $msg);
-            }  
-
-            redirect(base_url($this->module.'/data'));
-        } else {
-            $this->data['content'] = 'add_data';
-            $this->data['title'] = 'Tambah Dokument';
-            $this->data['data'] = 'active';
-            $this->data['dokument'] = 'active';
-            $this->data['js'] = $this->load->get_js_files();
-            $this->template($this->data, $this->module);
-        }
-    }
-
-    public function hapusdata() {
+    public function hapus() {
         $id = $this->input->post('id');
         $this->datamodel->hapus($id);
     }
@@ -126,9 +136,11 @@ class Data extends MY_Controller {
             $no++;
             $row = array();
             $row[] = $no;
-            $row[] = $field->data_keterangan;
             $row[] = $field->data_uraian;
-            $row[] = "<a href='".base_url('filedata/').$field->data_file."' target='_blank'>Download</a>";
+            $row[] = $field->data_keterangan;
+            $row[] = '<a class="btn btn-sm btn-icon btn-success"
+            data-toggle="tooltip" data-original-title="Detail" href="'.base_url('filedata/').$field->data_file.'" target="_blank"><i class="icon md-download" aria-hidden="true"></i> Download</a>' ;
+            $row[] = $field->data_kategori;
             $row[] = date("d-m-Y H:i:s", strtotime($field->data_create));
             $row[] = '<button class="edit btn btn-sm btn-icon btn-pure btn-default on-default edit-row"
             data-toggle="tooltip" data-original-title="Edit" id=' . $field->data_id . '><i class="icon md-edit" aria-hidden="true"></i></button><button class="delete btn btn-sm btn-icon btn-pure btn-default on-default remove-row"

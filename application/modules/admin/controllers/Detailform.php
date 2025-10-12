@@ -5,12 +5,12 @@ class Detailform extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'admin';
-        $this->load->js(base_url("assets/app/admin/detailform.js?v=1.3"));
+        $this->load->js(base_url("assets/app/admin/detailform.js?v=1.4"));
         $this->load->model('DtformModel', 'dtform');
         $this->load->model('FormulirModel', 'formulir');
 
         $role = $this->session->userdata('role');
-        if (!isset($role) || $role != 'LPM') {
+        if (!isset($role) || $role != 'PPM') {
             redirect(base_url());
         }
     }
@@ -18,12 +18,12 @@ class Detailform extends MY_Controller {
     public function index() {
         $form_id = $this->input->get('id');
         if(isset($form_id)){
-            $formulir = $this->formulir->getFormulir($form_id);
             $this->data['content'] = 'detailform/index';
-            $this->data['title'] = $formulir['form_nama'];
+            $this->data['title'] = 'Detail Formulir';
             $this->data['js'] = $this->load->get_js_files();
             $this->data['auditmenu'] = 'active';
             $this->data['formaudit'] = 'active';
+            $this->data['formulir'] = $this->formulir->getFormulir($form_id);
             $this->data['form_id'] = $form_id;
             $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
             $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
@@ -35,11 +35,10 @@ class Detailform extends MY_Controller {
     }
 
    public function tambah() {
-        $dtform_tujuan = $this->input->post('dtform_tujuan');
-        if($dtform_tujuan){
+        $dtform_pertanyaan = $this->input->post('dtform_pertanyaan');
+        if($dtform_pertanyaan){
                 $data = array();
-                $data['dtform_tujuan']  = $dtform_tujuan;
-                $data['dtform_pertanyaan'] = $this->input->post('dtform_pertanyaan');
+                $data['dtform_pertanyaan'] = $dtform_pertanyaan;
                 $data['dtform_lingkup']   = $this->input->post('dtform_lingkup');
                 $data['form_id']   = $this->input->post('form_id');
 
@@ -65,7 +64,6 @@ class Detailform extends MY_Controller {
         $dtform_id = $this->input->post('dtform_id');
         if($dtform_id){
                 $data = array();
-                $data['dtform_tujuan']  = $this->input->post('dtform_tujuan');
                 $data['dtform_pertanyaan'] = $this->input->post('dtform_pertanyaan');
                 $data['dtform_lingkup']   = $this->input->post('dtform_lingkup');
                 $data['form_id']   = $this->input->post('form_id');
@@ -125,7 +123,6 @@ class Detailform extends MY_Controller {
             $no++;
             $row = array();
             $row[] = $no;
-            $row[] = $field->dtform_tujuan;
             $row[] = $field->dtform_pertanyaan;
             $row[] = $field->dtform_lingkup;
             $row[] = date("d-m-Y H:i:s", strtotime($field->dtform_create));

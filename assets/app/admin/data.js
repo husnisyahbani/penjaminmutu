@@ -1,13 +1,13 @@
 $(function () {
 
-    $('#data').DataTable({
+    var datalist = $('#data').DataTable({
         "responsive": true,
         "processing": true,
         "serverSide": true,
         "searching": true,
         "order": [],
         "columnDefs": [
-            {"targets": [0,3,5], "orderable": false}
+            {"targets": [0,3,6], "orderable": false}
         ],
         "ajax": {
             "url": base_url + "/data/listdata",
@@ -15,57 +15,60 @@ $(function () {
         }
     });
 
-    $('#info').DataTable({
-        "responsive": true,
-        "processing": true,
-        "serverSide": true,
-        "searching": true,
-        "order": [],
-        "columnDefs": [
-            {"targets": [0,3,5], "orderable": false}
-        ],
-        "ajax": {
-            "url": base_url + "/info/listdata",
-            "type": "POST"
-        }
-    });
-
     $("#data").on("click", ".edit", function () {
         var id = $(this).attr('id');
-        location.href = base_url+ "/data/editdata?id="+id;
+        getdata(id);
     });
-
 
     $("#data").on("click", ".delete", function () {
         var id = $(this).attr('id');
         hapusdata(id);
-    });
-
-    $("#info").on("click", ".edit", function () {
-        var id = $(this).attr('id');
-        location.href = base_url+ "/info/editdata?id="+id;
-    });
-
-
-    $("#info").on("click", ".delete", function () {
-        var id = $(this).attr('id');
-        hapusinfo(id);
-    });
-
-    $("#downloadcrekap").on("click", function () {
-        location.href = base_url + "/data/downloaddata";
-    });
+    });   
 
     $("#tambahdata").on("click", function () {
-        //window.open(base_url + "/pegawai/tambah");
-        location.href = base_url + "/data/tambahdata";
+         $('#dataAddModal').modal('show');
     });
 
-    $("#tambahinfo").on("click", function () {
-        //window.open(base_url + "/pegawai/tambah");
-        location.href = base_url + "/info/tambahdata";
-    });
-
+    function getdata(id)
+    {
+        $.ajax({
+            url: base_url + "/data/getData/"+id,
+            type: "GET",
+            dataType: "json",
+            beforeSend: function () {
+                swal.fire({
+                    title: 'Loading',
+                    allowEscapeKey: false,
+                    allowOutsideClick: false,
+                    onOpen: () => {
+                        swal.showLoading();
+                    }
+                });
+            },
+            success: function (list) {
+                swal.close();
+                if (list.status) {
+                    $('#dataEditModal').modal('show');
+                    $("#edit_data_uraian").val(list.data_uraian);
+                    $("#edit_data_keterangan").val(list.data_keterangan);
+                    $("#edit_data_kategori").val(list.data_kategori);
+                    $("#data_id").val(list.data_id);
+                } else {
+                    swal.fire("Oops", "Gagal!", "error");
+                        $("#formeditdata")
+                    .formValidation('disableSubmitButtons', false)
+                    .formValidation('resetForm', true);
+                }   
+            },
+            error: function () {
+                swal.fire("Oops", "No connection!", "error");
+                
+                 $("#formeditdata")
+                .formValidation('disableSubmitButtons', false)
+                .formValidation('resetForm', true);
+            }
+        });
+    }
 
     function hapusdata($id)
     {
@@ -79,7 +82,7 @@ $(function () {
             cancelButtonText: 'Tidak',
             preConfirm: function () {
                 $.ajax({
-                    url: base_url + "/data/hapusdata",
+                    url: base_url + "/data/hapus",
                     type: "POST",
                     data: { id: $id}
                 })
@@ -89,7 +92,7 @@ $(function () {
                                 text: "Data Telah Terhapus!",
                                 type: "success",
                                 preConfirm: function () {
-                                    location.href = base_url + "/data";
+                                    datalist.ajax.reload();
                                 }
                             });
                         })
@@ -100,125 +103,120 @@ $(function () {
         });
     }
 
-    function hapusinfo($id)
-    {
-        swal.fire({
-            title: "Anda Yakin?",
-            text: "Anda Yakin Ingin Info Ini?",
-            type: "warning",
-            showCancelButton: true,
-            showLoaderOnConfirm: true,
-            confirmButtonText: "Ya, Hapus!",
-            cancelButtonText: 'Tidak',
-            preConfirm: function () {
-                $.ajax({
-                    url: base_url + "/info/hapusdata",
-                    type: "POST",
-                    data: { id: $id}
-                })
-                        .done(function (data) {
-                            swal.fire({
-                                title: "Hapus",
-                                text: "Data Telah Terhapus!",
-                                type: "success",
-                                preConfirm: function () {
-                                    location.href = base_url + "/info";
-                                }
-                            });
-                        })
-                        .error(function (data) {
-                            swal.fire("Oops", "No connection!", "error");
-                        });
+    $("#formadddata").formValidation({
+        framework: "bootstrap4",
+        excluded: [':disabled'],
+        err: {
+            clazz: 'invalid-feedback'
+        },
+        control: {
+            valid: 'is-valid',
+            invalid: 'is-invalid'
+        },
+        row: {
+            invalid: 'has-danger'
+        }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+
+        var $form = $(e.target);       // ✅ perbaikan
+        var formData = new FormData(e.target);
+
+        $.ajax({
+            url: base_url + "/data/tambah",
+            type: "POST",
+            data: formData,
+            processData: false,        // ✅ wajib
+            contentType: false,        // ✅ wajib
+            beforeSend: function () {
+                $("#dataAddModal").modal('hide');
+                swal.fire({
+                    title: 'Loading',
+                    allowEscapeKey: false,
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        swal.showLoading();
+                    }
+                });
+            },
+            success: function (data) {
+                swal.close();
+                var list = data == null ? [] : (data instanceof Array ? data : [data]);
+                $.each(list, function (index, org_types) {
+                    if (org_types.status) {
+                        datalist.ajax.reload();
+                    } else {
+                        swal.fire("Oops", org_types.pesan, "error");
+                    }
+                });
+                $form.formValidation('disableSubmitButtons', false)
+                    .formValidation('resetForm', true);
+            },
+            error: function () {
+                swal.fire("Oops", "No connection!", "error");
+                $form.formValidation('disableSubmitButtons', false)
+                    .formValidation('resetForm', true);
             }
         });
-    }
+});
 
-   
 
-    $('#formadddata').formValidation({
+$("#formeditdata").formValidation({
         framework: "bootstrap4",
-        button: {
-            selector: '#validateButton',
-            disabled: 'disabled'
-        },
-        icon: null,
-        fields: {
-            
-           
-            upload_file: {
-                validators: {
-                    notEmpty: {
-                        message: 'Wajib Diisi'
-                    }
-                }
-            },data_keterangan: {
-                validators: {
-                    notEmpty: {
-                        message: 'Wajib Diisi'
-                    }
-                }
-            },
-            data_uraian: {
-                validators: {
-                    notEmpty: {
-                        message: 'Wajib Diisi'
-                    }
-                }
-            }
-        },
+        excluded: [':disabled'],
         err: {
             clazz: 'invalid-feedback'
         },
         control: {
-            // The CSS class for valid control
             valid: 'is-valid',
-            // The CSS class for invalid control
             invalid: 'is-invalid'
         },
         row: {
             invalid: 'has-danger'
         }
-    });
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
 
+        var $form = $(e.target);       // ✅ perbaikan
+        var formData = new FormData(e.target);
 
-    $('#formeditdata').formValidation({
-        framework: "bootstrap4",
-        button: {
-            selector: '#validateButton',
-            disabled: 'disabled'
-        },
-        icon: null,
-        fields: {
-            
-           
-            data_keterangan: {
-                validators: {
-                    notEmpty: {
-                        message: 'Wajib Diisi'
+        $.ajax({
+            url: base_url + "/data/edit",
+            type: "POST",
+            data: formData,
+            processData: false,        // ✅ wajib
+            contentType: false,        // ✅ wajib
+            beforeSend: function () {
+                $("#dataEditModal").modal('hide');
+                swal.fire({
+                    title: 'Loading',
+                    allowEscapeKey: false,
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        swal.showLoading();
                     }
-                }
+                });
             },
-            data_uraian: {
-                validators: {
-                    notEmpty: {
-                        message: 'Wajib Diisi'
+            success: function (data) {
+                swal.close();
+                var list = data == null ? [] : (data instanceof Array ? data : [data]);
+                $.each(list, function (index, org_types) {
+                    if (org_types.status) {
+                        datalist.ajax.reload();
+                    } else {
+                        swal.fire("Oops", org_types.pesan, "error");
                     }
-                }
+                });
+                $form.formValidation('disableSubmitButtons', false)
+                    .formValidation('resetForm', true);
+            },
+            error: function () {
+                swal.fire("Oops", "No connection!", "error");
+                $form.formValidation('disableSubmitButtons', false)
+                    .formValidation('resetForm', true);
             }
-        },
-        err: {
-            clazz: 'invalid-feedback'
-        },
-        control: {
-            // The CSS class for valid control
-            valid: 'is-valid',
-            // The CSS class for invalid control
-            invalid: 'is-invalid'
-        },
-        row: {
-            invalid: 'has-danger'
-        }
-    });
+        });
+});
 
   
 })

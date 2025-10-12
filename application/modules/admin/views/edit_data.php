@@ -45,7 +45,7 @@
                             <div class="form-group row">
                                 <label class="col-md-3 form-control-label">Kategori</label>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control" name="data_kategori" value="DATABASE" readonly/>
+                                    <input type="text" class="form-control" name="data_kategori" value="DATABASE"/>
                                 </div>
                             </div>
 

@@ -14,8 +14,25 @@
         </div>
       </div>
       <div class="page-content container-fluid">
-      
-
+        <div class="row"  data-by-row="true">
+<div class="col-xl-4 col-md-8">
+    <div class="panel">
+        <div class="card">
+                <div class="card-header white bg-red-600 p-30 clearfix">
+                    <a class="avatar avatar-100 float-left mr-20" href="javascript:void(0)">
+                        <img src="<?php echo base_url("assets/assets/images/sijamu.png");?>" alt=""></a>
+                        <div class="float-left">
+                            <div class="font-size-20 mb-15"><?php if(isset($formulir['form_nama'])){echo $formulir['form_nama'];}?></div>
+                            
+                            
+                            
+                            
+                        </div>
+                    </div>
+            </div>
+    </div>
+</div>     
+<div class="col-xl-8 col-md-16">
         <div class="panel">
             <header class="panel-heading">
                 <h3 class="panel-title"><?=$title?></h3> 
@@ -30,7 +47,6 @@
                     <thead>
                         <tr>
                             <th width="20px">No</th>
-                            <th>Tujuan</th>
                             <th>Pertanyaan</th>
                             <th>Lingkup</th>
                             <th width="200px">Tanggal</th>
@@ -44,6 +60,8 @@
                 </table>
             </div>
         </div>
+</div>
+</div>
     </div>
     </div>
     <!-- End Page -->
@@ -66,11 +84,7 @@
             <div class="modal-body">
 
                 <div class="row">
-                    <div class="col-md-12 center">
-                      <h4 class="example-title">Tujuan</h4>
-                        <input type="text" class="form-control" id="dtform_tujuan" name="dtform_tujuan" data-fv-notempty="true"
-                        data-fv-notempty-message="Wajib Diisi"/>
-                    </div>
+                    
                     <div class="col-md-12 center">
                       <h4 class="example-title">Pertanyaan</h4>
                         <textarea class="editor" id="dtform_pertanyaan" name="dtform_pertanyaan" data-fv-notempty="true"
@@ -112,11 +126,7 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-md-12 center">
-                      <h4 class="example-title">Tujuan</h4>
-                        <input type="text" class="form-control" id="edit_dtform_tujuan" name="dtform_tujuan" data-fv-notempty="true"
-                        data-fv-notempty-message="Wajib Diisi"/>
-                    </div>
+                    
                     <div class="col-md-12 center">
                       <h4 class="example-title">Pertanyaan</h4>
                         <textarea class="editor" id="edit_dtform_pertanyaan" name="dtform_pertanyaan" data-fv-notempty="true"

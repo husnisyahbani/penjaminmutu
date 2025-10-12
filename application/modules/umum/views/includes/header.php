@@ -26,7 +26,7 @@
     <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/flag-icon-css/flag-icon.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/waves/waves.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/bootstrap-datepicker/bootstrap-datepicker.css">
-    <link rel="stylesheet" href="<?php echo asset_url();?>assets/examples/css/pages/login-v3.css">
+    <link rel="stylesheet" href="<?php echo asset_url();?>assets/examples/css/pages/login-v3_2.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/toastr/toastr.min.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/dropify/dropify.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/formvalidation/formValidation.css">

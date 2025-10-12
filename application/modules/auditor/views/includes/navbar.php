@@ -50,9 +50,9 @@
                 </span>
               </a>
               <div class="dropdown-menu" role="menu">
-                <a class="dropdown-item" href="<?php echo base_url("admin/akun/password");?>" role="menuitem"><i class="icon md-power" aria-hidden="true"></i> Ubah Password</a>  
+                <a class="dropdown-item" href="<?php echo base_url($module."/dashboard/password");?>" role="menuitem"><i class="icon md-power" aria-hidden="true"></i> Ubah Password</a>  
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="<?php echo base_url("admin/akun/logout");?>" role="menuitem"><i class="icon md-power" aria-hidden="true"></i> Logout</a>
+                <a class="dropdown-item" href="<?php echo base_url($module."/dashboard/logout");?>" role="menuitem"><i class="icon md-power" aria-hidden="true"></i> Logout</a>
               </div>
             </li>
 

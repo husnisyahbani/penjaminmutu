@@ -9,7 +9,7 @@ class Akun extends MY_Controller {
         $this->load->model('AkunModel', 'akun');
 
         $role = $this->session->userdata('role');
-        if (!isset($role) || $role != 'LPM') {
+        if (!isset($role) || $role != 'PPM') {
             redirect(base_url());
         }
     }

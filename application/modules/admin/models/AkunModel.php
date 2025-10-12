@@ -189,6 +189,20 @@ class AkunModel extends CI_Model {
         $this->db->where("users_id",$id);
         $this->db->from($this->table);
         $query = $this->db->get();
+        return $query->row_array();
+    }
+
+    function getAllAuditor() {
+        $this->db->from($this->table);
+        $this->db->where("role","AUDITOR");
+        $query = $this->db->get();
+        return $query->result_array();
+    }
+
+    function getAllAuditee() {
+        $this->db->from($this->table);
+        $this->db->where("role","AUDITEE");
+        $query = $this->db->get();
         return $query->result_array();
     }
     

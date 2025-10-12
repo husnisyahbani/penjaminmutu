@@ -20,7 +20,7 @@ class Login extends MY_Controller {
             if ($output) {
                
                 $role = $this->session->userdata('role');
-                if (isset($role) && $role == 'LPM') {
+                if (isset($role) && $role == 'PPM') {
                     redirect(base_url('admin'));
                 }else if (isset($role) && $role == 'AUDITOR') {
                     redirect(base_url('auditor'));

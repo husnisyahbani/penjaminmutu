@@ -4,7 +4,7 @@
         <div class="panel">
           <div class="panel-body">
             <div class="brand">
-              <img class="brand-img" src="<?php echo asset_url();?>/assets/images/logostik.png" alt="STIK SITI KHADIJAH" width="120px">
+              <img class="brand-img" src="<?php echo asset_url();?>/assets/images/sijamu.png" alt="STIK SITI KHADIJAH" width="120px">
               <h2 class="brand-text font-size-18">Sistem Informasi Penjamin Mutu</h2>
             </div>
             <form method="post" action="<?php echo base_url("login") ?>" autocomplete="off">
@@ -24,21 +24,7 @@
           </div>
         </div>
 
-        <footer class="page-copyright page-copyright-inverse">
-          <p>WEBSITE BY STIK SITI KHADIJAH</p>
-          <p>© 2021. All RIGHT RESERVED.</p>
-          <!-- <div class="social">
-            <a class="btn btn-icon btn-pure" href="javascript:void(0)">
-            <i class="icon bd-twitter" aria-hidden="true"></i>
-          </a>
-            <a class="btn btn-icon btn-pure" href="javascript:void(0)">
-            <i class="icon bd-facebook" aria-hidden="true"></i>
-          </a>
-            <a class="btn btn-icon btn-pure" href="javascript:void(0)">
-            <i class="icon bd-google-plus" aria-hidden="true"></i>
-          </a>
-          </div> -->
-        </footer>
+       
       </div>
     </div>
     <!-- End Page -->

@@ -42,7 +42,7 @@
                                 <div class="col-md-9">
                                     <select class="form-control" name="role" id="role">
                                         <option value="">-- Pilih Peran --</option>
-                                        <option value="LPM" <?php if (isset($result[0]['role']) && $result[0]['role'] === "LPM") {echo "selected";} ?>>LPM</option>
+                                        <option value="LPM" <?php if (isset($result[0]['role']) && $result[0]['role'] === "PPM") {echo "selected";} ?>>PPM</option>
                                         <option value="AUDITOR" <?php if (isset($result[0]['role']) && $result[0]['role'] === "AUDITOR") {echo "selected";} ?>>AUDITOR</option>
                                         <option value="AUDITEE" <?php if (isset($result[0]['role']) && $result[0]['role'] === "AUDITEE") {echo "selected";} ?>>AUDITEE</option>
                                         </select>

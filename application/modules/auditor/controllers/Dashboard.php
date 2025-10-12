@@ -17,11 +17,7 @@ class Dashboard extends MY_Controller {
     public function index() {
         $users_id = $this->session->userdata('users_id');
         $this->data['auditor'] = $this->akun->getAkunById($users_id);
-        // echo "<pre>";
-        // print_r($this->data['auditor']);
-        // echo "</pre>";
-        $this->data['auditmenu'] = 'active';
-        $this->data['audit'] = 'active';
+        $this->data['dashboard'] = 'active';
         $this->data['content'] = 'dashboard/index';
         $this->data['title'] = 'Akun';
         $this->data['js'] = $this->load->get_js_files();

@@ -7,7 +7,7 @@ $(function () {
         "searching": true,
         "order": [],
         "columnDefs": [
-            {"targets": [0,5], "orderable": false}
+            {"targets": [0,4], "orderable": false}
         ],
         "ajax": {
             "url": base_url + "/detailform/listdtform/"+form_id,
@@ -29,7 +29,7 @@ $(function () {
                     title: 'Loading',
                     allowEscapeKey: false,
                     allowOutsideClick: false,
-                    didOpen: () => {
+                    onOpen: () => {
                         swal.showLoading();
                     }
                 });
@@ -140,7 +140,7 @@ $(function () {
                     title: 'Loading',
                     allowEscapeKey: false,
                     allowOutsideClick: false,
-                    didOpen: () => {
+                    onOpen: () => {
                         swal.showLoading();
                     }
                 });
@@ -200,7 +200,7 @@ $("#formeditdtform").formValidation({
                     title: 'Loading',
                     allowEscapeKey: false,
                     allowOutsideClick: false,
-                    didOpen: () => {
+                    onOpen: () => {
                         swal.showLoading();
                     }
                 });

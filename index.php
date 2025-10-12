@@ -56,9 +56,9 @@
  */
 	
 	
-	define('ENVIRONMENT', 'production');
+	//define('ENVIRONMENT', 'production');
 	
-	//define('ENVIRONMENT', 'development');
+	define('ENVIRONMENT', 'development');
 
 /*
  *---------------------------------------------------------------

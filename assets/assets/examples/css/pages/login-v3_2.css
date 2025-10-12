@@ -10,7 +10,7 @@
   background: #3949ab;
   /* Old browsers */
   /* IE9 SVG, needs conditional override of 'filter' to 'none' */
-  background-image: url("../../images/loginmutu.jpeg");
+  background-image: linear-gradient(180deg, #76c461, #30b771);
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-size: 100% 100%; }

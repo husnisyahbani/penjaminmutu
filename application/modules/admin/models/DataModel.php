@@ -10,8 +10,8 @@ class DataModel extends CI_Model {
         parent::__construct();
     }
 
-    var $column_search = array('data_keterangan','data_uraian','data_file','data_create');
-    var $column_order = array(null,'data_keterangan','data_uraian',null,'data_create',null);
+    var $column_search = array('data_keterangan','data_uraian','data_file','data_kategori','data_create');
+    var $column_order = array(null,'data_keterangan','data_uraian',null,'data_kategori','data_create',null);
     var $order = array('data_create' => 'desc');
 
     private function _get_datatables_query($search, $ordering) {
@@ -49,8 +49,8 @@ class DataModel extends CI_Model {
         $this->db->select('data_uraian');
         $this->db->select('data_keterangan');
         $this->db->select('data_file');
+        $this->db->select('data_kategori');
         $this->db->select('data_create');
-        $this->db->where('data_kategori','DATABASE');
         $this->db->from('data');
         $query = $this->db->get();
         return $query->result();
@@ -62,8 +62,8 @@ class DataModel extends CI_Model {
         $this->db->select('data_uraian');
         $this->db->select('data_keterangan');
         $this->db->select('data_file');
+        $this->db->select('data_kategori');
         $this->db->select('data_create');
-        $this->db->where('data_kategori','DATABASE');
         $this->db->from('data');
         $query = $this->db->get();
         return $query->num_rows();
@@ -74,8 +74,8 @@ class DataModel extends CI_Model {
         $this->db->select('data_uraian');
         $this->db->select('data_keterangan');
         $this->db->select('data_file');
+        $this->db->select('data_kategori');
         $this->db->select('data_create');
-        $this->db->where('data_kategori','DATABASE');
         $this->db->from('data');
         return $this->db->count_all_results();
     }
@@ -138,7 +138,7 @@ class DataModel extends CI_Model {
         $this->db->where('data_id',$id);
         $this->db->from('data');
         $query = $this->db->get();
-        return $query->result_array();
+        return $query->row_array();
     }
 
     public function edit($data) {
