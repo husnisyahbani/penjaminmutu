@@ -5,7 +5,7 @@ class Daftaraudit extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'admin';
-        $this->load->js(base_url("assets/app/admin/daftaraudit.js?v=1.7"));
+        $this->load->js(base_url("assets/app/admin/daftaraudit.js?v=1.12"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
@@ -78,6 +78,23 @@ class Daftaraudit extends MY_Controller {
             header('Content-Type: application/json');
             echo json_encode($query); 
         }
+    }
+
+    public function jawab() {
+        $data = array();
+        $data['dtform_id'] = $this->input->post('dtform_id');
+        $data['audit_id'] = $this->input->post('audit_id');
+        $data['jwb_jawaban'] = $this->input->post('jwb_jawaban');
+        if($this->auditjawab->is_exist($data)){
+            $status = $this->auditjawab->jawab($data);
+        }else{
+            $status = $this->auditjawab->add($data);
+        }
+        
+        $query = array("status" => $status);
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
+        echo json_encode($query);
     }
 
     public function hapus() {
@@ -153,7 +170,7 @@ class Daftaraudit extends MY_Controller {
             $row[] = $field->dtform_pertanyaan;
             $row[] = $field->dtform_lingkup;
             if($field->audit_status == "DRAFT"){
-                $row[] = $field->jwb_jawaban.' <button type="button" class="edit btn btn-warning btn-xs waves-effect waves-classic"><i class="icon md-edit" aria-hidden="true"></i></button>';
+                $row[] = $field->jwb_jawaban.' <button type="button" class="edit btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i></button>';
             }else{
                 $row[] = $field->jwb_jawaban;
             }

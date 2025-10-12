@@ -204,7 +204,7 @@
     role="dialog"
     tabindex="-1">
     <div class="modal-dialog modal-simple">
-        <form id="formadd" class="modal-content">
+        <form id="formedit" class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
@@ -216,7 +216,7 @@
                 <div class="row">
                     <div class="col-md-12 center">
                         <h4 class="example-title">Pertanyaan</h4>
-                        <textarea id="jwb_jawaban" class="editor" name="jwb_jawaban" readonly></textarea>
+                        <textarea id="pertanyaan" class="editor" name="pertanyaan" readonly></textarea>
                     </div>
                     <div class="col-md-12 center">
                         <h4 class="example-title">Jawaban</h4>

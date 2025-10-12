@@ -45,7 +45,9 @@ class AuditjawabModel extends CI_Model {
         if ($length != -1) {
             $this->db->limit($length, $start);
         }
+        $this->db->select("audit_id");
         $this->db->select("audit_status");
+        $this->db->select("dt.dtform_id as dtform_id");
         $this->db->select("dt.dtform_pertanyaan as dtform_pertanyaan");
         $this->db->select("dt.dtform_lingkup as dtform_lingkup");
         $this->db->select("(SELECT jwb_catatan from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id) as jwb_catatan");
@@ -61,7 +63,9 @@ class AuditjawabModel extends CI_Model {
 
     function count_filtered($search, $ordering,$id) {
         $this->_get_datatables_query($search, $ordering);
+        $this->db->select("audit_id");
         $this->db->select("audit_status");
+        $this->db->select("dt.dtform_id as dtform_id");
         $this->db->select("dt.dtform_pertanyaan as dtform_pertanyaan");
         $this->db->select("dt.dtform_lingkup as dtform_lingkup");
         $this->db->select("(SELECT jwb_catatan from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id) as jwb_catatan");
@@ -91,6 +95,27 @@ class AuditjawabModel extends CI_Model {
         $this->db->from('auditjawab');
         $this->db->delete();
         return($this->db->affected_rows() != 1) ? false : true;
+    }
+
+     public function jawab($data) {
+        $this->db->trans_start();
+        $this->db->where("audit_id",$data['audit_id']);
+        $this->db->where("dtform_id",$data['dtform_id']);
+        $this->db->update('auditjawab',$data);
+        $this->db->trans_complete();
+        return $this->db->trans_status();
+    }
+
+    public function is_exist($data) {
+        
+        $this->db->where("audit_id",$data['audit_id']);
+        $this->db->where("dtform_id",$data['dtform_id']);
+        $query = $this->db->get('auditjawab');
+        if ($query->num_rows() > 0) {
+            return true; // data ada
+        } else {
+            return false; // data tidak ada
+        }
     }
 
     

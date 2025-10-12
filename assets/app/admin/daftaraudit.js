@@ -29,8 +29,18 @@ $(function () {
         }
     });
 
+    var $dtform_id;
+    var $audit_id;
+
     $("#daftarpertanyaan").on("click", ".edit", function () {
+        $dtform_id = $(this).attr('dtform_id');
+        $audit_id = $(this).attr('audit_id');
         $("#editModal").modal('show');
+        var tr = $(this).closest('tr');
+        var rowData = daftarpertanyaan.row(tr).data();
+        var pertanyaan = rowData[1];
+        tinymce.get('pertanyaan').setContent(pertanyaan);
+
     });
 
     $("#daftaraudit").on("click", ".detail", function () {
@@ -84,6 +94,68 @@ $(function () {
                 $.each(list, function (index, org_types) {
                     if (org_types.status) {
                         daftaraudit.ajax.reload();
+                    } else {
+                        swal.fire("Oops", org_types.pesan, "error");
+                    }
+                });
+                $form.formValidation('disableSubmitButtons', false)
+                    .formValidation('resetForm', true);
+            },
+            error: function () {
+                swal.fire("Oops", "No connection!", "error");
+                $form.formValidation('disableSubmitButtons', false)
+                    .formValidation('resetForm', true);
+            }
+        });
+
+    return false;
+});
+
+$("#formedit").formValidation({
+        framework: "bootstrap4",
+        excluded: [':disabled'],
+        err: {
+            clazz: 'invalid-feedback'
+        },
+        control: {
+            valid: 'is-valid',
+            invalid: 'is-invalid'
+        },
+        row: {
+            invalid: 'has-danger'
+        }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+
+        var $form = $(e.target);       // ✅ perbaikan
+        //var formData = new FormData(e.target);
+        var $jwb_jawaban = tinymce.get('jwb_jawaban').getContent();
+
+        $.ajax({
+            url: base_url + "/daftaraudit/jawab",
+            type: "POST",
+            data: {
+                dtform_id:$dtform_id,
+                audit_id:$audit_id,
+                jwb_jawaban:$jwb_jawaban
+            },
+            beforeSend: function () {
+                $("#editModal").modal('hide');
+                swal.fire({
+                    title: 'Loading',
+                    allowEscapeKey: false,
+                    allowOutsideClick: false,
+                    onOpen: () => {
+                        swal.showLoading();
+                    }
+                });
+            },
+            success: function (data) {
+                swal.close();
+                var list = data == null ? [] : (data instanceof Array ? data : [data]);
+                $.each(list, function (index, org_types) {
+                    if (org_types.status) {
+                        daftarpertanyaan.ajax.reload();
                     } else {
                         swal.fire("Oops", org_types.pesan, "error");
                     }
