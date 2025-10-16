@@ -34,14 +34,14 @@
               </a>
             </li>
 
-            <li class="site-menu-item <?php if(isset($auditee)){echo $auditee;} ?>">
-              <a class="animsition-link" href="<?php echo base_url($module.'/auditee');?>">
+            <li class="site-menu-item <?php if(isset($pengendalian)){echo $pengendalian;} ?>">
+              <a class="animsition-link" href="<?php echo base_url($module.'/pengendalian');?>">
                 <span class="site-menu-title">Pengendalian</span>
               </a>
             </li>
 
-            <li class="site-menu-item <?php if(isset($auditee)){echo $auditee;} ?>">
-              <a class="animsition-link" href="<?php echo base_url($module.'/auditee');?>">
+            <li class="site-menu-item <?php if(isset($peningkatan)){echo $peningkatan;} ?>">
+              <a class="animsition-link" href="<?php echo base_url($module.'/peningkatan');?>">
                 <span class="site-menu-title">Peningkatan</span>
               </a>
             </li>

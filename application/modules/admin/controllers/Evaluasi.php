@@ -1,11 +1,11 @@
 <?php
 
-class Data extends MY_Controller {
+class Evaluasi extends MY_Controller {
 
     public function __construct() {
         parent::__construct();
         $this->module = 'admin';
-        $this->load->js(base_url("assets/app/admin/data.js?v=1.11"));
+        $this->load->js(base_url("assets/app/admin/evaluasi.js?v=1.0"));
         $this->load->model('DataModel', 'datamodel');
 
         $role = $this->session->userdata('role');
@@ -19,7 +19,7 @@ class Data extends MY_Controller {
         $this->data['title'] = 'Dokumen Mutu';
         $this->data['js'] = $this->load->get_js_files();
         $this->data['data'] = 'active';
-        $this->data['semua'] = 'active';
+        $this->data['evaluasi'] = 'active';
         $this->data['dokument'] = 'active';
         $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
         $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
@@ -120,7 +120,7 @@ class Data extends MY_Controller {
         $this->datamodel->hapus($id);
     }
 
-    public function listdata($id = null) {
+    public function listdata($id = "EVALUASI") {
         $post = array();
         $post['search'] = $this->input->post('search');
         $post['order'] = $this->input->post('order');

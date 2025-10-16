@@ -3,24 +3,7 @@
 
     <!-- Page -->
     <div class="page">
-    <div class="page-header">
-        
-        <div class="page-header-actions">
-        <!-- <button type="button" id="dowloadcrekap" class="btn btn-block btn-success"><i class="icon md-download" aria-hidden="true"></i>Download</button>
-        <button type="button" id="tambahcrekap" class="btn btn-block btn-success"><i class="icon md-plus" aria-hidden="true"></i>Tambah</button>
-                     -->
-          <!-- <button type="button" class="btn btn-sm btn-icon btn-danger" data-toggle="tooltip"
-            data-original-title="Download" id="downloaddata">
-            <i class="icon md-download" aria-hidden="true"></i>Download
-          </button> -->
-
-          <button type="button" class="btn btn-sm btn-icon btn-success" data-toggle="tooltip"
-            data-original-title="Tambah" id="tambahdata">
-            <i class="icon md-plus" aria-hidden="true"></i>Tambah
-          </button>
-          
-        </div>
-      </div>
+    
       <div class="page-content container-fluid">
       
 
@@ -28,9 +11,9 @@
             <header class="panel-heading">
                 <h3 class="panel-title"><?=$title;?></h3> 
                 <div class="panel-actions panel-actions-keep">
-                    <div class="row">
-                        
-                        </div>
+                    <button type="button" class="btn btn-sm btn-icon btn-success" id="tambahdata">
+                                <i class="icon md-plus" aria-hidden="true"></i>Tambah
+                    </button>
                     
                 </div>
             </header>
@@ -83,7 +66,8 @@
                 <div class="row">
                     <div class="col-md-12 center">
                       <h4 class="example-title">File</h4>
-                        <input type="file" id="add_file" name="upload_file" data-plugin="dropify"/>
+                        <input type="file" id="add_file" name="upload_file" data-plugin="dropify" data-fv-notempty="true"
+                        data-fv-notempty-message="Wajib Diisi"/>
                     </div>
                     <div class="col-md-12 center">
                       <h4 class="example-title">Judul</h4>

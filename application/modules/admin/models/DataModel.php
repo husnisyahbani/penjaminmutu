@@ -40,7 +40,7 @@ class DataModel extends CI_Model {
         }
     }
 
-    function get_datatables($length, $start, $search, $ordering) {
+    function get_datatables($length, $start, $search, $ordering,$id) {
         $this->_get_datatables_query($search, $ordering);
         if ($length != -1) {
             $this->db->limit($length, $start);
@@ -52,11 +52,13 @@ class DataModel extends CI_Model {
         $this->db->select('data_kategori');
         $this->db->select('data_create');
         $this->db->from('data');
+        if(isset($id))
+        $this->db->where('data_kategori',$id);
         $query = $this->db->get();
         return $query->result();
     }
 
-    function count_filtered($search, $ordering) {
+    function count_filtered($search, $ordering,$id) {
         $this->_get_datatables_query($search, $ordering);
         $this->db->select('data_id');
         $this->db->select('data_uraian');
@@ -65,11 +67,13 @@ class DataModel extends CI_Model {
         $this->db->select('data_kategori');
         $this->db->select('data_create');
         $this->db->from('data');
+        if(isset($id))
+        $this->db->where('data_kategori',$id);
         $query = $this->db->get();
         return $query->num_rows();
     }
 
-    public function count_all() {
+    public function count_all($id) {
         $this->db->select('data_id');
         $this->db->select('data_uraian');
         $this->db->select('data_keterangan');
@@ -77,6 +81,8 @@ class DataModel extends CI_Model {
         $this->db->select('data_kategori');
         $this->db->select('data_create');
         $this->db->from('data');
+        if(isset($id))
+        $this->db->where('data_kategori',$id);
         return $this->db->count_all_results();
     }
 

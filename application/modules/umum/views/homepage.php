@@ -69,11 +69,11 @@
         <div class="container py-5 mt-4">
             <div class="row pt-5 justify-content-center align-items-center">
                 <div class="col-lg-5">
-                    <img srcset="<?php echo base_url("/assets/assets/images/doctorfix.png");?> 2x" src="<?php echo base_url("/assets/assets/images/doctorfix.png");?>" alt="SIJAMU" class="img-fluid mt-5">
+                    <img width="400px" srcset="<?php echo base_url("/assets/assets/images/iconsijamu.png");?> 2x" src="<?php echo base_url("/assets/assets/images/iconsijamu.png");?>" alt="SIJAMU" class="img-fluid mt-5">
                 </div>
                 <div class="col-lg-7">
-                    <h1 class="text-lg-end mt-5 mb-5"><strong>SIJAMU </strong></h1>
-                    <p class="text-lg-end mt-5 mb-5">Sistem Penjamin Mutu (SIJAMU) ini dikembangkan dengan tujuan untuk mempermudah, mempercepat &amp; mewakili seluruh proses audit di lingkungan STIK SITI KHADIJAH</p>
+                    <h1 class="text-lg-end mt-5 mb-5" style="font-weight: bold; color: black;"><strong>SIJAMU <span style="display: block; margin-top: 3px; font-weight: bold; color: black; font-size: 20px;"> Sistem Penjamin Mutu</span></strong></h1>
+                    <p class="text-lg-end mt-5 mb-5" style="font-weight: bold; color: black;">Selamat Datang di SIJAMU, Modia Informasi, Monitoring, dan evaluasi mutu untuk mendukung pelaksanaan Sistem Penjamin Mutu Internal STIK SITI KHADIJAH secara terintegrasi, transparan, dan berkelanjutan dalam mewujudkan pendidikan tinggi yang bermutu</p>
                     <p class="text-lg-end"><a class="btn btn-warning btn-lg px-5 py-3 rounded-5" href="<?php echo base_url();?>#fitur" role="button">Pelajari lebih lanjut</a></p>
                 </div>
             </div>
