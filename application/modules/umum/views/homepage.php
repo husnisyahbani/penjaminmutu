@@ -173,16 +173,16 @@ function animateScroll() {
 let lastScrollTop = 0;
 const navbar = document.querySelector('.main-header');
 
-window.addEventListener('scroll', function() {
-  let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+// window.addEventListener('scroll', function() {
+//   let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
   
-  if (scrollTop > lastScrollTop && scrollTop > 100) {
-    navbar.style.top = "-100px";
-  } else {
-    navbar.style.top = "0";
-  }
-  lastScrollTop = scrollTop;
-});
+//   if (scrollTop > lastScrollTop && scrollTop > 100) {
+//     navbar.style.top = "-200px";
+//   } else {
+//     navbar.style.top = "0";
+//   }
+//   lastScrollTop = scrollTop;
+// });
 
 // Tutup navbar otomatis setelah klik link
 const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
