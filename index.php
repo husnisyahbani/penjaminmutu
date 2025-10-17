@@ -58,7 +58,30 @@
 	
 	//define('ENVIRONMENT', 'production');
 	
-	define('ENVIRONMENT', 'development');
+	// index.php atau bootstrap awal (sebelum menggunakan ENVIRONMENT)
+$host = $_SERVER['HTTP_HOST'] ?? '';
+$serverName = $_SERVER['SERVER_NAME'] ?? '';
+$serverAddr = $_SERVER['SERVER_ADDR'] ?? '';
+
+// Daftar host / nama server lokal
+$local_hosts = [
+    'localhost',
+    '127.0.0.1',
+    '::1',
+    'localhost:8080',  // jika pakai port tertentu
+    // bisa tambah sesuai kebutuhan
+];
+
+if (
+    in_array($host, $local_hosts) ||
+    in_array($serverName, $local_hosts) ||
+    in_array($serverAddr, $local_hosts)
+) {
+    define('ENVIRONMENT', 'development');
+} else {
+    define('ENVIRONMENT', 'production');
+}
+
 
 /*
  *---------------------------------------------------------------
