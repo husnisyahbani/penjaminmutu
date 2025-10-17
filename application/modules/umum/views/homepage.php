@@ -69,7 +69,7 @@
         <div class="container py-5 mt-4">
             <div class="row pt-5 justify-content-center align-items-center">
                 <div class="col-lg-5">
-                    <img width="400px" srcset="<?php echo base_url("/assets/assets/images/iconsijamu.png");?> 2x" src="<?php echo base_url("/assets/assets/images/iconsijamu.png");?>" alt="SIJAMU" class="img-fluid mt-5">
+                    <img width="400px" srcset="<?php echo base_url("/assets/assets/images/sijamuhomepage.png");?> 2x" src="<?php echo base_url("/assets/assets/images/sijamuhomepage.png");?>" alt="SIJAMU" class="img-fluid mt-5">
                 </div>
                 <div class="col-lg-7">
                     <h1 class="text-lg-end mt-5 mb-5" style="font-weight: bold; color: black;"><strong>SIJAMU <span style="display: block; margin-top: 3px; font-weight: bold; color: black; font-size: 20px;"> Sistem Penjamin Mutu</span></strong></h1>

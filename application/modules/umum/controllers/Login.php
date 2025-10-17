@@ -24,6 +24,8 @@ class Login extends MY_Controller {
                     redirect(base_url('admin'));
                 }else if (isset($role) && $role == 'AUDITOR') {
                     redirect(base_url('auditor'));
+                }else if (isset($role) && $role == 'AUDITEE') {
+                    redirect(base_url('auditee'));
                 }
             } else {
                 echo "gagal";
@@ -37,6 +39,8 @@ class Login extends MY_Controller {
                 redirect(base_url('admin'));
             }else if (isset($role) && $role == 'AUDITOR') {
                 redirect(base_url('auditor'));
+            }else if (isset($role) && $role == 'AUDITEE') {
+                redirect(base_url('auditee'));
             } else {
                 $this->data['content'] = 'login';
                 $this->data['title'] = 'Login';
