@@ -4,15 +4,15 @@ if (!defined('BASEPATH')) {
     exit('No direct script access allowed');
 }
 
-class FormulirModel extends CI_Model {
+class MutuauditModel extends CI_Model {
 
     function __construct() {
         parent::__construct();
     }
 
-    var $column_search = array('form_nama','form_kode','form_deskripsi','form_create');
-    var $column_order = array(null,'form_nama','form_kode','form_deskripsi','form_create',null);
-    var $order = array('form_create' => 'desc');
+    var $column_search = array('form_nama','auditor','auditee','audit_create');
+    var $column_order = array(null,'form_nama','auditor','auditee','audit_create',null);
+    var $order = array('audit_create' => 'desc');
 
     private function _get_datatables_query($search, $ordering) {
         $i = 0;
@@ -46,52 +46,48 @@ class FormulirModel extends CI_Model {
             $this->db->limit($length, $start);
         }
         
-        $this->db->from('formulir');
+        $this->db->from('mutu_audit');
+        $this->db->join('formulir', 'formulir.form_id = mutu_audit.form_id', 'left');
         $query = $this->db->get();
         return $query->result();
     }
 
     function count_filtered($search, $ordering) {
         $this->_get_datatables_query($search, $ordering);
-        $this->db->from('formulir');
+        $this->db->from('mutu_audit');
+        $this->db->join('formulir', 'formulir.form_id = mutu_audit.form_id', 'left');
         $query = $this->db->get();
         return $query->num_rows();
     }
 
     public function count_all() {
-        $this->db->from('formulir');
+        $this->db->from('mutu_audit');
         return $this->db->count_all_results();
     }
 
     public function add($data) {
-        $this->db->insert('formulir',$data);
+        $this->db->insert('mutu_audit',$data);
         return($this->db->affected_rows() != 1) ? false : true;
     }
 
-    public function hapus($id) {
-        $this->db->where('form_id',$id);
-        $this->db->from('formulir');
+    public function hapus($audit_id ) {
+        $this->db->where('audit_id ',$audit_id );
+        $this->db->from('mutu_audit');
         $this->db->delete();
         return($this->db->affected_rows() != 1) ? false : true;
     }
 
-    function getFormulir($id) {
-        $this->db->where('form_id',$id);
-        $this->db->from('formulir');
+    function getdetailform($audit_id ) {
+        $this->db->where('audit_id ',$audit_id );
+        $this->db->from('mutu_audit');
         $query = $this->db->get();
         return $query->row_array();
     }
 
-    function getAllFormulir() {
-        $this->db->from('formulir');
-        $query = $this->db->get();
-        return $query->result_array();
-    }
-
     public function edit($data) {
         $this->db->trans_start();
-        $this->db->where("form_id",$data['form_id']);
-        $this->db->update('formulir',$data);
+        $this->db->where("audit_id ",$data['audit_id ']);
+        $this->db->update('mutu_audit',$data);
         $this->db->trans_complete();
         return $this->db->trans_status();
     }

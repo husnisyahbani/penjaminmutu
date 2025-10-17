@@ -1,11 +1,12 @@
 <?php
 
-class Dashboard extends MY_Controller {
+class Detailform extends MY_Controller {
 
     public function __construct() {
         parent::__construct();
         $this->module = 'auditor';
-        $this->load->js(base_url("assets/app/auditor/formaudit.js?v=1.2"));
+        $this->load->js(base_url("assets/app/auditor/detailform.js?v=1.4"));
+        $this->load->model('DtformModel', 'dtform');
         $this->load->model('FormulirModel', 'formulir');
 
         $role = $this->session->userdata('role');
@@ -15,24 +16,32 @@ class Dashboard extends MY_Controller {
     }
 
     public function index() {
-        $this->data['content'] = 'dashboard/index';
-        $this->data['title'] = 'Formulir Audit';
-        $this->data['js'] = $this->load->get_js_files();
-        $this->data['dashboard'] = 'active';
-        $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
-        $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
-        $this->template($this->data, $this->module);
+        $form_id = $this->input->get('id');
+        if(isset($form_id)){
+            $this->data['content'] = 'detailform/index';
+            $this->data['title'] = 'Detail Formulir';
+            $this->data['js'] = $this->load->get_js_files();
+            $this->data['dashboard'] = 'active';
+            $this->data['formulir'] = $this->formulir->getFormulir($form_id);
+            $this->data['form_id'] = $form_id;
+            $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
+            $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
+            $this->template($this->data, $this->module);
+        }else{
+            redirect(base_url('formaudit'));
+        }
+        
     }
 
    public function tambah() {
-        $form_nama = $this->input->post('form_nama');
-        if($form_nama){
+        $dtform_pertanyaan = $this->input->post('dtform_pertanyaan');
+        if($dtform_pertanyaan){
                 $data = array();
-                $data['form_nama']  = strtoupper($form_nama);
-                $data['form_kode'] = $this->input->post('form_kode');
-                $data['form_deskripsi']   = $this->input->post('form_deskripsi');
+                $data['dtform_pertanyaan'] = $dtform_pertanyaan;
+                $data['dtform_lingkup']   = $this->input->post('dtform_lingkup');
+                $data['form_id']   = $this->input->post('form_id');
 
-                if ($this->formulir->add($data)) {
+                if ($this->dtform->add($data)) {
                     $query = array("status" => true, "pesan" => "Berhasil");
                 } else {
                     $query = array("status" => false, "pesan" => "Gagal");
@@ -51,15 +60,15 @@ class Dashboard extends MY_Controller {
     }
 
     public function edit() {
-        $form_id = $this->input->post('form_id');
-        if($form_id){
+        $dtform_id = $this->input->post('dtform_id');
+        if($dtform_id){
                 $data = array();
-                $data['form_nama']  = strtoupper($this->input->post('form_nama'));
-                $data['form_kode'] = $this->input->post('form_kode');
-                $data['form_deskripsi']   = $this->input->post('form_deskripsi');
-                $data['form_id'] = $form_id;
+                $data['dtform_pertanyaan'] = $this->input->post('dtform_pertanyaan');
+                $data['dtform_lingkup']   = $this->input->post('dtform_lingkup');
+                $data['form_id']   = $this->input->post('form_id');
+                $data['dtform_id'] = $dtform_id;
 
-                if ($this->formulir->edit($data)) {
+                if ($this->dtform->edit($data)) {
                     $query = array("status" => true, "pesan" => "Berhasil");
                 } else {
                     $query = array("status" => false, "pesan" => "Gagal");
@@ -77,9 +86,9 @@ class Dashboard extends MY_Controller {
         } 
     }
 
-    public function getFormulirById($id) {
+    public function getdtformById($id) {
         if(isset($id)){
-            $query = $this->formulir->getFormulir($id);
+            $query = $this->dtform->getdetailform($id);
             $query['status'] = true;
             header('Access-Control-Allow-Origin: *');
             header('Content-Type: application/json');
@@ -94,10 +103,10 @@ class Dashboard extends MY_Controller {
 
     public function hapus() {
         $id = $this->input->post('id');
-        $this->formulir->hapus($id);
+        $this->dtform->hapus($id);
     }
 
-    public function listformulir() {
+    public function listdtform($id) {
         $post = array();
         $post['search'] = $this->input->post('search');
         $post['order'] = $this->input->post('order');
@@ -106,29 +115,27 @@ class Dashboard extends MY_Controller {
         $post['draw'] = $this->input->post('draw');
 
 
-        $list = $this->formulir->get_datatables($post['length'], $post['start'], $post['search'], $post['order']);
+        $list = $this->dtform->get_datatables($post['length'], $post['start'], $post['search'], $post['order'],$id);
         $data = array();
         $no = $this->input->post('start');
         foreach ($list as $field) {
             $no++;
             $row = array();
             $row[] = $no;
-            $row[] = $field->form_nama;
-            $row[] = $field->form_kode;
-            $row[] = $field->form_deskripsi;
-            $row[] = date("d-m-Y H:i:s", strtotime($field->form_create));
-            $row[] = '<button class="detail btn btn-sm btn-icon btn-pure btn-default on-default edit-row"
-            data-toggle="tooltip" data-original-title="Detail" id=' . $field->form_id . '><i class="icon md-book" aria-hidden="true"></i></button><button class="edit btn btn-sm btn-icon btn-pure btn-default on-default edit-row"
-            data-toggle="tooltip" data-original-title="Edit" id=' . $field->form_id . '><i class="icon md-edit" aria-hidden="true"></i></button><button class="delete btn btn-sm btn-icon btn-pure btn-default on-default remove-row"
-                      data-toggle="tooltip" data-original-title="Remove" id=' . $field->form_id . '><i class="icon md-delete" aria-hidden="true"></i></button>';
+            $row[] = $field->dtform_pertanyaan;
+            $row[] = $field->dtform_lingkup;
+            $row[] = date("d-m-Y H:i:s", strtotime($field->dtform_create));
+            $row[] = '</button><button class="edit btn btn-sm btn-icon btn-pure btn-default on-default edit-row"
+            data-toggle="tooltip" data-original-title="Edit" id=' . $field->dtform_id . '><i class="icon md-edit" aria-hidden="true"></i></button><button class="delete btn btn-sm btn-icon btn-pure btn-default on-default remove-row"
+                      data-toggle="tooltip" data-original-title="Remove" id=' . $field->dtform_id . '><i class="icon md-delete" aria-hidden="true"></i></button>';
            
             $data[] = $row;
         }
 
         $output = array(
             "draw" => $post['draw'],
-            "recordsTotal" => $this->formulir->count_all(),
-            "recordsFiltered" => $this->formulir->count_filtered($post['search'], $post['order']),
+            "recordsTotal" => $this->dtform->count_all($id),
+            "recordsFiltered" => $this->dtform->count_filtered($post['search'], $post['order'],$id),
             "data" => $data,
         );
         //output dalam format JSON

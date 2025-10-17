@@ -129,7 +129,7 @@ if (isset($pesanerror)) {
     </script>
     
 <script type="text/javascript">
-    var base_url = '<?php echo base_url('admin'); ?>';
+    var base_url = '<?php echo base_url('auditee'); ?>';
     var root_url = '<?php echo base_url(); ?>';
     var form_id = '<?php if(isset($form_id)) echo $form_id; ?>';
  </script>

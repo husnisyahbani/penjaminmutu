@@ -4,15 +4,15 @@ if (!defined('BASEPATH')) {
     exit('No direct script access allowed');
 }
 
-class FormulirModel extends CI_Model {
+class DtformModel extends CI_Model {
 
     function __construct() {
         parent::__construct();
     }
 
-    var $column_search = array('form_nama','form_kode','form_deskripsi','form_create');
-    var $column_order = array(null,'form_nama','form_kode','form_deskripsi','form_create',null);
-    var $order = array('form_create' => 'desc');
+    var $column_search = array('dtform_tujuan','dtform_pertanyaan','dtform_lingkup','dtform_create');
+    var $column_order = array(null,'dtform_tujuan','dtform_pertanyaan','dtform_lingkup','dtform_create',null);
+    var $order = array('dtform_create' => 'desc');
 
     private function _get_datatables_query($search, $ordering) {
         $i = 0;
@@ -40,58 +40,55 @@ class FormulirModel extends CI_Model {
         }
     }
 
-    function get_datatables($length, $start, $search, $ordering) {
+    function get_datatables($length, $start, $search, $ordering,$id) {
         $this->_get_datatables_query($search, $ordering);
         if ($length != -1) {
             $this->db->limit($length, $start);
         }
         
-        $this->db->from('formulir');
+        $this->db->from('detailform');
+        $this->db->where("form_id",$id);
         $query = $this->db->get();
         return $query->result();
     }
 
-    function count_filtered($search, $ordering) {
+    function count_filtered($search, $ordering,$id) {
         $this->_get_datatables_query($search, $ordering);
-        $this->db->from('formulir');
+        $this->db->from('detailform');
+        $this->db->where("form_id",$id);
         $query = $this->db->get();
         return $query->num_rows();
     }
 
-    public function count_all() {
-        $this->db->from('formulir');
+    public function count_all($id) {
+        $this->db->from('detailform');
+        $this->db->where("form_id",$id);
         return $this->db->count_all_results();
     }
 
     public function add($data) {
-        $this->db->insert('formulir',$data);
+        $this->db->insert('detailform',$data);
         return($this->db->affected_rows() != 1) ? false : true;
     }
 
     public function hapus($id) {
-        $this->db->where('form_id',$id);
-        $this->db->from('formulir');
+        $this->db->where('dtform_id',$id);
+        $this->db->from('detailform');
         $this->db->delete();
         return($this->db->affected_rows() != 1) ? false : true;
     }
 
-    function getFormulir($id) {
-        $this->db->where('form_id',$id);
-        $this->db->from('formulir');
+    function getdetailform($id) {
+        $this->db->where('dtform_id',$id);
+        $this->db->from('detailform');
         $query = $this->db->get();
         return $query->row_array();
     }
 
-    function getAllFormulir() {
-        $this->db->from('formulir');
-        $query = $this->db->get();
-        return $query->result_array();
-    }
-
     public function edit($data) {
         $this->db->trans_start();
-        $this->db->where("form_id",$data['form_id']);
-        $this->db->update('formulir',$data);
+        $this->db->where("dtform_id",$data['dtform_id']);
+        $this->db->update('detailform',$data);
         $this->db->trans_complete();
         return $this->db->trans_status();
     }

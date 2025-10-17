@@ -1,27 +1,27 @@
 $(function () {
 
-    var formulir = $('#formulir').DataTable({
+    var dtform = $('#dtform').DataTable({
         "responsive": true,
         "processing": true,
         "serverSide": true,
         "searching": true,
         "order": [],
         "columnDefs": [
-            {"targets": [0,5], "orderable": false}
+            {"targets": [0,4], "orderable": false}
         ],
         "ajax": {
-            "url": base_url + "/formaudit/listformulir",
+            "url": base_url + "/detailform/listdtform/"+form_id,
             "type": "POST"
         }
     });
 
    
 
-    $("#formulir").on("click", ".edit", function () {
+    $("#dtform").on("click", ".edit", function () {
         var id = $(this).attr('id');
 
         $.ajax({
-            url: base_url + "/formaudit/getFormulirById/"+id,
+            url: base_url + "/detailform/getdtformById/"+id,
             type: "GET",
             dataType: "json",
             beforeSend: function () {
@@ -29,7 +29,7 @@ $(function () {
                     title: 'Loading',
                     allowEscapeKey: false,
                     allowOutsideClick: false,
-                    didOpen: () => {
+                    onOpen: () => {
                         swal.showLoading();
                     }
                 });
@@ -37,15 +37,15 @@ $(function () {
             success: function (list) {
                 swal.close();
                 if (list.status) {
-                    $('#formulirEditModal').modal('show');
-                    $("#edit_form_nama").val(list.form_nama);
-                    $("#edit_form_kode").val(list.form_kode);
-                    $("#form_id").val(list.form_id);
-                    tinymce.get('edit_isi_artikel').setContent(list.form_deskripsi);
+                    $('#dtformEditModal').modal('show');
+                    $("#edit_dtform_tujuan").val(list.dtform_tujuan);
+                    $("#dtform_id").val(list.dtform_id);
+                    tinymce.get('edit_dtform_pertanyaan').setContent(list.dtform_pertanyaan);
+                    tinymce.get('edit_dtform_lingkup').setContent(list.dtform_lingkup);
                     
                 } else {
                     swal.fire("Oops", "Gagal!", "error");
-                        $("#formeditformulir")
+                        $("#formeditdtform")
                     .formValidation('disableSubmitButtons', false)
                     .formValidation('resetForm', true);
                 }   
@@ -53,7 +53,7 @@ $(function () {
             error: function () {
                 swal.fire("Oops", "No connection!", "error");
                 
-                 $("#formeditformulir")
+                 $("#formeditdtform")
                 .formValidation('disableSubmitButtons', false)
                 .formValidation('resetForm', true);
             }
@@ -61,12 +61,12 @@ $(function () {
     });
 
 
-    $("#formulir").on("click", ".delete", function () {
+    $("#dtform").on("click", ".delete", function () {
         var id = $(this).attr('id');
         hapus(id);
     });
 
-    $("#formulir").on("click", ".detail", function () {
+    $("#dtform").on("click", ".detail", function () {
         var id = $(this).attr('id');
         location.href = base_url + "/detailform?id="+id;
     });
@@ -75,7 +75,7 @@ $(function () {
     {
         swal.fire({
             title: "Anda Yakin?",
-            text: "Anda Yakin Ingin Hapus Formulir Ini?",
+            text: "Anda Yakin Ingin Hapus dtform Ini?",
             type: "warning",
             showCancelButton: true,
             showLoaderOnConfirm: true,
@@ -83,17 +83,17 @@ $(function () {
             cancelButtonText: 'Tidak',
             preConfirm: function () {
                 $.ajax({
-                    url: base_url + "/formaudit/hapus",
+                    url: base_url + "/detailform/hapus",
                     type: "POST",
                     data: { id: $id}
                 })
                         .done(function (data) {
                             swal.fire({
                                 title: "Hapus",
-                                text: "Formulir Telah Terhapus!",
+                                text: "dtform Telah Terhapus!",
                                 type: "success",
                                 preConfirm: function () {
-                                    formulir.ajax.reload();
+                                    dtform.ajax.reload();
                                 }
                             });
                         })
@@ -105,11 +105,11 @@ $(function () {
     }
 
     $("#tambah").on("click", function () {
-        $("#formulirAddModal").modal('show');
+        $("#dtformAddModal").modal('show');
     });
 
 
-    $("#formaddformulir").formValidation({
+    $("#formadddtform").formValidation({
         framework: "bootstrap4",
         excluded: [':disabled'],
         err: {
@@ -129,18 +129,18 @@ $(function () {
         var formData = new FormData(e.target);
 
         $.ajax({
-            url: base_url + "/formaudit/tambah",
+            url: base_url + "/detailform/tambah",
             type: "POST",
             data: formData,
             processData: false,        // ✅ wajib
             contentType: false,        // ✅ wajib
             beforeSend: function () {
-                $("#formulirAddModal").modal('hide');
+                $("#dtformAddModal").modal('hide');
                 swal.fire({
                     title: 'Loading',
                     allowEscapeKey: false,
                     allowOutsideClick: false,
-                    didOpen: () => {
+                    onOpen: () => {
                         swal.showLoading();
                     }
                 });
@@ -150,7 +150,7 @@ $(function () {
                 var list = data == null ? [] : (data instanceof Array ? data : [data]);
                 $.each(list, function (index, org_types) {
                     if (org_types.status) {
-                        formulir.ajax.reload();
+                        dtform.ajax.reload();
                     } else {
                         swal.fire("Oops", org_types.pesan, "error");
                     }
@@ -169,7 +169,7 @@ $(function () {
 });
 
 
-$("#formeditformulir").formValidation({
+$("#formeditdtform").formValidation({
         framework: "bootstrap4",
         excluded: [':disabled'],
         err: {
@@ -189,18 +189,18 @@ $("#formeditformulir").formValidation({
         var formData = new FormData(e.target);
 
         $.ajax({
-            url: base_url + "/formaudit/edit",
+            url: base_url + "/detailform/edit",
             type: "POST",
             data: formData,
             processData: false,        // ✅ wajib
             contentType: false,        // ✅ wajib
             beforeSend: function () {
-                $("#formulirEditModal").modal('hide');
+                $("#dtformEditModal").modal('hide');
                 swal.fire({
                     title: 'Loading',
                     allowEscapeKey: false,
                     allowOutsideClick: false,
-                    didOpen: () => {
+                    onOpen: () => {
                         swal.showLoading();
                     }
                 });
@@ -210,7 +210,7 @@ $("#formeditformulir").formValidation({
                 var list = data == null ? [] : (data instanceof Array ? data : [data]);
                 $.each(list, function (index, org_types) {
                     if (org_types.status) {
-                        formulir.ajax.reload();
+                        dtform.ajax.reload();
                     } else {
                         swal.fire("Oops", org_types.pesan, "error");
                     }
