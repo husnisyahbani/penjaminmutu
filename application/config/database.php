@@ -73,27 +73,75 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $active_group = 'default';
 $query_builder = TRUE;
 
-$db['default'] = array(
-	'dsn'	=> '',
-	'hostname' => '103.49.239.63',
-	'username' => 'stiksiti_igni339',
-	'password' => 'Kgw90g)q6tJJ',
-	// 'hostname' => 'localhost',
-	// 'username' => 'root',
-	// 'password' => '',
-	'database' => 'stiksiti_akademik',
-	'dbdriver' => 'mysqli',
-	'dbprefix' => 'mutu_',
-	'pconnect' => FALSE,
-	'db_debug' => (ENVIRONMENT !== 'production'),
-	'cache_on' => FALSE,
-	'cachedir' => '',
-	'char_set' => 'utf8',
-	'dbcollat' => 'utf8_general_ci',
-	'swap_pre' => '',
-	'encrypt' => FALSE,
-	'compress' => FALSE,
-	'stricton' => FALSE,
-	'failover' => array(),
-	'save_queries' => TRUE
-);
+if (ENVIRONMENT === 'development') {
+    // 🔧 Koneksi lokal
+    $db['default'] = array(
+        'dsn'       => '',
+        'hostname'  => 'localhost',
+        'username'  => 'root',
+        'password'  => '',
+        'database'  => 'stiksiti_akademik',
+        'dbdriver'  => 'mysqli',
+        'dbprefix'  => 'mutu_',
+        'pconnect'  => FALSE,
+        'db_debug'  => TRUE, // tampilkan error SQL
+        'cache_on'  => FALSE,
+        'cachedir'  => '',
+        'char_set'  => 'utf8',
+        'dbcollat'  => 'utf8_general_ci',
+        'swap_pre'  => '',
+        'encrypt'   => FALSE,
+        'compress'  => FALSE,
+        'stricton'  => FALSE,
+        'failover'  => array(),
+        'save_queries' => TRUE
+    );
+} else {
+    // 🚀 Koneksi production (hosting)
+    $db['default'] = array(
+        'dsn'       => '',
+        'hostname'  => '103.49.239.63',
+        'username'  => 'stiksiti_igni339',
+        'password'  => 'Kgw90g)q6tJJ',
+        'database'  => 'stiksiti_akademik',
+        'dbdriver'  => 'mysqli',
+        'dbprefix'  => 'mutu_',
+        'pconnect'  => FALSE,
+        'db_debug'  => (ENVIRONMENT !== 'production'),
+        'cache_on'  => FALSE,
+        'cachedir'  => '',
+        'char_set'  => 'utf8',
+        'dbcollat'  => 'utf8_general_ci',
+        'swap_pre'  => '',
+        'encrypt'   => FALSE,
+        'compress'  => FALSE,
+        'stricton'  => FALSE,
+        'failover'  => array(),
+        'save_queries' => TRUE
+    );
+}
+
+// $db['default'] = array(
+// 	'dsn'	=> '',
+// 	'hostname' => '103.49.239.63',
+// 	'username' => 'stiksiti_igni339',
+// 	'password' => 'Kgw90g)q6tJJ',
+// 	// 'hostname' => 'localhost',
+// 	// 'username' => 'root',
+// 	// 'password' => '',
+// 	'database' => 'stiksiti_akademik',
+// 	'dbdriver' => 'mysqli',
+// 	'dbprefix' => 'mutu_',
+// 	'pconnect' => FALSE,
+// 	'db_debug' => (ENVIRONMENT !== 'production'),
+// 	'cache_on' => FALSE,
+// 	'cachedir' => '',
+// 	'char_set' => 'utf8',
+// 	'dbcollat' => 'utf8_general_ci',
+// 	'swap_pre' => '',
+// 	'encrypt' => FALSE,
+// 	'compress' => FALSE,
+// 	'stricton' => FALSE,
+// 	'failover' => array(),
+// 	'save_queries' => TRUE
+// );
