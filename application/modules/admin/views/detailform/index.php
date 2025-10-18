@@ -49,7 +49,6 @@
                             <th width="20px">No</th>
                             <th>Pertanyaan</th>
                             <th>Lingkup</th>
-                            <th width="200px">Tanggal</th>
                             <th width="100px">Aksi</th>
                         </tr>
                     </thead>

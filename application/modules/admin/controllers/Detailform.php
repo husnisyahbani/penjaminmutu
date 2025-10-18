@@ -5,7 +5,7 @@ class Detailform extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'admin';
-        $this->load->js(base_url("assets/app/admin/detailform.js?v=1.4"));
+        $this->load->js(base_url("assets/app/admin/detailform.js?v=1.5"));
         $this->load->model('DtformModel', 'dtform');
         $this->load->model('FormulirModel', 'formulir');
 
@@ -125,7 +125,6 @@ class Detailform extends MY_Controller {
             $row[] = $no;
             $row[] = $field->dtform_pertanyaan;
             $row[] = $field->dtform_lingkup;
-            $row[] = date("d-m-Y H:i:s", strtotime($field->dtform_create));
             $row[] = '</button><button class="edit btn btn-sm btn-icon btn-pure btn-default on-default edit-row"
             data-toggle="tooltip" data-original-title="Edit" id=' . $field->dtform_id . '><i class="icon md-edit" aria-hidden="true"></i></button><button class="delete btn btn-sm btn-icon btn-pure btn-default on-default remove-row"
                       data-toggle="tooltip" data-original-title="Remove" id=' . $field->dtform_id . '><i class="icon md-delete" aria-hidden="true"></i></button>';

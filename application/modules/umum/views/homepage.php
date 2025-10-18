@@ -46,7 +46,7 @@
   <nav class="navbar navbar-expand-lg bg-white shadow-lg rounded-5 px-lg-4 mx-lg-5 mt-3 mt-lg-5">
     <div class="container-fluid">
       <a class="navbar-brand px-0" href="<?php echo base_url();?>">
-        <img src="<?php echo asset_url();?>/assets/images/sijamu.png" alt="STIK SITI KHADIJAH Logo" height="80">
+        <img src="<?php echo asset_url();?>/assets/images/logostik.png" alt="STIK SITI KHADIJAH Logo" height="80">
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuUtama" aria-controls="menuUtama" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>

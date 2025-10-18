@@ -108,7 +108,7 @@ class Akun extends MY_Controller {
                 $msg = 'Berhasil';
                 $this->session->set_flashdata('pesanberhasil', $msg);
             }else{
-                $msg = 'Gagal, Data Kepala daerah telah ada';
+                $msg = 'Gagal, Data Username telah ada';
                 $this->session->set_flashdata('pesanerror', $msg);
             }
             redirect(base_url($this->module.'/akun'));

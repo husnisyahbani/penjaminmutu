@@ -192,4 +192,35 @@ class Daftaraudit extends MY_Controller {
     }
 
 
+    public function password() {
+        $submitpass = $this->input->post('submitpass');
+        if (isset($submitpass)) {
+           $data = array();
+           $passlama = md5($this->input->post('passlama'));
+           
+           $data['users_id'] = $this->session->userdata('users_id');
+           $data['username'] = $this->session->userdata('username');
+           $data['password'] = md5($this->input->post('password'));
+           if($this->akun->passlama($passlama)&&$this->akun->edit($data)){
+               $msg = 'Berhasil';
+               $this->session->set_flashdata('pesanberhasil', $msg);
+           }else{
+               $msg = 'Gagal, password lama salah';
+               $this->session->set_flashdata('pesanerror', $msg);
+           }
+           redirect(base_url($this->module));
+       } else {
+           $this->data['content'] = 'password';
+           $this->data['title'] = 'Ubah Password';
+           $this->data['js'] = $this->load->get_js_files();
+           $this->template($this->data, $this->module);
+       }
+   }
+
+    public function logout() {
+        $this->session->sess_destroy();
+        redirect(base_url());
+    }
+
+
 }
