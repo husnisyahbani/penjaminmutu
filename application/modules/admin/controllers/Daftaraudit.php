@@ -5,7 +5,7 @@ class Daftaraudit extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'admin';
-        $this->load->js(base_url("assets/app/admin/daftaraudit.js?v=1.12"));
+        $this->load->js(base_url("assets/app/admin/daftaraudit.js?v=1.24"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
@@ -125,16 +125,17 @@ class Daftaraudit extends MY_Controller {
             $row[] = '<button class="detail btn btn-sm btn-icon btn-success"
             data-toggle="tooltip" data-original-title="DETAIL" id=' . $field->audit_id.'><i class="icon md-book" aria-hidden="true"></i> Detail</button> <button class="delete btn btn-sm btn-icon btn-danger"
             data-toggle="tooltip" data-original-title="DELETE" id=' . $field->audit_id.'><i class="icon md-delete" aria-hidden="true"></i> Hapus</button>';
-            if($field->audit_status == "DRAFT"){
-                $row[] = '<button class="detail btn btn-sm btn-icon btn-success"
-            data-toggle="tooltip" data-original-title="KIRIM" id=' . $field->audit_id.'><i class="icon md-play" aria-hidden="true"></i> Kirim</button>';
-            }else if($field->audit_status == "TERKIRIM"){                                        
-                $row[] = '<button type="button" class="btn btn-danger btn-xs waves-effect waves-classic"><i class="icon md-check" aria-hidden="true"></i>Terkirim</button>';
-            }else if($field->audit_status == "PROSES"){
-                $row[] = '<button type="button" class="btn btn-warning btn-xs waves-effect waves-classic"><i class="icon md-home" aria-hidden="true"></i>Diproses</button>';
-            }else if($field->audit_status == "SELESAI"){
-                $row[] = '<button type="button" class="selesai btn btn-success btn-xs waves-effect waves-classic" id="'.$field->audit_id.'"><i class="icon md-download" aria-hidden="true"></i>Selesai</button>';
-            }
+            $row[] = $field->audit_status;
+            // if($field->audit_status == "DRAFT"){
+            //     $row[] = '<button class="detail btn btn-sm btn-icon btn-success"
+            // data-toggle="tooltip" data-original-title="KIRIM" id=' . $field->audit_id.'><i class="icon md-play" aria-hidden="true"></i> Kirim</button>';
+            // }else if($field->audit_status == "TERKIRIM"){                                        
+            //     $row[] = '<button type="button" class="btn btn-danger btn-xs waves-effect waves-classic"><i class="icon md-check" aria-hidden="true"></i>Terkirim</button>';
+            // }else if($field->audit_status == "PROSES"){
+            //     $row[] = '<button type="button" class="btn btn-warning btn-xs waves-effect waves-classic"><i class="icon md-home" aria-hidden="true"></i>Diproses</button>';
+            // }else if($field->audit_status == "SELESAI"){
+            //     $row[] = '<button type="button" class="selesai btn btn-success btn-xs waves-effect waves-classic" id="'.$field->audit_id.'"><i class="icon md-download" aria-hidden="true"></i>Selesai</button>';
+            // }
             
             
             $data[] = $row;
@@ -169,11 +170,13 @@ class Daftaraudit extends MY_Controller {
             $row[] = $no;
             $row[] = $field->dtform_pertanyaan;
             $row[] = $field->dtform_lingkup;
-            if($field->audit_status == "DRAFT"){
-                $row[] = $field->jwb_jawaban.' <button type="button" class="edit btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i></button>';
-            }else{
-                $row[] = $field->jwb_jawaban;
-            }
+            // if($field->audit_status == "DRAFT"){
+            //     $row[] = $field->jwb_jawaban.' <button type="button" class="edit btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i></button>';
+            // }else{
+            //     $row[] = $field->jwb_jawaban;
+            // }
+
+            $row[] = $field->jwb_jawaban;
             
             $row[] = $field->jwb_hasil;
             $row[] = $field->jwb_temuan;

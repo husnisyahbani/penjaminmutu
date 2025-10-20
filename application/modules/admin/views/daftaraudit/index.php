@@ -89,7 +89,7 @@
             </div>
 
 
-            <div class="col-xl-12 col-md-24">
+            <!-- <div class="col-xl-12 col-md-24">
                 <div class="panel">
                     <header class="panel-heading">
                         <h3 class="panel-title">Detail Pertanyaan</h3>
@@ -98,27 +98,10 @@
                         </div>
                     </header>
                     <div class="panel-body">
-                        <table class="table table-hover dataTable w-full" id="daftarpertanyaan">
-                            <thead>
-                                <tr>
-                                    <th >No</th>
-                                    <th >Pertanyaan</th>
-                                    <th >Ruang Lingkup</th>
-                                    <th >Jawaban</th>
-                                    <th >Hasil</th>
-                                    <th >Temuan</th>
-                                    <th >Catatan</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                
-
-                            </tbody>
-                        </table>
+                        
                     </div>
                 </div>
-            </div>
+            </div> -->
             
         </div>
     </div>
@@ -237,3 +220,38 @@
         </div>
     </form>
 </div>
+
+
+                <div class="modal fade example-modal-lg" aria-hidden="true" aria-labelledby="exampleOptionalLarge"
+                      id="pertanyaanModal" role="dialog" tabindex="-1" data-bs-backdrop="false">
+                      <div class="modal-dialog modal-simple modal-lg">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">×</span>
+                            </button>
+                            <h4 class="modal-title" id="exampleOptionalLarge">Detail Pertanyaan</h4>
+                          </div>
+                          <div class="modal-body">
+                            <table class="table table-hover dataTable w-full" id="daftarpertanyaan">
+                            <thead>
+                                <tr>
+                                    <th >No</th>
+                                    <th >Pertanyaan</th>
+                                    <th >Ruang Lingkup</th>
+                                    <th >Jawaban</th>
+                                    <th >Hasil</th>
+                                    <th >Temuan</th>
+                                    <th >Catatan</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                
+
+                            </tbody>
+                        </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>

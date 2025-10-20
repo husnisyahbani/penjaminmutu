@@ -1,4 +1,6 @@
 $(function () {
+
+    
     var daftaraudit = $('#daftaraudit').DataTable({
         "responsive": true,
         "processing": true,
@@ -35,7 +37,27 @@ $(function () {
     $("#daftarpertanyaan").on("click", ".edit", function () {
         $dtform_id = $(this).attr('dtform_id');
         $audit_id = $(this).attr('audit_id');
-        $("#editModal").modal('show');
+        // $('#pertanyaanModal').modal('hide');
+        // $("#editModal").modal('show');
+        // $('#editModal').on('hidden.bs.modal', function () {
+        //     $('#pertanyaanModal').modal('show');
+        //     $('body').addClass('modal-open');
+        // });
+
+        $('#pertanyaanModal').modal('hide');
+
+        $('#pertanyaanModal').one('hidden.bs.modal', function () {
+        $('#editModal').modal('show');
+        });
+
+        $('#editModal').one('hidden.bs.modal', function () {
+        setTimeout(() => {
+            $('#pertanyaanModal').modal('show');
+            $('body').addClass('modal-open');
+        }, 300);
+        });
+
+
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
         var pertanyaan = rowData[1];
@@ -44,6 +66,7 @@ $(function () {
     });
 
     $("#daftaraudit").on("click", ".detail", function () {
+        $("#pertanyaanModal").modal('show');
         var id = $(this).attr('id');
         daftarpertanyaan.ajax.url(base_url + "/daftaraudit/listpertanyaan/"+id).load();
     });
