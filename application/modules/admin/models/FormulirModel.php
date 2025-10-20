@@ -64,6 +64,7 @@ class FormulirModel extends CI_Model {
     }
 
     public function add($data) {
+        $data['users_id'] = $this->session->userdata('users_id');
         $this->db->insert('formulir',$data);
         return($this->db->affected_rows() != 1) ? false : true;
     }
