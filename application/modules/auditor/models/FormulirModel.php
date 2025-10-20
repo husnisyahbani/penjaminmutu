@@ -45,7 +45,10 @@ class FormulirModel extends CI_Model {
         if ($length != -1) {
             $this->db->limit($length, $start);
         }
-        
+        $users_id = $this->session->userdata('users_id');
+        if(isset($users_id)){
+            $this->db->where('users_id',$users_id);
+        }
         $this->db->from('formulir');
         $query = $this->db->get();
         return $query->result();
@@ -53,12 +56,20 @@ class FormulirModel extends CI_Model {
 
     function count_filtered($search, $ordering) {
         $this->_get_datatables_query($search, $ordering);
+        $users_id = $this->session->userdata('users_id');
+        if(isset($users_id)){
+            $this->db->where('users_id',$users_id);
+        }
         $this->db->from('formulir');
         $query = $this->db->get();
         return $query->num_rows();
     }
 
     public function count_all() {
+        $users_id = $this->session->userdata('users_id');
+        if(isset($users_id)){
+            $this->db->where('users_id',$users_id);
+        }
         $this->db->from('formulir');
         return $this->db->count_all_results();
     }
