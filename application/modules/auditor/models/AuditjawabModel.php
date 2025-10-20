@@ -57,6 +57,10 @@ class AuditjawabModel extends CI_Model {
         $this->db->from('audit au');
         $this->db->join('detailform dt', 'dt.form_id = au.form_id', 'left');
         $this->db->where('au.audit_id',$id);
+        $users_id = $this->session->userdata('users_id');
+        if(isset($users_id)){
+            $this->db->where('au.auditee_id',$users_id);
+        }
         $query = $this->db->get();
         return $query->result();
     }
@@ -75,6 +79,10 @@ class AuditjawabModel extends CI_Model {
         $this->db->from('audit au');
         $this->db->join('detailform dt', 'dt.form_id = au.form_id', 'left');
         $this->db->where('au.audit_id',$id);
+        $users_id = $this->session->userdata('users_id');
+        if(isset($users_id)){
+            $this->db->where('au.auditee_id',$users_id);
+        }
         $query = $this->db->get();
         return $query->num_rows();
     }
@@ -82,6 +90,10 @@ class AuditjawabModel extends CI_Model {
     public function count_all($id) {
         $this->db->from('audit');
         $this->db->where('audit.audit_id',$id);
+        $users_id = $this->session->userdata('users_id');
+        if(isset($users_id)){
+            $this->db->where('au.auditee_id',$users_id);
+        }
         return $this->db->count_all_results();
     }
 

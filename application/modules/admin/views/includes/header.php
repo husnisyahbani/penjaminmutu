@@ -21,13 +21,16 @@
     <script src="https://cdn.tiny.cloud/1/2vfigjikc198eohzhjdy4kgw3m94rmetkn3meeijacpibx67/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 
 <script>
-document.addEventListener("DOMContentLoaded", function(){
+document.addEventListener("DOMContentLoaded", function() {
   tinymce.init({
     selector: 'textarea.editor',
     menubar: false,
-    plugins: 'code lists table',
-    toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | code',
-    height: 200
+    plugins: 'code lists table link autolink', // ✅ tambahkan plugin link & autolink
+    toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link | code', // ✅ tombol link
+    height: 200,
+    link_title: false, // opsional: sembunyikan input title
+    target_list: false, // opsional: hilangkan pilihan open in new window
+    default_link_target: '_blank' // opsional: buka link di tab baru
   });
 });
 </script>
