@@ -5,7 +5,7 @@ class Daftaraudit extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'admin';
-        $this->load->js(base_url("assets/app/admin/daftaraudit.js?v=1.24"));
+        $this->load->js(base_url("assets/app/admin/daftaraudit.js?v=1.26"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
@@ -99,7 +99,11 @@ class Daftaraudit extends MY_Controller {
 
     public function hapus() {
         $id = $this->input->post('id');
-        $this->mutu->hapus($id);
+        $status = $this->mutu->hapus($id);
+        $query = array("status" => $status);
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
+        echo json_encode($query);
     }
 
     public function listmutu() {
@@ -150,6 +154,8 @@ class Daftaraudit extends MY_Controller {
         //output dalam format JSON
         echo json_encode($output);
     }
+
+    
 
 
     public function listpertanyaan($id=null) {

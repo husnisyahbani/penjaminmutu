@@ -71,6 +71,56 @@ $(function () {
         daftarpertanyaan.ajax.url(base_url + "/daftaraudit/listpertanyaan/"+id).load();
     });
 
+    $("#daftaraudit").on("click", ".delete", function () {
+        var id = $(this).attr('id');
+        hapusdata(id);
+    });
+
+    function hapusdata($id)
+    {
+        swal.fire({
+            title: "Anda Yakin?",
+            text: "Anda Yakin Ingin Menghapus Ajuan Ini?",
+            type: "warning",
+            showCancelButton: true,
+            showLoaderOnConfirm: true,
+            confirmButtonText: "Ya, Hapus!",
+            cancelButtonText: 'Tidak',
+            preConfirm: function () {
+                $.ajax({
+                    url: base_url + "/daftaraudit/hapus",
+                    type: "POST",
+                    data: { id: $id}
+                })
+                        .done(function (data) {
+                            if(data.status){
+                                    swal.fire({
+                                        title: "Hapus",
+                                        text: "Ajuan Telah Terhapus!",
+                                        type: "success",
+                                        preConfirm: function () {
+                                            daftaraudit.ajax.reload();
+                                        }
+                                    });
+                            }else{
+                                swal.fire({
+                                        title: "Gagal",
+                                        text: "Ajuan Tidak dapat dihapus!",
+                                        type: "danger",
+                                        preConfirm: function () {
+                                            daftaraudit.ajax.reload();
+                                        }
+                                    });
+                            }
+                            
+                        })
+                        .error(function (data) {
+                            swal.fire("Oops", "No connection!", "error");
+                        });
+            }
+        });
+    }
+
      $("#tambah").on("click", function () {
         $("#addModal").modal('show');
     });
