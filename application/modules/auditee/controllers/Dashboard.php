@@ -5,7 +5,7 @@ class Dashboard extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditee';
-        $this->load->js(base_url("assets/app/auditee/daftaraudit.js?v=1.16"));
+        $this->load->js(base_url("assets/app/auditee/daftaraudit.js?v=1.18"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
@@ -96,6 +96,13 @@ class Dashboard extends MY_Controller {
         echo json_encode($query);
     }
 
+    public function update() {
+        $data = array();
+        $data['audit_id'] = $this->input->post('id');
+        $data['audit_status'] = "TERKIRIM";
+        $this->mutu->edit($data);
+    }
+
     public function hapus() {
         $id = $this->input->post('id');
         $this->mutu->hapus($id);
@@ -122,17 +129,16 @@ class Dashboard extends MY_Controller {
             $row[] = $field->auditee;
             $row[] = $field->unit;
             $row[] = '<button class="detail btn btn-sm btn-icon btn-success"
-            data-toggle="tooltip" data-original-title="DETAIL" id=' . $field->audit_id.'><i class="icon md-book" aria-hidden="true"></i> Detail</button> <button class="delete btn btn-sm btn-icon btn-danger"
-            data-toggle="tooltip" data-original-title="DELETE" id=' . $field->audit_id.'><i class="icon md-delete" aria-hidden="true"></i> Hapus</button>';
+            data-toggle="tooltip" data-original-title="DETAIL" id=' . $field->audit_id.'><i class="icon md-book" aria-hidden="true"></i> Detail</button>';
             if($field->audit_status == "DRAFT"){
-                $row[] = '<button class="detail btn btn-sm btn-icon btn-success"
+                $row[] = '<button class="kirim btn btn-sm btn-icon btn-success"
             data-toggle="tooltip" data-original-title="KIRIM" id=' . $field->audit_id.'><i class="icon md-play" aria-hidden="true"></i> Kirim</button>';
             }else if($field->audit_status == "TERKIRIM"){                                        
-                $row[] = '<button type="button" class="btn btn-danger btn-xs waves-effect waves-classic"><i class="icon md-check" aria-hidden="true"></i>Terkirim</button>';
+                $row[] = '<button type="button" class="btn btn-danger btn-sm btn-icon"><i class="icon md-timer" aria-hidden="true"></i>Terkirim</button>';
             }else if($field->audit_status == "PROSES"){
-                $row[] = '<button type="button" class="btn btn-warning btn-xs waves-effect waves-classic"><i class="icon md-home" aria-hidden="true"></i>Diproses</button>';
+                $row[] = '<button type="button" class="btn btn-warning btn-sm btn-icon"><i class="icon md-home" aria-hidden="true"></i>Diproses</button>';
             }else if($field->audit_status == "SELESAI"){
-                $row[] = '<button type="button" class="selesai btn btn-success btn-xs waves-effect waves-classic" id="'.$field->audit_id.'"><i class="icon md-download" aria-hidden="true"></i>Selesai</button>';
+                $row[] = '<button type="button" class="selesai btn btn-success btn-sm btn-icon" id="'.$field->audit_id.'"><i class="icon md-download" aria-hidden="true"></i>Selesai</button>';
             }
             
             

@@ -57,9 +57,9 @@
                         <h3 class="panel-title">AUDIT</h3>
                         <div class="panel-actions panel-actions-keep">
                             
-                            <button type="button" class="btn btn-sm btn-icon btn-success" id="tambah">
+                            <!-- <button type="button" class="btn btn-sm btn-icon btn-success" id="tambah">
                                 <i class="icon md-plus" aria-hidden="true"></i>Tambah
-                            </button>
+                            </button> -->
                         </div>
                     </header>
                     <div class="panel-body">

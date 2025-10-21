@@ -61,9 +61,47 @@ $(function () {
         daftarpertanyaan.ajax.url(base_url + "/dashboard/listpertanyaan/"+id).load();
     });
 
-     $("#tambah").on("click", function () {
-        $("#addModal").modal('show');
+    $("#daftaraudit").on("click", ".kirim", function () {
+        var id = $(this).attr('id');
+        kirim(id);
     });
+
+    function kirim($id)
+    {
+        swal.fire({
+            title: "Anda Yakin?",
+            text: "Anda Yakin Ingin Mengirim Ajuan Ini?",
+            type: "warning",
+            showCancelButton: true,
+            showLoaderOnConfirm: true,
+            confirmButtonText: "Ya, Kirim!",
+            cancelButtonText: 'Tidak',
+            preConfirm: function () {
+                $.ajax({
+                    url: base_url + "/dashboard/update",
+                    type: "POST",
+                    data: { id: $id}
+                })
+                        .done(function (data) {
+                            swal.fire({
+                                title: "Hapus",
+                                text: "Ajuan Telah Terkirim!",
+                                type: "success",
+                                preConfirm: function () {
+                                    daftaraudit.ajax.reload();
+                                }
+                            });
+                        })
+                        .error(function (data) {
+                            swal.fire("Oops", "No connection!", "error");
+                        });
+            }
+        });
+    }
+
+    //  $("#tambah").on("click", function () {
+    //     $("#addModal").modal('show');
+    // });
 
     $("#formadd").formValidation({
         framework: "bootstrap4",
