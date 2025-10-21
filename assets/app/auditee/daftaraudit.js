@@ -50,7 +50,7 @@ $(function () {
         });
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
-        var pertanyaan = rowData[1];
+        var pertanyaan = rowData[2];
         tinymce.get('pertanyaan').setContent(pertanyaan);
 
     });
