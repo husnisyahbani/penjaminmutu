@@ -13,7 +13,7 @@ class Dashboard extends MY_Controller {
         $this->load->model('FormulirModel', 'formulir');
 
         $role = $this->session->userdata('role');
-        if (!isset($role) || $role != 'AUDITOR') {
+        if (!isset($role) || $role != 'AUDITEE') {
             redirect(base_url());
         }
     }
