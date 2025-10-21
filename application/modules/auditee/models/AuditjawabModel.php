@@ -92,7 +92,7 @@ class AuditjawabModel extends CI_Model {
         $this->db->where('audit.audit_id',$id);
         $users_id = $this->session->userdata('users_id');
         if(isset($users_id)){
-            $this->db->where('au.auditee_id',$users_id);
+            $this->db->where('audit.auditee_id',$users_id);
         }
         return $this->db->count_all_results();
     }
