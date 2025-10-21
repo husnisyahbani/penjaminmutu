@@ -9,7 +9,7 @@ $(function () {
             {"targets": [0,5,6], "orderable": false}
         ],
         "ajax": {
-            "url": base_url + "/daftaraudit/listmutu/",
+            "url": base_url + "/dashboard/listmutu/",
             "type": "POST"
         }
     });
@@ -24,7 +24,7 @@ $(function () {
             {"targets": [0,1,2,3,4,5,6], "orderable": false}
         ],
         "ajax": {
-            "url": base_url + "/daftaraudit/listpertanyaan",
+            "url": base_url + "/dashboard/listpertanyaan",
             "type": "POST"
         }
     });
@@ -57,7 +57,7 @@ $(function () {
 
     $("#daftaraudit").on("click", ".detail", function () {
         var id = $(this).attr('id');
-        daftarpertanyaan.ajax.url(base_url + "/daftaraudit/listpertanyaan/"+id).load();
+        daftarpertanyaan.ajax.url(base_url + "/dashboard/listpertanyaan/"+id).load();
     });
 
      $("#tambah").on("click", function () {
@@ -84,7 +84,7 @@ $(function () {
         var formData = new FormData(e.target);
 
         $.ajax({
-            url: base_url + "/daftaraudit/tambah",
+            url: base_url + "/dashboard/tambah",
             type: "POST",
             data: formData,
             processData: false,        // ✅ wajib
@@ -144,7 +144,7 @@ $("#formedit").formValidation({
         var $jwb_jawaban = tinymce.get('jwb_jawaban').getContent();
 
         $.ajax({
-            url: base_url + "/daftaraudit/jawab",
+            url: base_url + "/dashboard/jawab",
             type: "POST",
             data: {
                 dtform_id:$dtform_id,
