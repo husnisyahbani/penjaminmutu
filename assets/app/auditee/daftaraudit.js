@@ -56,6 +56,7 @@ $(function () {
     });
 
     $("#daftaraudit").on("click", ".detail", function () {
+        $('#pertanyaanModal').modal('show');
         var id = $(this).attr('id');
         daftarpertanyaan.ajax.url(base_url + "/dashboard/listpertanyaan/"+id).load();
     });
