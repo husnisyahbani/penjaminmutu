@@ -51,7 +51,9 @@ $(function () {
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
         var pertanyaan = rowData[1];
+        var hasil = rowData[2];
         tinymce.get('pertanyaanhasil').setContent(pertanyaan);
+        tinymce.get('jwb_hasil').setContent(hasil);
 
     });
 
@@ -74,7 +76,9 @@ $(function () {
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
         var pertanyaan = rowData[1];
+        var temuan = rowData[2];
         tinymce.get('pertanyaantemuan').setContent(pertanyaan);
+        $('#jwb_temuan').val(temuan);
 
     });
 
@@ -97,7 +101,9 @@ $(function () {
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
         var pertanyaan = rowData[1];
+        var catatan = rowData[2];
         tinymce.get('pertanyaancatatan').setContent(pertanyaan);
+        tinymce.get('jwb_catatan').setContent(catatan);
 
     });
 
@@ -327,7 +333,7 @@ $("#formtemuan").formValidation({
 
         var $form = $(e.target);       // ✅ perbaikan
         //var formData = new FormData(e.target);
-        var $jwb_temuan = tinymce.get('jwb_temuan').getContent();
+        var $jwb_temuan = $('#jwb_temuan').val();
 
         $.ajax({
             url: base_url + "/daftaraudit/temuan",
