@@ -116,7 +116,7 @@ $(function () {
     {
         swal.fire({
             title: "Anda Yakin?",
-            text: "Anda Yakin Ingin Memproses Formulir Ini?",
+            text: "Anda Yakin Ingin Memproses Formulir Ini?"+$id,
             type: "warning",
             showCancelButton: true,
             showLoaderOnConfirm: true,
