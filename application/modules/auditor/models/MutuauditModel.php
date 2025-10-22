@@ -98,7 +98,7 @@ class MutuauditModel extends CI_Model {
 
     public function edit($data) {
         $this->db->trans_start();
-        $this->db->where("audit_id ",$data['audit_id ']);
+        $this->db->where("audit_id ",$data['audit_id']);
         $this->db->update('mutu_audit',$data);
         $this->db->trans_complete();
         return $this->db->trans_status();

@@ -134,11 +134,7 @@ class Daftaraudit extends MY_Controller {
         $data = array();
         $data['audit_id'] = $this->input->post('id');
         $data['audit_status'] = "PROSES";
-        $query = array("data" => $data);
-        header('Access-Control-Allow-Origin: *');
-        header('Content-Type: application/json');
-        echo json_encode($query);
-        //$this->mutu->edit($data);
+        $this->mutu->edit($data);
     }
 
     public function selesai() {
