@@ -51,7 +51,7 @@ $(function () {
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
         var pertanyaan = rowData[1];
-        tinymce.get('pertanyaan').setContent(pertanyaan);
+        tinymce.get('pertanyaanhasil').setContent(pertanyaan);
 
     });
 
@@ -74,7 +74,7 @@ $(function () {
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
         var pertanyaan = rowData[1];
-        tinymce.get('pertanyaan').setContent(pertanyaan);
+        tinymce.get('pertanyaantemuan').setContent(pertanyaan);
 
     });
 
@@ -97,7 +97,7 @@ $(function () {
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
         var pertanyaan = rowData[1];
-        tinymce.get('pertanyaan').setContent(pertanyaan);
+        tinymce.get('pertanyaancatatan').setContent(pertanyaan);
 
     });
 

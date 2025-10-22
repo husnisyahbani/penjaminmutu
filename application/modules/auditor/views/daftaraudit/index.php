@@ -187,7 +187,7 @@
                 <div class="row">
                     <div class="col-md-12 center">
                         <h4 class="example-title">Pertanyaan</h4>
-                        <textarea id="pertanyaan" class="editor" name="pertanyaan" readonly></textarea>
+                        <textarea id="pertanyaanhasil" class="editor" name="pertanyaan" readonly></textarea>
                     </div>
                     <div class="col-md-12 center">
                         <h4 class="example-title">Jawaban</h4>
@@ -229,7 +229,7 @@
                 <div class="row">
                     <div class="col-md-12 center">
                         <h4 class="example-title">Pertanyaan</h4>
-                        <textarea id="pertanyaan" class="editor" name="pertanyaan" readonly></textarea>
+                        <textarea id="pertanyaantemuan" class="editor" name="pertanyaan" readonly></textarea>
                     </div>
                     <div class="col-md-12 center">
                         <h4 class="example-title">Temuan</h4>
@@ -278,7 +278,7 @@
                 <div class="row">
                     <div class="col-md-12 center">
                         <h4 class="example-title">Pertanyaan</h4>
-                        <textarea id="pertanyaan" class="editor" name="pertanyaan" readonly></textarea>
+                        <textarea id="pertanyaancatatan" class="editor" name="pertanyaan" readonly></textarea>
                     </div>
                     <div class="col-md-12 center">
                         <h4 class="example-title">Catatan</h4>

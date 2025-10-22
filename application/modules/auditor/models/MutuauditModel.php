@@ -50,7 +50,7 @@ class MutuauditModel extends CI_Model {
         $this->db->join('formulir', 'formulir.form_id = mutu_audit.form_id', 'left');
         $users_id = $this->session->userdata('users_id');
         if(isset($users_id)){
-            $this->db->where('mutu_audit.auditor_id',$users_id);
+            $this->db->where('auditor_id',$users_id);
         }
         $query = $this->db->get();
         return $query->result();
@@ -62,7 +62,7 @@ class MutuauditModel extends CI_Model {
         $this->db->join('formulir', 'formulir.form_id = mutu_audit.form_id', 'left');
         $users_id = $this->session->userdata('users_id');
         if(isset($users_id)){
-            $this->db->where('mutu_audit.auditor_id',$users_id);
+            $this->db->where('auditor_id',$users_id);
         }
         $query = $this->db->get();
         return $query->num_rows();
@@ -72,7 +72,7 @@ class MutuauditModel extends CI_Model {
         $this->db->from('mutu_audit');
         $users_id = $this->session->userdata('users_id');
         if(isset($users_id)){
-            $this->db->where('mutu_audit.auditor_id',$users_id);
+            $this->db->where('auditor_id',$users_id);
         }
         return $this->db->count_all_results();
     }
