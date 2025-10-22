@@ -169,18 +169,18 @@
 
 <div
     class="modal fade"
-    id="editModal"
+    id="hasilModal"
     aria-hidden="false"
     aria-labelledby="exampleFormModalLabel"
     role="dialog"
     tabindex="-1">
     <div class="modal-dialog modal-simple">
-        <form id="formedit" class="modal-content">
+        <form id="formhasil" class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
-                <h4 class="modal-title" id="exampleFormModalLabel">Jawaban</h4>
+                <h4 class="modal-title" id="exampleFormModalLabel">Hasil</h4>
             </div>
             <div class="modal-body">
 
@@ -191,7 +191,98 @@
                     </div>
                     <div class="col-md-12 center">
                         <h4 class="example-title">Jawaban</h4>
-                        <textarea id="jwb_jawaban" class="editor" name="jwb_jawaban"></textarea>
+                        <textarea id="jwb_hasil" class="editor" name="jwb_hasil"></textarea>
+                    </div>
+                </div>
+
+                
+
+            </div>
+
+            <div class="modal-footer">
+            <div class="text-right">
+                    <button type="submit" class="btn btn-primary" id="submitjawaban" name="submitjawaban" value="submitjawaban">Kirim</button>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<div
+    class="modal fade"
+    id="temuanModal"
+    aria-hidden="false"
+    aria-labelledby="exampleFormModalLabel"
+    role="dialog"
+    tabindex="-1">
+    <div class="modal-dialog modal-simple">
+        <form id="formtemuan" class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title" id="exampleFormModalLabel">TEMUAN</h4>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-md-12 center">
+                        <h4 class="example-title">Pertanyaan</h4>
+                        <textarea id="pertanyaan" class="editor" name="pertanyaan" readonly></textarea>
+                    </div>
+                    <div class="col-md-12 center">
+                        <h4 class="example-title">Temuan</h4>
+                        <select class="form-control" name="auditee" id="auditee" data-fv-notempty="true"
+                        data-fv-notempty-message="Wajib Dipilih">                                 
+                            <option value="S">S</option>
+                            <option value="OB">OB</option>
+                            <option value="TS MINOR">TS MINOR</option>
+                            <option value="TS MAYOR">TS MAYOR</option>
+                        </select>
+                    </div>
+                </div>
+
+                
+
+            </div>
+
+            <div class="modal-footer">
+            <div class="text-right">
+                    <button type="submit" class="btn btn-primary" id="submitjawaban" name="submitjawaban" value="submitjawaban">Kirim</button>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+
+<div
+    class="modal fade"
+    id="catatanModal"
+    aria-hidden="false"
+    aria-labelledby="exampleFormModalLabel"
+    role="dialog"
+    tabindex="-1">
+    <div class="modal-dialog modal-simple">
+        <form id="formcatatan" class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title" id="exampleFormModalLabel">CATATAN</h4>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-md-12 center">
+                        <h4 class="example-title">Pertanyaan</h4>
+                        <textarea id="pertanyaan" class="editor" name="pertanyaan" readonly></textarea>
+                    </div>
+                    <div class="col-md-12 center">
+                        <h4 class="example-title">Catatan</h4>
+                        <textarea id="jwb_catatan" class="editor" name="jwb_catatan"></textarea>
                     </div>
                 </div>
 

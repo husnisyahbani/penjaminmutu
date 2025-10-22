@@ -32,10 +32,68 @@ $(function () {
     var $dtform_id;
     var $audit_id;
 
-    $("#daftarpertanyaan").on("click", ".edit", function () {
+    $("#daftarpertanyaan").on("click", ".hasil", function () {
         $dtform_id = $(this).attr('dtform_id');
         $audit_id = $(this).attr('audit_id');
-        $("#editModal").modal('show');
+        $('#pertanyaanModal').modal('hide');
+
+        $('#pertanyaanModal').one('hidden.bs.modal', function () {
+        $('#hasilModal').modal('show');
+        });
+
+        $('#hasilModal').one('hidden.bs.modal', function () {
+        setTimeout(() => {
+            $('#pertanyaanModal').modal('show');
+            $('body').addClass('modal-open');
+        }, 300);
+        });
+
+        var tr = $(this).closest('tr');
+        var rowData = daftarpertanyaan.row(tr).data();
+        var pertanyaan = rowData[1];
+        tinymce.get('pertanyaan').setContent(pertanyaan);
+
+    });
+
+    $("#daftarpertanyaan").on("click", ".temuan", function () {
+        $dtform_id = $(this).attr('dtform_id');
+        $audit_id = $(this).attr('audit_id');
+        $('#pertanyaanModal').modal('hide');
+
+        $('#pertanyaanModal').one('hidden.bs.modal', function () {
+        $('#temuanModal').modal('show');
+        });
+
+        $('#temuanModal').one('hidden.bs.modal', function () {
+        setTimeout(() => {
+            $('#pertanyaanModal').modal('show');
+            $('body').addClass('modal-open');
+        }, 300);
+        });
+
+        var tr = $(this).closest('tr');
+        var rowData = daftarpertanyaan.row(tr).data();
+        var pertanyaan = rowData[1];
+        tinymce.get('pertanyaan').setContent(pertanyaan);
+
+    });
+
+    $("#daftarpertanyaan").on("click", ".catatan", function () {
+        $dtform_id = $(this).attr('dtform_id');
+        $audit_id = $(this).attr('audit_id');
+        $('#pertanyaanModal').modal('hide');
+
+        $('#pertanyaanModal').one('hidden.bs.modal', function () {
+        $('#catatanModal').modal('show');
+        });
+
+        $('#catatanModal').one('hidden.bs.modal', function () {
+        setTimeout(() => {
+            $('#pertanyaanModal').modal('show');
+            $('body').addClass('modal-open');
+        }, 300);
+        });
+
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
         var pertanyaan = rowData[1];
@@ -44,6 +102,7 @@ $(function () {
     });
 
     $("#daftaraudit").on("click", ".detail", function () {
+        $('#pertanyaanModal').modal('show');
         var id = $(this).attr('id');
         daftarpertanyaan.ajax.url(base_url + "/daftaraudit/listpertanyaan/"+id).load();
     });
@@ -111,7 +170,7 @@ $(function () {
     return false;
 });
 
-$("#formedit").formValidation({
+$("#formhasil").formValidation({
         framework: "bootstrap4",
         excluded: [':disabled'],
         err: {
@@ -129,18 +188,144 @@ $("#formedit").formValidation({
 
         var $form = $(e.target);       // ✅ perbaikan
         //var formData = new FormData(e.target);
-        var $jwb_jawaban = tinymce.get('jwb_jawaban').getContent();
+        var $jwb_hasil = tinymce.get('jwb_hasil').getContent();
 
         $.ajax({
-            url: base_url + "/daftaraudit/jawab",
+            url: base_url + "/daftaraudit/hasil",
             type: "POST",
             data: {
                 dtform_id:$dtform_id,
                 audit_id:$audit_id,
-                jwb_jawaban:$jwb_jawaban
+                jwb_hasil:$jwb_hasil
             },
             beforeSend: function () {
-                $("#editModal").modal('hide');
+                $("#hasilModal").modal('hide');
+                swal.fire({
+                    title: 'Loading',
+                    allowEscapeKey: false,
+                    allowOutsideClick: false,
+                    onOpen: () => {
+                        swal.showLoading();
+                    }
+                });
+            },
+            success: function (data) {
+                swal.close();
+                var list = data == null ? [] : (data instanceof Array ? data : [data]);
+                $.each(list, function (index, org_types) {
+                    if (org_types.status) {
+                        daftarpertanyaan.ajax.reload();
+                    } else {
+                        swal.fire("Oops", org_types.pesan, "error");
+                    }
+                });
+                $form.formValidation('disableSubmitButtons', false)
+                    .formValidation('resetForm', true);
+            },
+            error: function () {
+                swal.fire("Oops", "No connection!", "error");
+                $form.formValidation('disableSubmitButtons', false)
+                    .formValidation('resetForm', true);
+            }
+        });
+
+    return false;
+});
+
+
+$("#formtemuan").formValidation({
+        framework: "bootstrap4",
+        excluded: [':disabled'],
+        err: {
+            clazz: 'invalid-feedback'
+        },
+        control: {
+            valid: 'is-valid',
+            invalid: 'is-invalid'
+        },
+        row: {
+            invalid: 'has-danger'
+        }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+
+        var $form = $(e.target);       // ✅ perbaikan
+        //var formData = new FormData(e.target);
+        var $jwb_temuan = tinymce.get('jwb_temuan').getContent();
+
+        $.ajax({
+            url: base_url + "/daftaraudit/temuan",
+            type: "POST",
+            data: {
+                dtform_id:$dtform_id,
+                audit_id:$audit_id,
+                jwb_temuan:$jwb_temuan
+            },
+            beforeSend: function () {
+                $("#temuanModal").modal('hide');
+                swal.fire({
+                    title: 'Loading',
+                    allowEscapeKey: false,
+                    allowOutsideClick: false,
+                    onOpen: () => {
+                        swal.showLoading();
+                    }
+                });
+            },
+            success: function (data) {
+                swal.close();
+                var list = data == null ? [] : (data instanceof Array ? data : [data]);
+                $.each(list, function (index, org_types) {
+                    if (org_types.status) {
+                        daftarpertanyaan.ajax.reload();
+                    } else {
+                        swal.fire("Oops", org_types.pesan, "error");
+                    }
+                });
+                $form.formValidation('disableSubmitButtons', false)
+                    .formValidation('resetForm', true);
+            },
+            error: function () {
+                swal.fire("Oops", "No connection!", "error");
+                $form.formValidation('disableSubmitButtons', false)
+                    .formValidation('resetForm', true);
+            }
+        });
+
+    return false;
+});
+
+
+$("#formcatatan").formValidation({
+        framework: "bootstrap4",
+        excluded: [':disabled'],
+        err: {
+            clazz: 'invalid-feedback'
+        },
+        control: {
+            valid: 'is-valid',
+            invalid: 'is-invalid'
+        },
+        row: {
+            invalid: 'has-danger'
+        }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+
+        var $form = $(e.target);       // ✅ perbaikan
+        //var formData = new FormData(e.target);
+        var $jwb_catatan = tinymce.get('jwb_catatan').getContent();
+
+        $.ajax({
+            url: base_url + "/daftaraudit/catatan",
+            type: "POST",
+            data: {
+                dtform_id:$dtform_id,
+                audit_id:$audit_id,
+                jwb_catatan:$jwb_catatan
+            },
+            beforeSend: function () {
+                $("#catatanModal").modal('hide');
                 swal.fire({
                     title: 'Loading',
                     allowEscapeKey: false,
