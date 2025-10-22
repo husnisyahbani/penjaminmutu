@@ -107,6 +107,82 @@ $(function () {
         daftarpertanyaan.ajax.url(base_url + "/daftaraudit/listpertanyaan/"+id).load();
     });
 
+    $("#daftaraudit").on("click", ".proses", function () {
+        var id = $(this).attr('id');
+        proses(id);
+    });
+
+    function proses($id)
+    {
+        swal.fire({
+            title: "Anda Yakin?",
+            text: "Anda Yakin Ingin Memproses Formulir Ini?",
+            type: "warning",
+            showCancelButton: true,
+            showLoaderOnConfirm: true,
+            confirmButtonText: "Ya, Proses!",
+            cancelButtonText: 'Tidak',
+            preConfirm: function () {
+                $.ajax({
+                    url: base_url + "/dashboard/proses",
+                    type: "POST",
+                    data: { id: $id}
+                })
+                        .done(function (data) {
+                            swal.fire({
+                                title: "Hapus",
+                                text: "Formulir Sedang Diproses!",
+                                type: "success",
+                                preConfirm: function () {
+                                    daftaraudit.ajax.reload();
+                                }
+                            });
+                        })
+                        .error(function (data) {
+                            swal.fire("Oops", "No connection!", "error");
+                        });
+            }
+        });
+    }
+
+    $("#daftaraudit").on("click", ".selesai", function () {
+        var id = $(this).attr('id');
+        selesai(id);
+    });
+
+    function selesai($id)
+    {
+        swal.fire({
+            title: "Anda Yakin?",
+            text: "Anda Yakin Ingin Selesaikan Proses Formulir Ini?",
+            type: "warning",
+            showCancelButton: true,
+            showLoaderOnConfirm: true,
+            confirmButtonText: "Ya, Selesai!",
+            cancelButtonText: 'Tidak',
+            preConfirm: function () {
+                $.ajax({
+                    url: base_url + "/dashboard/selesai",
+                    type: "POST",
+                    data: { id: $id}
+                })
+                        .done(function (data) {
+                            swal.fire({
+                                title: "Hapus",
+                                text: "Formulir Telah Selesai Diproses!",
+                                type: "success",
+                                preConfirm: function () {
+                                    daftaraudit.ajax.reload();
+                                }
+                            });
+                        })
+                        .error(function (data) {
+                            swal.fire("Oops", "No connection!", "error");
+                        });
+            }
+        });
+    }
+
      $("#tambah").on("click", function () {
         $("#addModal").modal('show');
     });

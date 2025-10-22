@@ -5,7 +5,7 @@ class Daftaraudit extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditor';
-        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=1.13"));
+        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=1.14"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
@@ -130,10 +130,17 @@ class Daftaraudit extends MY_Controller {
         echo json_encode($query);
     }
 
-    public function update() {
+    public function proses() {
         $data = array();
         $data['audit_id'] = $this->input->post('id');
         $data['audit_status'] = "PROSES";
+        $this->mutu->edit($data);
+    }
+
+    public function selesai() {
+        $data = array();
+        $data['audit_id'] = $this->input->post('id');
+        $data['audit_status'] = "SELESAI";
         $this->mutu->edit($data);
     }
 
@@ -166,17 +173,19 @@ class Daftaraudit extends MY_Controller {
             if($field->audit_status == "PROSES" || $field->audit_status == "SELESAI"){
                 $row[] = '<button class="detail btn btn-sm btn-icon btn-success"
             data-toggle="tooltip" data-original-title="DETAIL" id=' . $field->audit_id.'><i class="icon md-book" aria-hidden="true"></i></button>';
+            }else{
+                $row[] = "";
             }
             
             if($field->audit_status == "DRAFT"){
                 $row[] = '<button class="btn btn-primary btn-xs waves-effect waves-classic"
             data-toggle="tooltip" data-original-title="DRAFT">Draft</button>';
             }else if($field->audit_status == "TERKIRIM"){                                        
-                $row[] = '<button type="button" class="btn btn-sm btn-icon btn-warning"><i class="icon md-play" aria-hidden="true"></i>Proses</button>';
+                $row[] = '<button type="button" class="proses btn btn-sm btn-icon btn-warning"><i class="icon md-play" aria-hidden="true"></i>Proses</button>';
             }else if($field->audit_status == "PROSES"){
-                $row[] = '<button type="button" class="btn btn-sm btn-icon btn-danger"><i class="icon md-play" aria-hidden="true"></i>Selesai</button>';
+                $row[] = '<button type="button" class="selesai btn btn-sm btn-icon btn-danger"><i class="icon md-play" aria-hidden="true"></i>Selesai</button>';
             }else if($field->audit_status == "SELESAI"){
-                $row[] = '<button type="button" class="selesai btn btn-success btn-xs waves-effect waves-classic" id="'.$field->audit_id.'"><i class="icon md-download" aria-hidden="true"></i>Selesai</button>';
+                $row[] = '<button type="button" class="btn btn-success btn-xs waves-effect waves-classic" id="'.$field->audit_id.'"><i class="icon md-download" aria-hidden="true"></i>Selesai</button>';
             }
             
             
