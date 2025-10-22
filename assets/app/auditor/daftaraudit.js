@@ -109,7 +109,8 @@ $(function () {
 
     $("#daftaraudit").on("click", ".proses", function () {
         var id = $(this).attr('id');
-        proses(id);
+        alert("Hai "+id);
+        ///proses(id);
     });
 
     function proses($id)
