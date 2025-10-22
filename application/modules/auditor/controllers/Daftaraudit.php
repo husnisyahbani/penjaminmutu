@@ -129,11 +129,11 @@ class Daftaraudit extends MY_Controller {
             $row[] = $field->auditee;
             $row[] = $field->unit;
             $row[] = '<button class="detail btn btn-sm btn-icon btn-success"
-            data-toggle="tooltip" data-original-title="DETAIL" id=' . $field->audit_id.'><i class="icon md-book" aria-hidden="true"></i> Detail</button> <button class="delete btn btn-sm btn-icon btn-danger"
-            data-toggle="tooltip" data-original-title="DELETE" id=' . $field->audit_id.'><i class="icon md-delete" aria-hidden="true"></i> Hapus</button>';
+            data-toggle="tooltip" data-original-title="DETAIL" id=' . $field->audit_id.'><i class="icon md-book" aria-hidden="true"></i></button> <button class="delete btn btn-sm btn-icon btn-danger"
+            data-toggle="tooltip" data-original-title="DELETE" id=' . $field->audit_id.'><i class="icon md-delete" aria-hidden="true"></i></button>';
             if($field->audit_status == "DRAFT"){
                 $row[] = '<button class="btn btn-primary btn-xs waves-effect waves-classic"
-            data-toggle="tooltip" data-original-title="DRAFT"><i class="icon md-play" aria-hidden="true"></i> Draft</button>';
+            data-toggle="tooltip" data-original-title="DRAFT">Draft</button>';
             }else if($field->audit_status == "TERKIRIM"){                                        
                 $row[] = '<button type="button" class="btn btn-sm btn-icon btn-warning"><i class="icon md-play" aria-hidden="true"></i>Proses</button>';
             }else if($field->audit_status == "PROSES"){
