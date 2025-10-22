@@ -124,7 +124,7 @@ $(function () {
             cancelButtonText: 'Tidak',
             preConfirm: function () {
                 $.ajax({
-                    url: base_url + "/dashboard/proses",
+                    url: base_url + "/daftaraudit/proses",
                     type: "POST",
                     data: { id: $id}
                 })
@@ -162,7 +162,7 @@ $(function () {
             cancelButtonText: 'Tidak',
             preConfirm: function () {
                 $.ajax({
-                    url: base_url + "/dashboard/selesai",
+                    url: base_url + "/daftaraudit/selesai",
                     type: "POST",
                     data: { id: $id}
                 })

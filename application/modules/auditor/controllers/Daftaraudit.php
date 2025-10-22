@@ -174,7 +174,8 @@ class Daftaraudit extends MY_Controller {
                 $row[] = '<button class="detail btn btn-sm btn-icon btn-success"
             data-toggle="tooltip" data-original-title="DETAIL" id=' . $field->audit_id.'><i class="icon md-book" aria-hidden="true"></i></button>';
             }else{
-                $row[] = "";
+                $row[] = '<button class="btn btn-warning btn-xs waves-effect waves-classic"
+            data-toggle="tooltip" data-original-title="Wait">Menunggu Proses</button>';
             }
             
             if($field->audit_status == "DRAFT"){
