@@ -50,8 +50,8 @@ $(function () {
 
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
-        var pertanyaan = rowData[1];
-        var hasil = rowData[2];
+        var pertanyaan = rowData[2];
+        var hasil = rowData[4];
         tinymce.get('pertanyaanhasil').setContent(pertanyaan);
         tinymce.get('jwb_hasil').setContent(hasil);
 
@@ -75,8 +75,8 @@ $(function () {
 
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
-        var pertanyaan = rowData[1];
-        var temuan = rowData[2];
+        var pertanyaan = rowData[2];
+        var temuan = rowData[5];
         tinymce.get('pertanyaantemuan').setContent(pertanyaan);
         $('#jwb_temuan').val(temuan);
 
@@ -100,8 +100,8 @@ $(function () {
 
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
-        var pertanyaan = rowData[1];
-        var catatan = rowData[2];
+        var pertanyaan = rowData[2];
+        var catatan = rowData[6];
         tinymce.get('pertanyaancatatan').setContent(pertanyaan);
         tinymce.get('jwb_catatan').setContent(catatan);
 
