@@ -182,9 +182,9 @@ class Daftaraudit extends MY_Controller {
                 $row[] = '<button class="btn btn-primary btn-xs waves-effect waves-classic"
             data-toggle="tooltip" data-original-title="DRAFT">Draft</button>';
             }else if($field->audit_status == "TERKIRIM"){                                        
-                $row[] = '<button type="button" class="proses btn btn-sm btn-icon btn-warning"><i class="icon md-play" aria-hidden="true"></i>Proses</button>';
+                $row[] = '<button type="button" class="proses btn btn-sm btn-icon btn-warning" id="'.$field->audit_id.'"><i class="icon md-play" aria-hidden="true"></i>Proses</button>';
             }else if($field->audit_status == "PROSES"){
-                $row[] = '<button type="button" class="selesai btn btn-sm btn-icon btn-danger"><i class="icon md-play" aria-hidden="true"></i>Selesai</button>';
+                $row[] = '<button type="button" class="selesai btn btn-sm btn-icon btn-danger" id="'.$field->audit_id.'"><i class="icon md-play" aria-hidden="true"></i>Selesai</button>';
             }else if($field->audit_status == "SELESAI"){
                 $row[] = '<button type="button" class="btn btn-success btn-xs waves-effect waves-classic" id="'.$field->audit_id.'"><i class="icon md-download" aria-hidden="true"></i>Selesai</button>';
             }
