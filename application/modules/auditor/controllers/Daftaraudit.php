@@ -96,6 +96,13 @@ class Daftaraudit extends MY_Controller {
         echo json_encode($query);
     }
 
+    public function update() {
+        $data = array();
+        $data['audit_id'] = $this->input->post('id');
+        $data['audit_status'] = "PROSES";
+        $this->mutu->edit($data);
+    }
+
     public function hapus() {
         $id = $this->input->post('id');
         $this->mutu->hapus($id);
@@ -125,12 +132,12 @@ class Daftaraudit extends MY_Controller {
             data-toggle="tooltip" data-original-title="DETAIL" id=' . $field->audit_id.'><i class="icon md-book" aria-hidden="true"></i> Detail</button> <button class="delete btn btn-sm btn-icon btn-danger"
             data-toggle="tooltip" data-original-title="DELETE" id=' . $field->audit_id.'><i class="icon md-delete" aria-hidden="true"></i> Hapus</button>';
             if($field->audit_status == "DRAFT"){
-                $row[] = '<button class="detail btn btn-sm btn-icon btn-success"
-            data-toggle="tooltip" data-original-title="KIRIM" id=' . $field->audit_id.'><i class="icon md-play" aria-hidden="true"></i> Kirim</button>';
+                $row[] = '<button class="btn btn-default btn-xs waves-effect waves-classic"
+            data-toggle="tooltip" data-original-title="DRAFT"><i class="icon md-play" aria-hidden="true"></i> Draft</button>';
             }else if($field->audit_status == "TERKIRIM"){                                        
-                $row[] = '<button type="button" class="btn btn-danger btn-xs waves-effect waves-classic"><i class="icon md-check" aria-hidden="true"></i>Terkirim</button>';
+                $row[] = '<button type="button" class="btn btn-sm btn-icon btn-warning"><i class="icon md-play" aria-hidden="true"></i>Proses</button>';
             }else if($field->audit_status == "PROSES"){
-                $row[] = '<button type="button" class="btn btn-warning btn-xs waves-effect waves-classic"><i class="icon md-home" aria-hidden="true"></i>Diproses</button>';
+                $row[] = '<button type="button" class="btn btn-sm btn-icon btn-danger"><i class="icon md-play" aria-hidden="true"></i>Selesai</button>';
             }else if($field->audit_status == "SELESAI"){
                 $row[] = '<button type="button" class="selesai btn btn-success btn-xs waves-effect waves-classic" id="'.$field->audit_id.'"><i class="icon md-download" aria-hidden="true"></i>Selesai</button>';
             }
@@ -168,15 +175,24 @@ class Daftaraudit extends MY_Controller {
             $row[] = $no;
             $row[] = $field->dtform_pertanyaan;
             $row[] = $field->dtform_lingkup;
-            if($field->audit_status == "DRAFT"){
-                $row[] = $field->jwb_jawaban.' <button type="button" class="edit btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i></button>';
+            $row[] = $field->jwb_jawaban;
+            if($field->audit_status == "TERKIRIM"){
+                $row[] = $field->jwb_hasil.' <button type="button" class="hasil btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i></button>';
             }else{
-                $row[] = $field->jwb_jawaban;
+                $row[] = $field->jwb_hasil;
             }
-            
-            $row[] = $field->jwb_hasil;
-            $row[] = $field->jwb_temuan;
-            $row[] = $field->jwb_catatan;
+
+            if($field->audit_status == "TERKIRIM"){
+                $row[] = $field->jwb_temuan.' <button type="button" class="temuan btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i></button>';
+            }else{
+                $row[] = $field->jwb_temuan;
+            }
+
+            if($field->audit_status == "TERKIRIM"){
+                $row[] = $field->jwb_catatan.' <button type="button" class="catatan btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i></button>';
+            }else{
+                $row[] = $field->jwb_catatan;
+            }
            
             $data[] = $row;
         }
