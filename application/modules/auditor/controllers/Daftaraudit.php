@@ -223,19 +223,19 @@ class Daftaraudit extends MY_Controller {
             $row[] = $field->dtform_pertanyaan;
             $row[] = $field->dtform_lingkup;
             $row[] = $field->jwb_jawaban;
-            if($field->audit_status == "TERKIRIM"){
+            if($field->audit_status == "PROSES"){
                 $row[] = $field->jwb_hasil.' <button type="button" class="hasil btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i></button>';
             }else{
                 $row[] = $field->jwb_hasil;
             }
 
-            if($field->audit_status == "TERKIRIM"){
+            if($field->audit_status == "PROSES"){
                 $row[] = $field->jwb_temuan.' <button type="button" class="temuan btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i></button>';
             }else{
                 $row[] = $field->jwb_temuan;
             }
 
-            if($field->audit_status == "TERKIRIM"){
+            if($field->audit_status == "PROSES"){
                 $row[] = $field->jwb_catatan.' <button type="button" class="catatan btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i></button>';
             }else{
                 $row[] = $field->jwb_catatan;
