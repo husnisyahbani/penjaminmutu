@@ -110,14 +110,14 @@ $(function () {
     $("#daftaraudit").on("click", ".proses", function () {
         var id = $(this).attr('id');
         alert("Hai "+id);
-        ///proses(id);
+       // proses(id);
     });
 
     function proses($id)
     {
         swal.fire({
             title: "Anda Yakin?",
-            text: "Anda Yakin Ingin Memproses Formulir Ini?"+$id,
+            text: "Anda Yakin Ingin Memproses Formulir Ini?",
             type: "warning",
             showCancelButton: true,
             showLoaderOnConfirm: true,
