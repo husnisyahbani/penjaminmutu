@@ -109,11 +109,10 @@ $(function () {
 
     $("#daftaraudit").on("click", ".proses", function () {
         var id = $(this).attr('id');
-       // alert("Hai "+id);
         proses(id);
     });
 
-    function proses($id)
+    function proses(idku)
     {
         swal.fire({
             title: "Anda Yakin?",
@@ -127,7 +126,7 @@ $(function () {
                 $.ajax({
                     url: base_url + "/daftaraudit/proses",
                     type: "POST",
-                    data: { id: $id}
+                    data: { id: idku}
                 })
                         .done(function (data) {
                             swal.fire({
