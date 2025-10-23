@@ -61,7 +61,7 @@
 <script src="<?php echo asset_url();?>global/vendor/dropify/dropify.min.js"></script>
 <script src="<?php echo asset_url();?>global/vendor/formvalidation/formValidation.min.js"></script>
 <script src="<?php echo asset_url();?>global/vendor/formvalidation/framework/bootstrap4.min.js"></script>
-<script src="<?php echo asset_url();?>global/vendor/summernote/summernote.min.js"></script>
+<script src="<?php echo asset_url();?>summernote/summernote-bs4.js"></script>
 <script src="<?php echo asset_url(); ?>global/vendor/bootstrap-datepicker/bootstrap-datepicker.js"></script>
 <script src="<?php echo asset_url(); ?>global/vendor/toastr/toastr.js"></script>
 
@@ -99,7 +99,12 @@
 <script src="<?php echo asset_url();?>assets/examples/js/dashboard/v1.js"></script>
 
 
-
+<script>
+      $('.editor').summernote({
+        tabsize: 2,
+        height: 300
+      });
+</script>
 
 
 <script>

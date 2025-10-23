@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function(){
     <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/dropify/dropify.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/formvalidation/formValidation.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>assets/examples/css/forms/validation.css">
-    <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/summernote/summernote.css">
+    <link rel="stylesheet" href="<?php echo asset_url();?>summernote/summernote-bs4.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>assets/examples/css/uikit/modals.css">
     <link rel="stylesheet" href="<?php echo asset_url(); ?>global/vendor/toastr/toastr.min.css">
      <link rel="stylesheet" href="<?php echo asset_url(); ?>global/vendor/bootstrap-datepicker/bootstrap-datepicker.css">
@@ -94,17 +94,7 @@ document.addEventListener("DOMContentLoaded", function(){
     
     <!-- Scripts -->
     <script src="<?php echo asset_url();?>global/vendor/breakpoints/breakpoints.js"></script>
-    <script src="https://cdn.ckeditor.com/4.14.0/standard-all/ckeditor.js"></script>
-
-     <script>
-    CKEDITOR.replace('editor', {
-      height: 300,
-      extraPlugins: 'autogrow',
-      removePlugins: 'resize',
-      autoGrow_minHeight: 200,
-      autoGrow_maxHeight: 600
-    });
-  </script>
+    
     <script>
       Breakpoints();
     </script>

@@ -94,24 +94,24 @@
 <script src="<?php echo asset_url();?>assets/examples/js/tables/datatable.js"></script>
 <script src="<?php echo asset_url();?>assets/examples/js/uikit/icon.js"></script>
 <script src="<?php echo asset_url();?>global/js/Plugin/sweetalert2.min.js"></script>
-<script src="<?php echo asset_url();?>global/js/Plugin/summernote.js"></script>
+<!-- <script src="<?php echo asset_url();?>global/js/Plugin/summernote.js"></script> -->
+<script src="<?php echo asset_url();?>summernote/summernote-bs4.js"></script>
 <script src="<?php echo asset_url();?>assets/examples/js/forms/editor-summernote.js"></script>
 <script src="<?php echo asset_url();?>assets/examples/js/dashboard/v1.js"></script>
 
 <script>
-$(document).ready(function() {
-  // Inisialisasi semua editor
-  $('.editor').each(function() {
-    CKEDITOR.replace($(this).attr('name'));
-  });
-
- 
-});
+      $('.editor').summernote({
+        tabsize: 2,
+        height: 300
+      });
 </script>
+
 
 
 <script>
      $(function () {
+
+        
         <?php
 if (isset($pesanberhasil)) {
     echo "toastr.options.timeOut = 'false';

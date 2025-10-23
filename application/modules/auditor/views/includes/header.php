@@ -18,7 +18,6 @@
     <link rel="stylesheet" href="<?php echo asset_url();?>global/css/bootstrap-extend.min.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>assets/css/site.min.css">
 
-    <script src="<?php echo asset_url();?>/assets/tinymce/js/tinymce/tinymce.min.js"></script>
 
     <!-- <script src="https://cdn.tiny.cloud/1/2vfigjikc198eohzhjdy4kgw3m94rmetkn3meeijacpibx67/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script> -->
 
@@ -62,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function(){
     <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/dropify/dropify.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/formvalidation/formValidation.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>assets/examples/css/forms/validation.css">
-    <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/summernote/summernote.css">
+    <link rel="stylesheet" href="<?php echo asset_url();?>summernote/summernote-bs4.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>assets/examples/css/uikit/modals.css">
     <link rel="stylesheet" href="<?php echo asset_url(); ?>global/vendor/toastr/toastr.min.css">
      <link rel="stylesheet" href="<?php echo asset_url(); ?>global/vendor/bootstrap-datepicker/bootstrap-datepicker.css">
