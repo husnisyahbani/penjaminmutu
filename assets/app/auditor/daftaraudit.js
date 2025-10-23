@@ -52,12 +52,9 @@ $(function () {
         var rowData = daftarpertanyaan.row(tr).data();
         var pertanyaan = rowData[2];
         var hasil = rowData[4];
-        
+        var cleanHasil = hasil.replace(/<button[\s\S]*$/i, '');
         $('#pertanyaanhasil').summernote('code',pertanyaan);
-        hasil.find('button').remove();
-        $('#jwb_hasil').summernote('code',hasil);
-        //tinymce.get('pertanyaanhasil').setContent(pertanyaan);
-        //tinymce.get('jwb_hasil').setContent(hasil);
+        $('#jwb_hasil').summernote('code',cleanHasil);
 
     });
 
@@ -81,11 +78,9 @@ $(function () {
         var rowData = daftarpertanyaan.row(tr).data();
         var pertanyaan = rowData[2];
         var temuan = rowData[5];
-        
+        var cleanTemuan = temuan.replace(/<button[\s\S]*$/i, '');
         $('#pertanyaantemuan').summernote('code',pertanyaan);
-        //tinymce.get('pertanyaantemuan').setContent(pertanyaan);
-        temuan.find('button').remove();
-        $('#jwb_temuan').val(temuan);
+        $('#jwb_temuan').val(cleanTemuan);
 
     });
 
@@ -109,18 +104,8 @@ $(function () {
         var rowData = daftarpertanyaan.row(tr).data();
         var pertanyaan = rowData[2];
         var catatan = rowData[6];
-        
+        var cleanCatatan = catatan.replace(/<button[\s\S]*$/i, '');
         $('#pertanyaancatatan').summernote('code',pertanyaan);
-        
-        var parser = new DOMParser();
-        var doc = parser.parseFromString(catatan, 'text/html');
-
-        // hapus semua button
-        $(doc).find('button').remove();
-
-        // ambil kembali isi body-nya
-        var cleanCatatan = doc.body.innerHTML;
-
         // tampilkan di summernote
         $('#jwb_catatan').summernote('code', cleanCatatan);
 
