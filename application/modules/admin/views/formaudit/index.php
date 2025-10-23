@@ -3,16 +3,7 @@
 
     <!-- Page -->
     <div class="page">
-    <div class="page-header">
-        
-        <div class="page-header-actions">
-          <button type="button" class="btn btn-sm btn-icon btn-success" data-toggle="tooltip"
-            data-original-title="Tambah" id="tambah">
-            <i class="icon md-plus" aria-hidden="true"></i>Tambah
-          </button>
-          
-        </div>
-      </div>
+    
       <div class="page-content container-fluid">
       
 
@@ -21,7 +12,9 @@
                 <h3 class="panel-title">Formulir</h3> 
                 <div class="panel-actions panel-actions-keep">
                     <div class="row">
-                        
+                        <button type="button" class="btn btn-sm btn-icon btn-success" id="tambah">
+                                <i class="icon md-plus" aria-hidden="true"></i>Tambah
+                            </button>
                     </div>
                 </div>
             </header>
