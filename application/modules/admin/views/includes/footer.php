@@ -98,17 +98,16 @@
 <script src="<?php echo asset_url();?>assets/examples/js/forms/editor-summernote.js"></script>
 <script src="<?php echo asset_url();?>assets/examples/js/dashboard/v1.js"></script>
 
-
 <script>
-    $('.editor').each(function() {
-    CKEDITOR.replace($(this).attr('name'), {
-      height: 200,
-      extraPlugins: 'autogrow',
-      removePlugins: 'resize',
-      autoGrow_maxHeight: 300
-    });
+$(document).ready(function() {
+  // Inisialisasi semua editor
+  $('.editor').each(function() {
+    CKEDITOR.replace($(this).attr('name'));
   });
-  </script>
+
+ 
+});
+</script>
 
 
 <script>
