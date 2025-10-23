@@ -104,4 +104,48 @@ class MutuauditModel extends CI_Model {
         return $this->db->trans_status();
     }
 
+    public function totalTerkirim(){
+        $this->db->from('mutu_audit');
+        $users_id = $this->session->userdata('users_id');
+        if(isset($users_id)){
+            $this->db->where('auditor_id',$users_id);
+        }
+        $this->db->where("audit_status","TERKIRIM");
+        $query = $this->db->get();
+        return $query->num_rows();
+    }
+
+    public function totalProses(){
+        $this->db->from('mutu_audit');
+        $users_id = $this->session->userdata('users_id');
+        if(isset($users_id)){
+            $this->db->where('auditor_id',$users_id);
+        }
+        $this->db->where("audit_status","PROSES");
+        $query = $this->db->get();
+        return $query->num_rows();
+    }
+
+    public function totalSelesai(){
+        $this->db->from('mutu_audit');
+        $users_id = $this->session->userdata('users_id');
+        if(isset($users_id)){
+            $this->db->where('auditor_id',$users_id);
+        }
+        $this->db->where("audit_status","SELESAI");
+        $query = $this->db->get();
+        return $query->num_rows();
+    }
+
+    public function totalDraft(){
+        $this->db->from('mutu_audit');
+        $users_id = $this->session->userdata('users_id');
+        if(isset($users_id)){
+            $this->db->where('auditor_id',$users_id);
+        }
+        $this->db->where("audit_status","DRAFT");
+        $query = $this->db->get();
+        return $query->num_rows();
+    }
+
 }
