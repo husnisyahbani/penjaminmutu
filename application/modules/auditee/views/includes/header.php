@@ -18,10 +18,10 @@
     <link rel="stylesheet" href="<?php echo asset_url();?>global/css/bootstrap-extend.min.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>assets/css/site.min.css">
 
-    <script src="<?php echo asset_url();?>/assets/tinymce/js/tinymce/tinymce.min.js"></script>
+    <!-- <script src="<?php echo asset_url();?>/assets/tinymce/js/tinymce/tinymce.min.js"></script> -->
     <!-- <script src="https://cdn.tiny.cloud/1/2vfigjikc198eohzhjdy4kgw3m94rmetkn3meeijacpibx67/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script> -->
 
-<script>
+<!-- <script>
 document.addEventListener("DOMContentLoaded", function(){
   tinymce.init({
     selector: 'textarea.editor',
@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function(){
     height: 200
   });
 });
-</script>
+</script> -->
 
 <style>
 /* CSS jangan taruh di dalam <script> */
@@ -95,6 +95,16 @@ document.addEventListener("DOMContentLoaded", function(){
     <!-- Scripts -->
     <script src="<?php echo asset_url();?>global/vendor/breakpoints/breakpoints.js"></script>
     <script src="https://cdn.ckeditor.com/4.14.0/standard-all/ckeditor.js"></script>
+
+     <script>
+    CKEDITOR.replace('editor', {
+      height: 300,
+      extraPlugins: 'autogrow',
+      removePlugins: 'resize',
+      autoGrow_minHeight: 200,
+      autoGrow_maxHeight: 600
+    });
+  </script>
     <script>
       Breakpoints();
     </script>
