@@ -52,8 +52,9 @@ $(function () {
         var rowData = daftarpertanyaan.row(tr).data();
         var pertanyaan = rowData[2];
         var hasil = rowData[4];
-        hasil.find('button').remove();
+        
         $('#pertanyaanhasil').summernote('code',pertanyaan);
+        hasil.find('button').remove();
         $('#jwb_hasil').summernote('code',hasil);
         //tinymce.get('pertanyaanhasil').setContent(pertanyaan);
         //tinymce.get('jwb_hasil').setContent(hasil);
@@ -80,9 +81,10 @@ $(function () {
         var rowData = daftarpertanyaan.row(tr).data();
         var pertanyaan = rowData[2];
         var temuan = rowData[5];
-        temuan.find('button').remove();
+        
         $('#pertanyaantemuan').summernote('code',pertanyaan);
         //tinymce.get('pertanyaantemuan').setContent(pertanyaan);
+        temuan.find('button').remove();
         $('#jwb_temuan').val(temuan);
 
     });
@@ -107,8 +109,9 @@ $(function () {
         var rowData = daftarpertanyaan.row(tr).data();
         var pertanyaan = rowData[2];
         var catatan = rowData[6];
-        catatan.find('button').remove();
+        
         $('#pertanyaancatatan').summernote('code',pertanyaan);
+        catatan.find('button').remove();
         $('#jwb_catatan').summernote('code',catatan);
         //tinymce.get('pertanyaancatatan').setContent(pertanyaan);
         //tinymce.get('jwb_catatan').setContent(catatan);
