@@ -55,7 +55,7 @@ $(function () {
         var jawaban = rowData[3];
         var cleanJawaban = jawaban.replace(/<button[\s\S]*$/i, '');
         $('#pertanyaan').summernote('code', pertanyaan);
-        $('#jwb_jawab').summernote('code', cleanJawaban);
+        $('#jwb_jawaban').summernote('code', cleanJawaban);
 
     });
 
