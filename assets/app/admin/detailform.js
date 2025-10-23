@@ -40,8 +40,10 @@ $(function () {
                     $('#dtformEditModal').modal('show');
                     $("#edit_dtform_tujuan").val(list.dtform_tujuan);
                     $("#dtform_id").val(list.dtform_id);
-                    tinymce.get('edit_dtform_pertanyaan').setContent(list.dtform_pertanyaan);
-                    tinymce.get('edit_dtform_lingkup').setContent(list.dtform_lingkup);
+                    $('#edit_dtform_pertanyaan').summernote('code',list.dtform_pertanyaan);
+                    $('#edit_dtform_lingkup').summernote('code',list.dtform_lingkup);
+                    // tinymce.get('edit_dtform_pertanyaan').setContent(list.dtform_pertanyaan);
+                    // tinymce.get('edit_dtform_lingkup').setContent(list.dtform_lingkup);
                     
                 } else {
                     swal.fire("Oops", "Gagal!", "error");

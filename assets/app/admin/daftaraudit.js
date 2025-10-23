@@ -61,7 +61,8 @@ $(function () {
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
         var pertanyaan = rowData[1];
-        tinymce.get('pertanyaan').setContent(pertanyaan);
+        $('#pertanyaan').summernote('code',pertanyaan);
+        //tinymce.get('pertanyaan').setContent(pertanyaan);
 
     });
 
@@ -202,7 +203,8 @@ $("#formedit").formValidation({
 
         var $form = $(e.target);       // ✅ perbaikan
         //var formData = new FormData(e.target);
-        var $jwb_jawaban = tinymce.get('jwb_jawaban').getContent();
+        var $jwb_jawaban = $('#jwb_jawaban').summernote('code');
+        //var $jwb_jawaban = tinymce.get('jwb_jawaban').getContent();
 
         $.ajax({
             url: base_url + "/daftaraudit/jawab",

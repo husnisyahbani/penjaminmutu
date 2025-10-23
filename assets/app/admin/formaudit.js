@@ -41,7 +41,8 @@ $(function () {
                     $("#edit_form_nama").val(list.form_nama);
                     $("#edit_form_kode").val(list.form_kode);
                     $("#form_id").val(list.form_id);
-                    tinymce.get('edit_isi_artikel').setContent(list.form_deskripsi);
+                    $('#edit_isi_artikel').summernote('code',list.form_deskripsi);
+                    //tinymce.get('edit_isi_artikel').setContent(list.form_deskripsi);
                     
                 } else {
                     swal.fire("Oops", "Gagal!", "error");

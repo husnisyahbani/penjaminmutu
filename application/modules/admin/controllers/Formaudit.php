@@ -5,7 +5,7 @@ class Formaudit extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'admin';
-        $this->load->js(base_url("assets/app/admin/formaudit.js?v=1.17"));
+        $this->load->js(base_url("assets/app/admin/formaudit.js?v=1.18"));
         $this->load->model('FormulirModel', 'formulir');
 
         $role = $this->session->userdata('role');
