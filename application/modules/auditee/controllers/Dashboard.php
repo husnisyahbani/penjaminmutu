@@ -5,7 +5,7 @@ class Dashboard extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditee';
-        $this->load->js(base_url("assets/app/auditee/daftaraudit.js?v=1.18"));
+        $this->load->js(base_url("assets/app/auditee/daftaraudit.js?v=1.19"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');

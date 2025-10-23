@@ -51,7 +51,11 @@ $(function () {
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
         var pertanyaan = rowData[2];
-        tinymce.get('pertanyaan').setContent(pertanyaan);
+        var jawaban = rowData[3];
+        var cleanJawaban = jawaban.replace(/<button[\s\S]*$/i, '');
+        $('#pertanyaan').summernote('code', pertanyaan);
+        $('#jwb_jawab').summernote('code', cleanJawaban);
+        //tinymce.get('pertanyaan').setContent(pertanyaan);
 
     });
 
