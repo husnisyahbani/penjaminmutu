@@ -52,8 +52,10 @@ $(function () {
         var rowData = daftarpertanyaan.row(tr).data();
         var pertanyaan = rowData[2];
         var hasil = rowData[4];
-        tinymce.get('pertanyaanhasil').setContent(pertanyaan);
-        tinymce.get('jwb_hasil').setContent(hasil);
+        $('#pertanyaanhasil').summernote('code',pertanyaan);
+        $('#jwb_hasil').summernote('code',hasil);
+        //tinymce.get('pertanyaanhasil').setContent(pertanyaan);
+        //tinymce.get('jwb_hasil').setContent(hasil);
 
     });
 
@@ -77,7 +79,8 @@ $(function () {
         var rowData = daftarpertanyaan.row(tr).data();
         var pertanyaan = rowData[2];
         var temuan = rowData[5];
-        tinymce.get('pertanyaantemuan').setContent(pertanyaan);
+        $('#pertanyaantemuan').summernote('code',pertanyaan);
+        //tinymce.get('pertanyaantemuan').setContent(pertanyaan);
         $('#jwb_temuan').val(temuan);
 
     });
@@ -102,8 +105,10 @@ $(function () {
         var rowData = daftarpertanyaan.row(tr).data();
         var pertanyaan = rowData[2];
         var catatan = rowData[6];
-        tinymce.get('pertanyaancatatan').setContent(pertanyaan);
-        tinymce.get('jwb_catatan').setContent(catatan);
+        $('#pertanyaancatatan').summernote('code',pertanyaan);
+        $('#jwb_catatan').summernote('code',catatan);
+        //tinymce.get('pertanyaancatatan').setContent(pertanyaan);
+        //tinymce.get('jwb_catatan').setContent(catatan);
 
     });
 
@@ -270,7 +275,8 @@ $("#formhasil").formValidation({
 
         var $form = $(e.target);       // ✅ perbaikan
         //var formData = new FormData(e.target);
-        var $jwb_hasil = tinymce.get('jwb_hasil').getContent();
+        var $jwb_hasil = $('#jwb_hasil').summernote('code');
+        //var $jwb_hasil = tinymce.get('jwb_hasil').getContent();
 
         $.ajax({
             url: base_url + "/daftaraudit/hasil",
@@ -396,7 +402,8 @@ $("#formcatatan").formValidation({
 
         var $form = $(e.target);       // ✅ perbaikan
         //var formData = new FormData(e.target);
-        var $jwb_catatan = tinymce.get('jwb_catatan').getContent();
+        var $jwb_catatan = $('#jwb_catatan').summernote('code');
+        //var $jwb_catatan = tinymce.get('jwb_catatan').getContent();
 
         $.ajax({
             url: base_url + "/daftaraudit/catatan",

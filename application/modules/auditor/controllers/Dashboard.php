@@ -5,7 +5,7 @@ class Dashboard extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditor';
-        $this->load->js(base_url("assets/app/auditor/formaudit.js?v=1.2"));
+        $this->load->js(base_url("assets/app/auditor/formaudit.js?v=1.3"));
         $this->load->model('FormulirModel', 'formulir');
 
         $role = $this->session->userdata('role');

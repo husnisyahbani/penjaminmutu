@@ -5,7 +5,7 @@ class Detailform extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditor';
-        $this->load->js(base_url("assets/app/auditor/detailform.js?v=1.4"));
+        $this->load->js(base_url("assets/app/auditor/detailform.js?v=1.5"));
         $this->load->model('DtformModel', 'dtform');
         $this->load->model('FormulirModel', 'formulir');
 
