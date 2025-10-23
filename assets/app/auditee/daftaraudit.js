@@ -48,6 +48,11 @@ $(function () {
             $('body').addClass('modal-open');
         }, 300);
         });
+
+        $('#pertanyaan').summernote('code',"");
+        // tampilkan di summernote
+        $('#jwb_catatan').summernote('code', "");
+
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
         var pertanyaan = rowData[2];
