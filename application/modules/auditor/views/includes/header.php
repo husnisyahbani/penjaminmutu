@@ -19,20 +19,6 @@
     <link rel="stylesheet" href="<?php echo asset_url();?>assets/css/site.min.css">
 
 
-    <!-- <script src="https://cdn.tiny.cloud/1/2vfigjikc198eohzhjdy4kgw3m94rmetkn3meeijacpibx67/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script> -->
-
-<script>
-document.addEventListener("DOMContentLoaded", function(){
-  tinymce.init({
-    selector: 'textarea.editor',
-    menubar: false,
-    plugins: 'code lists table',
-    toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | code',
-    height: 200
-  });
-});
-</script>
-
 <style>
 /* CSS jangan taruh di dalam <script> */
 .tox {
@@ -94,7 +80,6 @@ document.addEventListener("DOMContentLoaded", function(){
     
     <!-- Scripts -->
     <script src="<?php echo asset_url();?>global/vendor/breakpoints/breakpoints.js"></script>
-    <script src="https://cdn.ckeditor.com/4.14.0/standard-all/ckeditor.js"></script>
     <script>
       Breakpoints();
     </script>
