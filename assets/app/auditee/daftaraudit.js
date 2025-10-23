@@ -51,7 +51,7 @@ $(function () {
 
         $('#pertanyaan').summernote('code',"");
         // tampilkan di summernote
-        $('#jwb_catatan').summernote('code', "");
+        $('#jwb_jawab').summernote('code', "");
 
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
