@@ -60,6 +60,27 @@ class MutuauditModel extends CI_Model {
         return $query->num_rows();
     }
 
+    public function totalTerkirim(){
+        $this->db->from('mutu_audit');
+        $this->db->where("audit_status","TERKIRIM");
+        $query = $this->db->get();
+        return $query->num_rows();
+    }
+
+    public function totalProses(){
+        $this->db->from('mutu_audit');
+        $this->db->where("audit_status","PROSES");
+        $query = $this->db->get();
+        return $query->num_rows();
+    }
+
+    public function totalSelesai(){
+        $this->db->from('mutu_audit');
+        $this->db->where("audit_status","SELESAI");
+        $query = $this->db->get();
+        return $query->num_rows();
+    }
+
     public function count_all() {
         $this->db->from('mutu_audit');
         return $this->db->count_all_results();

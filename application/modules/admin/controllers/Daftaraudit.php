@@ -24,6 +24,9 @@ class Daftaraudit extends MY_Controller {
             $this->data['js'] = $this->load->get_js_files();
             $this->data['auditmenu'] = 'active';
             $this->data['audit'] = 'active';
+            $this->data['totalterkirim'] = $this->mutu->totalTerkirim();
+            $this->data['totalterProses'] = $this->mutu->totalProses();
+            $this->data['totalselesai'] = $this->mutu->totalSelesai();
             $this->data['listauditor'] = $this->akun->getAllAuditor();
             $this->data['listauditee'] = $this->akun->getAllAuditee();
             $this->data['formulir'] = $this->formulir->getAllFormulir();

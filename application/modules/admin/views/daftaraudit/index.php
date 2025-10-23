@@ -4,7 +4,7 @@
         <div class="row" data-plugin="matchHeight" data-by-row="true">
 
             <div class="col-xl-4 col-md-8">
-                <div class="card card-block p-25 bg-orange-600">
+                <div class="card card-block p-25 bg-red-600">
                     <div class="counter counter-lg counter-inverse">
                         <div class="counter-label text-uppercase">AUDIT TERKIRIM</div>
                         <div class="counter-number-group">
@@ -18,7 +18,7 @@
             </div>
 
             <div class="col-xl-4 col-md-8">
-                <div class="card card-block p-25 bg-red-600">
+                <div class="card card-block p-25 bg-orange-600">
                     <div class="counter counter-lg counter-inverse">
                         <div class="counter-label text-uppercase">AUDIT PROSES</div>
                         <div class="counter-number-group">
