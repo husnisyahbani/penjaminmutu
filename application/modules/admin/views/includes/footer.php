@@ -99,7 +99,15 @@
 <script src="<?php echo asset_url();?>assets/examples/js/dashboard/v1.js"></script>
 
 
-
+<script>
+    CKEDITOR.replace('edit_isi_artikel', {
+      height: 300,
+      extraPlugins: 'autogrow',
+      removePlugins: 'resize',
+      autoGrow_minHeight: 200,
+      autoGrow_maxHeight: 600
+    });
+  </script>
 
 
 <script>

@@ -101,15 +101,7 @@ document.addEventListener("DOMContentLoaded", function() {
     <script src="<?php echo asset_url();?>global/vendor/breakpoints/breakpoints.js"></script>
     <script src="https://cdn.ckeditor.com/4.14.0/standard-all/ckeditor.js"></script>
 
-     <script>
-    CKEDITOR.replace('edit_isi_artikel', {
-      height: 300,
-      extraPlugins: 'autogrow',
-      removePlugins: 'resize',
-      autoGrow_minHeight: 200,
-      autoGrow_maxHeight: 600
-    });
-  </script>
+     
     <script>
       Breakpoints();
     </script>
