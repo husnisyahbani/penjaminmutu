@@ -105,7 +105,7 @@
       height: 200,
       extraPlugins: 'autogrow',
       removePlugins: 'resize',
-      autoGrow_maxHeight: 600
+      autoGrow_maxHeight: 300
     });
   });
   </script>
