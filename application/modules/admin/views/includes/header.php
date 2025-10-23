@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", function() {
     
     <!-- Scripts -->
     <script src="<?php echo asset_url();?>global/vendor/breakpoints/breakpoints.js"></script>
-    <script src="<?php echo asset_url();?>ckeditor/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.25.1/standard-all/ckeditor.js"></script>
 
      
     <script>
