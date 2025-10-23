@@ -48,6 +48,10 @@ class MutuauditModel extends CI_Model {
         
         $this->db->from('mutu_audit');
         $this->db->join('formulir', 'formulir.form_id = mutu_audit.form_id', 'left');
+        $users_id = $this->session->userdata('users_id');
+        if(isset($users_id)){
+            $this->db->where('auditee_id',$users_id);
+        }
         $query = $this->db->get();
         return $query->result();
     }
@@ -56,12 +60,20 @@ class MutuauditModel extends CI_Model {
         $this->_get_datatables_query($search, $ordering);
         $this->db->from('mutu_audit');
         $this->db->join('formulir', 'formulir.form_id = mutu_audit.form_id', 'left');
+        $users_id = $this->session->userdata('users_id');
+        if(isset($users_id)){
+            $this->db->where('auditee_id',$users_id);
+        }
         $query = $this->db->get();
         return $query->num_rows();
     }
 
     public function count_all() {
         $this->db->from('mutu_audit');
+        $users_id = $this->session->userdata('users_id');
+        if(isset($users_id)){
+            $this->db->where('auditee_id',$users_id);
+        }
         return $this->db->count_all_results();
     }
 
@@ -90,6 +102,50 @@ class MutuauditModel extends CI_Model {
         $this->db->update('mutu_audit',$data);
         $this->db->trans_complete();
         return $this->db->trans_status();
+    }
+
+    public function totalTerkirim(){
+        $this->db->from('mutu_audit');
+        $users_id = $this->session->userdata('users_id');
+        if(isset($users_id)){
+            $this->db->where('auditee_id',$users_id);
+        }
+        $this->db->where("audit_status","TERKIRIM");
+        $query = $this->db->get();
+        return $query->num_rows();
+    }
+
+    public function totalProses(){
+        $this->db->from('mutu_audit');
+        $users_id = $this->session->userdata('users_id');
+        if(isset($users_id)){
+            $this->db->where('auditee_id',$users_id);
+        }
+        $this->db->where("audit_status","PROSES");
+        $query = $this->db->get();
+        return $query->num_rows();
+    }
+
+    public function totalSelesai(){
+        $this->db->from('mutu_audit');
+        $users_id = $this->session->userdata('users_id');
+        if(isset($users_id)){
+            $this->db->where('auditee_id',$users_id);
+        }
+        $this->db->where("audit_status","SELESAI");
+        $query = $this->db->get();
+        return $query->num_rows();
+    }
+
+    public function totalDraft(){
+        $this->db->from('mutu_audit');
+        $users_id = $this->session->userdata('users_id');
+        if(isset($users_id)){
+            $this->db->where('auditee_id',$users_id);
+        }
+        $this->db->where("audit_status","DRAFT");
+        $query = $this->db->get();
+        return $query->num_rows();
     }
 
 }

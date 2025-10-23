@@ -55,7 +55,6 @@ $(function () {
         var cleanJawaban = jawaban.replace(/<button[\s\S]*$/i, '');
         $('#pertanyaan').summernote('code', pertanyaan);
         $('#jwb_jawab').summernote('code', cleanJawaban);
-        //tinymce.get('pertanyaan').setContent(pertanyaan);
 
     });
 
@@ -184,7 +183,7 @@ $("#formedit").formValidation({
 
         var $form = $(e.target);       // ✅ perbaikan
         //var formData = new FormData(e.target);
-        var $jwb_jawaban = tinymce.get('jwb_jawaban').getContent();
+        var $jwb_jawaban = $('#jwb_jawaban').summernote('code');
 
         $.ajax({
             url: base_url + "/dashboard/jawab",

@@ -5,7 +5,7 @@ class Dashboard extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditee';
-        $this->load->js(base_url("assets/app/auditee/daftaraudit.js?v=1.19"));
+        $this->load->js(base_url("assets/app/auditee/daftaraudit.js?v=1.21"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
@@ -23,6 +23,10 @@ class Dashboard extends MY_Controller {
             $this->data['title'] = 'Daftar Audit';
             $this->data['js'] = $this->load->get_js_files();
             $this->data['dashboard'] = 'active';
+            $this->data['totalterkirim'] = $this->mutu->totalTerkirim();
+            $this->data['totalterProses'] = $this->mutu->totalProses();
+            $this->data['totalselesai'] = $this->mutu->totalSelesai();
+            $this->data['totaldraft'] = $this->mutu->totalDraft();
             $this->data['listauditor'] = $this->akun->getAllAuditor();
             $this->data['listauditee'] = $this->akun->getAllAuditee();
             $this->data['formulir'] = $this->formulir->getAllFormulir();
