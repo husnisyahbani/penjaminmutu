@@ -111,8 +111,12 @@ $(function () {
         var catatan = rowData[6];
         
         $('#pertanyaancatatan').summernote('code',pertanyaan);
-        catatan.find('button').remove();
-        $('#jwb_catatan').summernote('code',catatan);
+        
+        // ubah string catatan ke jQuery object lalu hapus tombolnya
+        var cleanCatatan = $('<div>' + catatan + '</div>').find('button').remove().end().html();
+
+        // tampilkan di summernote tanpa button
+        $('#jwb_catatan').summernote('code', cleanCatatan);
         //tinymce.get('pertanyaancatatan').setContent(pertanyaan);
         //tinymce.get('jwb_catatan').setContent(catatan);
 
