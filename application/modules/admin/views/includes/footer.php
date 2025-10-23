@@ -100,13 +100,14 @@
 
 
 <script>
-    CKEDITOR.replace('edit_isi_artikel', {
-      height: 300,
+    $('.editor').each(function() {
+    CKEDITOR.replace($(this).attr('name'), {
+      height: 200,
       extraPlugins: 'autogrow',
       removePlugins: 'resize',
-      autoGrow_minHeight: 200,
       autoGrow_maxHeight: 600
     });
+  });
   </script>
 
 
