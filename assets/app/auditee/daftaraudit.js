@@ -49,10 +49,6 @@ $(function () {
         }, 300);
         });
 
-        $('#pertanyaan').summernote('code',"");
-        // tampilkan di summernote
-        $('#jwb_jawab').summernote('code', "");
-
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
         var pertanyaan = rowData[2];
