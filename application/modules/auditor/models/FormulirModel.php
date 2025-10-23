@@ -96,6 +96,10 @@ class FormulirModel extends CI_Model {
 
     function getAllFormulir() {
         $this->db->from('formulir');
+        $users_id = $this->session->userdata('users_id');
+        if(isset($users_id)){
+            $this->db->where('users_id',$users_id);
+        }
         $query = $this->db->get();
         return $query->result_array();
     }
