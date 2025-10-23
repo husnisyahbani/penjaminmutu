@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function() {
     <script src="https://cdn.ckeditor.com/4.14.0/standard-all/ckeditor.js"></script>
 
      <script>
-    CKEDITOR.replace('editor', {
+    CKEDITOR.replace('edit_form_nama', {
       height: 300,
       extraPlugins: 'autogrow',
       removePlugins: 'resize',
