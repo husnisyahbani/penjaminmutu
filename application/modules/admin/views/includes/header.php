@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="<?php echo asset_url();?>global/css/bootstrap-extend.min.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>assets/css/site.min.css">
 
-    <script src="<?php echo asset_url();?>/assets/tinymce/tinymce.min.js"></script>
+    <script src="<?php echo asset_url();?>/assets/tinymce/js/tinymce/tinymce.min.js"></script>
 
 
     <!-- <script src="https://cdn.tiny.cloud/1/2vfigjikc198eohzhjdy4kgw3m94rmetkn3meeijacpibx67/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script> -->
