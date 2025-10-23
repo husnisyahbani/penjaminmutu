@@ -27,6 +27,7 @@ class Daftaraudit extends MY_Controller {
             $this->data['totalterkirim'] = $this->mutu->totalTerkirim();
             $this->data['totalterProses'] = $this->mutu->totalProses();
             $this->data['totalselesai'] = $this->mutu->totalSelesai();
+            $this->data['totaldraft'] = $this->mutu->totalDraft();
             $this->data['listauditor'] = $this->akun->getAllAuditor();
             $this->data['listauditee'] = $this->akun->getAllAuditee();
             $this->data['formulir'] = $this->formulir->getAllFormulir();

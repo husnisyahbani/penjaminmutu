@@ -81,6 +81,13 @@ class MutuauditModel extends CI_Model {
         return $query->num_rows();
     }
 
+    public function totalDraft(){
+        $this->db->from('mutu_audit');
+        $this->db->where("audit_status","DRAFT");
+        $query = $this->db->get();
+        return $query->num_rows();
+    }
+
     public function count_all() {
         $this->db->from('mutu_audit');
         return $this->db->count_all_results();

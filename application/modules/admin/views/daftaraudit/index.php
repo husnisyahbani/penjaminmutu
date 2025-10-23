@@ -3,7 +3,21 @@
         
         <div class="row" data-plugin="matchHeight" data-by-row="true">
 
-            <div class="col-xl-4 col-md-8">
+        <div class="col-xl-3 col-md-6">
+                <div class="card card-block p-25 bg-blue-600">
+                    <div class="counter counter-lg counter-inverse">
+                        <div class="counter-label text-uppercase">AUDIT DRAFT</div>
+                        <div class="counter-number-group">
+                            <span class="counter-number-related"></span>
+                            <span class="counter-number">
+                            <?php if(isset($totaldraft)){echo number_format($totaldraft,0,',','.');}else{echo '0';}?>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6">
                 <div class="card card-block p-25 bg-red-600">
                     <div class="counter counter-lg counter-inverse">
                         <div class="counter-label text-uppercase">AUDIT TERKIRIM</div>
@@ -17,7 +31,7 @@
                 </div>
             </div>
 
-            <div class="col-xl-4 col-md-8">
+            <div class="col-xl-3 col-md-6">
                 <div class="card card-block p-25 bg-orange-600">
                     <div class="counter counter-lg counter-inverse">
                         <div class="counter-label text-uppercase">AUDIT PROSES</div>
@@ -31,7 +45,7 @@
                 </div>
             </div>
 
-            <div class="col-xl-4 col-md-8">
+            <div class="col-xl-3 col-md-6">
                 <div class="card card-block p-25 bg-green-600">
                     <div class="counter counter-lg counter-inverse">
                         <div class="counter-label text-uppercase">AUDIT SELESAI</div>
