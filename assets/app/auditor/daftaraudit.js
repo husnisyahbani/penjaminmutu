@@ -112,13 +112,17 @@ $(function () {
         
         $('#pertanyaancatatan').summernote('code',pertanyaan);
         
-        // ubah string catatan ke jQuery object lalu hapus tombolnya
-        var cleanCatatan = $('<div>' + catatan + '</div>').find('button').remove().end().html();
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(catatan, 'text/html');
 
-        // tampilkan di summernote tanpa button
+        // hapus semua button
+        $(doc).find('button').remove();
+
+        // ambil kembali isi body-nya
+        var cleanCatatan = doc.body.innerHTML;
+
+        // tampilkan di summernote
         $('#jwb_catatan').summernote('code', cleanCatatan);
-        //tinymce.get('pertanyaancatatan').setContent(pertanyaan);
-        //tinymce.get('jwb_catatan').setContent(catatan);
 
     });
 
