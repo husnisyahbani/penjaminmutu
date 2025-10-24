@@ -51,7 +51,12 @@ class PtkModel extends CI_Model {
         $this->db->select("dt.dtform_pertanyaan as dtform_pertanyaan");
         $this->db->select("dt.dtform_lingkup as dtform_lingkup");
         $this->db->select("(SELECT jwb_catatan from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id) as jwb_catatan");
-        $this->db->select("(SELECT jwb_temuan from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id) as jwb_temuan");
+        $this->db->select("(SELECT jwb_temuan 
+                    FROM mutu_auditjawab 
+                    WHERE audit_id = au.audit_id 
+                      AND dtform_id = dt.dtform_id
+                      AND jwb_temuan IN ('OB','TS MINOR','TS MAYOR')
+                    LIMIT 1) as jwb_temuan");
         $this->db->select("(SELECT jwb_hasil from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id) as jwb_hasil");
         $this->db->select("(SELECT jwb_jawaban from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id) as jwb_jawaban");
         $this->db->from('audit au');
@@ -74,13 +79,18 @@ class PtkModel extends CI_Model {
         $this->db->select("dt.dtform_pertanyaan as dtform_pertanyaan");
         $this->db->select("dt.dtform_lingkup as dtform_lingkup");
         $this->db->select("(SELECT jwb_catatan from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id) as jwb_catatan");
-        $this->db->select("(SELECT jwb_temuan from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id) as jwb_temuan");
+        $this->db->select("(SELECT jwb_temuan 
+                    FROM mutu_auditjawab 
+                    WHERE audit_id = au.audit_id 
+                      AND dtform_id = dt.dtform_id
+                      AND jwb_temuan IN ('OB','TS MINOR','TS MAYOR')
+                    LIMIT 1) as jwb_temuan");
+
         $this->db->select("(SELECT jwb_hasil from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id) as jwb_hasil");
         $this->db->select("(SELECT jwb_jawaban from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id) as jwb_jawaban");
         $this->db->from('audit au');
         $this->db->join('detailform dt', 'dt.form_id = au.form_id', 'left');
         $this->db->where('au.audit_id',$id);
-        $this->db->where_in('jwb_temuan',array("OB","TS MINOR","TS MAYOR"));
         $users_id = $this->session->userdata('users_id');
         if(isset($users_id)){
             $this->db->where('au.auditee_id',$users_id);
@@ -90,14 +100,19 @@ class PtkModel extends CI_Model {
     }
 
     public function count_all($id) {
-        $this->db->select("(SELECT jwb_temuan from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id) as jwb_temuan");
+        $this->db->select("(SELECT jwb_temuan 
+                    FROM mutu_auditjawab 
+                    WHERE audit_id = au.audit_id 
+                      AND dtform_id = dt.dtform_id
+                      AND jwb_temuan IN ('OB','TS MINOR','TS MAYOR')
+                    LIMIT 1) as jwb_temuan");
+
         $this->db->from('audit');
         $this->db->where('audit.audit_id',$id);
         $users_id = $this->session->userdata('users_id');
         if(isset($users_id)){
             $this->db->where('audit.auditee_id',$users_id);
         }
-        $this->db->where_in('jwb_temuan',array("OB","TS MINOR","TS MAYOR"));
         return $this->db->count_all_results();
     }
 
