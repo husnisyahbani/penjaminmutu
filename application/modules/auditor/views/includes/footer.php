@@ -102,8 +102,16 @@
 
 <script>
       $('.editor').summernote({
-        tabsize: 2,
-        height: 300
+        height: 300,
+            toolbar: [
+        ['style', ['bold', 'italic', 'underline', 'clear']],
+        ['font', ['strikethrough', 'superscript', 'subscript']],
+        ['fontsize', ['fontsize']],
+        ['color', ['color']],
+        ['para', ['ul', 'ol', 'paragraph']],
+        ['insert', ['link']], // 👈 pastikan ini ada
+        ['view', ['codeview']]
+    ]
       });
 </script>
 
