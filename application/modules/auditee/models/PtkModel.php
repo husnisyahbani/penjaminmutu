@@ -145,4 +145,40 @@ class PtkModel extends CI_Model {
         }
     }
 
+    public function totalObservasi(){
+        $this->db->from('mutu_auditjawab');
+        $this->db->join('mutu_audit ma', 'ma.audit_id = mutu_auditjawab.audit_id', 'left');
+        $users_id = $this->session->userdata('users_id');
+        if(isset($users_id)){
+            $this->db->where('ma.auditee_id',$users_id);
+        }
+        $this->db->where("jwb_temuan","OB");
+        $query = $this->db->get();
+        return $query->num_rows();
+    }
+
+    public function totalMinor(){
+        $this->db->from('mutu_auditjawab');
+        $this->db->join('mutu_audit ma', 'ma.audit_id = mutu_auditjawab.audit_id', 'left');
+        $users_id = $this->session->userdata('users_id');
+        if(isset($users_id)){
+            $this->db->where('ma.auditee_id',$users_id);
+        }
+        $this->db->where("jwb_temuan","TS MINOR");
+        $query = $this->db->get();
+        return $query->num_rows();
+    }
+
+    public function totalMayor(){
+        $this->db->from('mutu_auditjawab');
+        $this->db->join('mutu_audit ma', 'ma.audit_id = mutu_auditjawab.audit_id', 'left');
+        $users_id = $this->session->userdata('users_id');
+        if(isset($users_id)){
+            $this->db->where('ma.auditee_id',$users_id);
+        }
+        $this->db->where("jwb_temuan","TS MAYOR");
+        $query = $this->db->get();
+        return $query->num_rows();
+    }
+
 }
