@@ -65,6 +65,7 @@ class Ptk extends MY_Controller {
             $row[] = $field->jwb_hasil;
             $row[] = $field->jwb_temuan;
             $row[] = $field->jwb_catatan;
+            if(isset($field->jwb_koreksi))
             $row[] = $field->jwb_koreksi.' <button type="button" class="edit btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i></button>';;
   
             
