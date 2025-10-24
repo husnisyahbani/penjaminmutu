@@ -73,83 +73,9 @@ class AkunModel extends CI_Model {
         return($this->db->affected_rows() != 1) ? false : true;
     }
     
-    public function reset($id) {
-        $hasil = $this->getAkunById($id);
-        $username = '123456';
-        $input = array(
-            "users_id" =>$id,
-            "password" => md5($username)
-        );
-        $this->edit($input);
-    }
-    
-    public function hapussaksibyusername($username) {
-        $this->db->where("username",$username);
-        $this->db->where("role","SAKSI");
-        $this->db->from($this->table);
-        $this->db->delete();
-        return($this->db->affected_rows() != 1) ? false : true;
-    }
-
-    public function hapustimsesbyusername($username) {
-        $this->db->where("username",$username);
-        $this->db->where("role","RELAWAN");
-        $this->db->from($this->table);
-        $this->db->delete();
-        return($this->db->affected_rows() != 1) ? false : true;
-    }
-    
     public function edit($data) {
         $this->db->trans_start();
         $this->db->where("users_id",$data['users_id']);
-        $this->db->update($this->table,$data);
-        $this->db->trans_complete();
-        return $this->db->trans_status();
-    }
-
-    public function approvetimses($username) {
-        $this->db->trans_start();
-        $this->db->where("username",$username);
-        $this->db->where("role","RELAWAN");
-        $data = array(
-            "valid" => '1'
-        );
-        $this->db->update($this->table,$data);
-        $this->db->trans_complete();
-        return $this->db->trans_status();
-    }
-    
-    public function rejecttimses($username) {
-        $this->db->trans_start();
-        $this->db->where("username",$username);
-        $this->db->where("role","RELAWAN");
-        $data = array(
-            "valid" => '0'
-        );
-        $this->db->update($this->table,$data);
-        $this->db->trans_complete();
-        return $this->db->trans_status();
-    }
-    
-    public function approvesaksi($username) {
-        $this->db->trans_start();
-        $this->db->where("username",$username);
-        $this->db->where("role","SAKSI");
-        $data = array(
-            "valid" => '1'
-        );
-        $this->db->update($this->table,$data);
-        $this->db->trans_complete();
-        return $this->db->trans_status();
-    }
-    
-    public function rejectsaksi($username) {
-        $this->db->trans_start();
-        $this->db->where("username",$username);
-        $this->db->where("role","SAKSI");
-        $data = array(
-            "valid" => '0'
-        );
         $this->db->update($this->table,$data);
         $this->db->trans_complete();
         return $this->db->trans_status();
@@ -174,8 +100,7 @@ class AkunModel extends CI_Model {
         $query = $this->db->get();
         return $query->result_array();
     }
-    
-   
+
     
     function getProvinces($id) {
         $this->db->select("nama");

@@ -75,7 +75,7 @@ class Akun extends MY_Controller {
             $data['username'] = $this->input->post('username');
             $data['role'] = $this->input->post('role');
 
-            if(!$this->akun->is_exist($data) && $this->akun->edit($data)){
+            if($this->akun->edit($data)){
                 $msg = 'Berhasil';
                 $this->session->set_flashdata('pesanberhasil', $msg);
             }else{
@@ -87,6 +87,7 @@ class Akun extends MY_Controller {
             $this->data['content'] = 'edit_akun';
             $this->data['title'] = 'Akun';
             $this->data['akun'] = 'active';
+            $this->data['result'] = $this->akun->getAkunById($id);
             $this->data['js'] = $this->load->get_js_files();
             $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
             $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');

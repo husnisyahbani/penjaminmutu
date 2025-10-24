@@ -4,7 +4,7 @@
         <div class="panel">
           <div class="panel-body">
             <div class="brand">
-              <img class="brand-img" src="<?php echo asset_url();?>/assets/images/sijamu.png" alt="STIK SITI KHADIJAH" width="120px">
+              <img class="brand-img" src="<?php echo asset_url();?>/assets/images/logostik.png" alt="STIK SITI KHADIJAH" width="120px">
               <h2 class="brand-text font-size-18">Sistem Informasi Penjamin Mutu</h2>
             </div>
             <form method="post" action="<?php echo base_url("login") ?>" autocomplete="off">
