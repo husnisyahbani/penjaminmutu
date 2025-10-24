@@ -5,7 +5,7 @@ class Ptk extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditee';
-        $this->load->js(base_url("assets/app/auditor/ptk.js?v=1.1"));
+        $this->load->js(base_url("assets/app/auditee/ptk.js?v=1.1"));
         $this->load->model('PtkModel', 'ptkmodel');
 
         $role = $this->session->userdata('role');
