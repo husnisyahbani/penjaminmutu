@@ -65,7 +65,6 @@ class PtkModel extends CI_Model {
         if(isset($users_id)){
             $this->db->where('au.auditee_id',$users_id);
         }
-        $this->db->where_in('jwb_temuan',array("OB","TS MINOR","TS MAYOR"));
         $query = $this->db->get();
         return $query->result();
     }
