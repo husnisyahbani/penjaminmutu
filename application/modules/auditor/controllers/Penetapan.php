@@ -5,7 +5,7 @@ class Penetapan extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditor';
-        $this->load->js(base_url("assets/app/auditor/penetapan.js?v=1.0"));
+        $this->load->js(base_url("assets/app/auditor/penetapan.js?v=1.1"));
         $this->load->model('DataModel', 'datamodel');
 
         $role = $this->session->userdata('role');

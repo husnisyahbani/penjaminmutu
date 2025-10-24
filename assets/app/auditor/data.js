@@ -7,7 +7,7 @@ $(function () {
         "searching": true,
         "order": [],
         "columnDefs": [
-            {"targets": [0,3,6], "orderable": false}
+            {"targets": [0,3], "orderable": false}
         ],
         "ajax": {
             "url": base_url + "/data/listdata",

@@ -11,9 +11,7 @@
             <header class="panel-heading">
                 <h3 class="panel-title"><?=$title;?></h3> 
                 <div class="panel-actions panel-actions-keep">
-                    <button type="button" class="btn btn-sm btn-icon btn-success" id="tambahdata">
-                                <i class="icon md-plus" aria-hidden="true"></i>Tambah
-                    </button>
+                    
                     
                 </div>
             </header>
