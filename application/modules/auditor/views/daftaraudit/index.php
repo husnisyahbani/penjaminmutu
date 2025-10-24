@@ -329,9 +329,11 @@
                             <thead>
                                 <tr>
                                     <th >No</th>
-                                    <th >Pertanyaan</th>
-                                    <th >Ruang Lingkup</th>
-                                    <th >Jawaban</th>
+                                    <th >Evaluasi</th>
+                                    <th >Hasil Evaluasi</th>
+                                    <th >Tujuan</th>
+                                    <th >Referensi</th>
+                                    <th >Lingkup Pertanyaan</th>
                                     <th >Hasil</th>
                                     <th >Temuan</th>
                                     <th >Catatan</th>

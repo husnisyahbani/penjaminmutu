@@ -5,7 +5,7 @@ class Daftaraudit extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditor';
-        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=1.27"));
+        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=1.28"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
@@ -224,9 +224,26 @@ class Daftaraudit extends MY_Controller {
             $no++;
             $row = array();
             $row[] = $no;
-            $row[] = $field->dtform_pertanyaan;
-            $row[] = $field->dtform_lingkup;
+            $row[] = $field->dtform_pertanyaan."<br/".$field->dtform_lingkup;
             $row[] = $field->jwb_jawaban;
+            if($field->audit_status == "PROSES"){
+                $row[] = $field->jwb_tujuan.' <button type="button" class="tujuan btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i></button>';
+            }else{
+                $row[] = $field->jwb_tujuan;
+            }
+
+            if($field->audit_status == "PROSES"){
+                $row[] = $field->jwb_referensi.' <button type="button" class="referensi btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i></button>';
+            }else{
+                $row[] = $field->jwb_referensi;
+            }
+            
+            if($field->audit_status == "PROSES"){
+                $row[] = $field->jwb_pertanyaan.' <button type="button" class="pertanyaan btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i></button>';
+            }else{
+                $row[] = $field->jwb_pertanyaan;
+            }
+
             if($field->audit_status == "PROSES"){
                 $row[] = $field->jwb_hasil.' <button type="button" class="hasil btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i></button>';
             }else{

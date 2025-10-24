@@ -21,7 +21,7 @@ $(function () {
         "searching": true,
         "order": [],
         "columnDefs": [
-            {"targets": [0,1,2,3,4,5,6], "orderable": false}
+            {"targets": [0,1,2,3,4,5,6,7,8], "orderable": false}
         ],
         "ajax": {
             "url": base_url + "/daftaraudit/listpertanyaan",
@@ -50,8 +50,8 @@ $(function () {
 
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
-        var pertanyaan = rowData[2];
-        var hasil = rowData[4];
+        var pertanyaan = rowData[1];
+        var hasil = rowData[6];
         var cleanHasil = hasil.replace(/<button[\s\S]*$/i, '');
         $('#pertanyaanhasil').summernote('code',pertanyaan);
         $('#jwb_hasil').summernote('code',cleanHasil);
@@ -76,8 +76,8 @@ $(function () {
 
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
-        var pertanyaan = rowData[2];
-        var temuan = rowData[5];
+        var pertanyaan = rowData[1];
+        var temuan = rowData[7];
         var cleanTemuan = temuan.replace(/<button[\s\S]*$/i, '');
         $('#pertanyaantemuan').summernote('code',pertanyaan);
         $('#jwb_temuan').val(cleanTemuan);
@@ -106,8 +106,8 @@ $(function () {
 
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
-        var pertanyaan = rowData[2];
-        var catatan = rowData[6];
+        var pertanyaan = rowData[1];
+        var catatan = rowData[8];
         var cleanCatatan = catatan.replace(/<button[\s\S]*$/i, '');
         $('#pertanyaancatatan').summernote('code',pertanyaan);
         // tampilkan di summernote
