@@ -17,7 +17,7 @@
                 </div>
             </div>
 
-            <div class="col-xl-3 col-md-6">
+            <div class="col-xl-4 col-md-8">
                 <div class="card card-block p-25 bg-orange-600">
                     <div class="counter counter-lg counter-inverse">
                         <div class="counter-label text-uppercase">MINOR</div>
@@ -31,7 +31,7 @@
                 </div>
             </div>
 
-            <div class="col-xl-3 col-md-6">
+            <div class="col-xl-4 col-md-8">
                 <div class="card card-block p-25 bg-red-600">
                     <div class="counter counter-lg counter-inverse">
                         <div class="counter-label text-uppercase">MAYOR</div>
