@@ -40,7 +40,7 @@ class PtkModel extends CI_Model {
         }
     }
 
-    function get_datatables($length, $start, $search, $ordering,$id) {
+    function get_datatables($length, $start, $search, $ordering) {
         $this->_get_datatables_query($search, $ordering);
         if ($length != -1) {
             $this->db->limit($length, $start);
@@ -61,7 +61,6 @@ class PtkModel extends CI_Model {
         $this->db->select("(SELECT jwb_jawaban from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id) as jwb_jawaban");
         $this->db->from('audit au');
         $this->db->join('detailform dt', 'dt.form_id = au.form_id', 'left');
-        $this->db->where('au.audit_id',$id);
         $users_id = $this->session->userdata('users_id');
         if(isset($users_id)){
             $this->db->where('au.auditee_id',$users_id);
@@ -71,7 +70,7 @@ class PtkModel extends CI_Model {
         return $query->result();
     }
 
-    function count_filtered($search, $ordering,$id) {
+    function count_filtered($search, $ordering) {
         $this->_get_datatables_query($search, $ordering);
         $this->db->select("audit_id");
         $this->db->select("audit_status");
@@ -90,7 +89,6 @@ class PtkModel extends CI_Model {
         $this->db->select("(SELECT jwb_jawaban from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id) as jwb_jawaban");
         $this->db->from('audit au');
         $this->db->join('detailform dt', 'dt.form_id = au.form_id', 'left');
-        $this->db->where('au.audit_id',$id);
         $users_id = $this->session->userdata('users_id');
         if(isset($users_id)){
             $this->db->where('au.auditee_id',$users_id);
@@ -99,7 +97,7 @@ class PtkModel extends CI_Model {
         return $query->num_rows();
     }
 
-    public function count_all($id) {
+    public function count_all() {
         $this->db->select("(SELECT jwb_temuan 
                     FROM mutu_auditjawab 
                     WHERE audit_id = au.audit_id 
@@ -108,7 +106,6 @@ class PtkModel extends CI_Model {
                     LIMIT 1) as jwb_temuan");
 
         $this->db->from('audit');
-        $this->db->where('audit.audit_id',$id);
         $users_id = $this->session->userdata('users_id');
         if(isset($users_id)){
             $this->db->where('audit.auditee_id',$users_id);
