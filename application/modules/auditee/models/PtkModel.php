@@ -61,7 +61,7 @@ class PtkModel extends CI_Model {
         if(isset($users_id)){
             $this->db->where('au.auditee_id',$users_id);
         }
-        $this->db->where('jwb_temuan != "S"');
+        $this->db->where_in('jwb_temuan',array("OB","TS MINOR","TS MAYOR"));
         $query = $this->db->get();
         return $query->result();
     }
@@ -80,7 +80,7 @@ class PtkModel extends CI_Model {
         $this->db->from('audit au');
         $this->db->join('detailform dt', 'dt.form_id = au.form_id', 'left');
         $this->db->where('au.audit_id',$id);
-        $this->db->where('jwb_temuan != "S"');
+        $this->db->where_in('jwb_temuan',array("OB","TS MINOR","TS MAYOR"));
         $users_id = $this->session->userdata('users_id');
         if(isset($users_id)){
             $this->db->where('au.auditee_id',$users_id);
@@ -97,7 +97,7 @@ class PtkModel extends CI_Model {
         if(isset($users_id)){
             $this->db->where('audit.auditee_id',$users_id);
         }
-        $this->db->where('jwb_temuan != "S"');
+        $this->db->where_in('jwb_temuan',array("OB","TS MINOR","TS MAYOR"));
         return $this->db->count_all_results();
     }
 
