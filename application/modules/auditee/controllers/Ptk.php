@@ -19,6 +19,9 @@ class Ptk extends MY_Controller {
             $this->data['title'] = 'PERMINTAAN TINDAKAN KOREKSI';
             $this->data['js'] = $this->load->get_js_files();
             $this->data['ptk'] = 'active';
+            $this->data['observasi'] = $this->ptkmodel->totalObservasi();
+            $this->data['minor'] = $this->ptkmodel->totalMinor();
+            $this->data['mayor'] = $this->ptkmodel->totalMayor();
             $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
             $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
             $this->template($this->data, $this->module); 
