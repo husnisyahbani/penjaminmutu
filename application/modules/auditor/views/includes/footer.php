@@ -153,6 +153,7 @@ if (isset($pesanerror)) {
     var base_url = '<?php echo base_url('auditor'); ?>';
     var root_url = '<?php echo base_url(); ?>';
     var form_id = '<?php if(isset($form_id)) echo $form_id; ?>';
+    var audit_id = '<?php if(isset($audit_id)) echo $audit_id; ?>';
  </script>
 
 <?php

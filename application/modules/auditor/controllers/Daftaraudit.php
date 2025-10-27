@@ -5,7 +5,7 @@ class Daftaraudit extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditor';
-        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=1.29"));
+        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=1.34"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
@@ -37,8 +37,10 @@ class Daftaraudit extends MY_Controller {
 
     public function detail($id) {
         if(isset($id)){
-            $this->data['content'] = 'daftaraudit/index';
+            $this->data['content'] = 'daftaraudit/detail';
             $this->data['title'] = 'Daftar Audit';
+            $this->data['audit_id'] = $id;
+            $this->data['result'] = $this->mutu->getAuditById($id);
             $this->data['js'] = $this->load->get_js_files();
             $this->data['audit'] = 'active';
             $this->data['pesanerror'] = $this->session->flashdata('pesanerror');

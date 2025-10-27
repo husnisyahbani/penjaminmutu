@@ -24,7 +24,7 @@ $(function () {
             {"targets": [0,1,2,3,4,5,6,7,8], "orderable": false}
         ],
         "ajax": {
-            "url": base_url + "/daftaraudit/listpertanyaan",
+            "url": base_url + "/daftaraudit/listpertanyaan/"+audit_id,
             "type": "POST"
         }
     });
@@ -87,22 +87,11 @@ $(function () {
     $("#daftarpertanyaan").on("click", ".catatan", function () {
         $dtform_id = $(this).attr('dtform_id');
         $audit_id = $(this).attr('audit_id');
-        $('#pertanyaanModal').modal('hide');
-
-        $('#pertanyaanModal').one('hidden.bs.modal', function () {
         $('#catatanModal').modal('show');
-        });
-
-        $('#catatanModal').one('hidden.bs.modal', function () {
-        setTimeout(() => {
-            $('#pertanyaanModal').modal('show');
-            $('body').addClass('modal-open');
-        }, 300);
-        });
 
         $('#pertanyaancatatan').summernote('code',"");
-        // tampilkan di summernote
-        $('#jwb_catatan').summernote('code', "");
+        // // tampilkan di summernote
+         $('#jwb_catatan').summernote('code', "");
 
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
@@ -118,7 +107,8 @@ $(function () {
     $("#daftaraudit").on("click", ".detail", function () {
         $('#pertanyaanModal').modal('show');
         var id = $(this).attr('id');
-        daftarpertanyaan.ajax.url(base_url + "/daftaraudit/listpertanyaan/"+id).load();
+         window.location.href = base_url+'/daftaraudit/detail/'+id;
+        //daftarpertanyaan.ajax.url(base_url + "/daftaraudit/listpertanyaan/"+id).load();
     });
 
     $("#daftaraudit").on("click", ".proses", function () {

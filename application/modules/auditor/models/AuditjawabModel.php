@@ -50,6 +50,9 @@ class AuditjawabModel extends CI_Model {
         $this->db->select("dt.dtform_id as dtform_id");
         $this->db->select("dt.dtform_pertanyaan as dtform_pertanyaan");
         $this->db->select("dt.dtform_lingkup as dtform_lingkup");
+        $this->db->select("(SELECT jwb_tujuan from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id) as jwb_tujuan");
+        $this->db->select("(SELECT jwb_referensi from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id) as jwb_referensi");
+        $this->db->select("(SELECT jwb_pertanyaan from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id) as jwb_pertanyaan");
         $this->db->select("(SELECT jwb_catatan from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id) as jwb_catatan");
         $this->db->select("(SELECT jwb_temuan from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id) as jwb_temuan");
         $this->db->select("(SELECT jwb_hasil from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id) as jwb_hasil");
