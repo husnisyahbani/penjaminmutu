@@ -88,7 +88,7 @@ $(function () {
                 })
                         .done(function (data) {
                             swal.fire({
-                                title: "Hapus",
+                                title: "Terkirim",
                                 text: "Ajuan Telah Terkirim!",
                                 type: "success",
                                 preConfirm: function () {

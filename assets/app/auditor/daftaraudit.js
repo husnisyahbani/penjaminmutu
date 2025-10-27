@@ -144,7 +144,7 @@ $(function () {
                 })
                         .done(function (data) {
                             swal.fire({
-                                title: "Hapus",
+                                title: "Diproses",
                                 text: "Formulir Sedang Diproses!",
                                 type: "success",
                                 preConfirm: function () {
@@ -182,7 +182,7 @@ $(function () {
                 })
                         .done(function (data) {
                             swal.fire({
-                                title: "Hapus",
+                                title: "Selesai",
                                 text: "Formulir Telah Selesai Diproses!",
                                 type: "success",
                                 preConfirm: function () {
