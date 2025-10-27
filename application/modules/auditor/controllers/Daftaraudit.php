@@ -35,6 +35,18 @@ class Daftaraudit extends MY_Controller {
             $this->template($this->data, $this->module); 
     }
 
+    public function detail($id) {
+        if(isset($id)){
+            $this->data['content'] = 'daftaraudit/index';
+            $this->data['title'] = 'Daftar Audit';
+            $this->data['js'] = $this->load->get_js_files();
+            $this->data['audit'] = 'active';
+            $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
+            $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
+            $this->template($this->data, $this->module); 
+        }
+    }
+
    public function tambah() {
         $form_id = $this->input->post('form_id');
         if($form_id){

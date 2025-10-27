@@ -61,7 +61,6 @@
 <script src="<?php echo asset_url();?>global/vendor/dropify/dropify.min.js"></script>
 <script src="<?php echo asset_url();?>global/vendor/formvalidation/formValidation.min.js"></script>
 <script src="<?php echo asset_url();?>global/vendor/formvalidation/framework/bootstrap4.min.js"></script>
-<script src="<?php echo asset_url();?>global/vendor/summernote/summernote.min.js"></script>
 <script src="<?php echo asset_url(); ?>global/vendor/bootstrap-datepicker/bootstrap-datepicker.js"></script>
 <script src="<?php echo asset_url(); ?>global/vendor/toastr/toastr.js"></script>
 
@@ -95,14 +94,16 @@
 <script src="<?php echo asset_url();?>assets/examples/js/uikit/icon.js"></script>
 <script src="<?php echo asset_url();?>global/js/Plugin/sweetalert2.min.js"></script>
 <script src="<?php echo asset_url();?>summernote/summernote-bs4.js"></script>
-<script src="<?php echo asset_url();?>assets/examples/js/forms/editor-summernote.js"></script>
+<script src="<?php echo asset_url();?>summernote/lang/summernote-id-ID.js"></script>
 <script src="<?php echo asset_url();?>assets/examples/js/dashboard/v1.js"></script>
 
 
 
 <script>
+    $(document).ready(function() {
       $('.editor').summernote({
         height: 300,
+         dialogsInBody: true,
             toolbar: [
         ['style', ['bold', 'italic', 'underline', 'clear']],
         ['font', ['strikethrough', 'superscript', 'subscript']],
@@ -113,6 +114,13 @@
         ['view', ['codeview']]
     ]
       });
+
+       $(document).on('focusin', function(e) {
+    if ($(e.target).closest(".note-editable").length) {
+      e.stopImmediatePropagation();
+    }
+  });
+    });
 </script>
 
 <script>
