@@ -32,21 +32,71 @@ $(function () {
     var $dtform_id;
     var $audit_id;
 
+    $("#daftarpertanyaan").on("click", ".tujuan", function () {
+        $dtform_id = $(this).attr('dtform_id');
+        $audit_id = $(this).attr('audit_id');
+        $('#tujuanModal').modal('show');
+        $('#pertanyaantujuan').summernote('code',"");
+        // // tampilkan di summernote
+         $('#jwb_tujuan').summernote('code', "");
+        
+
+        var tr = $(this).closest('tr');
+        var rowData = daftarpertanyaan.row(tr).data();
+        var pertanyaan = rowData[1];
+        var tujuan = rowData[3];
+        var cleanTujuan = tujuan.replace(/<button[\s\S]*$/i, '');
+        $('#pertanyaanreferensi').summernote('code',pertanyaan);
+        $('#jwb_referensi').summernote('code',cleanTujuan);
+
+    });
+
+    $("#daftarpertanyaan").on("click", ".referensi", function () {
+        $dtform_id = $(this).attr('dtform_id');
+        $audit_id = $(this).attr('audit_id');
+        $('#referensiModal').modal('show');
+        $('#pertanyaanreferensi').summernote('code',"");
+        // // tampilkan di summernote
+         $('#jwb_referensi').summernote('code', "");
+        
+
+        var tr = $(this).closest('tr');
+        var rowData = daftarpertanyaan.row(tr).data();
+        var pertanyaan = rowData[1];
+        var referensi = rowData[4];
+        var cleanReferensi = referensi.replace(/<button[\s\S]*$/i, '');
+        $('#pertanyaanreferensi').summernote('code',pertanyaan);
+        $('#jwb_referensi').summernote('code',cleanReferensi);
+
+    });
+
+    $("#daftarpertanyaan").on("click", ".pertanyaan", function () {
+        $dtform_id = $(this).attr('dtform_id');
+        $audit_id = $(this).attr('audit_id');
+        $('#pertanyaanModal').modal('show');
+        $('#pertanyaanpertanyaan').summernote('code',"");
+        // // tampilkan di summernote
+         $('#jwb_pertanyaan').summernote('code', "");
+        
+
+        var tr = $(this).closest('tr');
+        var rowData = daftarpertanyaan.row(tr).data();
+        var pertanyaan = rowData[1];
+        var lingkuppertanyaan = rowData[5];
+        var cleanPertanyaan = lingkuppertanyaan.replace(/<button[\s\S]*$/i, '');
+        $('#pertanyaanpertanyaan').summernote('code',pertanyaan);
+        $('#jwb_pertanyaan').summernote('code',cleanPertanyaan);
+
+    });
+
     $("#daftarpertanyaan").on("click", ".hasil", function () {
         $dtform_id = $(this).attr('dtform_id');
         $audit_id = $(this).attr('audit_id');
-        $('#pertanyaanModal').modal('hide');
-
-        $('#pertanyaanModal').one('hidden.bs.modal', function () {
         $('#hasilModal').modal('show');
-        });
-
-        $('#hasilModal').one('hidden.bs.modal', function () {
-        setTimeout(() => {
-            $('#pertanyaanModal').modal('show');
-            $('body').addClass('modal-open');
-        }, 300);
-        });
+        $('#pertanyaanhasil').summernote('code',"");
+        // // tampilkan di summernote
+         $('#jwb_hasil').summernote('code', "");
+        
 
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
@@ -61,18 +111,10 @@ $(function () {
     $("#daftarpertanyaan").on("click", ".temuan", function () {
         $dtform_id = $(this).attr('dtform_id');
         $audit_id = $(this).attr('audit_id');
-        $('#pertanyaanModal').modal('hide');
-
-        $('#pertanyaanModal').one('hidden.bs.modal', function () {
         $('#temuanModal').modal('show');
-        });
-
-        $('#temuanModal').one('hidden.bs.modal', function () {
-        setTimeout(() => {
-            $('#pertanyaanModal').modal('show');
-            $('body').addClass('modal-open');
-        }, 300);
-        });
+        $('#pertanyaantemuan').summernote('code',"");
+        // // tampilkan di summernote
+         $('#jwb_temuan').summernote('code', "");
 
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
@@ -233,6 +275,196 @@ $(function () {
                 $.each(list, function (index, org_types) {
                     if (org_types.status) {
                         daftaraudit.ajax.reload();
+                    } else {
+                        swal.fire("Oops", org_types.pesan, "error");
+                    }
+                });
+                $form.formValidation('disableSubmitButtons', false)
+                    .formValidation('resetForm', true);
+            },
+            error: function () {
+                swal.fire("Oops", "No connection!", "error");
+                $form.formValidation('disableSubmitButtons', false)
+                    .formValidation('resetForm', true);
+            }
+        });
+
+    return false;
+});
+
+
+$("#formtujuan").formValidation({
+        framework: "bootstrap4",
+        excluded: [':disabled'],
+        err: {
+            clazz: 'invalid-feedback'
+        },
+        control: {
+            valid: 'is-valid',
+            invalid: 'is-invalid'
+        },
+        row: {
+            invalid: 'has-danger'
+        }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+
+        var $form = $(e.target);       // ✅ perbaikan
+        //var formData = new FormData(e.target);
+        var $jwb_tujuan = $('#jwb_tujuan').summernote('code');
+        //var $jwb_catatan = tinymce.get('jwb_catatan').getContent();
+
+        $.ajax({
+            url: base_url + "/daftaraudit/tujuan",
+            type: "POST",
+            data: {
+                dtform_id:$dtform_id,
+                audit_id:$audit_id,
+                jwb_tujuan:$jwb_tujuan
+            },
+            beforeSend: function () {
+                $("#tujuanModal").modal('hide');
+                swal.fire({
+                    title: 'Loading',
+                    allowEscapeKey: false,
+                    allowOutsideClick: false,
+                    onOpen: () => {
+                        swal.showLoading();
+                    }
+                });
+            },
+            success: function (data) {
+                swal.close();
+                var list = data == null ? [] : (data instanceof Array ? data : [data]);
+                $.each(list, function (index, org_types) {
+                    if (org_types.status) {
+                        daftarpertanyaan.ajax.reload();
+                    } else {
+                        swal.fire("Oops", org_types.pesan, "error");
+                    }
+                });
+                $form.formValidation('disableSubmitButtons', false)
+                    .formValidation('resetForm', true);
+            },
+            error: function () {
+                swal.fire("Oops", "No connection!", "error");
+                $form.formValidation('disableSubmitButtons', false)
+                    .formValidation('resetForm', true);
+            }
+        });
+
+    return false;
+});
+
+$("#formreferensi").formValidation({
+        framework: "bootstrap4",
+        excluded: [':disabled'],
+        err: {
+            clazz: 'invalid-feedback'
+        },
+        control: {
+            valid: 'is-valid',
+            invalid: 'is-invalid'
+        },
+        row: {
+            invalid: 'has-danger'
+        }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+
+        var $form = $(e.target);       // ✅ perbaikan
+        //var formData = new FormData(e.target);
+        var $jwb_referensi = $('#jwb_referensi').summernote('code');
+        //var $jwb_catatan = tinymce.get('jwb_catatan').getContent();
+
+        $.ajax({
+            url: base_url + "/daftaraudit/referensi",
+            type: "POST",
+            data: {
+                dtform_id:$dtform_id,
+                audit_id:$audit_id,
+                jwb_referensi:$jwb_referensi
+            },
+            beforeSend: function () {
+                $("#referensiModal").modal('hide');
+                swal.fire({
+                    title: 'Loading',
+                    allowEscapeKey: false,
+                    allowOutsideClick: false,
+                    onOpen: () => {
+                        swal.showLoading();
+                    }
+                });
+            },
+            success: function (data) {
+                swal.close();
+                var list = data == null ? [] : (data instanceof Array ? data : [data]);
+                $.each(list, function (index, org_types) {
+                    if (org_types.status) {
+                        daftarpertanyaan.ajax.reload();
+                    } else {
+                        swal.fire("Oops", org_types.pesan, "error");
+                    }
+                });
+                $form.formValidation('disableSubmitButtons', false)
+                    .formValidation('resetForm', true);
+            },
+            error: function () {
+                swal.fire("Oops", "No connection!", "error");
+                $form.formValidation('disableSubmitButtons', false)
+                    .formValidation('resetForm', true);
+            }
+        });
+
+    return false;
+});
+
+$("#formpertanyaan").formValidation({
+        framework: "bootstrap4",
+        excluded: [':disabled'],
+        err: {
+            clazz: 'invalid-feedback'
+        },
+        control: {
+            valid: 'is-valid',
+            invalid: 'is-invalid'
+        },
+        row: {
+            invalid: 'has-danger'
+        }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+
+        var $form = $(e.target);       // ✅ perbaikan
+        //var formData = new FormData(e.target);
+        var $jwb_pertanyaan = $('#jwb_pertanyaan').summernote('code');
+        //var $jwb_catatan = tinymce.get('jwb_catatan').getContent();
+
+        $.ajax({
+            url: base_url + "/daftaraudit/pertanyaan",
+            type: "POST",
+            data: {
+                dtform_id:$dtform_id,
+                audit_id:$audit_id,
+                jwb_pertanyaan:$jwb_pertanyaan
+            },
+            beforeSend: function () {
+                $("#pertanyaanModal").modal('hide');
+                swal.fire({
+                    title: 'Loading',
+                    allowEscapeKey: false,
+                    allowOutsideClick: false,
+                    onOpen: () => {
+                        swal.showLoading();
+                    }
+                });
+            },
+            success: function (data) {
+                swal.close();
+                var list = data == null ? [] : (data instanceof Array ? data : [data]);
+                $.each(list, function (index, org_types) {
+                    if (org_types.status) {
+                        daftarpertanyaan.ajax.reload();
                     } else {
                         swal.fire("Oops", org_types.pesan, "error");
                     }

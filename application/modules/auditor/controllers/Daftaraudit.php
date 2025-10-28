@@ -97,6 +97,57 @@ class Daftaraudit extends MY_Controller {
         }
     }
 
+    public function referensi() {
+        $data = array();
+        $data['dtform_id'] = $this->input->post('dtform_id');
+        $data['audit_id'] = $this->input->post('audit_id');
+        $data['jwb_referensi'] = $this->input->post('jwb_referensi');
+        if($this->auditjawab->is_exist($data)){
+            $status = $this->auditjawab->jawab($data);
+        }else{
+            $status = $this->auditjawab->add($data);
+        }
+        
+        $query = array("status" => $status);
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
+        echo json_encode($query);
+    }
+
+    public function pertanyaan() {
+        $data = array();
+        $data['dtform_id'] = $this->input->post('dtform_id');
+        $data['audit_id'] = $this->input->post('audit_id');
+        $data['jwb_pertanyaan'] = $this->input->post('jwb_pertanyaan');
+        if($this->auditjawab->is_exist($data)){
+            $status = $this->auditjawab->jawab($data);
+        }else{
+            $status = $this->auditjawab->add($data);
+        }
+        
+        $query = array("status" => $status);
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
+        echo json_encode($query);
+    }
+
+    public function tujuan() {
+        $data = array();
+        $data['dtform_id'] = $this->input->post('dtform_id');
+        $data['audit_id'] = $this->input->post('audit_id');
+        $data['jwb_tujuan'] = $this->input->post('jwb_tujuan');
+        if($this->auditjawab->is_exist($data)){
+            $status = $this->auditjawab->jawab($data);
+        }else{
+            $status = $this->auditjawab->add($data);
+        }
+        
+        $query = array("status" => $status);
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
+        echo json_encode($query);
+    }
+
     public function catatan() {
         $data = array();
         $data['dtform_id'] = $this->input->post('dtform_id');

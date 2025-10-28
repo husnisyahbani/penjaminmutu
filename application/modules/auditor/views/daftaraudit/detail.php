@@ -50,6 +50,132 @@
 
 <div
     class="modal fade"
+    id="tujuanModal"
+    aria-hidden="false"
+    aria-labelledby="exampleFormModalLabel"
+    role="dialog"
+    tabindex="-1">
+    <div class="modal-dialog modal-simple">
+        <form id="formtujuan" class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title" id="exampleFormModalLabel">Tujuan</h4>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-md-12 center">
+                        <h4 class="example-title">Pertanyaan</h4>
+                        <textarea id="pertanyaantujuan" class="editor" name="pertanyaantujuan" readonly></textarea>
+                    </div>
+                    <div class="col-md-12 center">
+                        <h4 class="example-title">Tujuan</h4>
+                        <textarea id="jwb_tujuan" class="editor" name="jwb_tujuan"></textarea>
+                    </div>
+                </div>
+
+                
+
+            </div>
+
+            <div class="modal-footer">
+            <div class="text-right">
+                    <button type="submit" class="btn btn-primary" id="submitjawaban" name="submitjawaban" value="submitjawaban">Kirim</button>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<div
+    class="modal fade"
+    id="referensiModal"
+    aria-hidden="false"
+    aria-labelledby="exampleFormModalLabel"
+    role="dialog"
+    tabindex="-1">
+    <div class="modal-dialog modal-simple">
+        <form id="formreferensi" class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title" id="exampleFormModalLabel">Referensi</h4>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-md-12 center">
+                        <h4 class="example-title">Pertanyaan</h4>
+                        <textarea id="pertanyaanreferensi" class="editor" name="pertanyaanreferensi" readonly></textarea>
+                    </div>
+                    <div class="col-md-12 center">
+                        <h4 class="example-title">Referensi</h4>
+                        <textarea id="jwb_referensi" class="editor" name="jwb_referensi"></textarea>
+                    </div>
+                </div>
+
+                
+
+            </div>
+
+            <div class="modal-footer">
+            <div class="text-right">
+                    <button type="submit" class="btn btn-primary" id="submitjawaban" name="submitjawaban" value="submitjawaban">Kirim</button>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<div
+    class="modal fade"
+    id="pertanyaanModal"
+    aria-hidden="false"
+    aria-labelledby="exampleFormModalLabel"
+    role="dialog"
+    tabindex="-1">
+    <div class="modal-dialog modal-simple">
+        <form id="formpertanyaan" class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title" id="exampleFormModalLabel">Lingkup Pertanyaan</h4>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-md-12 center">
+                        <h4 class="example-title">Pertanyaan</h4>
+                        <textarea id="pertanyaanpertanyaan" class="editor" name="pertanyaanpertanyaan" readonly></textarea>
+                    </div>
+                    <div class="col-md-12 center">
+                        <h4 class="example-title">Lingkup Pertanyaan</h4>
+                        <textarea id="jwb_pertanyaan" class="editor" name="jwb_pertanyaan"></textarea>
+                    </div>
+                </div>
+
+                
+
+            </div>
+
+            <div class="modal-footer">
+            <div class="text-right">
+                    <button type="submit" class="btn btn-primary" id="submitjawaban" name="submitjawaban" value="submitjawaban">Kirim</button>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<div
+    class="modal fade"
     id="hasilModal"
     aria-hidden="false"
     aria-labelledby="exampleFormModalLabel"
