@@ -47,7 +47,7 @@ $(function () {
         var tujuan = rowData[3];
         var cleanTujuan = tujuan.replace(/<button[\s\S]*$/i, '');
         $('#pertanyaanreferensi').summernote('code',pertanyaan);
-        $('#jwb_referensi').summernote('code',cleanTujuan);
+        $('#jwb_tujuan').summernote('code',cleanTujuan);
 
     });
 
