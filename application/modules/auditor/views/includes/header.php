@@ -47,7 +47,7 @@
     <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/dropify/dropify.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/formvalidation/formValidation.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>assets/examples/css/forms/validation.css">
-    <link rel="stylesheet" href="<?php echo asset_url();?>summernote/summernote-bs4.css">
+    <link rel="stylesheet" href="<?php echo asset_url();?>summernote/summernote.min.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>assets/examples/css/uikit/modals.css">
     <link rel="stylesheet" href="<?php echo asset_url(); ?>global/vendor/toastr/toastr.min.css">
      <link rel="stylesheet" href="<?php echo asset_url(); ?>global/vendor/bootstrap-datepicker/bootstrap-datepicker.css">

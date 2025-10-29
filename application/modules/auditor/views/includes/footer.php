@@ -93,7 +93,7 @@
 <script src="<?php echo asset_url();?>assets/examples/js/tables/datatable.js"></script>
 <script src="<?php echo asset_url();?>assets/examples/js/uikit/icon.js"></script>
 <script src="<?php echo asset_url();?>global/js/Plugin/sweetalert2.min.js"></script>
-<script src="<?php echo asset_url();?>summernote/summernote-bs4.js"></script>
+<script src="<?php echo asset_url();?>summernote/summernote.min.js"></script>
 <!--<script src="<?php echo asset_url();?>summernote/lang/summernote-id-ID.js"></script> -->
 <script src="<?php echo asset_url();?>assets/examples/js/dashboard/v1.js"></script>
 
