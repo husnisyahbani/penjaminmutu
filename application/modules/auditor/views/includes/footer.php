@@ -93,35 +93,13 @@
 <script src="<?php echo asset_url();?>assets/examples/js/tables/datatable.js"></script>
 <script src="<?php echo asset_url();?>assets/examples/js/uikit/icon.js"></script>
 <script src="<?php echo asset_url();?>global/js/Plugin/sweetalert2.min.js"></script>
-<script src="<?php echo asset_url();?>summernote/summernote.min.js"></script>
-<!--<script src="<?php echo asset_url();?>summernote/lang/summernote-id-ID.js"></script> -->
 <script src="<?php echo asset_url();?>assets/examples/js/dashboard/v1.js"></script>
+<script src="<?php echo asset_url();?>global/js/Plugin/summernote.js"></script>
 
 
 
 <script>
     $(document).ready(function() {
-
-      
-    //   $('.editor').summernote({
-    //     height: 300,
-    //      dialogsInBody: true,
-    //         toolbar: [
-    //     ['style', ['bold', 'italic', 'underline', 'clear']],
-    //     ['font', ['strikethrough', 'superscript', 'subscript']],
-    //     ['fontsize', ['fontsize']],
-    //     ['color', ['color']],
-    //     ['para', ['ul', 'ol', 'paragraph']],
-    //     ['insert', ['link']], // 👈 pastikan ini ada
-    //     ['view', ['codeview']]
-    // ]
-    //   });
-
-    // $('#hasilModal, #catatanModal, #pertanyaanModal, #tujuanModal, #referensiModal').on('focusin', function(e) {
-    //   if ($(e.target).closest('.note-editable').length) {
-    //     e.stopImmediatePropagation();
-    //   }
-    // });
 
 
   });
