@@ -24,6 +24,33 @@
 .tox {
   z-index: 2000 !important;
 }
+
+/* Pastikan Quill editor berada di dalam modal dengan benar */
+.modal .ql-container {
+  border-radius: 8px;
+  background: #fff;
+  z-index: 1060 !important; /* lebih tinggi dari backdrop modal */
+  position: relative;
+  width: 100%;
+}
+
+.modal .ql-toolbar {
+  border-radius: 8px 8px 0 0;
+  z-index: 1060 !important;
+  position: relative;
+}
+
+.modal .ql-editor {
+  min-height: 150px;
+  z-index: 1060 !important;
+  background-color: #fff;
+}
+
+/* Jika toolbar tertutup elemen lain */
+.ql-tooltip {
+  z-index: 1070 !important;
+}
+
 </style>
 
     <!-- Plugins -->
