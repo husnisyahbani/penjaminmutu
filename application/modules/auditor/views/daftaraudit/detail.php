@@ -236,7 +236,7 @@
                 <div class="row">
                     <div class="col-md-12 center">
                         <h4 class="example-title">Pertanyaan</h4>
-                        <textarea id="pertanyaantemuan" class="editor" name="pertanyaan" readonly></textarea>
+                        <textarea id="pertanyaantemuan"  name="pertanyaan" readonly></textarea>
                     </div>
                     <div class="col-md-12 center">
                         <h4 class="example-title">Temuan</h4>
