@@ -49,7 +49,8 @@
     <link rel="stylesheet" href="<?php echo asset_url();?>assets/examples/css/forms/validation.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>assets/examples/css/uikit/modals.css">
     <link rel="stylesheet" href="<?php echo asset_url(); ?>global/vendor/toastr/toastr.min.css">
-     <link rel="stylesheet" href="<?php echo asset_url(); ?>global/vendor/bootstrap-datepicker/bootstrap-datepicker.css">
+    <link rel="stylesheet" href="<?php echo asset_url(); ?>global/vendor/bootstrap-datepicker/bootstrap-datepicker.css">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     
     
     <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/datatables.net-bs4/dataTables.bootstrap4.css">

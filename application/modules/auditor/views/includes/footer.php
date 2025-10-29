@@ -94,12 +94,19 @@
 <script src="<?php echo asset_url();?>assets/examples/js/uikit/icon.js"></script>
 <script src="<?php echo asset_url();?>global/js/Plugin/sweetalert2.min.js"></script>
 <script src="<?php echo asset_url();?>assets/examples/js/dashboard/v1.js"></script>
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
 
 
 <script>
     $(document).ready(function() {
-
+var quillPertanyaan = new Quill('#pertanyaantemuan', {
+    theme: 'snow',
+    readOnly: true,
+    modules: {
+      toolbar: false
+    }
+  });
   
   });
 </script>
