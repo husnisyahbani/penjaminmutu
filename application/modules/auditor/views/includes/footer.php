@@ -70,7 +70,7 @@
 <script src="<?php echo asset_url();?>global/js/Base.js"></script>
 <script src="<?php echo asset_url();?>global/js/Config.js"></script>
 
-<script src="<?php echo asset_url();?>assets/js/Section/Menubar.js"></script>
+<script src="<?php echo asset_url();?>assets/js/Section/Menubar_v02.js"></script>
 <script src="<?php echo asset_url();?>assets/js/Section/Sidebar.js"></script>
 <script src="<?php echo asset_url();?>assets/js/Section/PageAside.js"></script>
 <script src="<?php echo asset_url();?>assets/js/Section/GridMenu.js"></script>
