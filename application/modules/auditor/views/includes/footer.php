@@ -102,10 +102,7 @@
 <script>
     $(document).ready(function() {
 
-       $('#pertanyaantemuan').summernote({
-    height: 200,
-    toolbar: false, // karena readonly
-  }).summernote('disable'); // biar tidak bisa diketik
+      
     //   $('.editor').summernote({
     //     height: 300,
     //      dialogsInBody: true,
