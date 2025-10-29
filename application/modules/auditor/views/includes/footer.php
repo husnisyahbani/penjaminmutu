@@ -115,7 +115,7 @@
     ]
       });
 
-    $('#hasilModal, #temuanModal, #catatanModal, #pertanyaanModal, #tujuanModal, #referensiModal').on('focusin', function(e) {
+    $('#hasilModal, #catatanModal, #pertanyaanModal, #tujuanModal, #referensiModal').on('focusin', function(e) {
       if ($(e.target).closest('.note-editable').length) {
         e.stopImmediatePropagation();
       }
