@@ -46,7 +46,7 @@ $(function () {
         var pertanyaan = rowData[1];
         var tujuan = rowData[3];
         var cleanTujuan = tujuan.replace(/<button[\s\S]*$/i, '');
-        $('#pertanyaanreferensi').summernote('code',pertanyaan);
+        $('#pertanyaantujuan').summernote('code',pertanyaan);
         $('#jwb_tujuan').summernote('code',cleanTujuan);
 
     });
@@ -147,7 +147,7 @@ $(function () {
     });
 
     $("#daftaraudit").on("click", ".detail", function () {
-        $('#pertanyaanModal').modal('show');
+       // $('#pertanyaanModal').modal('show');
         var id = $(this).attr('id');
          window.location.href = base_url+'/daftaraudit/detail/'+id;
         //daftarpertanyaan.ajax.url(base_url + "/daftaraudit/listpertanyaan/"+id).load();

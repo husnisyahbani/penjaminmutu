@@ -115,12 +115,12 @@
     ]
       });
 
-       $(document).on('focusin', function(e) {
-    if ($(e.target).closest(".note-editable").length) {
-      e.stopImmediatePropagation();
-    }
-  });
+    $(document).on('focusin', function(e) {
+      if ($(e.target).closest(".note-editable").length) {
+        e.stopImmediatePropagation();
+      }
     });
+  });
 </script>
 
 <script>
