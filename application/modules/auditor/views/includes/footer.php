@@ -100,13 +100,47 @@
 
 <script>
     $(document).ready(function() {
-var quillPertanyaan = new Quill('#pertanyaantemuan', {
-    theme: 'snow',
-    readOnly: true,
-    modules: {
-      toolbar: false
-    }
-  });
+// Ganti semua textarea dengan class .editor menjadi Quill editor
+    $('.editor').each(function() {
+        const textarea = $(this);
+        const editorId = textarea.attr('id') + '_quill';
+        
+        // Buat elemen div sebagai wadah quill
+        const quillContainer = $('<div id="' + editorId + '"></div>');
+        textarea.hide().after(quillContainer);
+        
+        // Inisialisasi Quill
+        const quill = new Quill('#' + editorId, {
+            theme: 'snow',
+            placeholder: 'Tulis di sini...',
+            modules: {
+                toolbar: [
+                    [{ header: [1, 2, false] }],
+                    ['bold', 'italic', 'underline'],
+                    ['link', 'blockquote', 'code-block'],
+                    [{ list: 'ordered' }, { list: 'bullet' }],
+                    ['clean']
+                ]
+            }
+        });
+
+        // Sinkronisasi konten Quill ke textarea (agar bisa dikirim lewat form)
+        quill.on('text-change', function() {
+            textarea.val(quill.root.innerHTML);
+        });
+
+        // Jika textarea sudah punya isi, tampilkan di Quill
+        if (textarea.val().trim() !== '') {
+            quill.root.innerHTML = textarea.val();
+        }
+    });
+
+    // Saat modal dibuka, pastikan editor muncul dengan benar
+    $('.modal').on('shown.bs.modal', function () {
+        $(this).find('.ql-editor').each(function(){
+            this.focus();
+        });
+    });
   
   });
 </script>
