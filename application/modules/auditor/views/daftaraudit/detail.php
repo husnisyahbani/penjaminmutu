@@ -240,7 +240,8 @@
                     </div>
                     <div class="col-md-12 center">
                         <h4 class="example-title">Temuan</h4>
-                        <select class="form-control" name="jwb_temuan" id="jwb_temuan">                                 
+                        <select class="form-control" name="jwb_temuan" id="jwb_temuan" data-fv-notempty="true"
+                        data-fv-notempty-message="Wajib Dipilih">                                 
                             <option value="S">S</option>
                             <option value="OB">OB</option>
                             <option value="TS MINOR">TS MINOR</option>
