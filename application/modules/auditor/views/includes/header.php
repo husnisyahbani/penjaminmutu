@@ -50,7 +50,6 @@
     <link rel="stylesheet" href="<?php echo asset_url();?>assets/examples/css/uikit/modals.css">
     <link rel="stylesheet" href="<?php echo asset_url(); ?>global/vendor/toastr/toastr.min.css">
      <link rel="stylesheet" href="<?php echo asset_url(); ?>global/vendor/bootstrap-datepicker/bootstrap-datepicker.css">
-     <link rel="stylesheet" href="<?php echo asset_url(); ?>global/vendor/summernote/summernote.css">
     
     
     <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/datatables.net-bs4/dataTables.bootstrap4.css">
