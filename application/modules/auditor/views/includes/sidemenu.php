@@ -56,12 +56,12 @@
          </ul>
         </li>
 
-        <!-- <li class="site-menu-item <?php if(isset($dashboard)){echo $dashboard;} ?>">
+        <li class="site-menu-item <?php if(isset($dashboard)){echo $dashboard;} ?>">
           <a class="animsition-link" href="<?php echo base_url($module."/dashboard");?>">
                   <i class="site-menu-icon md-view-compact" aria-hidden="true"></i>
                   <span class="site-menu-title">Formulir</span>
               </a>
-        </li> -->
+        </li>
         
         
         

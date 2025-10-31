@@ -49,46 +49,44 @@
 </div>
 
 <div
-    class="modal fade"
-    id="tujuanModal"
-    aria-hidden="false"
-    aria-labelledby="exampleFormModalLabel"
-    role="dialog"
-    tabindex="-1">
-    <div class="modal-dialog modal-simple">
-        <form id="formtujuan" class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-                <h4 class="modal-title" id="exampleFormModalLabel">Tujuan</h4>
-            </div>
-            <div class="modal-body">
-
-                <div class="row">
-                    <div class="col-md-12 center">
-                        <h4 class="example-title">Pertanyaan</h4>
-                        <textarea id="pertanyaantujuan" class="editor" name="pertanyaantujuan" readonly></textarea>
-                    </div>
-                    <div class="col-md-12 center">
-                        <h4 class="example-title">Tujuan</h4>
-                        <textarea id="jwb_tujuan" class="editor" name="jwb_tujuan"></textarea>
-                    </div>
-                </div>
-
-                
-
-            </div>
-
-            <div class="modal-footer">
-            <div class="text-right">
-                    <button type="submit" class="btn btn-primary" id="submitjawaban" name="submitjawaban" value="submitjawaban">Kirim</button>
-                </div>
-            </div>
-
+  class="modal fade"
+  id="tujuanModal"
+  aria-hidden="false"
+  aria-labelledby="exampleFormModalLabel"
+  role="dialog"
+  tabindex="-1">
+  
+  <div class="modal-dialog modal-simple">
+    <div class="modal-content">
+      <form id="formtujuan">
+        
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="exampleFormModalLabel">Tujuan</h4>
         </div>
-    </form>
-</div>
+
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-12 center">
+              <h4 class="example-title">Masukkan Tujuan</h4>
+              <textarea id="jwb_tujuan" class="editor" name="jwb_tujuan"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer text-right">
+          <button type="submit" class="btn btn-primary" id="submitjawaban" name="submitjawaban" value="submitjawaban">
+            Kirim
+          </button>
+        </div>
+
+      </form>
+    </div> <!-- /.modal-content -->
+  </div> <!-- /.modal-dialog -->
+</div> <!-- /.modal -->
+
 
 <div
     class="modal fade"
@@ -109,11 +107,7 @@
 
                 <div class="row">
                     <div class="col-md-12 center">
-                        <h4 class="example-title">Pertanyaan</h4>
-                        <textarea id="pertanyaanreferensi" class="editor" name="pertanyaanreferensi" readonly></textarea>
-                    </div>
-                    <div class="col-md-12 center">
-                        <h4 class="example-title">Referensi</h4>
+                        <h4 class="example-title">Masukkan Referensi</h4>
                         <textarea id="jwb_referensi" class="editor" name="jwb_referensi"></textarea>
                     </div>
                 </div>
@@ -151,11 +145,7 @@
 
                 <div class="row">
                     <div class="col-md-12 center">
-                        <h4 class="example-title">Pertanyaan</h4>
-                        <textarea id="pertanyaanpertanyaan" class="editor" name="pertanyaanpertanyaan" readonly></textarea>
-                    </div>
-                    <div class="col-md-12 center">
-                        <h4 class="example-title">Lingkup Pertanyaan</h4>
+                        <h4 class="example-title">Masukkan Pertanyaan Anda</h4>
                         <textarea id="jwb_pertanyaan" class="editor" name="jwb_pertanyaan"></textarea>
                     </div>
                 </div>
@@ -187,17 +177,13 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
-                <h4 class="modal-title" id="exampleFormModalLabel">Hasil</h4>
+                <h4 class="modal-title" id="exampleFormModalLabel">Masukkan Hasil</h4>
             </div>
             <div class="modal-body">
 
                 <div class="row">
                     <div class="col-md-12 center">
-                        <h4 class="example-title">Pertanyaan</h4>
-                        <textarea id="pertanyaanhasil" class="editor" name="pertanyaan" readonly></textarea>
-                    </div>
-                    <div class="col-md-12 center">
-                        <h4 class="example-title">Jawaban</h4>
+                        <h4 class="example-title">Hasil</h4>
                         <textarea id="jwb_hasil" class="editor" name="jwb_hasil"></textarea>
                     </div>
                 </div>
@@ -235,11 +221,7 @@
 
                 <div class="row">
                     <div class="col-md-12 center">
-                        <h4 class="example-title">Pertanyaan</h4>
-                        <textarea id="pertanyaantemuan" class="editor" name="pertanyaan" readonly></textarea>
-                    </div>
-                    <div class="col-md-12 center">
-                        <h4 class="example-title">Temuan</h4>
+                        <h4 class="example-title">Pilih Temuan</h4>
                         <select class="form-control" name="jwb_temuan" id="jwb_temuan" data-fv-notempty="true"
                         data-fv-notempty-message="Wajib Dipilih">                                 
                             <option value="S">S</option>
@@ -284,14 +266,13 @@
 
                 <div class="row">
                     <div class="col-md-12 center">
-                        <h4 class="example-title">Pertanyaan</h4>
-                        <textarea id="pertanyaancatatan" class="editor" name="pertanyaan" readonly></textarea>
-                    </div>
-                    <div class="col-md-12 center">
-                        <h4 class="example-title">Catatan</h4>
-                        <textarea id="jwb_catatan" class="editor" name="jwb_catatan"></textarea>
+                        <h4 class="example-title">Masukkan Catatan Anda</h4>
+                        <textarea id="jwb_catatan" class="editor" name="jwb_catatan" readonly></textarea>
+                        
                     </div>
                 </div>
+
+                
 
                 
 

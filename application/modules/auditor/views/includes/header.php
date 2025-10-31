@@ -20,35 +20,22 @@
 
 
 <style>
-/* CSS jangan taruh di dalam <script> */
-.tox {
-  z-index: 2000 !important;
-}
-
-/* Pastikan Quill editor berada di dalam modal dengan benar */
+/* Quill editor dalam modal */
 .modal .ql-container {
-  border-radius: 8px;
-  background: #fff;
-  z-index: 1060 !important; /* lebih tinggi dari backdrop modal */
-  position: relative;
-  width: 100%;
-}
-
-.modal .ql-toolbar {
-  border-radius: 8px 8px 0 0;
-  z-index: 1060 !important;
-  position: relative;
+  min-height: 150px;       /* tinggi minimal */
+  height: auto !important; /* biar ikut konten */
 }
 
 .modal .ql-editor {
   min-height: 150px;
-  z-index: 1060 !important;
-  background-color: #fff;
+  height: auto !important;
+  max-height: 60vh;        /* batasi supaya tidak terlalu tinggi */
+  overflow-y: auto;        /* tambahkan scrollbar kalau kepanjangan */
 }
 
-/* Jika toolbar tertutup elemen lain */
-.ql-tooltip {
-  z-index: 1070 !important;
+/* Biar modal ikut menyesuaikan */
+.modal-body {
+  overflow-y: visible !important;
 }
 
 </style>

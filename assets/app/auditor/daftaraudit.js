@@ -36,18 +36,13 @@ $(function () {
         $dtform_id = $(this).attr('dtform_id');
         $audit_id = $(this).attr('audit_id');
         $('#tujuanModal').modal('show');
-        $('#pertanyaantujuan').summernote('code',"");
-        // // tampilkan di summernote
-         $('#jwb_tujuan').summernote('code', "");
         
 
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
-        var pertanyaan = rowData[1];
         var tujuan = rowData[3];
         var cleanTujuan = tujuan.replace(/<button[\s\S]*$/i, '');
-        $('#pertanyaantujuan').summernote('code',pertanyaan);
-        $('#jwb_tujuan').summernote('code',cleanTujuan);
+        $('#jwb_tujuan').val(cleanTujuan);
 
     });
 
@@ -55,18 +50,13 @@ $(function () {
         $dtform_id = $(this).attr('dtform_id');
         $audit_id = $(this).attr('audit_id');
         $('#referensiModal').modal('show');
-        $('#pertanyaanreferensi').summernote('code',"");
-        // // tampilkan di summernote
-         $('#jwb_referensi').summernote('code', "");
         
 
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
-        var pertanyaan = rowData[1];
         var referensi = rowData[4];
         var cleanReferensi = referensi.replace(/<button[\s\S]*$/i, '');
-        $('#pertanyaanreferensi').summernote('code',pertanyaan);
-        $('#jwb_referensi').summernote('code',cleanReferensi);
+        $('#jwb_referensi').val(cleanReferensi);
 
     });
 
@@ -74,18 +64,13 @@ $(function () {
         $dtform_id = $(this).attr('dtform_id');
         $audit_id = $(this).attr('audit_id');
         $('#pertanyaanModal').modal('show');
-        $('#pertanyaanpertanyaan').summernote('code',"");
-        // // tampilkan di summernote
-         $('#jwb_pertanyaan').summernote('code', "");
         
 
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
-        var pertanyaan = rowData[1];
         var lingkuppertanyaan = rowData[5];
         var cleanPertanyaan = lingkuppertanyaan.replace(/<button[\s\S]*$/i, '');
-        $('#pertanyaanpertanyaan').summernote('code',pertanyaan);
-        $('#jwb_pertanyaan').summernote('code',cleanPertanyaan);
+        $('#jwb_pertanyaan').val(cleanPertanyaan);
 
     });
 
@@ -93,18 +78,13 @@ $(function () {
         $dtform_id = $(this).attr('dtform_id');
         $audit_id = $(this).attr('audit_id');
         $('#hasilModal').modal('show');
-        $('#pertanyaanhasil').summernote('code',"");
-        // // tampilkan di summernote
-         $('#jwb_hasil').summernote('code', "");
         
 
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
-        var pertanyaan = rowData[1];
         var hasil = rowData[6];
         var cleanHasil = hasil.replace(/<button[\s\S]*$/i, '');
-        $('#pertanyaanhasil').summernote('code',pertanyaan);
-        $('#jwb_hasil').summernote('code',cleanHasil);
+        $('#jwb_hasil').val(cleanHasil);
 
     });
 
@@ -112,16 +92,11 @@ $(function () {
         $dtform_id = $(this).attr('dtform_id');
         $audit_id = $(this).attr('audit_id');
         $('#temuanModal').modal('show');
-        $('#pertanyaantemuan').summernote('code',"");
-        // // tampilkan di summernote
-         $('#jwb_temuan').summernote('code', "");
 
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
-        var pertanyaan = rowData[1];
         var temuan = rowData[7];
         var cleanTemuan = temuan.replace(/<button[\s\S]*$/i, '');
-        $('#pertanyaantemuan').summernote('code',pertanyaan);
         $('#jwb_temuan').val(cleanTemuan);
 
     });
@@ -131,18 +106,12 @@ $(function () {
         $audit_id = $(this).attr('audit_id');
         $('#catatanModal').modal('show');
 
-        $('#pertanyaancatatan').summernote('code',"");
-        // // tampilkan di summernote
-         $('#jwb_catatan').summernote('code', "");
-
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
-        var pertanyaan = rowData[1];
         var catatan = rowData[8];
         var cleanCatatan = catatan.replace(/<button[\s\S]*$/i, '');
-        $('#pertanyaancatatan').summernote('code',pertanyaan);
         // tampilkan di summernote
-        $('#jwb_catatan').summernote('code', cleanCatatan);
+        $('#jwb_catatan').val(cleanCatatan);
 
     });
 
@@ -311,7 +280,7 @@ $("#formtujuan").formValidation({
 
         var $form = $(e.target);       // ✅ perbaikan
         //var formData = new FormData(e.target);
-        var $jwb_tujuan = $('#jwb_tujuan').summernote('code');
+        var $jwb_tujuan = $('#jwb_tujuan').val();
         //var $jwb_catatan = tinymce.get('jwb_catatan').getContent();
 
         $.ajax({
@@ -374,7 +343,7 @@ $("#formreferensi").formValidation({
 
         var $form = $(e.target);       // ✅ perbaikan
         //var formData = new FormData(e.target);
-        var $jwb_referensi = $('#jwb_referensi').summernote('code');
+        var $jwb_referensi = $('#jwb_referensi').val();
         //var $jwb_catatan = tinymce.get('jwb_catatan').getContent();
 
         $.ajax({
@@ -437,7 +406,7 @@ $("#formpertanyaan").formValidation({
 
         var $form = $(e.target);       // ✅ perbaikan
         //var formData = new FormData(e.target);
-        var $jwb_pertanyaan = $('#jwb_pertanyaan').summernote('code');
+        var $jwb_pertanyaan = $('#jwb_pertanyaan').val();
         //var $jwb_catatan = tinymce.get('jwb_catatan').getContent();
 
         $.ajax({
@@ -500,7 +469,7 @@ $("#formhasil").formValidation({
 
         var $form = $(e.target);       // ✅ perbaikan
         //var formData = new FormData(e.target);
-        var $jwb_hasil = $('#jwb_hasil').summernote('code');
+        var $jwb_hasil = $('#jwb_hasil').val();
         //var $jwb_hasil = tinymce.get('jwb_hasil').getContent();
 
         $.ajax({
@@ -627,7 +596,7 @@ $("#formcatatan").formValidation({
 
         var $form = $(e.target);       // ✅ perbaikan
         //var formData = new FormData(e.target);
-        var $jwb_catatan = $('#jwb_catatan').summernote('code');
+        var $jwb_catatan = $('#jwb_catatan').val();
         //var $jwb_catatan = tinymce.get('jwb_catatan').getContent();
 
         $.ajax({
