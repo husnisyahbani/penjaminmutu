@@ -78,7 +78,7 @@
         <h1 class="text-lg-end mt-5 mb-5" style="font-weight: bold; color: black;">
           <strong>SIJAMU 
             <span style="display: block; margin-top: 3px; font-weight: bold; color: black; font-size: 20px;">
-              Sistem Penjamin Mutu
+              Sistem Informasi Penjamin Mutu
             </span>
           </strong>
         </h1>
