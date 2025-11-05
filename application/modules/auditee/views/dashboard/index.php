@@ -252,9 +252,9 @@
     </form>
 </div>
 
-<div class="modal fade example-modal-lg" aria-hidden="true" aria-labelledby="exampleOptionalLarge"
+<div class="modal fade" aria-hidden="true" aria-labelledby="exampleOptionalLarge"
                       id="pertanyaanModal" role="dialog" tabindex="-1" data-bs-backdrop="false">
-                      <div class="modal-dialog modal-simple modal-lg">
+                      <div class="modal-dialog modal-simple modal-xl">
                         <div class="modal-content">
                           <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -269,9 +269,6 @@
                                     <th >No</th>
                                     <th >Pertanyaan</th>
                                     <th >Jawaban</th>
-                                    <th >Hasil</th>
-                                    <th >Temuan</th>
-                                    <th >Catatan</th>
                                 </tr>
                             </thead>
 

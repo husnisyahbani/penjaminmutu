@@ -21,7 +21,7 @@ $(function () {
         "searching": true,
         "order": [],
         "columnDefs": [
-            {"targets": [0,1,2,3,4,5], "orderable": false}
+            {"targets": [0,1,2], "orderable": false}
         ],
         "ajax": {
             "url": base_url + "/dashboard/listpertanyaan",
