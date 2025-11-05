@@ -6,7 +6,7 @@ $(function () {
         "searching": true,
         "order": [],
         "columnDefs": [
-            {"targets": [0,5,6], "orderable": false}
+            {"targets": [0,1,2,3,4,5], "orderable": false}
         ],
         "ajax": {
             "url": base_url + "/dashboard/listmutu/",
@@ -51,8 +51,8 @@ $(function () {
 
         var tr = $(this).closest('tr');
         var rowData = daftarpertanyaan.row(tr).data();
-        var pertanyaan = rowData[2];
-        var jawaban = rowData[3];
+        var pertanyaan = rowData[1];
+        var jawaban = rowData[2];
         var cleanJawaban = jawaban.replace(/<button[\s\S]*$/i, '');
         $('#pertanyaan').summernote('code', pertanyaan);
         $('#jwb_jawaban').summernote('code', cleanJawaban);

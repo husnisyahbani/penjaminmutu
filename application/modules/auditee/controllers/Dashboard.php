@@ -5,7 +5,7 @@ class Dashboard extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditee';
-        $this->load->js(base_url("assets/app/auditee/daftaraudit.js?v=1.27"));
+        $this->load->js(base_url("assets/app/auditee/daftaraudit.js?v=1.28"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
@@ -176,8 +176,7 @@ class Dashboard extends MY_Controller {
             $no++;
             $row = array();
             $row[] = $no;
-            $row[] = $field->dtform_pertanyaan;
-            $row[] = $field->dtform_lingkup;
+            $row[] = $field->dtform_pertanyaan."<br/>".$field->dtform_lingkup;
             if($field->audit_status == "DRAFT"){
                 $row[] = $field->jwb_jawaban.' <button type="button" class="edit btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i></button>';
             }else{

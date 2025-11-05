@@ -268,7 +268,6 @@
                                 <tr>
                                     <th >No</th>
                                     <th >Pertanyaan</th>
-                                    <th >Ruang Lingkup</th>
                                     <th >Jawaban</th>
                                     <th >Hasil</th>
                                     <th >Temuan</th>
