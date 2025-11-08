@@ -21,7 +21,7 @@
               </div>
               <hr/>
               <div class="font-size-14 grey-500">
-                <span><b>Auditee : <?=$result['auditee']?></b></span>
+                <span><b>Auditee : </b><?=$result['auditee']?></span>
               </div>
               <hr/>
             </div>
