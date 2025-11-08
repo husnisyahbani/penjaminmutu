@@ -53,7 +53,8 @@
             <div class="font-size-20">Temuan</div>
             <p>
               <select class="form-control" name="jwb_temuan" id="jwb_temuan" data-fv-notempty="true"
-                      data-fv-notempty-message="Wajib Dipilih">                                 
+                      data-fv-notempty-message="Wajib Dipilih"> 
+                <option value="">--Pilih Temuan--</option>                                
                 <option value="S" <?php if(isset($jawab['jwb_temuan']) && $jawab['jwb_temuan'] === 'S')echo 'selected'; ?>>S</option>
                 <option value="OB" <?php if(isset($jawab['jwb_temuan']) && $jawab['jwb_temuan'] === 'OB')echo 'selected'; ?>>OB</option>
                 <option value="TS MINOR" <?php if(isset($jawab['jwb_temuan']) && $jawab['jwb_temuan'] === 'TS MINOR')echo 'selected'; ?>>TS MINOR</option>
