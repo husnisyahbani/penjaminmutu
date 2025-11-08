@@ -20,6 +20,20 @@
 
 
 <style>
+  div[role="log"] {
+  display: none !important;
+}
+
+.ui-helper-hidden-accessible[role="log"],
+div[role="log"][aria-live="assertive"] {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  left: -9999px !important;
+}
+
 /* Quill editor dalam modal */
 .modal .ql-container {
   min-height: 150px;       /* tinggi minimal */
@@ -61,10 +75,10 @@
     <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/dropify/dropify.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/formvalidation/formValidation.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>assets/examples/css/forms/validation.css">
+    <link rel="stylesheet" href="<?php echo asset_url();?>summernote/summernote-bs4.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>assets/examples/css/uikit/modals.css">
     <link rel="stylesheet" href="<?php echo asset_url(); ?>global/vendor/toastr/toastr.min.css">
     <link rel="stylesheet" href="<?php echo asset_url(); ?>global/vendor/bootstrap-datepicker/bootstrap-datepicker.css">
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     
     
     <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/datatables.net-bs4/dataTables.bootstrap4.css">

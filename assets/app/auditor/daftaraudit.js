@@ -21,7 +21,7 @@ $(function () {
         "searching": true,
         "order": [],
         "columnDefs": [
-            {"targets": [0,1,2,3,4,5,6,7,8], "orderable": false}
+            {"targets": [0,1,2,3], "orderable": false}
         ],
         "ajax": {
             "url": base_url + "/daftaraudit/listpertanyaan/"+audit_id,
@@ -29,90 +29,17 @@ $(function () {
         }
     });
 
-    var $dtform_id;
-    var $audit_id;
+    $('#jwb_pertanyaan').summernote('code', jwb_pertanyaan);
+    $('#jwb_referensi').summernote('code', jwb_referensi);
+    $('#jwb_hasil').summernote('code', jwb_hasil);
+    $('#jwb_catatan').summernote('code', jwb_catatan);
+    $('#jwb_tujuan').summernote('code', jwb_tujuan);
 
-    $("#daftarpertanyaan").on("click", ".tujuan", function () {
-        $dtform_id = $(this).attr('dtform_id');
-        $audit_id = $(this).attr('audit_id');
-        $('#tujuanModal').modal('show');
-        
 
-        var tr = $(this).closest('tr');
-        var rowData = daftarpertanyaan.row(tr).data();
-        var tujuan = rowData[3];
-        var cleanTujuan = tujuan.replace(/<button[\s\S]*$/i, '');
-        $('#jwb_tujuan').val(cleanTujuan);
-
-    });
-
-    $("#daftarpertanyaan").on("click", ".referensi", function () {
-        $dtform_id = $(this).attr('dtform_id');
-        $audit_id = $(this).attr('audit_id');
-        $('#referensiModal').modal('show');
-        
-
-        var tr = $(this).closest('tr');
-        var rowData = daftarpertanyaan.row(tr).data();
-        var referensi = rowData[4];
-        var cleanReferensi = referensi.replace(/<button[\s\S]*$/i, '');
-        $('#jwb_referensi').val(cleanReferensi);
-
-    });
-
-    $("#daftarpertanyaan").on("click", ".pertanyaan", function () {
-        $dtform_id = $(this).attr('dtform_id');
-        $audit_id = $(this).attr('audit_id');
-        $('#pertanyaanModal').modal('show');
-        
-
-        var tr = $(this).closest('tr');
-        var rowData = daftarpertanyaan.row(tr).data();
-        var lingkuppertanyaan = rowData[5];
-        var cleanPertanyaan = lingkuppertanyaan.replace(/<button[\s\S]*$/i, '');
-        $('#jwb_pertanyaan').val(cleanPertanyaan);
-
-    });
-
-    $("#daftarpertanyaan").on("click", ".hasil", function () {
-        $dtform_id = $(this).attr('dtform_id');
-        $audit_id = $(this).attr('audit_id');
-        $('#hasilModal').modal('show');
-        
-
-        var tr = $(this).closest('tr');
-        var rowData = daftarpertanyaan.row(tr).data();
-        var hasil = rowData[6];
-        var cleanHasil = hasil.replace(/<button[\s\S]*$/i, '');
-        $('#jwb_hasil').val(cleanHasil);
-
-    });
-
-    $("#daftarpertanyaan").on("click", ".temuan", function () {
-        $dtform_id = $(this).attr('dtform_id');
-        $audit_id = $(this).attr('audit_id');
-        $('#temuanModal').modal('show');
-
-        var tr = $(this).closest('tr');
-        var rowData = daftarpertanyaan.row(tr).data();
-        var temuan = rowData[7];
-        var cleanTemuan = temuan.replace(/<button[\s\S]*$/i, '');
-        $('#jwb_temuan').val(cleanTemuan);
-
-    });
-
-    $("#daftarpertanyaan").on("click", ".catatan", function () {
-        $dtform_id = $(this).attr('dtform_id');
-        $audit_id = $(this).attr('audit_id');
-        $('#catatanModal').modal('show');
-
-        var tr = $(this).closest('tr');
-        var rowData = daftarpertanyaan.row(tr).data();
-        var catatan = rowData[8];
-        var cleanCatatan = catatan.replace(/<button[\s\S]*$/i, '');
-        // tampilkan di summernote
-        $('#jwb_catatan').val(cleanCatatan);
-
+    $("#daftarpertanyaan").on("click", ".delik", function () {
+        var audit_id = $(this).attr('audit_id');
+        var dtform_id = $(this).attr('dtform_id');
+         window.location.href = base_url+'/daftaraudit/delik?audit_id='+audit_id+"&dtform_id="+dtform_id;
     });
 
     $("#daftaraudit").on("click", ".detail", function () {
@@ -198,6 +125,288 @@ $(function () {
         });
     }
 
+    $("#kembali").on("click", function () {
+         var id = $(this).attr('audit_id');
+         window.location.href = base_url+'/daftaraudit/detail/'+id;
+    });
+
+    $("#submittemuan").on("click", function () {
+        $dtform_id = $(this).attr('dtform_id');
+        $audit_id = $(this).attr('audit_id');
+        $jwb_temuan = $('#jwb_temuan').val();
+
+        $.ajax({
+            url: base_url + "/daftaraudit/temuan",
+            type: "POST",
+            data: {
+                dtform_id:$dtform_id,
+                audit_id:$audit_id,
+                jwb_temuan:$jwb_temuan
+            },
+            beforeSend: function () {
+                swal.fire({
+                    title: 'Loading',
+                    allowEscapeKey: false,
+                    allowOutsideClick: false,
+                    onOpen: () => {
+                        swal.showLoading();
+                    }
+                });
+            },
+            success: function (data) {
+                swal.close();
+                var list = data == null ? [] : (data instanceof Array ? data : [data]);
+                $.each(list, function (index, org_types) {
+                    if (org_types.status) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: 'Data telah tersimpan.',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    } else {
+                        swal.fire("Oops", org_types.pesan, "error");
+                    }
+                });
+            },
+            error: function () {
+                swal.fire("Oops", "No connection!", "error");
+            }
+        });
+    });
+
+    $("#submitcatatan").on("click", function () {
+        $dtform_id = $(this).attr('dtform_id');
+        $audit_id = $(this).attr('audit_id');
+        $jwb_catatan = $('#jwb_catatan').summernote('code');
+
+        $.ajax({
+            url: base_url + "/daftaraudit/catatan",
+            type: "POST",
+            data: {
+                dtform_id:$dtform_id,
+                audit_id:$audit_id,
+                jwb_catatan:$jwb_catatan
+            },
+            beforeSend: function () {
+                swal.fire({
+                    title: 'Loading',
+                    allowEscapeKey: false,
+                    allowOutsideClick: false,
+                    onOpen: () => {
+                        swal.showLoading();
+                    }
+                });
+            },
+            success: function (data) {
+                swal.close();
+                var list = data == null ? [] : (data instanceof Array ? data : [data]);
+                $.each(list, function (index, org_types) {
+                    if (org_types.status) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: 'Data telah tersimpan.',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    } else {
+                        swal.fire("Oops", org_types.pesan, "error");
+                    }
+                });
+            },
+            error: function () {
+                swal.fire("Oops", "No connection!", "error");
+            }
+        });
+    });
+
+    $("#submitpertanyaan").on("click", function () {
+        $dtform_id = $(this).attr('dtform_id');
+        $audit_id = $(this).attr('audit_id');
+        $jwb_pertanyaan = $('#jwb_pertanyaan').summernote('code');
+
+        $.ajax({
+            url: base_url + "/daftaraudit/pertanyaan",
+            type: "POST",
+            data: {
+                dtform_id:$dtform_id,
+                audit_id:$audit_id,
+                jwb_pertanyaan:$jwb_pertanyaan
+            },
+            beforeSend: function () {
+                swal.fire({
+                    title: 'Loading',
+                    allowEscapeKey: false,
+                    allowOutsideClick: false,
+                    onOpen: () => {
+                        swal.showLoading();
+                    }
+                });
+            },
+            success: function (data) {
+                swal.close();
+                var list = data == null ? [] : (data instanceof Array ? data : [data]);
+                $.each(list, function (index, org_types) {
+                    if (org_types.status) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: 'Data telah tersimpan.',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    } else {
+                        swal.fire("Oops", org_types.pesan, "error");
+                    }
+                });
+            },
+            error: function () {
+                swal.fire("Oops", "No connection!", "error");
+            }
+        });
+    });
+
+    $("#submittujuan").on("click", function () {
+        $dtform_id = $(this).attr('dtform_id');
+        $audit_id = $(this).attr('audit_id');
+        $jwb_tujuan = $('#jwb_tujuan').summernote('code');
+
+        $.ajax({
+            url: base_url + "/daftaraudit/tujuan",
+            type: "POST",
+            data: {
+                dtform_id:$dtform_id,
+                audit_id:$audit_id,
+                jwb_tujuan:$jwb_tujuan
+            },
+            beforeSend: function () {
+                swal.fire({
+                    title: 'Loading',
+                    allowEscapeKey: false,
+                    allowOutsideClick: false,
+                    onOpen: () => {
+                        swal.showLoading();
+                    }
+                });
+            },
+            success: function (data) {
+                swal.close();
+                var list = data == null ? [] : (data instanceof Array ? data : [data]);
+                $.each(list, function (index, org_types) {
+                    if (org_types.status) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: 'Data telah tersimpan.',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    } else {
+                        swal.fire("Oops", org_types.pesan, "error");
+                    }
+                });
+            },
+            error: function () {
+                swal.fire("Oops", "No connection!", "error");
+            }
+        });
+    });
+
+
+    $("#submithasil").on("click", function () {
+        $dtform_id = $(this).attr('dtform_id');
+        $audit_id = $(this).attr('audit_id');
+        $jwb_hasil = $('#jwb_hasil').summernote('code');
+
+        $.ajax({
+            url: base_url + "/daftaraudit/hasil",
+            type: "POST",
+            data: {
+                dtform_id:$dtform_id,
+                audit_id:$audit_id,
+                jwb_hasil:$jwb_hasil
+            },
+            beforeSend: function () {
+                swal.fire({
+                    title: 'Loading',
+                    allowEscapeKey: false,
+                    allowOutsideClick: false,
+                    onOpen: () => {
+                        swal.showLoading();
+                    }
+                });
+            },
+            success: function (data) {
+                swal.close();
+                var list = data == null ? [] : (data instanceof Array ? data : [data]);
+                $.each(list, function (index, org_types) {
+                    if (org_types.status) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: 'Data telah tersimpan.',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    } else {
+                        swal.fire("Oops", org_types.pesan, "error");
+                    }
+                });
+            },
+            error: function () {
+                swal.fire("Oops", "No connection!", "error");
+            }
+        });
+    });
+
+    $("#submitreferensi").on("click", function () {
+        $dtform_id = $(this).attr('dtform_id');
+        $audit_id = $(this).attr('audit_id');
+        $jwb_referensi = $('#jwb_referensi').summernote('code');
+
+        $.ajax({
+            url: base_url + "/daftaraudit/referensi",
+            type: "POST",
+            data: {
+                dtform_id:$dtform_id,
+                audit_id:$audit_id,
+                jwb_referensi:$jwb_referensi
+            },
+            beforeSend: function () {
+                swal.fire({
+                    title: 'Loading',
+                    allowEscapeKey: false,
+                    allowOutsideClick: false,
+                    onOpen: () => {
+                        swal.showLoading();
+                    }
+                });
+            },
+            success: function (data) {
+                swal.close();
+                var list = data == null ? [] : (data instanceof Array ? data : [data]);
+                $.each(list, function (index, org_types) {
+                    if (org_types.status) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: 'Data telah tersimpan.',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    } else {
+                        swal.fire("Oops", org_types.pesan, "error");
+                    }
+                });
+            },
+            error: function () {
+                swal.fire("Oops", "No connection!", "error");
+            }
+        });
+    });
+
      $("#tambah").on("click", function () {
         $("#addModal").modal('show');
     });
@@ -244,386 +453,6 @@ $(function () {
                 $.each(list, function (index, org_types) {
                     if (org_types.status) {
                         daftaraudit.ajax.reload();
-                    } else {
-                        swal.fire("Oops", org_types.pesan, "error");
-                    }
-                });
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-            },
-            error: function () {
-                swal.fire("Oops", "No connection!", "error");
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-            }
-        });
-
-    return false;
-});
-
-
-$("#formtujuan").formValidation({
-        framework: "bootstrap4",
-        excluded: [':disabled'],
-        err: {
-            clazz: 'invalid-feedback'
-        },
-        control: {
-            valid: 'is-valid',
-            invalid: 'is-invalid'
-        },
-        row: {
-            invalid: 'has-danger'
-        }
-    }).on('success.form.fv', function(e) {
-        e.preventDefault();
-
-        var $form = $(e.target);       // ✅ perbaikan
-        //var formData = new FormData(e.target);
-        var $jwb_tujuan = $('#jwb_tujuan').val();
-        //var $jwb_catatan = tinymce.get('jwb_catatan').getContent();
-
-        $.ajax({
-            url: base_url + "/daftaraudit/tujuan",
-            type: "POST",
-            data: {
-                dtform_id:$dtform_id,
-                audit_id:$audit_id,
-                jwb_tujuan:$jwb_tujuan
-            },
-            beforeSend: function () {
-                $("#tujuanModal").modal('hide');
-                swal.fire({
-                    title: 'Loading',
-                    allowEscapeKey: false,
-                    allowOutsideClick: false,
-                    onOpen: () => {
-                        swal.showLoading();
-                    }
-                });
-            },
-            success: function (data) {
-                swal.close();
-                var list = data == null ? [] : (data instanceof Array ? data : [data]);
-                $.each(list, function (index, org_types) {
-                    if (org_types.status) {
-                        daftarpertanyaan.ajax.reload();
-                    } else {
-                        swal.fire("Oops", org_types.pesan, "error");
-                    }
-                });
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-            },
-            error: function () {
-                swal.fire("Oops", "No connection!", "error");
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-            }
-        });
-
-    return false;
-});
-
-$("#formreferensi").formValidation({
-        framework: "bootstrap4",
-        excluded: [':disabled'],
-        err: {
-            clazz: 'invalid-feedback'
-        },
-        control: {
-            valid: 'is-valid',
-            invalid: 'is-invalid'
-        },
-        row: {
-            invalid: 'has-danger'
-        }
-    }).on('success.form.fv', function(e) {
-        e.preventDefault();
-
-        var $form = $(e.target);       // ✅ perbaikan
-        //var formData = new FormData(e.target);
-        var $jwb_referensi = $('#jwb_referensi').val();
-        //var $jwb_catatan = tinymce.get('jwb_catatan').getContent();
-
-        $.ajax({
-            url: base_url + "/daftaraudit/referensi",
-            type: "POST",
-            data: {
-                dtform_id:$dtform_id,
-                audit_id:$audit_id,
-                jwb_referensi:$jwb_referensi
-            },
-            beforeSend: function () {
-                $("#referensiModal").modal('hide');
-                swal.fire({
-                    title: 'Loading',
-                    allowEscapeKey: false,
-                    allowOutsideClick: false,
-                    onOpen: () => {
-                        swal.showLoading();
-                    }
-                });
-            },
-            success: function (data) {
-                swal.close();
-                var list = data == null ? [] : (data instanceof Array ? data : [data]);
-                $.each(list, function (index, org_types) {
-                    if (org_types.status) {
-                        daftarpertanyaan.ajax.reload();
-                    } else {
-                        swal.fire("Oops", org_types.pesan, "error");
-                    }
-                });
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-            },
-            error: function () {
-                swal.fire("Oops", "No connection!", "error");
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-            }
-        });
-
-    return false;
-});
-
-$("#formpertanyaan").formValidation({
-        framework: "bootstrap4",
-        excluded: [':disabled'],
-        err: {
-            clazz: 'invalid-feedback'
-        },
-        control: {
-            valid: 'is-valid',
-            invalid: 'is-invalid'
-        },
-        row: {
-            invalid: 'has-danger'
-        }
-    }).on('success.form.fv', function(e) {
-        e.preventDefault();
-
-        var $form = $(e.target);       // ✅ perbaikan
-        //var formData = new FormData(e.target);
-        var $jwb_pertanyaan = $('#jwb_pertanyaan').val();
-        //var $jwb_catatan = tinymce.get('jwb_catatan').getContent();
-
-        $.ajax({
-            url: base_url + "/daftaraudit/pertanyaan",
-            type: "POST",
-            data: {
-                dtform_id:$dtform_id,
-                audit_id:$audit_id,
-                jwb_pertanyaan:$jwb_pertanyaan
-            },
-            beforeSend: function () {
-                $("#pertanyaanModal").modal('hide');
-                swal.fire({
-                    title: 'Loading',
-                    allowEscapeKey: false,
-                    allowOutsideClick: false,
-                    onOpen: () => {
-                        swal.showLoading();
-                    }
-                });
-            },
-            success: function (data) {
-                swal.close();
-                var list = data == null ? [] : (data instanceof Array ? data : [data]);
-                $.each(list, function (index, org_types) {
-                    if (org_types.status) {
-                        daftarpertanyaan.ajax.reload();
-                    } else {
-                        swal.fire("Oops", org_types.pesan, "error");
-                    }
-                });
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-            },
-            error: function () {
-                swal.fire("Oops", "No connection!", "error");
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-            }
-        });
-
-    return false;
-});
-
-$("#formhasil").formValidation({
-        framework: "bootstrap4",
-        excluded: [':disabled'],
-        err: {
-            clazz: 'invalid-feedback'
-        },
-        control: {
-            valid: 'is-valid',
-            invalid: 'is-invalid'
-        },
-        row: {
-            invalid: 'has-danger'
-        }
-    }).on('success.form.fv', function(e) {
-        e.preventDefault();
-
-        var $form = $(e.target);       // ✅ perbaikan
-        //var formData = new FormData(e.target);
-        var $jwb_hasil = $('#jwb_hasil').val();
-        //var $jwb_hasil = tinymce.get('jwb_hasil').getContent();
-
-        $.ajax({
-            url: base_url + "/daftaraudit/hasil",
-            type: "POST",
-            data: {
-                dtform_id:$dtform_id,
-                audit_id:$audit_id,
-                jwb_hasil:$jwb_hasil
-            },
-            beforeSend: function () {
-                $("#hasilModal").modal('hide');
-                swal.fire({
-                    title: 'Loading',
-                    allowEscapeKey: false,
-                    allowOutsideClick: false,
-                    onOpen: () => {
-                        swal.showLoading();
-                    }
-                });
-            },
-            success: function (data) {
-                swal.close();
-                var list = data == null ? [] : (data instanceof Array ? data : [data]);
-                $.each(list, function (index, org_types) {
-                    if (org_types.status) {
-                        daftarpertanyaan.ajax.reload();
-                    } else {
-                        swal.fire("Oops", org_types.pesan, "error");
-                    }
-                });
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-            },
-            error: function () {
-                swal.fire("Oops", "No connection!", "error");
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-            }
-        });
-
-    return false;
-});
-
-
-$("#formtemuan").formValidation({
-        framework: "bootstrap4",
-        excluded: [':disabled'],
-        err: {
-            clazz: 'invalid-feedback'
-        },
-        control: {
-            valid: 'is-valid',
-            invalid: 'is-invalid'
-        },
-        row: {
-            invalid: 'has-danger'
-        }
-    }).on('success.form.fv', function(e) {
-        e.preventDefault();
-
-        var $form = $(e.target);       // ✅ perbaikan
-        //var formData = new FormData(e.target);
-        var $jwb_temuan = $('#jwb_temuan').val();
-
-        $.ajax({
-            url: base_url + "/daftaraudit/temuan",
-            type: "POST",
-            data: {
-                dtform_id:$dtform_id,
-                audit_id:$audit_id,
-                jwb_temuan:$jwb_temuan
-            },
-            beforeSend: function () {
-                $("#temuanModal").modal('hide');
-                swal.fire({
-                    title: 'Loading',
-                    allowEscapeKey: false,
-                    allowOutsideClick: false,
-                    onOpen: () => {
-                        swal.showLoading();
-                    }
-                });
-            },
-            success: function (data) {
-                swal.close();
-                var list = data == null ? [] : (data instanceof Array ? data : [data]);
-                $.each(list, function (index, org_types) {
-                    if (org_types.status) {
-                        daftarpertanyaan.ajax.reload();
-                    } else {
-                        swal.fire("Oops", org_types.pesan, "error");
-                    }
-                });
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-            },
-            error: function () {
-                swal.fire("Oops", "No connection!", "error");
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-            }
-        });
-
-    return false;
-});
-
-
-$("#formcatatan").formValidation({
-        framework: "bootstrap4",
-        excluded: [':disabled'],
-        err: {
-            clazz: 'invalid-feedback'
-        },
-        control: {
-            valid: 'is-valid',
-            invalid: 'is-invalid'
-        },
-        row: {
-            invalid: 'has-danger'
-        }
-    }).on('success.form.fv', function(e) {
-        e.preventDefault();
-
-        var $form = $(e.target);       // ✅ perbaikan
-        //var formData = new FormData(e.target);
-        var $jwb_catatan = $('#jwb_catatan').val();
-        //var $jwb_catatan = tinymce.get('jwb_catatan').getContent();
-
-        $.ajax({
-            url: base_url + "/daftaraudit/catatan",
-            type: "POST",
-            data: {
-                dtform_id:$dtform_id,
-                audit_id:$audit_id,
-                jwb_catatan:$jwb_catatan
-            },
-            beforeSend: function () {
-                $("#catatanModal").modal('hide');
-                swal.fire({
-                    title: 'Loading',
-                    allowEscapeKey: false,
-                    allowOutsideClick: false,
-                    onOpen: () => {
-                        swal.showLoading();
-                    }
-                });
-            },
-            success: function (data) {
-                swal.close();
-                var list = data == null ? [] : (data instanceof Array ? data : [data]);
-                $.each(list, function (index, org_types) {
-                    if (org_types.status) {
-                        daftarpertanyaan.ajax.reload();
                     } else {
                         swal.fire("Oops", org_types.pesan, "error");
                     }

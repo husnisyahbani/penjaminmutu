@@ -63,6 +63,7 @@
 <script src="<?php echo asset_url();?>global/vendor/formvalidation/framework/bootstrap4.min.js"></script>
 <script src="<?php echo asset_url(); ?>global/vendor/bootstrap-datepicker/bootstrap-datepicker.js"></script>
 <script src="<?php echo asset_url(); ?>global/vendor/toastr/toastr.js"></script>
+<script src="<?php echo asset_url();?>summernote/summernote-bs4.js"></script>
 
 <!-- Scripts -->
 <script src="<?php echo asset_url();?>global/js/Component.js"></script>
@@ -94,46 +95,24 @@
 <script src="<?php echo asset_url();?>assets/examples/js/uikit/icon.js"></script>
 <script src="<?php echo asset_url();?>global/js/Plugin/sweetalert2.min.js"></script>
 <script src="<?php echo asset_url();?>assets/examples/js/dashboard/v1.js"></script>
-<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
 
 
 <script>
     $(document).ready(function() {
-// Ganti semua textarea dengan class .editor menjadi Quill editor
-    $('.editor').each(function() {
-        const textarea = $(this);
-        const editorId = textarea.attr('id') + '_quill';
-        
-        // Buat elemen div sebagai wadah quill
-        const quillContainer = $('<div id="' + editorId + '"></div>');
-        textarea.hide().after(quillContainer);
-        
-        // Inisialisasi Quill
-        const quill = new Quill('#' + editorId, {
-            theme: 'snow',
-            placeholder: 'Tulis di sini...',
-            modules: {
-                toolbar: [
-                    [{ header: [1, 2, false] }],
-                    ['bold', 'italic', 'underline'],
-                    ['link', 'blockquote', 'code-block'],
-                    [{ list: 'ordered' }, { list: 'bullet' }],
-                    ['clean']
-                ]
-            }
-        });
-
-        // Sinkronisasi konten Quill ke textarea (agar bisa dikirim lewat form)
-        quill.on('text-change', function() {
-            textarea.val(quill.root.innerHTML);
-        });
-
-        // Jika textarea sudah punya isi, tampilkan di Quill
-        if (textarea.val().trim() !== '') {
-            quill.root.innerHTML = textarea.val();
-        }
-    });
+$('.editor').summernote({
+        height: 300,
+         dialogsInBody: true,
+            toolbar: [
+        ['style', ['bold', 'italic', 'underline', 'clear']],
+        ['font', ['strikethrough', 'superscript', 'subscript']],
+        ['fontsize', ['fontsize']],
+        ['color', ['color']],
+        ['para', ['ul', 'ol', 'paragraph']],
+        ['insert', ['link']], // 👈 pastikan ini ada
+        ['view', ['codeview']]
+    ]
+      });
 
     // Saat modal dibuka, pastikan editor muncul dengan benar
     $('.modal').on('shown.bs.modal', function () {
@@ -176,6 +155,11 @@ if (isset($pesanerror)) {
     var root_url = '<?php echo base_url(); ?>';
     var form_id = '<?php if(isset($form_id)) echo $form_id; ?>';
     var audit_id = '<?php if(isset($audit_id)) echo $audit_id; ?>';
+    var jwb_pertanyaan = '<?php if(isset($jawab['jwb_pertanyaan'])) echo $jawab['jwb_pertanyaan']; ?>';
+    var jwb_referensi = '<?php if(isset($jawab['jwb_referensi'])) echo $jawab['jwb_referensi']; ?>';
+    var jwb_hasil = '<?php if(isset($jawab['jwb_hasil'])) echo $jawab['jwb_hasil']; ?>';
+    var jwb_catatan = '<?php if(isset($jawab['jwb_catatan'])) echo $jawab['jwb_catatan']; ?>';
+    var jwb_tujuan = '<?php if(isset($jawab['jwb_tujuan'])) echo $jawab['jwb_tujuan']; ?>';
  </script>
 
 <?php

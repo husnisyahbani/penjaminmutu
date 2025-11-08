@@ -17,15 +17,10 @@
                         <table class="table table-hover dataTable w-full" id="daftarpertanyaan">
                             <thead>
                                 <tr>
-                                    <th >No</th>
-                                    <th width="100px">Evaluasi</th>
-                                    <th >Hasil Evaluasi</th>
-                                    <th >Tujuan</th>
-                                    <th >Referensi</th>
-                                    <th >Pertanyaan</th>
-                                    <th >Hasil</th>
-                                    <th >Temuan</th>
-                                    <th >Catatan</th>
+                                    <th width="5%">No</th>
+                                    <th width="45%">Evaluasi</th>
+                                    <th width="45%">Hasil Evaluasi</th>
+                                    <th width="5%">Delik</th>
                                 </tr>
                             </thead>
 
