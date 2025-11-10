@@ -37,7 +37,7 @@
 
             <div class="font-size-20">Tujuan</div>
             <p><textarea id="jwb_tujuan" class="editor" name="jwb_tujuan"></textarea></p>
-            <button type="submit" class="btn btn-primary" id="submitjawaban" dtform_id="<?=$dtform_id?>" audit_id="<?=$audit_id?>">Simpan Tujuan</button>
+            <button type="submit" class="btn btn-primary" id="submittujuan" dtform_id="<?=$dtform_id?>" audit_id="<?=$audit_id?>">Simpan Tujuan</button>
 
             <hr/>
             <div class="font-size-20">Pertanyaan</div>
