@@ -63,7 +63,7 @@
                             </div>
 
                             <div class="text-right">
-                                <button type="submit" class="btn btn-primary" id="submittujuan" name="submittujuan">Simpan Tujuan</button>
+                                <button type="submit" class="btn btn-primary" id="submitreferensi" name="submitreferensi">Simpan Referensi</button>
                             </div>
                         </form>
 
