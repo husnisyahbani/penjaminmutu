@@ -29,11 +29,11 @@ $(function () {
         }
     });
 
-    $('#jwb_pertanyaan').summernote('code', jwb_pertanyaan);
-    $('#jwb_referensi').summernote('code', jwb_referensi);
-    $('#jwb_hasil').summernote('code', jwb_hasil);
-    $('#jwb_catatan').summernote('code', jwb_catatan);
-    $('#jwb_tujuan').summernote('code', jwb_tujuan);
+    // $('#jwb_pertanyaan').summernote('code', jwb_pertanyaan);
+    // $('#jwb_referensi').summernote('code', jwb_referensi);
+    // $('#jwb_hasil').summernote('code', jwb_hasil);
+    // $('#jwb_catatan').summernote('code', jwb_catatan);
+    // $('#jwb_tujuan').summernote('code', jwb_tujuan);
 
 
     $("#daftarpertanyaan").on("click", ".delik", function () {
