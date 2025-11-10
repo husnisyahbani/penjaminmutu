@@ -36,7 +36,12 @@
             <hr/>
 
             <div class="font-size-20">Tujuan</div>
-            <form class="form-horizontal" id="formtujuan" autocomplete="off" method="post" enctype="multipart/form-data">
+            <class="form-horizontal"
+                            id="formtujuan"
+                            autocomplete="off"
+                            action="<?php base_url() . $this->module.'/daftaraudit/tujuan/';?>"
+                            method="post"
+                            enctype="multipart/form-data">
                             <div class="form-group row">
                                 <div class="col-md-12">
                                   <textarea id="jwb_tujuan" class="editor" name="jwb_tujuan"  rows="6" data-fv-notempty="true"
