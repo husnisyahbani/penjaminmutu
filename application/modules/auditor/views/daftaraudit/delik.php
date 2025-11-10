@@ -36,22 +36,22 @@
             <hr/>
 
             <div class="font-size-20">Tujuan</div>
-            <p><textarea id="jwb_tujuan" class="editor" name="jwb_tujuan"></textarea></p>
+            <textarea id="jwb_tujuan" class="editor" name="jwb_tujuan"></textarea>
             <button type="submit" class="btn btn-primary" id="submittujuan" dtform_id="<?=$dtform_id?>" audit_id="<?=$audit_id?>">Simpan Tujuan</button>
 
             <hr/>
             <div class="font-size-20">Pertanyaan</div>
-            <p><textarea id="jwb_pertanyaan" class="editor" name="jwb_pertanyaan"></textarea></p>
+            <textarea id="jwb_pertanyaan" class="editor" name="jwb_pertanyaan"></textarea>
             <button type="submit" class="btn btn-primary" id="submitpertanyaan" dtform_id="<?=$dtform_id?>" audit_id="<?=$audit_id?>">Simpan Pertanyaan</button>
 
             <hr/>
             <div class="font-size-20">Referensi</div>
-            <p><textarea id="jwb_referensi" class="editor" name="jwb_referensi"></textarea></p>
+            <textarea id="jwb_referensi" class="editor" name="jwb_referensi"></textarea>
             <button type="submit" class="btn btn-primary" id="submitreferensi" dtform_id="<?=$dtform_id?>" audit_id="<?=$audit_id?>">Simpan Referensi</button>
 
             <hr/>
             <div class="font-size-20">Temuan</div>
-            <p>
+            
               <select class="form-control" name="jwb_temuan" id="jwb_temuan" data-fv-notempty="true"
                       data-fv-notempty-message="Wajib Dipilih"> 
                 <option value="">--Pilih Temuan--</option>                                
@@ -60,17 +60,17 @@
                 <option value="TS MINOR" <?php if(isset($jawab['jwb_temuan']) && $jawab['jwb_temuan'] === 'TS MINOR')echo 'selected'; ?>>TS MINOR</option>
                 <option value="TS MAYOR" <?php if(isset($jawab['jwb_temuan']) && $jawab['jwb_temuan'] === 'TS MAYOR')echo 'selected'; ?>>TS MAYOR</option>
               </select>
-            </p>
+            
             <button type="submit" class="btn btn-primary" id="submittemuan" dtform_id="<?=$dtform_id?>" audit_id="<?=$audit_id?>">Simpan Temuan</button>
 
             <hr/>
             <div class="font-size-20">Hasil</div>
-            <p><textarea id="jwb_hasil" class="editor" name="jwb_hasil"></textarea></p>
+            <textarea id="jwb_hasil" class="editor" name="jwb_hasil"></textarea>
             <button type="submit" class="btn btn-primary" id="submithasil" dtform_id="<?=$dtform_id?>" audit_id="<?=$audit_id?>">Simpan Hasil</button>
 
             <hr/>
             <div class="font-size-20">Catatan</div>
-            <p><textarea id="jwb_catatan" class="editor" name="jwb_catatan"></textarea></p>
+            <textarea id="jwb_catatan" class="editor" name="jwb_catatan"></textarea>
             <button type="submit" class="btn btn-primary" id="submitcatatan" dtform_id="<?=$dtform_id?>" audit_id="<?=$audit_id?>">Simpan Catatan</button>
           </div>
         </div>
