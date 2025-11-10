@@ -39,7 +39,7 @@
             <form class="form-horizontal"
                             id="formtujuan"
                             autocomplete="off"
-                            action="<?php base_url('auditor/daftaraudit/tujuan/') ;?>"
+                            action="<?php echo base_url('auditor/daftaraudit/tujuan/');?>"
                             method="post"
                             enctype="multipart/form-data">
                             <div class="form-group row">
