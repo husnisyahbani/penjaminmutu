@@ -130,68 +130,66 @@ $(function () {
          window.location.href = base_url+'/daftaraudit/detail/'+id;
     });
 
-    
+$('#formtujuan').formValidation({
+    framework: 'bootstrap4',
+    excluded: [':disabled'],
+    err: {
+        clazz: 'invalid-feedback'
+    },
+    control: {
+        valid: 'is-valid',
+        invalid: 'is-invalid'
+    },
+    row: {
+        invalid: 'has-danger'
+    }
+}).on('success.form.fv', function(e) {
+    e.preventDefault();
 
-    $("#formtujuan").formValidation({
-        framework: "bootstrap4",
-        excluded: [':disabled'],
-        err: {
-            clazz: 'invalid-feedback'
+    var $form = $(e.target);
+    var formData = new FormData(e.target);
+
+    $.ajax({
+        url: base_url + "daftaraudit/tujuan",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        beforeSend: function () {
+            Swal.fire({
+                title: 'Loading...',
+                allowEscapeKey: false,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
         },
-        control: {
-            valid: 'is-valid',
-            invalid: 'is-invalid'
+        success: function (data) {
+            Swal.close();
+            var list = data == null ? [] : (data instanceof Array ? data : [data]);
+            $.each(list, function (index, org_types) {
+                if (org_types.status) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Data telah tersimpan.',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                } else {
+                    Swal.fire("Oops", org_types.pesan, "error");
+                }
+            });
+            $form.formValidation('disableSubmitButtons', false)
+                 .formValidation('resetForm', true);
         },
-        row: {
-            invalid: 'has-danger'
+        error: function () {
+            Swal.fire("Oops", "No connection!", "error");
+            $form.formValidation('disableSubmitButtons', false)
+                 .formValidation('resetForm', true);
         }
-    }).on('success.form.fv', function(e) {
-        e.preventDefault();
-
-        var $form = $(e.target);       // ✅ perbaikan
-        var formData = new FormData(e.target);
-
-        $.ajax({
-            url: base_url + "/daftaraudit/tujuan",
-            type: "POST",
-            data: formData,
-            processData: false,        // ✅ wajib
-            contentType: false,        // ✅ wajib
-            beforeSend: function () {
-                swal.fire({
-                    title: 'Loading',
-                    allowEscapeKey: false,
-                    allowOutsideClick: false,
-                    onOpen: () => {
-                        swal.showLoading();
-                    }
-                });
-            },
-            success: function (data) {
-                swal.close();
-                var list = data == null ? [] : (data instanceof Array ? data : [data]);
-                $.each(list, function (index, org_types) {
-                    if (org_types.status) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil!',
-                            text: 'Data telah tersimpan.',
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-                    } else {
-                        swal.fire("Oops", org_types.pesan, "error");
-                    }
-                });
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-            },
-            error: function () {
-                swal.fire("Oops", "No connection!", "error");
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-            }
-        });
+    });
 
     return false;
 });

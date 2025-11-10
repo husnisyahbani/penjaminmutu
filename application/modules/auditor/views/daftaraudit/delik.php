@@ -35,7 +35,7 @@
             <p><?php if(isset($jawab['jwb_jawaban'])) echo $jawab['jwb_jawaban'];?></p>
             <hr/>
 
-             <div class="font-size-20">Tujuan</div>
+            <div class="font-size-20">Tujuan</div>
             <form class="form-horizontal" id="formtujuan" autocomplete="off" method="post" enctype="multipart/form-data">
                             <div class="form-group row">
                                 <div class="col-md-12">
