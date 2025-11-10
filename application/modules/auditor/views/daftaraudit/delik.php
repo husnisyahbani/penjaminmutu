@@ -36,7 +36,7 @@
             <hr/>
 
              <div class="font-size-20">Tujuan</div>
-            <form class="form-horizontal" id="formtujuan" autocomplete="off" action="<?php echo base_url() . 'admin/data/tambahdata';?>" method="post" enctype="multipart/form-data">
+            <form class="form-horizontal" id="formtujuan" autocomplete="off" method="post" enctype="multipart/form-data">
                             <div class="form-group row">
                                 <div class="col-md-12">
                                   <textarea id="jwb_tujuan" class="editor" name="jwb_tujuan"  rows="6" data-fv-notempty="true"
@@ -51,11 +51,13 @@
 
                         <hr/>
 
-             <div class="font-size-20">Pertanyaan</div>
-            <form class="form-horizontal" id="formpertanyaan" autocomplete="off" action="<?php echo base_url() . 'admin/data/tambahdata';?>" method="post" enctype="multipart/form-data">
+            
+
+            <div class="font-size-20">referensi</div>
+            <form class="form-horizontal" id="formreferensi" autocomplete="off" method="post" enctype="multipart/form-data">
                             <div class="form-group row">
                                 <div class="col-md-12">
-                                  <textarea id="jwb_pertanyaan" class="editor" name="jwb_pertanyaan"  rows="6" data-fv-notempty="true"
+                                  <textarea id="jwb_referensi" class="editor" name="jwb_referensi"  rows="6" data-fv-notempty="true"
                                            data-fv-notempty-message="Wajib Diisi"></textarea>
                                 </div>
                             </div>
@@ -64,6 +66,70 @@
                                 <button type="submit" class="btn btn-primary" id="submittujuan" name="submittujuan">Simpan Tujuan</button>
                             </div>
                         </form>
+
+                        <div class="font-size-20">Pertanyaan</div>
+            <form class="form-horizontal" id="formpertanyaan" autocomplete="off" method="post" enctype="multipart/form-data">
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                  <textarea id="jwb_pertanyaan" class="editor" name="jwb_pertanyaan"  rows="6" data-fv-notempty="true"
+                                           data-fv-notempty-message="Wajib Diisi"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="text-right">
+                                <button type="submit" class="btn btn-primary" id="submitpertanyaan" name="submitpertanyaan">Simpan Pertanyaan</button>
+                            </div>
+                        </form>
+
+
+                        <div class="font-size-20">Temuan</div>
+            <form class="form-horizontal" id="formtemuan" autocomplete="off" method="post" enctype="multipart/form-data">
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                <select class="form-control" name="jwb_temuan" id="jwb_temuan" data-fv-notempty="true"
+                                        data-fv-notempty-message="Wajib Dipilih"> 
+                                  <option value="">--Pilih Temuan--</option>                                
+                                  <option value="S" <?php if(isset($jawab['jwb_temuan']) && $jawab['jwb_temuan'] === 'S')echo 'selected'; ?>>S</option>
+                                  <option value="OB" <?php if(isset($jawab['jwb_temuan']) && $jawab['jwb_temuan'] === 'OB')echo 'selected'; ?>>OB</option>
+                                  <option value="TS MINOR" <?php if(isset($jawab['jwb_temuan']) && $jawab['jwb_temuan'] === 'TS MINOR')echo 'selected'; ?>>TS MINOR</option>
+                                  <option value="TS MAYOR" <?php if(isset($jawab['jwb_temuan']) && $jawab['jwb_temuan'] === 'TS MAYOR')echo 'selected'; ?>>TS MAYOR</option>
+                                </select>
+                                </div>
+                            </div>
+
+                            <div class="text-right">
+                                <button type="submit" class="btn btn-primary" id="submittemuan" name="submittemuan">Simpan Temuan</button>
+                            </div>
+                        </form>
+
+                        <div class="font-size-20">Hasil</div>
+            <form class="form-horizontal" id="formhasil" autocomplete="off" method="post" enctype="multipart/form-data">
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                  <textarea id="jwb_hasil" class="editor" name="jwb_hasil"  rows="6" data-fv-notempty="true"
+                                           data-fv-notempty-message="Wajib Diisi"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="text-right">
+                                <button type="submit" class="btn btn-primary" id="submithasil" name="submithasil">Simpan Hasil</button>
+                            </div>
+                        </form>
+
+                        <div class="font-size-20">Catatan</div>
+            <form class="form-horizontal" id="formcatatan" autocomplete="off" method="post" enctype="multipart/form-data">
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                  <textarea id="jwb_catatan" class="editor" name="jwb_catatan"  rows="6" data-fv-notempty="true"
+                                           data-fv-notempty-message="Wajib Diisi"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="text-right">
+                                <button type="submit" class="btn btn-primary" id="submitcatatan" name="submitcatatan">Simpan Catatan</button>
+                            </div>
+                        </form>
+
             <!-- <div class="font-size-20">Tujuan</div>
             <textarea id="jwb_tujuan" class="editor" name="jwb_tujuan"></textarea>
             <button type="submit" class="btn btn-primary" id="submittujuan" dtform_id="<?=$dtform_id?>" audit_id="<?=$audit_id?>">Simpan Tujuan</button> -->
