@@ -36,7 +36,7 @@
             <hr/>
 
             <div class="font-size-20">Tujuan</div>
-            <class="form-horizontal"
+            <form class="form-horizontal"
                             id="formtujuan"
                             autocomplete="off"
                             action="<?php base_url() . $this->module.'/daftaraudit/tujuan/';?>"
