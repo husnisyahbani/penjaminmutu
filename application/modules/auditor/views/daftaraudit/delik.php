@@ -35,9 +35,23 @@
             <p><?php if(isset($jawab['jwb_jawaban'])) echo $jawab['jwb_jawaban'];?></p>
             <hr/>
 
-            <div class="font-size-20">Tujuan</div>
+             <div class="font-size-20">Tujuan</div>
+            <form class="form-horizontal" id="formtujuan" autocomplete="off" action="<?php echo base_url() . 'admin/data/tambahdata';?>" method="post" enctype="multipart/form-data">
+                            <div class="form-group row">
+                                <div class="col-md-9">
+                                  <textarea id="jwb_tujuan" class="editor" name="jwb_tujuan"  rows="6" data-fv-notempty="true"
+                                           data-fv-notempty-message="Wajib Diisi"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="text-right">
+                                <button type="submit" class="btn btn-primary" id="submittujuan" name="submittujuan">Simpan Tujuan</button>
+                            </div>
+                        </form>
+
+            <!-- <div class="font-size-20">Tujuan</div>
             <textarea id="jwb_tujuan" class="editor" name="jwb_tujuan"></textarea>
-            <button type="submit" class="btn btn-primary" id="submittujuan" dtform_id="<?=$dtform_id?>" audit_id="<?=$audit_id?>">Simpan Tujuan</button>
+            <button type="submit" class="btn btn-primary" id="submittujuan" dtform_id="<?=$dtform_id?>" audit_id="<?=$audit_id?>">Simpan Tujuan</button> -->
 
             <hr/>
             <div class="font-size-20">Pertanyaan</div>
