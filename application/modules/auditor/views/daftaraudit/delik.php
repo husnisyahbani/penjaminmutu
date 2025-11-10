@@ -44,6 +44,9 @@
                                 </div>
                             </div>
 
+                            <input type="hidden" name="audit_id" value="<?php echo $audit_id;?>"/>
+                            <input type="hidden" name="dtform_id" value="<?php echo $dtform_id;?>"/>
+
                             <div class="text-right">
                                 <button type="submit" class="btn btn-primary" id="submittujuan" name="submittujuan">Simpan Tujuan</button>
                             </div>
