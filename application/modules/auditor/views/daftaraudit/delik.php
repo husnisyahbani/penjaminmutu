@@ -38,7 +38,7 @@
              <div class="font-size-20">Tujuan</div>
             <form class="form-horizontal" id="formtujuan" autocomplete="off" action="<?php echo base_url() . 'admin/data/tambahdata';?>" method="post" enctype="multipart/form-data">
                             <div class="form-group row">
-                                <div class="col-md-9">
+                                <div class="col-md-12">
                                   <textarea id="jwb_tujuan" class="editor" name="jwb_tujuan"  rows="6" data-fv-notempty="true"
                                            data-fv-notempty-message="Wajib Diisi"></textarea>
                                 </div>
@@ -54,7 +54,7 @@
              <div class="font-size-20">Pertanyaan</div>
             <form class="form-horizontal" id="formpertanyaan" autocomplete="off" action="<?php echo base_url() . 'admin/data/tambahdata';?>" method="post" enctype="multipart/form-data">
                             <div class="form-group row">
-                                <div class="col-md-9">
+                                <div class="col-md-12">
                                   <textarea id="jwb_pertanyaan" class="editor" name="jwb_pertanyaan"  rows="6" data-fv-notempty="true"
                                            data-fv-notempty-message="Wajib Diisi"></textarea>
                                 </div>
