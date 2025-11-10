@@ -49,11 +49,26 @@
                             </div>
                         </form>
 
+                        <hr/>
+
+             <div class="font-size-20">Pertanyaan</div>
+            <form class="form-horizontal" id="formpertanyaan" autocomplete="off" action="<?php echo base_url() . 'admin/data/tambahdata';?>" method="post" enctype="multipart/form-data">
+                            <div class="form-group row">
+                                <div class="col-md-9">
+                                  <textarea id="jwb_pertanyaan" class="editor" name="jwb_pertanyaan"  rows="6" data-fv-notempty="true"
+                                           data-fv-notempty-message="Wajib Diisi"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="text-right">
+                                <button type="submit" class="btn btn-primary" id="submittujuan" name="submittujuan">Simpan Tujuan</button>
+                            </div>
+                        </form>
             <!-- <div class="font-size-20">Tujuan</div>
             <textarea id="jwb_tujuan" class="editor" name="jwb_tujuan"></textarea>
             <button type="submit" class="btn btn-primary" id="submittujuan" dtform_id="<?=$dtform_id?>" audit_id="<?=$audit_id?>">Simpan Tujuan</button> -->
 
-            <hr/>
+            <!-- <hr/>
             <div class="font-size-20">Pertanyaan</div>
             <textarea id="jwb_pertanyaan" class="editor" name="jwb_pertanyaan"></textarea>
             <button type="submit" class="btn btn-primary" id="submitpertanyaan" dtform_id="<?=$dtform_id?>" audit_id="<?=$audit_id?>">Simpan Pertanyaan</button>
@@ -86,7 +101,7 @@
             <div class="font-size-20">Catatan</div>
             <textarea id="jwb_catatan" class="editor" name="jwb_catatan"></textarea>
             <button type="submit" class="btn btn-primary" id="submitcatatan" dtform_id="<?=$dtform_id?>" audit_id="<?=$audit_id?>">Simpan Catatan</button>
-          </div>
+          </div> -->
         </div>
         <!-- End Widget Info -->
       </div>
