@@ -39,7 +39,7 @@ $(function () {
     $("#daftarpertanyaan").on("click", ".delik", function () {
         var audit_id = $(this).attr('audit_id');
         var dtform_id = $(this).attr('dtform_id');
-         window.location.href = base_url+'/daftaraudit/delik?audit_id='+audit_id+"&dtform_id="+dtform_id;
+         window.location.href = base_url+'/delik?audit_id='+audit_id+"&dtform_id="+dtform_id;
     });
 
     $("#daftaraudit").on("click", ".detail", function () {
