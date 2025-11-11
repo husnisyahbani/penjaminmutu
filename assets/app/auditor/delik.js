@@ -69,7 +69,12 @@ $("#editcatatan").on("click", function () {
 
 
     $("#edittemuan").on("click", function () {
+       
+       var isiTemuan = $("#temuan").text();
        $('#temuanModal').modal('show');
+       $('#temuanModal').on('shown.bs.modal', function () {
+        $('#jwb_temuan').val(isiTemuan);
+    });
     });
 
 
@@ -339,6 +344,77 @@ $("#formhasil").formValidation({
             $.each(list, function (index, res) {
                 if (res.status) {
                     $("#hasil").html(isiHasil);
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Data telah tersimpan.',
+                        showConfirmButton: false,
+                        timer: 1200
+                    });
+                } else {
+                    Swal.fire("Oops", res.pesan, "error");
+                }
+            });
+
+            $form.formValidation('disableSubmitButtons', false)
+                .formValidation('resetForm', true);
+        },
+        error: function () {
+            Swal.fire("Oops", "No connection!", "error");
+            $form.formValidation('disableSubmitButtons', false)
+                .formValidation('resetForm', true);
+        }
+    });
+
+    return false;
+});
+
+
+$("#formtemuan").formValidation({
+    framework: "bootstrap4",
+    excluded: [':disabled', ':hidden', ':not(:visible)'], // ðŸ”§ tambahkan agar summernote tidak dianggap kosong
+    err: {
+        clazz: 'invalid-feedback'
+    },
+    control: {
+        valid: 'is-valid',
+        invalid: 'is-invalid'
+    },
+    row: {
+        invalid: 'has-danger'
+    }
+}).on('success.form.fv', function (e) {
+    e.preventDefault();
+
+    var $form = $(e.target);
+    var formData = new FormData(e.target);
+    var isiTemuan = $('#jwb_temuan').val();
+
+    $.ajax({
+        url: base_url + "/delik/temuan",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        beforeSend: function () {
+            $("#temuanModal").modal('hide');
+            Swal.fire({
+                title: 'Loading...',
+                allowEscapeKey: false,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        },
+        success: function (data) {
+            Swal.close();
+
+            var list = data == null ? [] : (data instanceof Array ? data : [data]);
+            $.each(list, function (index, res) {
+                if (res.status) {
+                    $("#temuan").val(isiTemuan);
 
                     Swal.fire({
                         icon: 'success',

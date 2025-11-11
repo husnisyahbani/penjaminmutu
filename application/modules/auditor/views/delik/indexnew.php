@@ -350,3 +350,50 @@
   </div>
 </div>
 
+
+<div
+  class="modal fade"
+  id="temuanModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleFormModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-simple" role="document">
+    <div class="modal-content">
+      <form id="formtemuan">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="exampleFormModalLabel">Temuan</h4>
+        </div>
+
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-12 center">
+              <h4 class="example-title">Masukkan Temuan</h4>
+              <select class="form-control" name="jwb_temuan" id="jwb_temuan" data-fv-notempty="true"
+                    data-fv-notempty-message="Wajib Dipilih"> 
+                                  <option value="">--Pilih Temuan--</option>                                
+                                  <option value="S" <?php if(isset($jawab['jwb_temuan']) && $jawab['jwb_temuan'] === 'S')echo 'selected'; ?>>S</option>
+                                  <option value="OB" <?php if(isset($jawab['jwb_temuan']) && $jawab['jwb_temuan'] === 'OB')echo 'selected'; ?>>OB</option>
+                                  <option value="TS MINOR" <?php if(isset($jawab['jwb_temuan']) && $jawab['jwb_temuan'] === 'TS MINOR')echo 'selected'; ?>>TS MINOR</option>
+                                  <option value="TS MAYOR" <?php if(isset($jawab['jwb_temuan']) && $jawab['jwb_temuan'] === 'TS MAYOR')echo 'selected'; ?>>TS MAYOR</option>
+                                </select>
+            </div>
+            <input type="hidden" name="audit_id" value="<?=$audit_id?>"/>
+            <input type="hidden" name="dtform_id" value="<?=$dtform_id?>"/>
+          </div>
+        </div>
+
+        <div class="modal-footer text-right">
+          <button type="submit" class="btn btn-primary" name="submitjawaban" value="submitjawaban">
+            Kirim
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
