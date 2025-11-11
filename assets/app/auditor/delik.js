@@ -35,74 +35,79 @@ $(function () {
     });
 
 
-    $("#formtujuan").formValidation({
-        framework: "bootstrap4",
-        excluded: [':disabled'],
-        err: {
-            clazz: 'invalid-feedback'
+   $("#formtujuan").formValidation({
+    framework: "bootstrap4",
+    excluded: [':disabled', ':hidden', ':not(:visible)'], // 🔧 tambahkan agar summernote tidak dianggap kosong
+    err: {
+        clazz: 'invalid-feedback'
+    },
+    control: {
+        valid: 'is-valid',
+        invalid: 'is-invalid'
+    },
+    row: {
+        invalid: 'has-danger'
+    }
+}).on('success.form.fv', function (e) {
+    e.preventDefault();
+
+    var $form = $(e.target);
+    var formData = new FormData(e.target);
+
+    // 🔧 Ambil konten dari Summernote, lalu tambahkan ke formData
+    var isiTujuan = $('#jwb_tujuan').summernote('code');
+    formData.set('jwb_tujuan', isiTujuan);
+
+    $.ajax({
+        url: base_url + "/delik/tujuan",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        beforeSend: function () {
+            $("#tujuanModal").modal('hide');
+            Swal.fire({
+                title: 'Loading...',
+                allowEscapeKey: false,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
         },
-        control: {
-            valid: 'is-valid',
-            invalid: 'is-invalid'
-        },
-        row: {
-            invalid: 'has-danger'
-        }
-    }).on('success.form.fv', function(e) {
-        e.preventDefault();
+        success: function (data) {
+            Swal.close();
 
-        var $form = $(e.target);       // ✅ perbaikan
-        var formData = new FormData(e.target);
+            var list = data == null ? [] : (data instanceof Array ? data : [data]);
+            $.each(list, function (index, res) {
+                if (res.status) {
+                    // 🔧 Update isi <p id="tujuan"> dari summernote
+                    $("#tujuan").html(isiTujuan);
 
-        $.ajax({
-            url: base_url + "/delik/tujuan",
-            type: "POST",
-            data: formData,
-            processData: false,        // ✅ wajib
-            contentType: false,        // ✅ wajib
-            beforeSend: function () {
-                $("#tujuanModal").modal('hide');
-                swal.fire({
-                    title: 'Loading',
-                    allowEscapeKey: false,
-                    allowOutsideClick: false,
-                    onOpen: () => {
-                        swal.showLoading();
-                    }
-                });
-            },
-            success: function (data) {
-                swal.close();
-                var list = data == null ? [] : (data instanceof Array ? data : [data]);
-                $.each(list, function (index, org_types) {
-                    if (org_types.status) {
-
-                        var newTujuan = $('#jwb_tujuan').summernote('code');
-                        // Set kembali ke elemen <p id="tujuan">
-                        $("#tujuan").html(newTujuan);
-                        
-                        Swal.fire({
+                    Swal.fire({
                         icon: 'success',
                         title: 'Berhasil!',
                         text: 'Data telah tersimpan.',
                         showConfirmButton: false,
-                        timer: 1000
+                        timer: 1200
                     });
-                    } else {
-                        swal.fire("Oops", org_types.pesan, "error");
-                    }
-                });
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-            },
-            error: function () {
-                swal.fire("Oops", "No connection!", "error");
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-            }
-        });
+                } else {
+                    Swal.fire("Oops", res.pesan, "error");
+                }
+            });
+
+            $form.formValidation('disableSubmitButtons', false)
+                .formValidation('resetForm', true);
+        },
+        error: function () {
+            Swal.fire("Oops", "No connection!", "error");
+            $form.formValidation('disableSubmitButtons', false)
+                .formValidation('resetForm', true);
+        }
+    });
 
     return false;
 });
+
 
 });
