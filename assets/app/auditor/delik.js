@@ -414,7 +414,7 @@ $("#formtemuan").formValidation({
             var list = data == null ? [] : (data instanceof Array ? data : [data]);
             $.each(list, function (index, res) {
                 if (res.status) {
-                    $("#temuan").val(isiTemuan);
+                    $("#temuan").text(isiTemuan);
 
                     Swal.fire({
                         icon: 'success',
