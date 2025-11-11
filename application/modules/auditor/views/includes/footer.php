@@ -155,11 +155,7 @@ if (isset($pesanerror)) {
     var root_url = '<?php echo base_url(); ?>';
     var form_id = '<?php if(isset($form_id)) echo $form_id; ?>';
     var audit_id = '<?php if(isset($audit_id)) echo $audit_id; ?>';
-    var jwb_pertanyaan = '<?php if(isset($jawab['jwb_pertanyaan'])) echo $jawab['jwb_pertanyaan']; ?>';
-    var jwb_referensi = '<?php if(isset($jawab['jwb_referensi'])) echo $jawab['jwb_referensi']; ?>';
-    var jwb_hasil = '<?php if(isset($jawab['jwb_hasil'])) echo $jawab['jwb_hasil']; ?>';
-    var jwb_catatan = '<?php if(isset($jawab['jwb_catatan'])) echo $jawab['jwb_catatan']; ?>';
-    var jwb_tujuan = '<?php if(isset($jawab['jwb_tujuan'])) echo $jawab['jwb_tujuan']; ?>';
+   
  </script>
 
 <?php
