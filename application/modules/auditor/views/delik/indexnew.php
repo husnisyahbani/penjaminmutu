@@ -196,3 +196,44 @@
   </div>
 </div>
 
+<div
+  class="modal fade"
+  id="tujuanModal"
+  aria-hidden="false"
+  aria-labelledby="exampleFormModalLabel"
+  role="dialog"
+  tabindex="-1">
+  
+  <div class="modal-dialog modal-simple">
+    <div class="modal-content">
+      <form id="formtujuan">
+        
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="exampleFormModalLabel">Tujuan</h4>
+        </div>
+
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-12 center">
+              <h4 class="example-title">Masukkan Tujuan</h4>
+              <textarea id="jwb_tujuan" class="editor" name="jwb_tujuan"></textarea>
+            </div>
+
+            <input type="hidden" name="audit_id" value="<?=$audit_id?>"/>
+            <input type="hidden" name="dtform_id" value="<?=$dtform_id?>"/>
+          </div>
+        </div>
+
+        <div class="modal-footer text-right">
+          <button type="submit" class="btn btn-primary" id="submitjawaban" name="submitjawaban" value="submitjawaban">
+            Kirim
+          </button>
+        </div>
+
+      </form>
+    </div> <!-- /.modal-content -->
+  </div> <!-- /.modal-dialog -->
+</div> <!-- /.modal -->
