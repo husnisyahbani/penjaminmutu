@@ -179,7 +179,166 @@
         </div>
 
         <div class="modal-footer text-right">
-          <button type="submit" class="btn btn-primary" id="submitjawaban" name="submitjawaban" value="submitjawaban">
+          <button type="submit" class="btn btn-primary" name="submitjawaban" value="submitjawaban">
+            Kirim
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="referensiModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleFormModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-simple" role="document">
+    <div class="modal-content">
+      <form id="formtujuan">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="exampleFormModalLabel">Referensi</h4>
+        </div>
+
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-12 center">
+              <h4 class="example-title">Masukkan Referensi</h4>
+              <textarea id="jwb_referensi" class="editor" name="jwb_referensi"></textarea>
+            </div>
+            <input type="hidden" name="audit_id" value="<?=$audit_id?>"/>
+            <input type="hidden" name="dtform_id" value="<?=$dtform_id?>"/>
+          </div>
+        </div>
+
+        <div class="modal-footer text-right">
+          <button type="submit" class="btn btn-primary" name="submitjawaban" value="submitjawaban">
+            Kirim
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<div
+  class="modal fade"
+  id="hasilModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleFormModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-simple" role="document">
+    <div class="modal-content">
+      <form id="formtujuan">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="exampleFormModalLabel">Hasil</h4>
+        </div>
+
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-12 center">
+              <h4 class="example-title">Masukkan Hasil</h4>
+              <textarea id="jwb_hasil" class="editor" name="jwb_hasil"></textarea>
+            </div>
+            <input type="hidden" name="audit_id" value="<?=$audit_id?>"/>
+            <input type="hidden" name="dtform_id" value="<?=$dtform_id?>"/>
+          </div>
+        </div>
+
+        <div class="modal-footer text-right">
+          <button type="submit" class="btn btn-primary" name="submitjawaban" value="submitjawaban">
+            Kirim
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<div
+  class="modal fade"
+  id="pertanyaanModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleFormModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-simple" role="document">
+    <div class="modal-content">
+      <form id="formtujuan">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="exampleFormModalLabel">Pertanyaan</h4>
+        </div>
+
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-12 center">
+              <h4 class="example-title">Masukkan Pertanyaan</h4>
+              <textarea id="jwb_pertanyaan" class="editor" name="jwb_pertanyaan"></textarea>
+            </div>
+            <input type="hidden" name="audit_id" value="<?=$audit_id?>"/>
+            <input type="hidden" name="dtform_id" value="<?=$dtform_id?>"/>
+          </div>
+        </div>
+
+        <div class="modal-footer text-right">
+          <button type="submit" class="btn btn-primary" name="submitjawaban" value="submitjawaban">
+            Kirim
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<div
+  class="modal fade"
+  id="catatanModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleFormModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-simple" role="document">
+    <div class="modal-content">
+      <form id="formtujuan">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="exampleFormModalLabel">Catatan</h4>
+        </div>
+
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-12 center">
+              <h4 class="example-title">Masukkan Catatan</h4>
+              <textarea id="jwb_catatan" class="editor" name="jwb_catatan"></textarea>
+            </div>
+            <input type="hidden" name="audit_id" value="<?=$audit_id?>"/>
+            <input type="hidden" name="dtform_id" value="<?=$dtform_id?>"/>
+          </div>
+        </div>
+
+        <div class="modal-footer text-right">
+          <button type="submit" class="btn btn-primary" name="submitjawaban" value="submitjawaban">
             Kirim
           </button>
         </div>
