@@ -78,7 +78,9 @@ echo $jawab['jwb_jawaban'];}?></p>
                     </div>
                   </header>
                   <div class="panel-body">
-                    <div id="referensi"><p></p><?php if(isset($jawab['jwb_referensi'])) echo $jawab['jwb_referensi'];?></div>
+                    <div id="referensi"><p></p><?php if(isset($jawab['jwb_referensi'])){ $allowed_tags = '<p><br><b><i><u><strong><em><ul><ol><li>';
+$jawab['jwb_referensi'] = strip_tags($jawab['jwb_referensi'], $allowed_tags);
+echo $jawab['jwb_referensi'];}?></div>
                   </div>
                 </div>
               </div>
