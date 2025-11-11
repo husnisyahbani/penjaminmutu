@@ -5,7 +5,7 @@ class Delik extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditor';
-        $this->load->js(base_url("assets/app/auditor/delik.js?v=1.5"));
+        $this->load->js(base_url("assets/app/auditor/delik.js?v=1.6"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');

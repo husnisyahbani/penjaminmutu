@@ -179,7 +179,7 @@
         </div>
 
         <div class="modal-footer text-right">
-          <button type="submit" class="btn btn-primary" name="submitjawaban" value="submitjawaban">
+          <button type="submit" class="btn btn-primary" id="submitjawaban" name="submitjawaban" value="submitjawaban">
             Kirim
           </button>
         </div>
