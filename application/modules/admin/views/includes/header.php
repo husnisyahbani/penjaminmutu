@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", function() {
 </style>
 
     <!-- Plugins -->
-    <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/animsition/animsition.css">
+    <!-- <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/animsition/animsition.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/asscrollable/asScrollable.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/switchery/switchery.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/intro-js/introjs.css">
@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", function() {
     <link rel="stylesheet" href="<?php echo asset_url();?>assets/examples/css/uikit/carousel.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/sweetalert/sweetalert2.min.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/blueimp-file-upload/jquery.fileupload.css">
-    <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/dropify/dropify.css">
+    <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/dropify/dropify.css"> -->
     <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/formvalidation/formValidation.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>assets/examples/css/forms/validation.css">
     <!-- <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/summernote/summernote.css"> -->
@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function() {
     <!-- Fonts -->
     <link rel="stylesheet" href="<?php echo asset_url();?>global/fonts/material-design/material-design.min.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>global/fonts/brand-icons/brand-icons.min.css">
-    <link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Roboto:300,400,500,300italic'>
+    <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,300italic'>
     
     <!--[if lt IE 9]>
     <script src="<?php echo asset_url();?>global/vendor/html5shiv/html5shiv.min.js"></script>
@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", function() {
     <![endif]-->
     
     <!-- Scripts -->
-    <script src="<?php echo asset_url();?>global/vendor/breakpoints/breakpoints.js"></script>
+    <!-- <script src="<?php echo asset_url();?>global/vendor/breakpoints/breakpoints.js"></script> -->
 
   </head>
   <body class="animsition site-navbar-small dashboard">
