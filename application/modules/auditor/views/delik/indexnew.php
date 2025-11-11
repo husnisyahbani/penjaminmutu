@@ -41,7 +41,9 @@
               <div class="tab-pane" id="exampleTabsTwo" role="tabpanel">
                 <div class="panel">
                   <div class="panel-body">
-                    <p><?php if(isset($jawab['jwb_jawaban'])) echo $jawab['jwb_jawaban'];?></p>
+                    <p><?php if(isset($jawab['jwb_jawaban'])){ $allowed_tags = '<p><br><b><i><u><strong><em><ul><ol><li>';
+$jawab['jwb_jawaban'] = strip_tags($jawab['jwb_jawaban'], $allowed_tags);
+echo $jawab['jwb_jawaban'];}?></p>
                   </div>
                 </div>
               </div>
