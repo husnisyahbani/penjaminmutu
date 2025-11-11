@@ -1,7 +1,17 @@
 $(function () {
     $("#edittujuan").on("click", function () {
-       $('#tujuanModal').modal('show');
+    // Ambil isi dari elemen <p id="tujuan">
+    var isiTujuan = $("#tujuan").html();
+
+    // Tampilkan modal
+    $('#tujuanModal').modal('show');
+
+    // Setelah modal tampil, masukkan isi ke Summernote
+    $('#tujuanModal').on('shown.bs.modal', function () {
+        $('#jwb_tujuan').summernote('code', isiTujuan);
     });
+});
+
 
     $("#editreferensi").on("click", function () {
        $('#referensiModal').modal('show');

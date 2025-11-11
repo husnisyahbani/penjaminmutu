@@ -61,7 +61,7 @@
                     </div>
                   </header>
                   <div class="panel-body">
-                    <p><?php if(isset($jawab['jwb_tujuan'])) echo $jawab['jwb_tujuan'];?></p>
+                    <p id="tujuan"><?php if(isset($jawab['jwb_tujuan'])) echo $jawab['jwb_tujuan'];?></p>
                   </div>
                 </div>
               </div>
@@ -76,7 +76,7 @@
                     </div>
                   </header>
                   <div class="panel-body">
-                    <p><?php if(isset($jawab['jwb_referensi'])) echo $jawab['jwb_referensi'];?></p>
+                    <p id="referensi"><?php if(isset($jawab['jwb_referensi'])) echo $jawab['jwb_referensi'];?></p>
                   </div>
                 </div>
               </div>
@@ -91,7 +91,7 @@
                     </div>
                   </header>
                   <div class="panel-body">
-                    <p><?php if(isset($jawab['jwb_hasil'])) echo $jawab['jwb_hasil'];?></p>
+                    <p id="hasil"><?php if(isset($jawab['jwb_hasil'])) echo $jawab['jwb_hasil'];?></p>
                   </div>
                 </div>
               </div>
@@ -106,7 +106,7 @@
                     </div>
                   </header>
                   <div class="panel-body">
-                    <p><?php if(isset($jawab['jwb_pertanyaan'])) echo $jawab['jwb_pertanyaan'];?></p>
+                    <p id="pertanyaan"><?php if(isset($jawab['jwb_pertanyaan'])) echo $jawab['jwb_pertanyaan'];?></p>
                   </div>
                 </div>
               </div>
@@ -121,7 +121,7 @@
                     </div>
                   </header>
                   <div class="panel-body">
-                    <p><?php if(isset($jawab['jwb_temuan'])) echo $jawab['jwb_temuan'];?></p>
+                    <p id="temuan"><?php if(isset($jawab['jwb_temuan'])) echo $jawab['jwb_temuan'];?></p>
                   </div>
                 </div>
               </div>
@@ -136,7 +136,7 @@
                     </div>
                   </header>
                   <div class="panel-body">
-                    <p><?php if(isset($jawab['jwb_catatan'])) echo $jawab['jwb_catatan'];?></p>
+                    <p id="catatan"><?php if(isset($jawab['jwb_catatan'])) echo $jawab['jwb_catatan'];?></p>
                   </div>
                 </div>
               </div>
