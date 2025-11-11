@@ -70,10 +70,13 @@ class Delik extends MY_Controller {
     }
 
     public function pertanyaan() {
+        
         $data = array();
         $data['dtform_id'] = $this->input->post('dtform_id');
         $data['audit_id'] = $this->input->post('audit_id');
         $data['jwb_pertanyaan'] = $this->input->post('jwb_pertanyaan');
+        $allowed_tags = '<p><br><b><i><u><strong><em><ul><ol><li>';
+        $data['jwb_pertanyaan'] = strip_tags($data['jwb_pertanyaan'], $allowed_tags);
         if($this->auditjawab->is_exist($data)){
             $status = $this->auditjawab->jawab($data);
         }else{
@@ -91,6 +94,8 @@ class Delik extends MY_Controller {
         $data['dtform_id'] = $this->input->post('dtform_id');
         $data['audit_id'] = $this->input->post('audit_id');
         $data['jwb_tujuan'] = $this->input->post('jwb_tujuan');
+        $allowed_tags = '<p><br><b><i><u><strong><em><ul><ol><li>';
+        $data['jwb_tujuan'] = strip_tags($data['jwb_tujuan'], $allowed_tags);
         if($this->auditjawab->is_exist($data)){
             $status = $this->auditjawab->jawab($data);
         }else{
@@ -108,6 +113,8 @@ class Delik extends MY_Controller {
         $data['dtform_id'] = $this->input->post('dtform_id');
         $data['audit_id'] = $this->input->post('audit_id');
         $data['jwb_catatan'] = $this->input->post('jwb_catatan');
+        $allowed_tags = '<p><br><b><i><u><strong><em><ul><ol><li>';
+        $data['jwb_catatan'] = strip_tags($data['jwb_catatan'], $allowed_tags);
         if($this->auditjawab->is_exist($data)){
             $status = $this->auditjawab->jawab($data);
         }else{
@@ -125,6 +132,8 @@ class Delik extends MY_Controller {
         $data['dtform_id'] = $this->input->post('dtform_id');
         $data['audit_id'] = $this->input->post('audit_id');
         $data['jwb_temuan'] = $this->input->post('jwb_temuan');
+        $allowed_tags = '<p><br><b><i><u><strong><em><ul><ol><li>';
+        $data['jwb_temuan'] = strip_tags($data['jwb_temuan'], $allowed_tags);
         if($this->auditjawab->is_exist($data)){
             $status = $this->auditjawab->jawab($data);
         }else{
@@ -142,6 +151,8 @@ class Delik extends MY_Controller {
         $data['dtform_id'] = $this->input->post('dtform_id');
         $data['audit_id'] = $this->input->post('audit_id');
         $data['jwb_hasil'] = $this->input->post('jwb_hasil');
+        $allowed_tags = '<p><br><b><i><u><strong><em><ul><ol><li>';
+        $data['jwb_hasil'] = strip_tags($data['jwb_hasil'], $allowed_tags);
         if($this->auditjawab->is_exist($data)){
             $status = $this->auditjawab->jawab($data);
         }else{
