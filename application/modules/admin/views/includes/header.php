@@ -18,55 +18,8 @@
     <link rel="stylesheet" href="<?php echo asset_url();?>global/css/bootstrap-extend.min.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>assets/css/site.min.css">
 
-    <!-- <script src="<?php echo asset_url();?>/assets/tinymce/js/tinymce/tinymce.min.js"></script> -->
-
-
-    <!-- <script src="https://cdn.tiny.cloud/1/2vfigjikc198eohzhjdy4kgw3m94rmetkn3meeijacpibx67/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script> -->
-
-<!-- <script>
-document.addEventListener("DOMContentLoaded", function() {
-  tinymce.init({
-    selector: 'textarea.editor',
-    menubar: false,
-    plugins: 'code lists table link autolink', // ✅ tambahkan plugin link & autolink
-    toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link | code', // ✅ tombol link
-    height: 200,
-    link_title: false, // opsional: sembunyikan input title
-    target_list: false, // opsional: hilangkan pilihan open in new window
-    default_link_target: '_blank' // opsional: buka link di tab baru
-  });
-});
-</script> -->
-
-<style>
-/* CSS jangan taruh di dalam <script> */
-.tox {
-  z-index: 2000 !important;
-}
-</style>
-
-    <!-- Plugins -->
-    <!-- <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/animsition/animsition.css">
-    <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/asscrollable/asScrollable.css">
-    <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/switchery/switchery.css">
-    <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/intro-js/introjs.css">
-    <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/slidepanel/slidePanel.css">
-    <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/jquery-mmenu/jquery-mmenu.css">
-    <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/flag-icon-css/flag-icon.css">
-    <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/waves/waves.css">
-    <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/chartist/chartist.css">
-    <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/jvectormap/jquery-jvectormap.css">
-    <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/chartist-plugin-tooltip/chartist-plugin-tooltip.css">
-    <link rel="stylesheet" href="<?php echo asset_url();?>assets/examples/css/dashboard/v1.css">
-    <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/owl-carousel/owl.carousel.css">
-    <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/slick-carousel/slick.css">
-    <link rel="stylesheet" href="<?php echo asset_url();?>assets/examples/css/uikit/carousel.css">
-    <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/sweetalert/sweetalert2.min.css">
-    <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/blueimp-file-upload/jquery.fileupload.css">
-    <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/dropify/dropify.css"> -->
     <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/formvalidation/formValidation.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>assets/examples/css/forms/validation.css">
-    <!-- <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/summernote/summernote.css"> -->
     <link rel="stylesheet" href="<?php echo asset_url();?>summernote/summernote-bs4.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>assets/examples/css/uikit/modals.css">
     <link rel="stylesheet" href="<?php echo asset_url(); ?>global/vendor/toastr/toastr.min.css">
@@ -81,25 +34,12 @@ document.addEventListener("DOMContentLoaded", function() {
     <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/datatables.net-responsive-bs4/dataTables.responsive.bootstrap4.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>global/vendor/datatables.net-buttons-bs4/dataTables.buttons.bootstrap4.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>assets/examples/css/tables/datatable.css">
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
     
     <!-- Fonts -->
     <link rel="stylesheet" href="<?php echo asset_url();?>global/fonts/material-design/material-design.min.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>global/fonts/brand-icons/brand-icons.min.css">
     <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,300italic'>
-    
-    <!--[if lt IE 9]>
-    <script src="<?php echo asset_url();?>global/vendor/html5shiv/html5shiv.min.js"></script>
-    <![endif]-->
-    
-    <!--[if lt IE 10]>
-    <script src="<?php echo asset_url();?>global/vendor/media-match/media.match.min.js"></script>
-    <script src="<?php echo asset_url();?>global/vendor/respond/respond.min.js"></script>
-    <![endif]-->
-    
-    <!-- Scripts -->
-    <!-- <script src="<?php echo asset_url();?>global/vendor/breakpoints/breakpoints.js"></script> -->
 
   </head>
-  <body class="animsition site-navbar-small dashboard">
+  <body class="site-navbar-small dashboard">
