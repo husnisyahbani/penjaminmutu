@@ -9,8 +9,8 @@
               <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="tab" href="#exampleTabsTwo" aria-controls="exampleTabsTwo" role="tab" aria-selected="false">Hasil Evaluasi</a></li>
               <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="tab" href="#exampleTabsThree" aria-controls="exampleTabsThree" role="tab" aria-selected="false">Tujuan</a></li>
               <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="tab" href="#exampleTabsFour" aria-controls="exampleTabsFour" role="tab" aria-selected="false">Referensi</a></li>
-              <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="tab" href="#exampleTabsFive" aria-controls="exampleTabsFive" role="tab" aria-selected="false">Hasil</a></li>
-              <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="tab" href="#exampleTabsSix" aria-controls="exampleTabsSix" role="tab" aria-selected="false">Pertanyaan</a></li>
+              <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="tab" href="#exampleTabsFive" aria-controls="exampleTabsFive" role="tab" aria-selected="false">Pertanyaan</a></li>
+              <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="tab" href="#exampleTabsSix" aria-controls="exampleTabsSix" role="tab" aria-selected="false">Hasil</a></li>
               <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="tab" href="#exampleTabsSeven" aria-controls="exampleTabsSeven" role="tab" aria-selected="false">Temuan</a></li>
               <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="tab" href="#exampleTabsEigth" aria-controls="exampleTabsEigth" role="tab" aria-selected="false">Catatan</a></li>
               <li class="dropdown nav-item" role="presentation" style="display: none;">
@@ -20,8 +20,8 @@
                   <a class="dropdown-item" data-toggle="tab" href="#exampleTabsTwo" aria-controls="exampleTabsTwo" role="tab">Hasil Evaluasi</a>
                   <a class="dropdown-item" data-toggle="tab" href="#exampleTabsThree" aria-controls="exampleTabsThree" role="tab">Tujuan</a>
                   <a class="dropdown-item" data-toggle="tab" href="#exampleTabsFour" aria-controls="exampleTabsFour" role="tab">Referensi</a>
-                  <a class="dropdown-item" data-toggle="tab" href="#exampleTabsFive" aria-controls="exampleTabsFive" role="tab">Hasil</a>
-                  <a class="dropdown-item" data-toggle="tab" href="#exampleTabsSix" aria-controls="exampleTabsSix" role="tab">Pertanyaan</a>
+                  <a class="dropdown-item" data-toggle="tab" href="#exampleTabsFive" aria-controls="exampleTabsFive" role="tab">Pertanyaan</a>
+                  <a class="dropdown-item" data-toggle="tab" href="#exampleTabsSix" aria-controls="exampleTabsSix" role="tab">Hasil</a>
                   <a class="dropdown-item" data-toggle="tab" href="#exampleTabsSeven" aria-controls="exampleTabsSeven" role="tab">Temuan</a>
                   <a class="dropdown-item" data-toggle="tab" href="#exampleTabsEigth" aria-controls="exampleTabsEigth" role="tab">Catatan</a>
                 </div>
@@ -81,22 +81,9 @@
                 </div>
               </div>
 
-              <div class="tab-pane" id="exampleTabsFive" role="tabpanel">
-                <div class="panel">
-                  <header class="panel-heading">
-                    <div class="panel-actions panel-actions-keep">
-                      <button type="button" class="btn btn-sm btn-icon btn-warning" data-toggle="tooltip" data-original-title="Edit Hasil" id="edithasil">
-                        <i class="icon md-edit" aria-hidden="true"></i> Edit Hasil
-                      </button>
-                    </div>
-                  </header>
-                  <div class="panel-body">
-                    <p id="hasil"><?php if(isset($jawab['jwb_hasil'])) echo $jawab['jwb_hasil'];?></p>
-                  </div>
-                </div>
-              </div>
+              
 
-              <div class="tab-pane" id="exampleTabsSix" role="tabpanel">
+              <div class="tab-pane" id="exampleTabsFive" role="tabpanel">
                 <div class="panel">
                   <header class="panel-heading">
                     <div class="panel-actions panel-actions-keep">
@@ -107,6 +94,21 @@
                   </header>
                   <div class="panel-body">
                     <p id="pertanyaan"><?php if(isset($jawab['jwb_pertanyaan'])) echo $jawab['jwb_pertanyaan'];?></p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tab-pane" id="exampleTabsSix" role="tabpanel">
+                <div class="panel">
+                  <header class="panel-heading">
+                    <div class="panel-actions panel-actions-keep">
+                      <button type="button" class="btn btn-sm btn-icon btn-warning" data-toggle="tooltip" data-original-title="Edit Hasil" id="edithasil">
+                        <i class="icon md-edit" aria-hidden="true"></i> Edit Hasil
+                      </button>
+                    </div>
+                  </header>
+                  <div class="panel-body">
+                    <p id="hasil"><?php if(isset($jawab['jwb_hasil'])) echo $jawab['jwb_hasil'];?></p>
                   </div>
                 </div>
               </div>
