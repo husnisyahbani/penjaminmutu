@@ -76,7 +76,7 @@
                     </div>
                   </header>
                   <div class="panel-body">
-                    <p id="referensi"><?php if(isset($jawab['jwb_referensi'])) echo $jawab['jwb_referensi'];?></p>
+                    <div id="referensi"><p></p><?php if(isset($jawab['jwb_referensi'])) echo $jawab['jwb_referensi'];?></div>
                   </div>
                 </div>
               </div>
@@ -93,7 +93,7 @@
                     </div>
                   </header>
                   <div class="panel-body">
-                    <p id="pertanyaan"><?php if(isset($jawab['jwb_pertanyaan'])) echo $jawab['jwb_pertanyaan'];?></p>
+                    <div id="pertanyaan"><p></p><?php if(isset($jawab['jwb_pertanyaan'])) echo $jawab['jwb_pertanyaan'];?></div>
                   </div>
                 </div>
               </div>
@@ -108,7 +108,7 @@
                     </div>
                   </header>
                   <div class="panel-body">
-                    <p id="hasil"><?php if(isset($jawab['jwb_hasil'])) echo $jawab['jwb_hasil'];?></p>
+                    <div id="hasil"><p></p><?php if(isset($jawab['jwb_hasil'])) echo $jawab['jwb_hasil'];?></div>
                   </div>
                 </div>
               </div>
@@ -123,7 +123,7 @@
                     </div>
                   </header>
                   <div class="panel-body">
-                    <p id="temuan"><?php if(isset($jawab['jwb_temuan'])) echo $jawab['jwb_temuan'];?></p>
+                    <div id="temuan"><p></p><?php if(isset($jawab['jwb_temuan'])) echo $jawab['jwb_temuan'];?></div>
                   </div>
                 </div>
               </div>
@@ -138,7 +138,7 @@
                     </div>
                   </header>
                   <div class="panel-body">
-                    <p id="catatan"><?php if(isset($jawab['jwb_catatan'])) echo $jawab['jwb_catatan'];?></p>
+                    <div id="catatan"><p></p><?php if(isset($jawab['jwb_catatan'])) echo $jawab['jwb_catatan'];?></div>
                   </div>
                 </div>
               </div>
