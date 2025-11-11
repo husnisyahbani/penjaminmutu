@@ -200,7 +200,7 @@
   aria-hidden="true">
   <div class="modal-dialog modal-simple" role="document">
     <div class="modal-content">
-      <form id="formtujuan">
+      <form id="formreferensi">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
@@ -240,7 +240,7 @@
   aria-hidden="true">
   <div class="modal-dialog modal-simple" role="document">
     <div class="modal-content">
-      <form id="formtujuan">
+      <form id="formhasil">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
@@ -280,7 +280,7 @@
   aria-hidden="true">
   <div class="modal-dialog modal-simple" role="document">
     <div class="modal-content">
-      <form id="formtujuan">
+      <form id="formpertanyaan">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
@@ -320,7 +320,7 @@
   aria-hidden="true">
   <div class="modal-dialog modal-simple" role="document">
     <div class="modal-content">
-      <form id="formtujuan">
+      <form id="formcatatan">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
