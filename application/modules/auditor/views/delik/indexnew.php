@@ -189,39 +189,3 @@
   </div>
 </div>
 
-<!-- ==== JS (hapus baris2 ini jika sudah dimuat di layout global) ==== -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.6.2/js/bootstrap.bundle.min.js"></script>
-
-<script>
-$(document).on('hidden.bs.modal', '.modal', function () {
-  // Pastikan semua modal tertutup bersih
-  $('.modal-backdrop').remove();
-  $('body').removeClass('modal-open');
-  $('body').css('padding-right', '');
-});
-</script>
-
-<script>
-  $(function () {
-    // Trigger khusus tombol Edit Tujuan -> buka modal
-    $('#edittujuan').on('click', function () {
-      $('#tujuanModal').modal('show');
-    });
-
-    // (Opsional) submit form tujuan via AJAX
-    $('#formtujuan').on('submit', function (e) {
-      e.preventDefault();
-      $.post('<?=base_url("controller/simpan_tujuan")?>', $(this).serialize())
-        .done(function (res) {
-          // TODO: ganti alert dengan toast/Swal jika mau
-          alert('Tujuan berhasil disimpan');
-          $('#tujuanModal').modal('hide');
-          // location.reload(); // jika perlu refresh
-        })
-        .fail(function () {
-          alert('Gagal menyimpan tujuan');
-        });
-    });
-  });
-</script>

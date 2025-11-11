@@ -1,6 +1,6 @@
 $(function () {
     $("#edittujuan").on("click", function () {
-        $("#edittujuan").modal('show');
+       $('#tujuanModal').modal('show');
     });
 
 });
