@@ -194,6 +194,15 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.6.2/js/bootstrap.bundle.min.js"></script>
 
 <script>
+$(document).on('hidden.bs.modal', '.modal', function () {
+  // Pastikan semua modal tertutup bersih
+  $('.modal-backdrop').remove();
+  $('body').removeClass('modal-open');
+  $('body').css('padding-right', '');
+});
+</script>
+
+<script>
   $(function () {
     // Trigger khusus tombol Edit Tujuan -> buka modal
     $('#edittujuan').on('click', function () {
