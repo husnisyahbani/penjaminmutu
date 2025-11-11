@@ -61,7 +61,7 @@
                     </div>
                   </header>
                   <div class="panel-body">
-                    <p id="tujuan"><?php if(isset($jawab['jwb_tujuan'])) echo $jawab['jwb_tujuan'];?></p>
+                    <div id="tujuan"><?php if(isset($jawab['jwb_tujuan'])) echo $jawab['jwb_tujuan'];?></div>
                   </div>
                 </div>
               </div>
