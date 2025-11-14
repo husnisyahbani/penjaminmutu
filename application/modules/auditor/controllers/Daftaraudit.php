@@ -5,7 +5,7 @@ class Daftaraudit extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditor';
-        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=1.55"));
+        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=1.56"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
@@ -205,8 +205,8 @@ class Daftaraudit extends MY_Controller {
             $row[] = $no;
             $row[] = $field->dtform_pertanyaan."<br/>".$field->dtform_lingkup;
             //$jawaban = $this->truncate_words($field->jwb_jawaban);
-            $row[] = $field->jwb_jawaban;
-            $row[] = ' <button type="button" class="delik btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i></button>';
+           // $row[] = $field->jwb_jawaban;
+            $row[] = ' <button type="button" class="delik btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i>Lihat Hasil dan Delik</button>';
            
             $data[] = $row;
         }

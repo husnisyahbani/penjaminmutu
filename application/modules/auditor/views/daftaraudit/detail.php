@@ -19,8 +19,7 @@
                                 <tr>
                                     <th width="5%">No</th>
                                     <th width="45%">Evaluasi</th>
-                                    <th width="45%">Hasil Evaluasi</th>
-                                    <th width="5%">Delik</th>
+                                    <th>Delik dan Jawaban</th>
                                 </tr>
                             </thead>
 
