@@ -120,4 +120,12 @@ class MutuauditModel extends CI_Model {
         return $this->db->trans_status();
     }
 
+    public function getAuditById($audit_id){
+        $this->db->from('mutu_audit');
+        $this->db->join('formulir', 'formulir.form_id = mutu_audit.form_id', 'left');
+        $this->db->where('audit_id',$audit_id);
+        $query = $this->db->get();
+        return $query->row_array();
+    }
+
 }
