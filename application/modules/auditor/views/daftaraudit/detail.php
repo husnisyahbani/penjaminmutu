@@ -19,7 +19,7 @@
                                 <tr>
                                     <th width="5%">No</th>
                                     <th>Evaluasi</th>
-                                    <th>Hasil Evaluasi dan Delik</th>
+                                    <th width="15%">Hasil Evaluasi dan Delik</th>
                                 </tr>
                             </thead>
 
