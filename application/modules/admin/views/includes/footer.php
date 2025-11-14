@@ -99,28 +99,41 @@
 <script src="<?php echo asset_url();?>assets/examples/js/forms/editor-summernote.js"></script>
 <script src="<?php echo asset_url();?>assets/examples/js/dashboard/v1.js"></script>
 
-<script>
+<<script>
     $(document).ready(function() {
-      $('.editor').summernote({
-        height: 300,
-         dialogsInBody: true,
-            toolbar: [
-        ['style', ['bold', 'italic', 'underline', 'clear']],
-        ['font', ['strikethrough', 'superscript', 'subscript']],
-        ['fontsize', ['fontsize']],
-        ['color', ['color']],
-        ['para', ['ul', 'ol', 'paragraph']],
-        ['insert', ['link']], // 👈 pastikan ini ada
-        ['view', ['codeview']]
-    ]
-      });
-
-       $(document).on('focusin', function(e) {
-    if ($(e.target).closest(".note-editable").length) {
-      e.stopImmediatePropagation();
+  $('.editor').summernote({
+  height: 300,
+  dialogsInBody: true,
+  toolbar: [
+    ['style', ['bold', 'italic', 'underline', 'clear']],
+    ['font', ['strikethrough', 'superscript', 'subscript']],
+    ['fontsize', ['fontsize']],
+    ['color', ['color']],
+    ['para', ['ul', 'ol', 'paragraph']],
+    ['insert', ['link']],
+    ['view', ['codeview']]
+  ],
+  callbacks: {
+    onPaste: function (e) {
+      e.preventDefault();
+      // Ambil teks polos dari clipboard
+      const clipboardData = (e.originalEvent || e).clipboardData || window.clipboardData;
+      const text = clipboardData.getData('text/plain');
+      // Sisipkan teks tanpa styling
+      document.execCommand('insertText', false, text);
     }
-  });
+  }
+});
+
+
+    // Saat modal dibuka, pastikan editor muncul dengan benar
+    $('.modal').on('shown.bs.modal', function () {
+        $(this).find('.ql-editor').each(function(){
+            this.focus();
+        });
     });
+  
+  });
 </script>
 
 
