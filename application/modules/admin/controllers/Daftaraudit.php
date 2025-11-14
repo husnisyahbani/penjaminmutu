@@ -201,7 +201,7 @@ class Daftaraudit extends MY_Controller {
             $no++;
             $row = array();
             $row[] = $no;
-            $row[] = $field->dtform_pertanyaan."<br/".$field->dtform_lingkup;
+            $row[] = $field->dtform_pertanyaan."<br/>".$field->dtform_lingkup;
             $row[] = $field->jwb_jawaban;
             $row[] = ' <button type="button" class="delik btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i></button>';
            
