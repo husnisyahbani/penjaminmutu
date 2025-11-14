@@ -50,10 +50,7 @@ $(function () {
         hapusdata(id);
     });
 
-    $("#daftaraudit").on("click", ".kembali", function () {
-         var id = $(this).attr('id');
-         kembali(id);
-    });
+    
 
     function kembali($id)
     {

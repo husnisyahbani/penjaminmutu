@@ -54,6 +54,56 @@ $(function () {
         proses(id);
     });
 
+    $("#daftaraudit").on("click", ".kembali", function () {
+         var id = $(this).attr('id');
+         kembali(id);
+    });
+
+    function kembali($id)
+    {
+        swal.fire({
+            title: "Anda Yakin?",
+            text: "Anda Yakin Ingin Mengembalikan Evaluasi Ini?",
+            type: "warning",
+            showCancelButton: true,
+            showLoaderOnConfirm: true,
+            confirmButtonText: "Ya, Kembalikan!",
+            cancelButtonText: 'Tidak',
+            preConfirm: function () {
+                $.ajax({
+                    url: base_url + "/daftaraudit/kembali",
+                    type: "POST",
+                    data: { id: $id}
+                })
+                        .done(function (data) {
+                            if(data.status){
+                                    swal.fire({
+                                        title: "Hapus",
+                                        text: "Evaluasi Telah Dikembalikan!",
+                                        type: "success",
+                                        preConfirm: function () {
+                                            daftaraudit.ajax.reload();
+                                        }
+                                    });
+                            }else{
+                                swal.fire({
+                                        title: "Gagal",
+                                        text: "Evaluasi Tidak dapat dikembalikan!",
+                                        type: "danger",
+                                        preConfirm: function () {
+                                            daftaraudit.ajax.reload();
+                                        }
+                                    });
+                            }
+                            
+                        })
+                        .error(function (data) {
+                            swal.fire("Oops", "No connection!", "error");
+                        });
+            }
+        });
+    }
+
     function proses(idku)
     {
         swal.fire({
