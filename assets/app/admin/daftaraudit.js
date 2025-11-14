@@ -26,7 +26,7 @@ $(function () {
             {"targets": [0,1,2,3], "orderable": false}
         ],
         "ajax": {
-            "url": base_url + "/daftaraudit/listpertanyaan"+audit_id,
+            "url": base_url + "/daftaraudit/listpertanyaan/"+audit_id,
             "type": "POST"
         }
     });
