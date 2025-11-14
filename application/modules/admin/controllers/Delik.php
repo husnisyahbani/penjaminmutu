@@ -29,7 +29,8 @@ class Delik extends MY_Controller {
             $this->data['result'] = $this->mutu->getAuditById($audit_id);
             $this->data['jawab'] = $this->auditjawab->getAuditJawab($audit_id,$dtform_id);
             $this->data['js'] = $this->load->get_js_files();
-            $this->data['audit'] = 'active';
+            $this->data['audit'] = 'active';//auditmenu
+            $this->data['auditmenu'] = 'active';
             $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
             $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
             $this->template($this->data, $this->module); 
