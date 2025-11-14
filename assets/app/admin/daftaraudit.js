@@ -23,7 +23,7 @@ $(function () {
         "searching": true,
         "order": [],
         "columnDefs": [
-            {"targets": [0,1,2,3], "orderable": false}
+            {"targets": [0,1,2], "orderable": false}
         ],
         "ajax": {
             "url": base_url + "/daftaraudit/listpertanyaan/"+audit_id,

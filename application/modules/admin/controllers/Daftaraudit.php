@@ -5,7 +5,7 @@ class Daftaraudit extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'admin';
-        $this->load->js(base_url("assets/app/admin/daftaraudit.js?v=1.32"));
+        $this->load->js(base_url("assets/app/admin/daftaraudit.js?v=1.33"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
@@ -202,8 +202,13 @@ class Daftaraudit extends MY_Controller {
             $row = array();
             $row[] = $no;
             $row[] = $field->dtform_pertanyaan."<br/>".$field->dtform_lingkup;
-            $row[] = $field->jwb_jawaban;
-            $row[] = ' <button type="button" class="delik btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i></button>';
+            //$jawaban = $this->truncate_words($field->jwb_jawaban);
+           // $row[] = $field->jwb_jawaban;
+           if(isset($field->jwb_jawaban)){
+                $row[] = ' <button type="button" class="delik btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i>Lihat Hasil dan Delik</button>';
+           }else{
+                $row[] = '';
+           }
            
             $data[] = $row;
         }

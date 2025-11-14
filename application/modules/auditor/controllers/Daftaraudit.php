@@ -221,7 +221,7 @@ class Daftaraudit extends MY_Controller {
            if(isset($field->jwb_jawaban)){
                 $row[] = ' <button type="button" class="delik btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i>Lihat Hasil dan Delik</button>';
            }else{
-                $row[] = ' <button type="button" class="btn btn-danger btn-xs waves-effect waves-classic"><i class="icon md-edit" aria-hidden="true"></i>Auditee Tidak Menjawab</button>';
+                $row[] = '';
            }
             
            
