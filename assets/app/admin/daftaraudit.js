@@ -31,15 +31,12 @@ $(function () {
         }
     });
 
-    var $dtform_id;
-    var $audit_id;
-
     $("#daftarpertanyaan").on("click", ".delik", function () {
         alert('hai');
-        $dtform_id = $(this).attr('dtform_id');
-        $audit_id = $(this).attr('audit_id');
+        dtform_id = $(this).attr('dtform_id');
+        audit_id = $(this).attr('audit_id');
         
-        //window.location.href = base_url+"/delik?audit_id="+audit_id+"&dtform_id="+dtform_id;
+        window.location.href = base_url+"/delik?audit_id="+audit_id+"&dtform_id="+dtform_id;
     });
 
     $("#daftaraudit").on("click", ".detail", function () {
