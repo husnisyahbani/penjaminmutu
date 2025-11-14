@@ -13,29 +13,28 @@ class Delik extends MY_Controller {
         $this->load->model('FormulirModel', 'formulir');
 
         $role = $this->session->userdata('role');
-        if (!isset($role) || $role != 'ADMIN') {
+        if (!isset($role) || $role != 'PPM') {
             redirect(base_url());
         }
     }
 
     public function index() {
-        // $audit_id = $this->input->get('audit_id');
-        // $dtform_id = $this->input->get('dtform_id');
-        // if(isset($audit_id) && isset($dtform_id)){
-        //     $this->data['content'] = 'delik/indexnew';
-        //     $this->data['title'] = 'Daftar Delik';
-        //     $this->data['audit_id'] = $audit_id;
-        //     $this->data['dtform_id'] = $dtform_id;
-        //     $this->data['result'] = $this->mutu->getAuditById($audit_id);
-        //     $this->data['jawab'] = $this->auditjawab->getAuditJawab($audit_id,$dtform_id);
-        //     $this->data['js'] = $this->load->get_js_files();
-        //     $this->data['audit'] = 'active';
-        //     $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
-        //     $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
-        //     $this->template($this->data, $this->module); 
+        $audit_id = $this->input->get('audit_id');
+        $dtform_id = $this->input->get('dtform_id');
+        if(isset($audit_id) && isset($dtform_id)){
+            $this->data['content'] = 'delik/indexnew';
+            $this->data['title'] = 'Daftar Delik';
+            $this->data['audit_id'] = $audit_id;
+            $this->data['dtform_id'] = $dtform_id;
+            $this->data['result'] = $this->mutu->getAuditById($audit_id);
+            $this->data['jawab'] = $this->auditjawab->getAuditJawab($audit_id,$dtform_id);
+            $this->data['js'] = $this->load->get_js_files();
+            $this->data['audit'] = 'active';
+            $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
+            $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
+            $this->template($this->data, $this->module); 
             
-        // }
-        echo 'hai';
+        }
     }
 
     public function getauditById($id) {
