@@ -172,6 +172,20 @@ class Daftaraudit extends MY_Controller {
         echo json_encode($output);
     }
 
+    function truncate_words(string $text, int $maxWords = 200, string $ellipsis = '...'): string {
+    // bersihkan whitespace berlebih dan hilangkan tag HTML jika perlu
+    $clean = trim(preg_replace('/\s+/', ' ', strip_tags($text)));
+    if ($clean === '') return $clean;
+
+    $words = preg_split('/\s+/', $clean);
+    if (count($words) <= $maxWords) {
+        return $clean;
+    }
+
+    $truncated = array_slice($words, 0, $maxWords);
+    return implode(' ', $truncated) . $ellipsis;
+}
+
 
     public function listpertanyaan($id=null) {
         $post = array();
@@ -190,7 +204,7 @@ class Daftaraudit extends MY_Controller {
             $row = array();
             $row[] = $no;
             $row[] = $field->dtform_pertanyaan."<br/>".$field->dtform_lingkup;
-            $jawaban = truncate_words($field->jwb_jawaban);
+            $jawaban = $this->truncate_words($field->jwb_jawaban);
             $row[] = $jawaban;
             $row[] = ' <button type="button" class="delik btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i></button>';
            
