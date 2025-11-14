@@ -97,6 +97,14 @@ class AuditjawabModel extends CI_Model {
         return($this->db->affected_rows() != 1) ? false : true;
     }
 
+    public function getAuditJawab($audit_id,$dtform_id){
+        $this->db->join('detailform', 'detailform.dtform_id = auditjawab.dtform_id', 'left');
+        $this->db->where("auditjawab.audit_id",$audit_id);
+        $this->db->where("auditjawab.dtform_id",$dtform_id);
+        $query = $this->db->get('auditjawab');
+        return $query->row_array();
+    }
+
      public function jawab($data) {
         $this->db->trans_start();
         $this->db->where("audit_id",$data['audit_id']);
