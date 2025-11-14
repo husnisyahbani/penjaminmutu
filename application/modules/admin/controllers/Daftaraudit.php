@@ -36,6 +36,20 @@ class Daftaraudit extends MY_Controller {
             $this->template($this->data, $this->module); 
     }
 
+    public function detail($id) {
+        if(isset($id)){
+            $this->data['content'] = 'daftaraudit/detail';
+            $this->data['title'] = 'Daftar Audit';
+            $this->data['audit_id'] = $id;
+            $this->data['result'] = $this->mutu->getAuditById($id);
+            $this->data['js'] = $this->load->get_js_files();
+            $this->data['audit'] = 'active';
+            $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
+            $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
+            $this->template($this->data, $this->module); 
+        }
+    }
+
    public function tambah() {
         $form_id = $this->input->post('form_id');
         if($form_id){
@@ -149,8 +163,7 @@ class Daftaraudit extends MY_Controller {
                 $row[] = '<button type="button" class="btn btn-warning btn-xs waves-effect waves-classic"><i class="icon md-home" aria-hidden="true"></i>Diproses</button>';
             }else if($field->audit_status == "SELESAI"){
                 $row[] = '<button class="detail btn btn-sm btn-icon btn-success"
-            data-toggle="tooltip" data-original-title="DETAIL" id=' . $field->audit_id.'><i class="icon md-book" aria-hidden="true"></i></button> <button class="delete btn btn-sm btn-icon btn-danger"
-            data-toggle="tooltip" data-original-title="DELETE" id=' . $field->audit_id.'><i class="icon md-delete" aria-hidden="true"></i></button> <button class="download btn btn-sm btn-icon btn-success"
+            data-toggle="tooltip" data-original-title="DETAIL" id=' . $field->audit_id.'><i class="icon md-book" aria-hidden="true"></i></button> <button class="download btn btn-sm btn-icon btn-success"
             data-toggle="tooltip" data-original-title="DELETE" id=' . $field->audit_id.'><i class="icon md-download" aria-hidden="true"></i></button>';
                 $row[] = '<button type="button" class="selesai btn btn-success btn-xs waves-effect waves-classic"><i class="icon md-download" aria-hidden="true"></i>Selesai</button>';
             }
