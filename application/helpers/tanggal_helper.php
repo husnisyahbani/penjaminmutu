@@ -20,3 +20,19 @@ if (!function_exists('konvtgl')) {
 		}
 	}
 }
+
+if (!function_exists('truncate_words')) {
+function truncate_words(string $text, int $maxWords = 200, string $ellipsis = '...'): string {
+    // bersihkan whitespace berlebih dan hilangkan tag HTML jika perlu
+    $clean = trim(preg_replace('/\s+/', ' ', strip_tags($text)));
+    if ($clean === '') return $clean;
+
+    $words = preg_split('/\s+/', $clean);
+    if (count($words) <= $maxWords) {
+        return $clean;
+    }
+
+    $truncated = array_slice($words, 0, $maxWords);
+    return implode(' ', $truncated) . $ellipsis;
+}
+}
