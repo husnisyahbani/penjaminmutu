@@ -34,7 +34,7 @@ $(function () {
     var $dtform_id;
     var $audit_id;
 
-    $("#daftarpertanyaan").on("click", ".edit", function () {
+    $("#daftarpertanyaan").on("click", ".delik", function () {
         $dtform_id = $(this).attr('dtform_id');
         $audit_id = $(this).attr('audit_id');
         window.location.href = base_url+'/delik?audit_id='+audit_id+"&dtform_id="+dtform_id;
@@ -43,9 +43,6 @@ $(function () {
     $("#daftaraudit").on("click", ".detail", function () {
          var id = $(this).attr('id');
          window.location.href = base_url+'/daftaraudit/detail/'+id;
-        // $("#pertanyaanModal").modal('show');
-        // var id = $(this).attr('id');
-        // daftarpertanyaan.ajax.url(base_url + "/daftaraudit/listpertanyaan/"+id).load();
     });
 
     $("#daftaraudit").on("click", ".delete", function () {
