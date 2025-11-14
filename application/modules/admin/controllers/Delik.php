@@ -35,6 +35,7 @@ class Delik extends MY_Controller {
             $this->template($this->data, $this->module); 
             
         }
+        echo 'hai';
     }
 
     public function getauditById($id) {
