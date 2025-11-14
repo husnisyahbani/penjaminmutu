@@ -201,19 +201,9 @@ class Daftaraudit extends MY_Controller {
             $no++;
             $row = array();
             $row[] = $no;
-            $row[] = $field->dtform_pertanyaan;
-            $row[] = $field->dtform_lingkup;
-            // if($field->audit_status == "DRAFT"){
-            //     $row[] = $field->jwb_jawaban.' <button type="button" class="edit btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i></button>';
-            // }else{
-            //     $row[] = $field->jwb_jawaban;
-            // }
-
+            $row[] = $field->dtform_pertanyaan."<br/".$field->dtform_lingkup;
             $row[] = $field->jwb_jawaban;
-            
-            $row[] = $field->jwb_hasil;
-            $row[] = $field->jwb_temuan;
-            $row[] = $field->jwb_catatan;
+            $row[] = ' <button type="button" class="delik btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i></button>';
            
             $data[] = $row;
         }
