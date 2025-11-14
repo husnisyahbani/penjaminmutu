@@ -123,7 +123,11 @@ class Daftaraudit extends MY_Controller {
         $data = array();
         $data['audit_status'] = 'DRAFT'; 
         $data['audit_id'] = $id;
-        $this->mutu->edit($data);
+        $status = $this->mutu->edit($data);
+        $query = array("status" => $status);
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
+        echo json_encode($query);
     }
 
     public function listmutu() {
