@@ -161,7 +161,7 @@ class Daftaraudit extends MY_Controller {
             }else if($field->audit_status == "TERKIRIM"){                                        
                 $row[] = '<button type="button" class="proses btn btn-sm btn-icon btn-warning" id="'.$field->audit_id.'"><i class="icon md-play" aria-hidden="true"></i>Proses</button>';
             }else if($field->audit_status == "PROSES"){
-                $row[] = '<button type="button" class="kembali btn btn-sm btn-icon btn-warning" id="'.$field->audit_id.'"><i class="icon md-restore" aria-hidden="true"></i>Kembalikan</button> <button type="button" class="selesai btn btn-sm btn-icon btn-danger" id="'.$field->audit_id.'"><i class="icon md-play" aria-hidden="true"></i>Selesai</button>';
+                $row[] = '<button type="button" class="kembali btn btn-sm btn-icon btn-warning" id="'.$field->audit_id.'"><i class="icon md-close" aria-hidden="true"></i>Kembalikan</button> <button type="button" class="selesai btn btn-sm btn-icon btn-danger" id="'.$field->audit_id.'"><i class="icon md-play" aria-hidden="true"></i>Selesai</button>';
             }else if($field->audit_status == "SELESAI"){
                 $row[] = '<button type="button" class="btn btn-success btn-xs waves-effect waves-classic" id="'.$field->audit_id.'"><i class="icon md-download" aria-hidden="true"></i>Selesai</button>';
             }
