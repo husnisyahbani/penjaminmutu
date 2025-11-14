@@ -23,10 +23,10 @@ $(function () {
         "searching": true,
         "order": [],
         "columnDefs": [
-            {"targets": [0,1,2,3,4,5,6], "orderable": false}
+            {"targets": [0,1,2,3], "orderable": false}
         ],
         "ajax": {
-            "url": base_url + "/daftaraudit/listpertanyaan",
+            "url": base_url + "/daftaraudit/listpertanyaan"+audit_id,
             "type": "POST"
         }
     });
