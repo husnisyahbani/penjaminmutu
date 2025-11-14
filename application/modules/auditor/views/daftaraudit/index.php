@@ -86,7 +86,7 @@
                                     <th >Auditee</th>
                                     <th >Unit</th>
                                     <th> Aksi</th>
-                                    <th width="15%"> Status</th>
+                                    <th width="25%"> Status</th>
                                 </tr>
                             </thead>
 
