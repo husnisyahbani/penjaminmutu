@@ -5,7 +5,7 @@ class Daftaraudit extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditor';
-        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=1.56"));
+        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=1.57"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
@@ -118,6 +118,14 @@ class Daftaraudit extends MY_Controller {
         $this->mutu->hapus($id);
     }
 
+    public function kembali() {
+        $id = $this->input->post('id');
+        $data = array();
+        $data['audit_status'] = 'DRAFT'; 
+        $data['audit_id'] = $id;
+        $this->mutu->edit($data);
+    }
+
     public function listmutu() {
         $post = array();
         $post['search'] = $this->input->post('search');
@@ -153,7 +161,7 @@ class Daftaraudit extends MY_Controller {
             }else if($field->audit_status == "TERKIRIM"){                                        
                 $row[] = '<button type="button" class="proses btn btn-sm btn-icon btn-warning" id="'.$field->audit_id.'"><i class="icon md-play" aria-hidden="true"></i>Proses</button>';
             }else if($field->audit_status == "PROSES"){
-                $row[] = '<button type="button" class="selesai btn btn-sm btn-icon btn-danger" id="'.$field->audit_id.'"><i class="icon md-play" aria-hidden="true"></i>Selesai</button>';
+                $row[] = '<button type="button" class="kembali btn btn-sm btn-icon btn-warning" id="'.$field->audit_id.'"><i class="icon md-restore" aria-hidden="true"></i>Kembalikan</button> <button type="button" class="selesai btn btn-sm btn-icon btn-danger" id="'.$field->audit_id.'"><i class="icon md-play" aria-hidden="true"></i>Selesai</button>';
             }else if($field->audit_status == "SELESAI"){
                 $row[] = '<button type="button" class="btn btn-success btn-xs waves-effect waves-classic" id="'.$field->audit_id.'"><i class="icon md-download" aria-hidden="true"></i>Selesai</button>';
             }
