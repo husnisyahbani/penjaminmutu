@@ -41,6 +41,8 @@ class Daftaraudit extends MY_Controller {
             $this->data['content'] = 'daftaraudit/detail';
             $this->data['title'] = 'Daftar Audit';
             $this->data['audit_id'] = $id;
+            $this->data['audit'] = 'active';//auditmenu
+            $this->data['auditmenu'] = 'active';
             $this->data['result'] = $this->mutu->getAuditById($id);
             $this->data['js'] = $this->load->get_js_files();
             $this->data['audit'] = 'active';
