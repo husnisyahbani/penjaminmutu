@@ -11,7 +11,7 @@
         <div class="card">
                 <div class="card-header white bg-red-600 p-30 clearfix">
                     <a class="avatar avatar-100 float-left mr-20" href="javascript:void(0)">
-                        <img src="<?php echo base_url("assets/assets/images/sijamu.png");?>" alt=""></a>
+                        <img src="<?php echo base_url("assets/assets/images/logostik.png");?>" alt=""></a>
                         <div class="float-left">
                             <div class="font-size-20 mb-15"><?php if(isset($formulir['form_nama'])){echo $formulir['form_nama'];}?></div>
                             
