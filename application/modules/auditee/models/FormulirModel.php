@@ -26,8 +26,16 @@ class FormulirModel extends CI_Model {
 
     function getAllFormulir() {
         $this->db->from('formulir');
+        $this->db->join('detailform', 'detailform.form_id = formulir.form_id', 'left');
         $query = $this->db->get();
         return $query->result_array();
+    }
+
+    function getSoalFormulir($dtform_id) {
+        $this->db->from('detailform');
+        $this->db->where('dtform_id',$dtform_id);
+        $query = $this->db->get();
+        return $query->row_array();
     }
 
     function getFormulir($id) {

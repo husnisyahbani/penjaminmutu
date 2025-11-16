@@ -77,6 +77,11 @@ $("#editcatatan").on("click", function () {
     });
     });
 
+    $("#kembali").on("click", function () {
+    var id = $(this).attr('audit_id');
+    window.location.href = base_url+'/dashboard/detail/'+id;
+});
+
 
 
    $("#formtujuan").formValidation({

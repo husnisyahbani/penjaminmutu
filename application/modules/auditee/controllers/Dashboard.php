@@ -5,7 +5,7 @@ class Dashboard extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditee';
-        $this->load->js(base_url("assets/app/auditee/daftaraudit.js?v=1.31"));
+        $this->load->js(base_url("assets/app/auditee/daftaraudit.js?v=1.34"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
@@ -33,6 +33,21 @@ class Dashboard extends MY_Controller {
             $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
             $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
             $this->template($this->data, $this->module); 
+    }
+
+    public function detail($id) {
+        if(isset($id)){
+            $this->data['content'] = 'dashboard/detail';
+            $this->data['title'] = 'Daftar Audit';
+            $this->data['audit_id'] = $id;
+            $this->data['dashboard'] = 'active';
+            $this->data['result'] = $this->mutu->getAuditById($id);
+            $this->data['js'] = $this->load->get_js_files();
+            $this->data['audit'] = 'active';
+            $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
+            $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
+            $this->template($this->data, $this->module); 
+        }
     }
 
    public function tambah() {
@@ -177,11 +192,7 @@ class Dashboard extends MY_Controller {
             $row = array();
             $row[] = $no;
             $row[] = $field->dtform_pertanyaan."<br/>".$field->dtform_lingkup;
-            if($field->audit_status == "DRAFT"){
-                $row[] = $field->jwb_jawaban.' <button type="button" class="edit btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i></button>';
-            }else{
-                $row[] = $field->jwb_jawaban;
-            }
+            $row[] = ' <button type="button" class="delik btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i>Jawaban dan Delik</button>';
            
             $data[] = $row;
         }

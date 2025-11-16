@@ -129,15 +129,21 @@ class AuditjawabModel extends CI_Model {
             return false; // data tidak ada
         }
     }
-
     
-
     public function edit($data) {
         $this->db->trans_start();
         $this->db->where("jwb_id",$data['jwb_id']);
         $this->db->update('auditjawab',$data);
         $this->db->trans_complete();
         return $this->db->trans_status();
+    }
+
+    public function getAuditJawab($audit_id,$dtform_id){
+        $this->db->join('detailform', 'detailform.dtform_id = auditjawab.dtform_id', 'left');
+        $this->db->where("auditjawab.audit_id",$audit_id);
+        $this->db->where("auditjawab.dtform_id",$dtform_id);
+        $query = $this->db->get('auditjawab');
+        return $query->row_array();
     }
 
 }

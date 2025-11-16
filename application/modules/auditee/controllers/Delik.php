@@ -4,8 +4,8 @@ class Delik extends MY_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->module = 'auditor';
-        $this->load->js(base_url("assets/app/auditor/delik.js?v=1.12"));
+        $this->module = 'auditee';
+        $this->load->js(base_url("assets/app/auditee/delik.js?v=1.16"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
@@ -13,9 +13,16 @@ class Delik extends MY_Controller {
         $this->load->model('FormulirModel', 'formulir');
 
         $role = $this->session->userdata('role');
-        if (!isset($role) || $role != 'AUDITOR') {
+        if (!isset($role) || $role != 'AUDITEE') {
             redirect(base_url());
         }
+    }
+
+    public function test(){
+        // $soal = $this->formulir->getSoalFormulir("12");
+        // echo '<pre>';
+        // print_r($soal);
+        // echo '</pre>';
     }
 
     public function index() {
@@ -26,10 +33,13 @@ class Delik extends MY_Controller {
             $this->data['title'] = 'Delik';
             $this->data['audit_id'] = $audit_id;
             $this->data['dtform_id'] = $dtform_id;
+            $this->data['dashboard'] = 'active';
             $this->data['result'] = $this->mutu->getAuditById($audit_id);
             $this->data['jawab'] = $this->auditjawab->getAuditJawab($audit_id,$dtform_id);
+            $this->data['soal'] = $this->formulir->getSoalFormulir($dtform_id);
             $this->data['js'] = $this->load->get_js_files();
-            $this->data['audit'] = 'active';
+            $this->data['audit'] = 'active';//auditmenu
+            $this->data['auditmenu'] = 'active';
             $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
             $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
             $this->template($this->data, $this->module); 
@@ -50,6 +60,23 @@ class Delik extends MY_Controller {
             header('Content-Type: application/json');
             echo json_encode($query); 
         }
+    }
+
+    public function jawaban() {
+        $data = array();
+        $data['dtform_id'] = $this->input->post('dtform_id');
+        $data['audit_id'] = $this->input->post('audit_id');
+        $data['jwb_jawaban'] = $this->input->post('jwb_jawaban');
+        if($this->auditjawab->is_exist($data)){
+            $status = $this->auditjawab->jawab($data);
+        }else{
+            $status = $this->auditjawab->add($data);
+        }
+        
+        $query = array("status" => $status);
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
+        echo json_encode($query);
     }
 
     public function referensi() {

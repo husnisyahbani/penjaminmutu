@@ -101,50 +101,30 @@
 
 <script>
   $(document).ready(function() {
-  $('.editor').summernote({
-  height: 300,
-  dialogsInBody: true,
-  toolbar: [
-    ['style', ['bold', 'italic', 'underline', 'clear']],
-    ['font', ['strikethrough', 'superscript', 'subscript']],
-    ['fontsize', ['fontsize']],
-    ['color', ['color']],
-    ['para', ['ul', 'ol', 'paragraph']],
-    ['insert', ['link']],
-    ['view', ['codeview']]
-  ],
-  callbacks: {
-    onPaste: function (e) {
-      e.preventDefault();
-      // Ambil teks polos dari clipboard
-      const clipboardData = (e.originalEvent || e).clipboardData || window.clipboardData;
-      const text = clipboardData.getData('text/plain');
-      // Sisipkan teks tanpa styling
-      document.execCommand('insertText', false, text);
-    }
-  }
-});
-  //   $(document).ready(function() {
-  //     $('.editor').summernote({
-  //       height: 300,
-  //        dialogsInBody: true,
-  //           toolbar: [
-  //       ['style', ['bold', 'italic', 'underline', 'clear']],
-  //       ['font', ['strikethrough', 'superscript', 'subscript']],
-  //       ['fontsize', ['fontsize']],
-  //       ['color', ['color']],
-  //       ['para', ['ul', 'ol', 'paragraph']],
-  //       ['insert', ['link']], // 👈 pastikan ini ada
-  //       ['view', ['codeview']]
-  //   ]
-  //     });
-
-  //      $(document).on('focusin', function(e) {
-  //   if ($(e.target).closest(".note-editable").length) {
-  //     e.stopImmediatePropagation();
-  //   }
-  // });
-  //   });
+      $('.editor').summernote({
+      height: 300,
+      dialogsInBody: true,
+      toolbar: [
+        ['style', ['bold', 'italic', 'underline', 'clear']],
+        ['font', ['strikethrough', 'superscript', 'subscript']],
+        ['fontsize', ['fontsize']],
+        ['color', ['color']],
+        ['para', ['ul', 'ol', 'paragraph']],
+        ['insert', ['link']],
+        ['view', ['codeview']]
+      ],
+      callbacks: {
+        onPaste: function (e) {
+          e.preventDefault();
+          // Ambil teks polos dari clipboard
+          const clipboardData = (e.originalEvent || e).clipboardData || window.clipboardData;
+          const text = clipboardData.getData('text/plain');
+          // Sisipkan teks tanpa styling
+          document.execCommand('insertText', false, text);
+        }
+      }
+    });
+  });
 </script>
 
 
@@ -178,6 +158,7 @@ if (isset($pesanerror)) {
     var base_url = '<?php echo base_url('auditee'); ?>';
     var root_url = '<?php echo base_url(); ?>';
     var form_id = '<?php if(isset($form_id)) echo $form_id; ?>';
+    var audit_id = '<?php if(isset($audit_id)) echo $audit_id; ?>';
  </script>
 
 <?php

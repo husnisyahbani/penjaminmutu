@@ -24,45 +24,23 @@ $(function () {
             {"targets": [0,1,2], "orderable": false}
         ],
         "ajax": {
-            "url": base_url + "/dashboard/listpertanyaan",
+            "url": base_url + "/dashboard/listpertanyaan/"+audit_id,
             "type": "POST"
         }
     });
 
-    var $dtform_id;
-    var $audit_id;
-
-    $("#daftarpertanyaan").on("click", ".edit", function () {
-        $dtform_id = $(this).attr('dtform_id');
-        $audit_id = $(this).attr('audit_id');
-        //$("#editModal").modal('show');
-        $('#pertanyaanModal').modal('hide');
-
-        $('#pertanyaanModal').one('hidden.bs.modal', function () {
-        $('#editModal').modal('show');
-        });
-
-        $('#editModal').one('hidden.bs.modal', function () {
-        setTimeout(() => {
-            $('#pertanyaanModal').modal('show');
-            $('body').addClass('modal-open');
-        }, 300);
-        });
-
-        var tr = $(this).closest('tr');
-        var rowData = daftarpertanyaan.row(tr).data();
-        var pertanyaan = rowData[1];
-        var jawaban = rowData[2];
-        var cleanJawaban = jawaban.replace(/<button[\s\S]*$/i, '');
-        $('#pertanyaan').summernote('code', pertanyaan);
-        $('#jwb_jawaban').summernote('code', cleanJawaban);
-
+    $("#daftarpertanyaan").on("click", ".delik", function () {
+        var audit_id = $(this).attr('audit_id');
+        var dtform_id = $(this).attr('dtform_id');
+         window.location.href = base_url+"/delik?audit_id="+audit_id+"&dtform_id="+dtform_id;
     });
 
     $("#daftaraudit").on("click", ".detail", function () {
-        $('#pertanyaanModal').modal('show');
         var id = $(this).attr('id');
-        daftarpertanyaan.ajax.url(base_url + "/dashboard/listpertanyaan/"+id).load();
+        window.location.href = base_url+'/dashboard/detail/'+id;
+        // $('#pertanyaanModal').modal('show');
+        // var id = $(this).attr('id');
+        // daftarpertanyaan.ajax.url(base_url + "/dashboard/listpertanyaan/"+id).load();
     });
 
     $("#daftaraudit").on("click", ".kirim", function () {
@@ -74,7 +52,7 @@ $(function () {
     {
         swal.fire({
             title: "Anda Yakin?",
-            text: "Anda Yakin Ingin Mengirim Ajuan Ini?",
+            text: "Anda Yakin Ingin Mengirim Hasil Evaluasi Ini?",
             type: "warning",
             showCancelButton: true,
             showLoaderOnConfirm: true,
@@ -89,7 +67,7 @@ $(function () {
                         .done(function (data) {
                             swal.fire({
                                 title: "Terkirim",
-                                text: "Ajuan Telah Terkirim!",
+                                text: "Hasil Evaluasi Telah Terkirim!",
                                 type: "success",
                                 preConfirm: function () {
                                     daftaraudit.ajax.reload();
