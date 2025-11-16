@@ -5,7 +5,7 @@ class Delik extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'admin';
-        $this->load->js(base_url("assets/app/admin/delik.js?v=1.11"));
+        $this->load->js(base_url("assets/app/admin/delik.js?v=1.12"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
@@ -23,7 +23,7 @@ class Delik extends MY_Controller {
         $dtform_id = $this->input->get('dtform_id');
         if(isset($audit_id) && isset($dtform_id)){
             $this->data['content'] = 'delik/indexnew';
-            $this->data['title'] = 'Daftar Delik';
+            $this->data['title'] = 'Delik';
             $this->data['audit_id'] = $audit_id;
             $this->data['dtform_id'] = $dtform_id;
             $this->data['result'] = $this->mutu->getAuditById($audit_id);

@@ -3,6 +3,14 @@
     <div class="row" data-by-row="true">
       <div class="col-xl-12 col-lg-24S">
         <div class="panel">
+          <div class="panel-heading">
+                        <h3 class="panel-title"><?=$title;?></h3>
+                        <div class="panel-actions panel-actions-keep">
+                            <button type="button" class="btn btn-sm btn-icon btn-warning" audit_id="<?=$audit_id?>" id="kembali">
+                                <i class="icon md-undo" aria-hidden="true"></i>Kembali
+                            </button>
+                        </div>
+                    </div>
           <div class="nav-tabs-horizontal" data-plugin="tabs">
             <ul class="nav nav-tabs" role="tablist">
               <li class="nav-item" role="presentation"><a class="nav-link active show" data-toggle="tab" href="#exampleTabsOne" aria-controls="exampleTabsOne" role="tab" aria-selected="true">Evaluasi</a></li>
