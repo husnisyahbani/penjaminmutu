@@ -61,7 +61,7 @@
 <script src="<?php echo asset_url();?>global/vendor/dropify/dropify.min.js"></script>
 <script src="<?php echo asset_url();?>global/vendor/formvalidation/formValidation.min.js"></script>
 <script src="<?php echo asset_url();?>global/vendor/formvalidation/framework/bootstrap4.min.js"></script>
-<script src="<?php echo asset_url();?>global/vendor/summernote/summernote.min.js"></script>
+<script src="<?php echo asset_url();?>summernote/summernote-bs4.js"></script>
 <script src="<?php echo asset_url(); ?>global/vendor/bootstrap-datepicker/bootstrap-datepicker.js"></script>
 <script src="<?php echo asset_url(); ?>global/vendor/toastr/toastr.js"></script>
 
@@ -94,54 +94,42 @@
 <script src="<?php echo asset_url();?>assets/examples/js/tables/datatable.js"></script>
 <script src="<?php echo asset_url();?>assets/examples/js/uikit/icon.js"></script>
 <script src="<?php echo asset_url();?>global/js/Plugin/sweetalert2.min.js"></script>
-<!-- <script src="<?php echo asset_url();?>global/js/Plugin/summernote.js"></script> -->
-<script src="<?php echo asset_url();?>summernote/summernote-bs4.js"></script>
+<script src="<?php echo asset_url();?>global/js/Plugin/summernote.js"></script>
 <script src="<?php echo asset_url();?>assets/examples/js/forms/editor-summernote.js"></script>
 <script src="<?php echo asset_url();?>assets/examples/js/dashboard/v1.js"></script>
 
-<<script>
-    $(document).ready(function() {
-  $('.editor').summernote({
-  height: 300,
-  dialogsInBody: true,
-  toolbar: [
-    ['style', ['bold', 'italic', 'underline', 'clear']],
-    ['font', ['strikethrough', 'superscript', 'subscript']],
-    ['fontsize', ['fontsize']],
-    ['color', ['color']],
-    ['para', ['ul', 'ol', 'paragraph']],
-    ['insert', ['link']],
-    ['view', ['codeview']]
-  ],
-  callbacks: {
-    onPaste: function (e) {
-      e.preventDefault();
-      // Ambil teks polos dari clipboard
-      const clipboardData = (e.originalEvent || e).clipboardData || window.clipboardData;
-      const text = clipboardData.getData('text/plain');
-      // Sisipkan teks tanpa styling
-      document.execCommand('insertText', false, text);
-    }
-  }
-});
 
-
-    // Saat modal dibuka, pastikan editor muncul dengan benar
-    $('.modal').on('shown.bs.modal', function () {
-        $(this).find('.ql-editor').each(function(){
-            this.focus();
-        });
+<script>
+  $(document).ready(function() {
+      $('.editor').summernote({
+      height: 300,
+      dialogsInBody: true,
+      toolbar: [
+        ['style', ['bold', 'italic', 'underline', 'clear']],
+        ['font', ['strikethrough', 'superscript', 'subscript']],
+        ['fontsize', ['fontsize']],
+        ['color', ['color']],
+        ['para', ['ul', 'ol', 'paragraph']],
+        ['insert', ['link']],
+        ['view', ['codeview']]
+      ],
+      callbacks: {
+        onPaste: function (e) {
+          e.preventDefault();
+          // Ambil teks polos dari clipboard
+          const clipboardData = (e.originalEvent || e).clipboardData || window.clipboardData;
+          const text = clipboardData.getData('text/plain');
+          // Sisipkan teks tanpa styling
+          document.execCommand('insertText', false, text);
+        }
+      }
     });
-  
   });
 </script>
 
 
-
 <script>
      $(function () {
-
-        
         <?php
 if (isset($pesanberhasil)) {
     echo "toastr.options.timeOut = 'false';
