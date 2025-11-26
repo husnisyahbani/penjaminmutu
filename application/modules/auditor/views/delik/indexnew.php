@@ -16,22 +16,18 @@
               <li class="nav-item" role="presentation"><a class="nav-link active show" data-toggle="tab" href="#exampleTabsOne" aria-controls="exampleTabsOne" role="tab" aria-selected="true">Evaluasi</a></li>
               <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="tab" href="#exampleTabsTwo" aria-controls="exampleTabsTwo" role="tab" aria-selected="false">Hasil Evaluasi</a></li>
               <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="tab" href="#exampleTabsThree" aria-controls="exampleTabsThree" role="tab" aria-selected="false">Tujuan</a></li>
-              <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="tab" href="#exampleTabsFour" aria-controls="exampleTabsFour" role="tab" aria-selected="false">Referensi</a></li>
-              <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="tab" href="#exampleTabsFive" aria-controls="exampleTabsFive" role="tab" aria-selected="false">Pertanyaan</a></li>
-              <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="tab" href="#exampleTabsSix" aria-controls="exampleTabsSix" role="tab" aria-selected="false">Hasil</a></li>
-              <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="tab" href="#exampleTabsSeven" aria-controls="exampleTabsSeven" role="tab" aria-selected="false">Temuan</a></li>
-              <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="tab" href="#exampleTabsEigth" aria-controls="exampleTabsEigth" role="tab" aria-selected="false">Catatan</a></li>
+              <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="tab" href="#exampleTabsFour" aria-controls="exampleTabsFour" role="tab" aria-selected="false">Daftar Tilik</a></li>
               <li class="dropdown nav-item" role="presentation" style="display: none;">
                 <a class="dropdown-toggle nav-link" data-toggle="dropdown" href="#" aria-expanded="false">Menu </a>
                 <div class="dropdown-menu" role="menu">
                   <a class="dropdown-item" data-toggle="tab" href="#exampleTabsOne" aria-controls="exampleTabsOne" role="tab">Evaluasi</a>
                   <a class="dropdown-item" data-toggle="tab" href="#exampleTabsTwo" aria-controls="exampleTabsTwo" role="tab">Hasil Evaluasi</a>
                   <a class="dropdown-item" data-toggle="tab" href="#exampleTabsThree" aria-controls="exampleTabsThree" role="tab">Tujuan</a>
-                  <a class="dropdown-item" data-toggle="tab" href="#exampleTabsFour" aria-controls="exampleTabsFour" role="tab">Referensi</a>
-                  <a class="dropdown-item" data-toggle="tab" href="#exampleTabsFive" aria-controls="exampleTabsFive" role="tab">Pertanyaan</a>
+                  <a class="dropdown-item" data-toggle="tab" href="#exampleTabsFour" aria-controls="exampleTabsFour" role="tab">Daftar Tilik</a>
+                  <!-- <a class="dropdown-item" data-toggle="tab" href="#exampleTabsFive" aria-controls="exampleTabsFive" role="tab">Pertanyaan</a>
                   <a class="dropdown-item" data-toggle="tab" href="#exampleTabsSix" aria-controls="exampleTabsSix" role="tab">Hasil</a>
                   <a class="dropdown-item" data-toggle="tab" href="#exampleTabsSeven" aria-controls="exampleTabsSeven" role="tab">Temuan</a>
-                  <a class="dropdown-item" data-toggle="tab" href="#exampleTabsEigth" aria-controls="exampleTabsEigth" role="tab">Catatan</a>
+                  <a class="dropdown-item" data-toggle="tab" href="#exampleTabsEigth" aria-controls="exampleTabsEigth" role="tab">Catatan</a> -->
                 </div>
               </li>
             </ul>
@@ -80,80 +76,41 @@ echo $jawab['jwb_jawaban'];}?></p>
                 <div class="panel">
                   <header class="panel-heading">
                     <div class="panel-actions panel-actions-keep">
-                      <button type="button" class="btn btn-sm btn-icon btn-warning" data-toggle="tooltip" data-original-title="Edit Referensi" id="editreferensi">
-                        <i class="icon md-edit" aria-hidden="true"></i> Edit Referensi
+
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-icon btn-success"
+                        data-toggle="tooltip"
+                        data-original-title="Tambah Tilik"
+                        id="tambahtilik">
+                        <i class="icon md-plus" aria-hidden="true"></i> Tambah Tilik
                       </button>
+
                     </div>
                   </header>
+                  <br/>
                   <div class="panel-body">
-                    <div id="referensi"><p></p><?php if(isset($jawab['jwb_referensi'])){ $allowed_tags = '<p><br><b><i><u><strong><em><ul><ol><li>';
-$jawab['jwb_referensi'] = strip_tags($jawab['jwb_referensi'], $allowed_tags);
-echo $jawab['jwb_referensi'];}?></div>
+                        <table class="table table-hover dataTable table-striped w-full" id="tilik">
+                        <thead>
+                            <tr>
+                                <th width="5px">No</th>
+                                <th>Pertanyaan</th>
+                                <th>Hasil</th>
+                                <th>Temuan</th>
+                                <th>Catatan</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                        </tbody>
+                        </table>
                   </div>
                 </div>
               </div>
 
-              
-
-              <div class="tab-pane" id="exampleTabsFive" role="tabpanel">
-                <div class="panel">
-                  <header class="panel-heading">
-                    <div class="panel-actions panel-actions-keep">
-                      <button type="button" class="btn btn-sm btn-icon btn-warning" data-toggle="tooltip" data-original-title="Edit Pertanyaan" id="editpertanyaan">
-                        <i class="icon md-edit" aria-hidden="true"></i> Edit Pertanyaan
-                      </button>
-                    </div>
-                  </header>
-                  <div class="panel-body">
-                    <div id="pertanyaan"><p></p><?php if(isset($jawab['jwb_pertanyaan'])) echo $jawab['jwb_pertanyaan'];?></div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="tab-pane" id="exampleTabsSix" role="tabpanel">
-                <div class="panel">
-                  <header class="panel-heading">
-                    <div class="panel-actions panel-actions-keep">
-                      <button type="button" class="btn btn-sm btn-icon btn-warning" data-toggle="tooltip" data-original-title="Edit Hasil" id="edithasil">
-                        <i class="icon md-edit" aria-hidden="true"></i> Edit Hasil
-                      </button>
-                    </div>
-                  </header>
-                  <div class="panel-body">
-                    <div id="hasil"><p></p><?php if(isset($jawab['jwb_hasil'])) echo $jawab['jwb_hasil'];?></div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="tab-pane" id="exampleTabsSeven" role="tabpanel">
-                <div class="panel">
-                  <header class="panel-heading">
-                    <div class="panel-actions panel-actions-keep">
-                      <button type="button" class="btn btn-sm btn-icon btn-warning" data-toggle="tooltip" data-original-title="Edit Temuan" id="edittemuan">
-                        <i class="icon md-edit" aria-hidden="true"></i> Edit Temuan
-                      </button>
-                    </div>
-                  </header>
-                  <div class="panel-body">
-                    <div id="temuan"><p></p><?php if(isset($jawab['jwb_temuan'])) echo $jawab['jwb_temuan'];?></div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="tab-pane" id="exampleTabsEigth" role="tabpanel">
-                <div class="panel">
-                  <header class="panel-heading">
-                    <div class="panel-actions panel-actions-keep">
-                      <button type="button" class="btn btn-sm btn-icon btn-warning" data-toggle="tooltip" data-original-title="Edit Catatan" id="editcatatan">
-                        <i class="icon md-edit" aria-hidden="true"></i> Edit Catatan
-                      </button>
-                    </div>
-                  </header>
-                  <div class="panel-body">
-                    <div id="catatan"><p></p><?php if(isset($jawab['jwb_catatan'])) echo $jawab['jwb_catatan'];?></div>
-                  </div>
-                </div>
-              </div>
+             
 
             </div><!-- /.tab-content -->
           </div><!-- /.nav-tabs-horizontal -->
@@ -205,29 +162,37 @@ echo $jawab['jwb_referensi'];}?></div>
 
 <div
   class="modal fade"
-  id="referensiModal"
+  id="tilikModal"
   tabindex="-1"
   role="dialog"
   aria-labelledby="exampleFormModalLabel"
   aria-hidden="true">
   <div class="modal-dialog modal-simple" role="document">
     <div class="modal-content">
-      <form id="formreferensi">
+      <form id="formtilik">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
           </button>
-          <h4 class="modal-title" id="exampleFormModalLabel">Referensi</h4>
+          <h4 class="modal-title" id="exampleFormModalLabel">Tambah Tilik</h4>
         </div>
 
         <div class="modal-body">
+          
           <div class="row">
-            <div class="col-md-12 center">
-              <h4 class="example-title">Masukkan Referensi</h4>
-              <textarea id="jwb_referensi" class="editor" name="jwb_referensi"></textarea>
+            <div class="col-md-12 form-group center">
+              <h4 class="example-title">Referensi</h4>
+                        <input type="text" class="form-control" id="dtjwb_referensi" name="dtjwb_referensi" placeholder="Masukkan Referensi" data-fv-notempty="true"
+                        data-fv-notempty-message="Wajib Diisi"/>
+                    </div>
+
+            <div class="col-md-12 form-group center">
+              <h4 class="example-title">Pertanyaan</h4>
+              <input type="text" class="form-control" id="dtjwb_pertanyaan" name="dtjwb_pertanyaan" placeholder="Masukkan Pertanyaan" data-fv-notempty="true"
+                        data-fv-notempty-message="Wajib Diisi"/>
             </div>
-            <input type="hidden" name="audit_id" value="<?=$audit_id?>"/>
-            <input type="hidden" name="dtform_id" value="<?=$dtform_id?>"/>
+            
+            <input type="hidden" name="jwb_id" value="<?=$jwb_id?>"/>
           </div>
         </div>
 
@@ -242,130 +207,86 @@ echo $jawab['jwb_referensi'];}?></div>
   </div>
 </div>
 
+<div
+    class="modal fade"
+    id="editPertanyaanModal"
+    aria-hidden="false"
+    aria-labelledby="exampleFormModalLabel"
+    role="dialog"
+    tabindex="-1">
+    <div class="modal-dialog modal-simple">
+        <form id="formpertanyaan" class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title" id="informasiLabel">Edit Pertanyaan</h4>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-md-12 form-group center">
+                        <input type="text" class="form-control" id="edit_dtjwb_pertanyaan" name="edit_dtjwb_pertanyaan" placeholder="Masukkan Pertanyaan" data-fv-notempty="true"
+                        data-fv-notempty-message="Wajib Diisi"/>
+                    </div>
+                    <div class="col-md-12 form-group center">
+                        <input type="text" class="form-control" id="edit_dtjwb_referensi" name="edit_dtjwb_referensi" placeholder="Masukkan Pertanyaan" data-fv-notempty="true"
+                        data-fv-notempty-message="Wajib Diisi"/>
+                    </div>
+                    
+                    <input type="hidden" id="pertanyaan_dtjwb_id" name="pertanyaan_dtjwb_id" />
+                </div>
+            </div>
+
+            <div class="modal-footer">
+            <div class="text-right">
+                    <button type="submit" class="btn btn-primary" id="submitpertanyaan" name="submitpertanyaan" value="submitpertanyaan">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
 
 <div
-  class="modal fade"
-  id="hasilModal"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="exampleFormModalLabel"
-  aria-hidden="true">
-  <div class="modal-dialog modal-simple" role="document">
-    <div class="modal-content">
-      <form id="formhasil">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">×</span>
-          </button>
-          <h4 class="modal-title" id="exampleFormModalLabel">Hasil</h4>
-        </div>
-
-        <div class="modal-body">
-          <div class="row">
-            <div class="col-md-12 center">
-              <h4 class="example-title">Masukkan Hasil</h4>
-              <textarea id="jwb_hasil" class="editor" name="jwb_hasil"></textarea>
+    class="modal fade"
+    id="editHasilModal"
+    aria-hidden="false"
+    aria-labelledby="exampleFormModalLabel"
+    role="dialog"
+    tabindex="-1">
+    <div class="modal-dialog modal-simple">
+        <form id="formhasil" class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title" id="informasiLabel">Edit Hasil</h4>
             </div>
-            <input type="hidden" name="audit_id" value="<?=$audit_id?>"/>
-            <input type="hidden" name="dtform_id" value="<?=$dtform_id?>"/>
-          </div>
-        </div>
+            <div class="modal-body">
 
-        <div class="modal-footer text-right">
-          <button type="submit" class="btn btn-primary" name="submitjawaban" value="submitjawaban">
-            Kirim
-          </button>
-        </div>
+                <div class="row">
+                    <div class="col-md-12 center">
+                        <input type="text" class="form-control" id="edit_dtjwb_hasil" name="edit_dtjwb_hasil" placeholder="Masukkan Hasil" data-fv-notempty="true"
+                        data-fv-notempty-message="Wajib Diisi"/>
+                    </div>
+                    
+                    <input type="hidden" id="hasil_dtjwb_id" name="hasil_dtjwb_id" />
+                </div>
+            </div>
 
-      </form>
-    </div>
-  </div>
+            <div class="modal-footer">
+            <div class="text-right">
+                    <button type="submit" class="btn btn-primary" id="submithasil" name="submithasil" value="submithasil">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </form>
 </div>
 
 
 <div
   class="modal fade"
-  id="pertanyaanModal"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="exampleFormModalLabel"
-  aria-hidden="true">
-  <div class="modal-dialog modal-simple" role="document">
-    <div class="modal-content">
-      <form id="formpertanyaan">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">×</span>
-          </button>
-          <h4 class="modal-title" id="exampleFormModalLabel">Pertanyaan</h4>
-        </div>
-
-        <div class="modal-body">
-          <div class="row">
-            <div class="col-md-12 center">
-              <h4 class="example-title">Masukkan Pertanyaan</h4>
-              <textarea id="jwb_pertanyaan" class="editor" name="jwb_pertanyaan"></textarea>
-            </div>
-            <input type="hidden" name="audit_id" value="<?=$audit_id?>"/>
-            <input type="hidden" name="dtform_id" value="<?=$dtform_id?>"/>
-          </div>
-        </div>
-
-        <div class="modal-footer text-right">
-          <button type="submit" class="btn btn-primary" name="submitjawaban" value="submitjawaban">
-            Kirim
-          </button>
-        </div>
-
-      </form>
-    </div>
-  </div>
-</div>
-
-
-<div
-  class="modal fade"
-  id="catatanModal"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="exampleFormModalLabel"
-  aria-hidden="true">
-  <div class="modal-dialog modal-simple" role="document">
-    <div class="modal-content">
-      <form id="formcatatan">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">×</span>
-          </button>
-          <h4 class="modal-title" id="exampleFormModalLabel">Catatan</h4>
-        </div>
-
-        <div class="modal-body">
-          <div class="row">
-            <div class="col-md-12 center">
-              <h4 class="example-title">Masukkan Catatan</h4>
-              <textarea id="jwb_catatan" class="editor" name="jwb_catatan"></textarea>
-            </div>
-            <input type="hidden" name="audit_id" value="<?=$audit_id?>"/>
-            <input type="hidden" name="dtform_id" value="<?=$dtform_id?>"/>
-          </div>
-        </div>
-
-        <div class="modal-footer text-right">
-          <button type="submit" class="btn btn-primary" name="submitjawaban" value="submitjawaban">
-            Kirim
-          </button>
-        </div>
-
-      </form>
-    </div>
-  </div>
-</div>
-
-
-<div
-  class="modal fade"
-  id="temuanModal"
+  id="editTemuanModal"
   tabindex="-1"
   role="dialog"
   aria-labelledby="exampleFormModalLabel"
@@ -384,22 +305,21 @@ echo $jawab['jwb_referensi'];}?></div>
           <div class="row">
             <div class="col-md-12 center">
               <h4 class="example-title">Masukkan Temuan</h4>
-              <select class="form-control" name="jwb_temuan" id="jwb_temuan" data-fv-notempty="true"
+              <select class="form-control" name="edit_dtjwb_temuan" id="edit_dtjwb_temuan" data-fv-notempty="true"
                     data-fv-notempty-message="Wajib Dipilih"> 
                                   <option value="">--Pilih Temuan--</option>                                
-                                  <option value="S" <?php if(isset($jawab['jwb_temuan']) && $jawab['jwb_temuan'] === 'S')echo 'selected'; ?>>S</option>
-                                  <option value="OB" <?php if(isset($jawab['jwb_temuan']) && $jawab['jwb_temuan'] === 'OB')echo 'selected'; ?>>OB</option>
-                                  <option value="TS MINOR" <?php if(isset($jawab['jwb_temuan']) && $jawab['jwb_temuan'] === 'TS MINOR')echo 'selected'; ?>>TS MINOR</option>
-                                  <option value="TS MAYOR" <?php if(isset($jawab['jwb_temuan']) && $jawab['jwb_temuan'] === 'TS MAYOR')echo 'selected'; ?>>TS MAYOR</option>
+                                  <option value="S">S</option>
+                                  <option value="OB">OB</option>
+                                  <option value="TS MINOR">TS MINOR</option>
+                                  <option value="TS MAYOR">TS MAYOR</option>
                                 </select>
             </div>
-            <input type="hidden" name="audit_id" value="<?=$audit_id?>"/>
-            <input type="hidden" name="dtform_id" value="<?=$dtform_id?>"/>
+            <input type="hidden" id="temuan_dtjwb_id" name="temuan_dtjwb_id" />
           </div>
         </div>
 
         <div class="modal-footer text-right">
-          <button type="submit" class="btn btn-primary" name="submitjawaban" value="submitjawaban">
+          <button type="submit" class="btn btn-primary" name="submittemuan" value="submittemuan">
             Kirim
           </button>
         </div>
@@ -407,5 +327,41 @@ echo $jawab['jwb_referensi'];}?></div>
       </form>
     </div>
   </div>
+</div>
+
+<div
+    class="modal fade"
+    id="editCatatanModal"
+    aria-hidden="false"
+    aria-labelledby="exampleFormModalLabel"
+    role="dialog"
+    tabindex="-1">
+    <div class="modal-dialog modal-simple">
+        <form id="formcatatan" class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title" id="informasiLabel">Edit Catatan</h4>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-md-12 center">
+                        <input type="text" class="form-control" id="edit_dtjwb_catatan" name="edit_dtjwb_catatan" placeholder="Masukkan Catatan" data-fv-notempty="true"
+                        data-fv-notempty-message="Wajib Diisi"/>
+                    </div>
+                    
+                    <input type="hidden" id="catatan_dtjwb_id" name="catatan_dtjwb_id" />
+                </div>
+            </div>
+
+            <div class="modal-footer">
+            <div class="text-right">
+                    <button type="submit" class="btn btn-primary" id="submitcatatan" name="submitcatatan" value="submitcatatan">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </form>
 </div>
 
