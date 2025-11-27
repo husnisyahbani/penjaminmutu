@@ -5,7 +5,7 @@ class Delik extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditor';
-        $this->load->js(base_url("assets/app/auditor/delik.js?v=1.30"));
+        $this->load->js(base_url("assets/app/auditor/delik.js?v=1.31"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
@@ -153,7 +153,7 @@ class Delik extends MY_Controller {
 
     
 
-    public function listdelik() {
+    public function listdelik($id) {
         $post = array();
         $post['search'] = $this->input->post('search');
         $post['order'] = $this->input->post('order');
@@ -162,7 +162,7 @@ class Delik extends MY_Controller {
         $post['draw'] = $this->input->post('draw');
 
 
-        $list = $this->dtjwb->get_datatables($post['length'], $post['start'], $post['search'], $post['order']);
+        $list = $this->dtjwb->get_datatables($post['length'], $post['start'], $post['search'], $post['order'],$id);
         $data = array();
         $no = $this->input->post('start');
         foreach ($list as $field) {
@@ -185,8 +185,8 @@ class Delik extends MY_Controller {
 
         $output = array(
             "draw" => $post['draw'],
-            "recordsTotal" => $this->dtjwb->count_all(),
-            "recordsFiltered" => $this->dtjwb->count_filtered($post['search'], $post['order']),
+            "recordsTotal" => $this->dtjwb->count_all($id),
+            "recordsFiltered" => $this->dtjwb->count_filtered($post['search'], $post['order'],$id),
             "data" => $data,
         );
         //output dalam format JSON

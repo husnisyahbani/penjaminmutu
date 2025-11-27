@@ -40,15 +40,29 @@ class DtjwbModel extends CI_Model {
         }
     }
 
-    function get_datatables($length, $start, $search, $ordering) {
+    function get_datatables($length, $start, $search, $ordering,$id) {
         $this->_get_datatables_query($search, $ordering);
         if ($length != -1) {
             $this->db->limit($length, $start);
         }
-        
+        $this->db->where('jwb_id',$id);
         $this->db->from('mutu_auditjawabdetail');
         $query = $this->db->get();
         return $query->result();
+    }
+
+    function count_filtered($search, $ordering,$id) {
+        $this->_get_datatables_query($search, $ordering);
+        $this->db->where('jwb_id',$id);
+        $this->db->from('mutu_auditjawabdetail');
+        $query = $this->db->get();
+        return $query->num_rows();
+    }
+
+    public function count_all($id) {
+        $this->db->where('jwb_id',$id);
+        $this->db->from('mutu_auditjawabdetail');
+        return $this->db->count_all_results();
     }
 
     function getJwbid($audit_id,$dtform_id){ 
@@ -67,17 +81,7 @@ class DtjwbModel extends CI_Model {
         return $query->row_array();
     }
 
-    function count_filtered($search, $ordering) {
-        $this->_get_datatables_query($search, $ordering);
-        $this->db->from('mutu_auditjawabdetail');
-        $query = $this->db->get();
-        return $query->num_rows();
-    }
-
-    public function count_all() {
-        $this->db->from('mutu_auditjawabdetail');
-        return $this->db->count_all_results();
-    }
+    
 
     public function add($data) {
         $this->db->insert('mutu_auditjawabdetail',$data);

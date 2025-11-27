@@ -10,7 +10,7 @@ $(function () {
             {"targets": [0,5], "orderable": false}
         ],
         "ajax": {
-            "url": base_url + "/delik/listdelik",
+            "url": base_url + "/delik/listdelik/"+jwb_id,
             "type": "POST"
         }
     });
