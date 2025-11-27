@@ -87,6 +87,7 @@ $(function () {
                     $.each(list, function (index, org_types) {
                         if(org_types.status){
                             $("#edit_dtjwb_pertanyaan").val(org_types.dtjwb_pertanyaan);
+                            $("#edit_dtjwb_referensi").val(org_types.dtjwb_referensi);
                             $("#pertanyaan_dtjwb_id").val(org_types.dtjwb_id);
                             $('#editPertanyaanModal').modal('show');
                         }else{

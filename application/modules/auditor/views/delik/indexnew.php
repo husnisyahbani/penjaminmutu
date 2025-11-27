@@ -230,7 +230,7 @@ echo $jawab['jwb_jawaban'];}?></p>
                         data-fv-notempty-message="Wajib Diisi"/>
                     </div>
                     <div class="col-md-12 form-group center">
-                        <input type="text" class="form-control" id="edit_dtjwb_referensi" name="edit_dtjwb_referensi" placeholder="Masukkan Pertanyaan" data-fv-notempty="true"
+                        <input type="text" class="form-control" id="edit_dtjwb_referensi" name="edit_dtjwb_referensi" placeholder="Masukkan Referensi" data-fv-notempty="true"
                         data-fv-notempty-message="Wajib Diisi"/>
                     </div>
                     
