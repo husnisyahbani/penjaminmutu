@@ -225,14 +225,17 @@ echo $jawab['jwb_jawaban'];}?></p>
             <div class="modal-body">
 
                 <div class="row">
-                    <div class="col-md-12 form-group center">
-                        <input type="text" class="form-control" id="edit_dtjwb_pertanyaan" name="edit_dtjwb_pertanyaan" placeholder="Masukkan Pertanyaan" data-fv-notempty="true"
-                        data-fv-notempty-message="Wajib Diisi"/>
-                    </div>
-                    <div class="col-md-12 form-group center">
+                  <div class="col-md-12 form-group center">
+                      <h4 class="example-title">Referensi</h4>
                         <input type="text" class="form-control" id="edit_dtjwb_referensi" name="edit_dtjwb_referensi" placeholder="Masukkan Referensi" data-fv-notempty="true"
                         data-fv-notempty-message="Wajib Diisi"/>
                     </div>
+                    <div class="col-md-12 form-group center">
+                        <h4 class="example-title">Pertanyaan</h4>
+                        <input type="text" class="form-control" id="edit_dtjwb_pertanyaan" name="edit_dtjwb_pertanyaan" placeholder="Masukkan Pertanyaan" data-fv-notempty="true"
+                        data-fv-notempty-message="Wajib Diisi"/>
+                    </div>
+                    
                     
                     <input type="hidden" id="pertanyaan_dtjwb_id" name="pertanyaan_dtjwb_id" />
                 </div>
