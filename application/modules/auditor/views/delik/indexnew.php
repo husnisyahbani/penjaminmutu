@@ -128,7 +128,7 @@ echo $jawab['jwb_jawaban'];}?></p>
   role="dialog"
   aria-labelledby="exampleFormModalLabel"
   aria-hidden="true">
-  <div class="modal-dialog modal-simple" role="document">
+  <div class="modal-dialog modal-simple modal-lg" role="document">
     <div class="modal-content">
       <form id="formtujuan">
         <div class="modal-header">
@@ -167,7 +167,7 @@ echo $jawab['jwb_jawaban'];}?></p>
   role="dialog"
   aria-labelledby="exampleFormModalLabel"
   aria-hidden="true">
-  <div class="modal-dialog modal-simple" role="document">
+  <div class="modal-dialog modal-simple modal-lg" role="document">
     <div class="modal-content">
       <form id="formtilik">
         <div class="modal-header">
@@ -214,7 +214,7 @@ echo $jawab['jwb_jawaban'];}?></p>
     aria-labelledby="exampleFormModalLabel"
     role="dialog"
     tabindex="-1">
-    <div class="modal-dialog modal-simple">
+    <div class="modal-dialog modal-simple modal-lg">
         <form id="formpertanyaan" class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -257,7 +257,7 @@ echo $jawab['jwb_jawaban'];}?></p>
     aria-labelledby="exampleFormModalLabel"
     role="dialog"
     tabindex="-1">
-    <div class="modal-dialog modal-simple">
+    <div class="modal-dialog modal-simple modal-lg">
         <form id="formhasil" class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -294,7 +294,7 @@ echo $jawab['jwb_jawaban'];}?></p>
   role="dialog"
   aria-labelledby="exampleFormModalLabel"
   aria-hidden="true">
-  <div class="modal-dialog modal-simple" role="document">
+  <div class="modal-dialog modal-simple modal-lg" role="document">
     <div class="modal-content">
       <form id="formtemuan">
         <div class="modal-header">
@@ -339,7 +339,7 @@ echo $jawab['jwb_jawaban'];}?></p>
     aria-labelledby="exampleFormModalLabel"
     role="dialog"
     tabindex="-1">
-    <div class="modal-dialog modal-simple">
+    <div class="modal-dialog modal-simple modal-lg">
         <form id="formcatatan" class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
