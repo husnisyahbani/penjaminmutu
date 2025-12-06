@@ -7,7 +7,7 @@ class Daftaraudit extends MY_Controller {
         $this->module = 'admin';
         $this->load->js(base_url("assets/app/admin/daftaraudit.js?v=1.39"));
         $this->load->model('AuditjawabModel', 'auditjawab');
-        $this->load->model('AuditjawabDetailModel', 'auditjawabdetail');
+        $this->load->model('AuditJawabDetailModel', 'auditjawabdetail');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
         $this->load->model('AkunModel', 'akun');
