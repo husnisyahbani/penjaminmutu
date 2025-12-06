@@ -130,7 +130,8 @@ class Daftaraudit extends MY_Controller {
                     if(isset($detail) && count($detail) > 0){
                     foreach($detail as $dtjwb):
                         if($dtjwb["jwb_temuan"] == "S"){
-                            $dtjwb['jwb_temuan'] = "✔";
+                            //$dtjwb['jwb_temuan'] = "✔";
+                            $dtjwb['jwb_temuan'] = "X";
 
                                 $pdf->Row([
                                 $j,
