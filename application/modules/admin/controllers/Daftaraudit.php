@@ -21,7 +21,9 @@ class Daftaraudit extends MY_Controller {
     public function download() {
         $ids = $this->input->post('ids');
         if(isset($ids)){
-            
+            $pdf = new \setasign\Fpdi\Fpdi();
+            // add a page
+            $pdf->AddPage();
         }else{
             $this->session->set_flashdata('pesanerror', 'Tidak ada data yang dipilih!');
             redirect(base_url('admin/daftaraudit'));

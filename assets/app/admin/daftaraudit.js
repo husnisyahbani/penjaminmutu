@@ -68,19 +68,44 @@ $(function () {
             },
             success: function (data, status, xhr) {
                 swal.close();
+                // const blob = new Blob([data], { type: xhr.getResponseHeader('Content-Type') });
+                // const downloadUrl = URL.createObjectURL(blob);
+
+                // // Membuat elemen anchor untuk mengunduh file
+                // const a = document.createElement('a');
+                // a.href = downloadUrl;
+                // a.download = 'ekinerja.xlsx'; // Nama file
+                // document.body.appendChild(a);
+                // a.click();
+                // document.body.removeChild(a);
+
+                // // Membersihkan URL blob
+                // URL.revokeObjectURL(downloadUrl);
+                const contentDisposition = xhr.getResponseHeader('Content-Disposition');
+                let filename = 'download.pdf'; // default jika header tidak ada
+
+                if (contentDisposition && contentDisposition.indexOf('filename=') !== -1) {
+                    let match = contentDisposition.match(/filename="?(.+)"?/);
+                    if (match.length > 1) {
+                        filename = match[1];
+                    }
+                }
+
+                // Buat blob
                 const blob = new Blob([data], { type: xhr.getResponseHeader('Content-Type') });
                 const downloadUrl = URL.createObjectURL(blob);
 
-                // Membuat elemen anchor untuk mengunduh file
+                // Buat anchor untuk download
                 const a = document.createElement('a');
                 a.href = downloadUrl;
-                a.download = 'ekinerja.xlsx'; // Nama file
+                a.download = filename; // <<< nama file asli dari server
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
 
-                // Membersihkan URL blob
+                // Hapus blob
                 URL.revokeObjectURL(downloadUrl);
+
             },
             error: function (json) {
                 swal.fire("Oops", "No connection!", "error");
