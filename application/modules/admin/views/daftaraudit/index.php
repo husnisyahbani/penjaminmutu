@@ -80,7 +80,7 @@
                         <table class="table table-hover dataTable w-full" id="daftaraudit">
                             <thead>
                                 <tr>
-                                    <th ><input type="checkbox" id="selectAll"> No</th>
+                                    <th width="5%"><input type="checkbox" id="selectAll"> No</th>
                                     <th >Formulir</th>
                                     <th >Auditor</th>
                                     <th >Auditee</th>
