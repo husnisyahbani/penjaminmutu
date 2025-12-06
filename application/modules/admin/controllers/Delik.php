@@ -11,6 +11,7 @@ class Delik extends MY_Controller {
         $this->load->model('DtformModel', 'dtform');
         $this->load->model('AkunModel', 'akun');
         $this->load->model('FormulirModel', 'formulir');
+        $this->load->model('DtjwbModel', 'dtjwb');
 
         $role = $this->session->userdata('role');
         if (!isset($role) || $role != 'PPM') {
@@ -164,6 +165,46 @@ class Delik extends MY_Controller {
         header('Access-Control-Allow-Origin: *');
         header('Content-Type: application/json');
         echo json_encode($query);
+    }
+
+    public function listdelik($id) {
+        $post = array();
+        $post['search'] = $this->input->post('search');
+        $post['order'] = $this->input->post('order');
+        $post['length'] = $this->input->post('length');
+        $post['start'] = $this->input->post('start');
+        $post['draw'] = $this->input->post('draw');
+
+
+        $list = $this->dtjwb->get_datatables($post['length'], $post['start'], $post['search'], $post['order'],$id);
+        $data = array();
+        $no = $this->input->post('start');
+        foreach ($list as $field) {
+            $no++;
+            $row = array();
+            $row[] = $no;
+            $row[] = '<span style="font-size:16px;font-weight:bold">PERTANYAAN:</span><br/>'.$field->dtjwb_pertanyaan . '<br/><span style="font-size:16px;font-weight:bold">REFERENSI:</span><br/>'.$field->dtjwb_referensi.'<br/><button class="editpertanyaan btn btn-sm btn-icon btn-pure btn-default on-default"
+            data-toggle="tooltip" data-original-title="Pertanyaan" id=' . $field->dtjwb_id . '><i class="icon md-edit" aria-hidden="true"></i></button>';
+            $row[] = $field->dtjwb_hasil . '<button class="edithasil btn btn-sm btn-icon btn-pure btn-default on-default"
+            data-toggle="tooltip" data-original-title="Hasil" id=' . $field->dtjwb_id . '><i class="icon md-edit" aria-hidden="true"></i></button>';
+            $row[] = $field->dtjwb_temuan . '<button class="edittemuan btn btn-sm btn-icon btn-pure btn-default on-default"
+            data-toggle="tooltip" data-original-title="Temuan" id=' . $field->dtjwb_id . '><i class="icon md-edit" aria-hidden="true"></i></button>';
+            $row[] = $field->dtjwb_catatan . '<button class="editcatatan btn btn-sm btn-icon btn-pure btn-default on-default"
+            data-toggle="tooltip" data-original-title="Catatan" id=' . $field->dtjwb_id . '><i class="icon md-edit" aria-hidden="true"></i></button>';
+            $row[] = '<button class="delete btn btn-sm btn-icon btn-pure btn-default on-default remove-row"
+                      data-toggle="tooltip" data-original-title="Remove" id=' . $field->dtjwb_id . '><i class="icon md-delete" aria-hidden="true"></i></button>';
+           
+            $data[] = $row;
+        }
+
+        $output = array(
+            "draw" => $post['draw'],
+            "recordsTotal" => $this->dtjwb->count_all($id),
+            "recordsFiltered" => $this->dtjwb->count_filtered($post['search'], $post['order'],$id),
+            "data" => $data,
+        );
+        //output dalam format JSON
+        echo json_encode($output);
     }
 
 }

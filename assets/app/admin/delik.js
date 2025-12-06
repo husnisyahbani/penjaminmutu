@@ -1,4 +1,20 @@
 $(function () {
+
+    var tiliklist = $('#tilik').DataTable({
+        "responsive": true,
+        "processing": true,
+        "serverSide": true,
+        "searching": true,
+        "order": [],
+        "columnDefs": [
+            {"targets": [0,5], "orderable": false}
+        ],
+        "ajax": {
+            "url": base_url + "/delik/listdelik/"+jwb_id,
+            "type": "POST"
+        }
+    });
+    
     $("#edittujuan").on("click", function () {
     // Ambil isi dari elemen <p id="tujuan">
     var isiTujuan = $("#tujuan").html();

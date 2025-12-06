@@ -76,16 +76,7 @@ echo $jawab['jwb_jawaban'];}?></p>
                 <div class="panel">
                   <header class="panel-heading">
                     <div class="panel-actions panel-actions-keep">
-
-                      <button
-                        type="button"
-                        class="btn btn-sm btn-icon btn-success"
-                        data-toggle="tooltip"
-                        data-original-title="Tambah Tilik"
-                        id="tambahtilik">
-                        <i class="icon md-plus" aria-hidden="true"></i> Tambah Tilik
-                      </button>
-
+ 
                     </div>
                   </header>
                   <br/>
