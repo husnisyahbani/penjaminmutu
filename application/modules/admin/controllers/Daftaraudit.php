@@ -108,6 +108,7 @@ class Daftaraudit extends MY_Controller {
 
               
                 $dtform = $this->dtform->getAllDtformByFormId($audit['form_id']);
+                
                                 
                                 // Set lebar kolom
                 $pdf->SetWidths([
@@ -122,20 +123,22 @@ class Daftaraudit extends MY_Controller {
                 $j = 1;
 
                 foreach($dtform as $row){
-
-                    $pdf->Row([
-                        $j,
-                        $j,
-                        $row['dtjwb_referensi'],
-                        $row['dtjwb_pertanyaan'],
-                        $row['dtjwb_hasil'],
-                        $j,
-                        $j,
-                        $j,
-                        $j,
-                        $row['dtjwb_catatan']
-                    ]);
-
+                    $jwb = $this->auditjawab->getAuditJawabFix($audit['audit_id'],$row['dtform_id']);
+                    $detail = $this->auditjawabdetail->getAuditJawabDetail($jwb['jwb_id']);
+                    foreach($detail as $dtjwb):
+                        $pdf->Row([
+                            $j,
+                            $j,
+                            $dtjwb['dtjwb_referensi'],
+                            $dtjwb['dtjwb_pertanyaan'],
+                            $dtjwb['dtjwb_hasil'],
+                            $j,
+                            $j,
+                            $j,
+                            $j,
+                            $dtjwb['dtjwb_catatan']
+                        ]);
+                    endforeach;
                     $j++;
                 }
 
