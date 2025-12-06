@@ -56,7 +56,7 @@ class Daftaraudit extends MY_Controller {
                 $pdf->Image($gambar, $x, $y, $w, $h);
 
                 $pdf->AddPage();
-                $path = FCPATH . "filedata/templatemutu.pdf";
+                $path = FCPATH . "filedata/mutu.pdf";
                 $pdf->setSourceFile($path);
                 // import page 1
                 $tplIdx = $pdf->importPage(2);
