@@ -89,7 +89,6 @@ echo $jawab['jwb_jawaban'];}?></p>
                                 <th>Hasil</th>
                                 <th>Temuan</th>
                                 <th>Catatan</th>
-                                <th>Aksi</th>
                             </tr>
                         </thead>
 

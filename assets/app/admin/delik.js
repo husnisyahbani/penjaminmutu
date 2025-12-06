@@ -7,7 +7,7 @@ $(function () {
         "searching": true,
         "order": [],
         "columnDefs": [
-            {"targets": [0,5], "orderable": false}
+            {"targets": [0], "orderable": false}
         ],
         "ajax": {
             "url": base_url + "/delik/listdelik/"+jwb_id,

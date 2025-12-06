@@ -5,7 +5,7 @@ class Delik extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'admin';
-        $this->load->js(base_url("assets/app/admin/delik.js?v=1.14"));
+        $this->load->js(base_url("assets/app/admin/delik.js?v=1.15"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
@@ -184,16 +184,11 @@ class Delik extends MY_Controller {
             $no++;
             $row = array();
             $row[] = $no;
-            $row[] = '<span style="font-size:16px;font-weight:bold">PERTANYAAN:</span><br/>'.$field->dtjwb_pertanyaan . '<br/><span style="font-size:16px;font-weight:bold">REFERENSI:</span><br/>'.$field->dtjwb_referensi.'<br/><button class="editpertanyaan btn btn-sm btn-icon btn-pure btn-default on-default"
-            data-toggle="tooltip" data-original-title="Pertanyaan" id=' . $field->dtjwb_id . '><i class="icon md-edit" aria-hidden="true"></i></button>';
-            $row[] = $field->dtjwb_hasil . '<button class="edithasil btn btn-sm btn-icon btn-pure btn-default on-default"
-            data-toggle="tooltip" data-original-title="Hasil" id=' . $field->dtjwb_id . '><i class="icon md-edit" aria-hidden="true"></i></button>';
-            $row[] = $field->dtjwb_temuan . '<button class="edittemuan btn btn-sm btn-icon btn-pure btn-default on-default"
-            data-toggle="tooltip" data-original-title="Temuan" id=' . $field->dtjwb_id . '><i class="icon md-edit" aria-hidden="true"></i></button>';
-            $row[] = $field->dtjwb_catatan . '<button class="editcatatan btn btn-sm btn-icon btn-pure btn-default on-default"
-            data-toggle="tooltip" data-original-title="Catatan" id=' . $field->dtjwb_id . '><i class="icon md-edit" aria-hidden="true"></i></button>';
-            $row[] = '<button class="delete btn btn-sm btn-icon btn-pure btn-default on-default remove-row"
-                      data-toggle="tooltip" data-original-title="Remove" id=' . $field->dtjwb_id . '><i class="icon md-delete" aria-hidden="true"></i></button>';
+            $row[] = '<span style="font-size:16px;font-weight:bold">PERTANYAAN:</span><br/>'.$field->dtjwb_pertanyaan . '<br/><span style="font-size:16px;font-weight:bold">REFERENSI:</span><br/>'.$field->dtjwb_referensi;
+            $row[] = $field->dtjwb_hasil;
+            $row[] = $field->dtjwb_temuan;
+            $row[] = $field->dtjwb_catatan;
+            
            
             $data[] = $row;
         }
