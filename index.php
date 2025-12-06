@@ -56,23 +56,23 @@
  */
 	
 	
-	define('ENVIRONMENT', 'development');
+	//define('ENVIRONMENT', 'production');
 	
 	// index.php atau bootstrap awal (sebelum menggunakan ENVIRONMENT)
 // Deteksi environment otomatis
-// $host = $_SERVER['HTTP_HOST'] ?? '';
-// $server_name = $_SERVER['SERVER_NAME'] ?? '';
+$host = $_SERVER['HTTP_HOST'] ?? '';
+$server_name = $_SERVER['SERVER_NAME'] ?? '';
 
-// if (
-//     strpos($host, 'localhost') !== false ||
-//     strpos($server_name, 'localhost') !== false ||
-//     strpos($host, '127.0.0.1') !== false ||
-//     strpos($server_name, '127.0.0.1') !== false
-// ) {
-//     define('ENVIRONMENT', 'development');
-// } else {
-//     define('ENVIRONMENT', 'production');
-// }
+if (
+    strpos($host, 'localhost') !== false ||
+    strpos($server_name, 'localhost') !== false ||
+    strpos($host, '127.0.0.1') !== false ||
+    strpos($server_name, '127.0.0.1') !== false
+) {
+    define('ENVIRONMENT', 'development');
+} else {
+    define('ENVIRONMENT', 'production');
+}
 
 
 
