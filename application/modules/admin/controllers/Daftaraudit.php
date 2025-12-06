@@ -130,7 +130,7 @@ class Daftaraudit extends MY_Controller {
                     if(isset($detail) && count($detail) > 0){
                     foreach($detail as $dtjwb):
                         if($dtjwb["dtjwb_temuan"] == "S"){
-                            $dtjwb['dtjwb_temuan'] = "\u{2714}";
+                            $dtjwb['dtjwb_temuan'] = "X";
 
                                 $pdf->Row([
                                 $j,
@@ -145,7 +145,7 @@ class Daftaraudit extends MY_Controller {
                                 $dtjwb['dtjwb_catatan']
                             ]);
                         }else if($dtjwb["dtjwb_temuan"] == "TS"){
-                            $dtjwb['dtjwb_temuan'] = "\u{2714}";
+                            $dtjwb['dtjwb_temuan'] = "X";
 
                                 $pdf->Row([
                                 $j,
@@ -160,7 +160,7 @@ class Daftaraudit extends MY_Controller {
                                 $dtjwb['dtjwb_catatan']
                             ]);
                         }else if($dtjwb["dtjwb_temuan"] == "TS MINOR"){
-                            $dtjwb['dtjwb_temuan'] = "\u{2714}";
+                            $dtjwb['dtjwb_temuan'] = "X";
 
                                 $pdf->Row([
                                 $j,
@@ -175,7 +175,7 @@ class Daftaraudit extends MY_Controller {
                                 $dtjwb['dtjwb_catatan']
                             ]);
                         }else if($dtjwb["dtjwb_temuan"] == "TS MAYOR"){
-                            $dtjwb['dtjwb_temuan'] = "\u{2714}";
+                            $dtjwb['dtjwb_temuan'] = "\X";
 
                                 $pdf->Row([
                                 $j,
