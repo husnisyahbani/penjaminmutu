@@ -21,7 +21,7 @@ class Daftaraudit extends MY_Controller {
     public function download() {
         $ids = $this->input->post('ids');
         if(isset($ids)){
-            $pdf = new \setasign\Fpdi\Fpdi();
+            $pdf = new \setasign\Fpdi\Fpdi('P','mm','A4');
             // add a page
             $pdf->AddPage();
 

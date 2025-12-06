@@ -34,10 +34,6 @@ class ComposerStaticInit00cff7128c2edaacb917ba3fa523c85e
             'Prophecy\\' => 9,
             'PHPStan\\PhpDocParser\\' => 21,
         ),
-        'F' => 
-        array (
-            'Fpdf\\' => 5,
-        ),
         'D' => 
         array (
             'Doctrine\\Instantiator\\' => 22,
@@ -77,10 +73,6 @@ class ComposerStaticInit00cff7128c2edaacb917ba3fa523c85e
         array (
             0 => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src',
         ),
-        'Fpdf\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/fpdf/fpdf/src/Fpdf',
-        ),
         'Doctrine\\Instantiator\\' => 
         array (
             0 => __DIR__ . '/..' . '/doctrine/instantiator/src/Doctrine/Instantiator',
@@ -107,6 +99,7 @@ class ComposerStaticInit00cff7128c2edaacb917ba3fa523c85e
 
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'FPDF' => __DIR__ . '/..' . '/setasign/fpdf/fpdf.php',
         'File_Iterator' => __DIR__ . '/..' . '/phpunit/php-file-iterator/src/Iterator.php',
         'File_Iterator_Facade' => __DIR__ . '/..' . '/phpunit/php-file-iterator/src/Facade.php',
         'File_Iterator_Factory' => __DIR__ . '/..' . '/phpunit/php-file-iterator/src/Factory.php',
