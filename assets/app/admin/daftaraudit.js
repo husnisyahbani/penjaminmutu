@@ -16,6 +16,30 @@ $(function () {
         }
     });
 
+    let selectedIDs = [];
+
+    $('#daftaraudit').on('click', '.pilih', function () {
+        let id = $(this).val();
+
+        if ($(this).is(':checked')) {
+            if (!selectedIDs.includes(id)) selectedIDs.push(id);
+        } else {
+            selectedIDs = selectedIDs.filter(item => item != id);
+        }
+        
+
+        console.log(selectedIDs);
+    });
+
+    daftaraudit.on('draw', function () {
+        $('.pilih').each(function () {
+            let id = $(this).val();
+            if (selectedIDs.includes(id)) {
+                $(this).prop('checked', true);
+            }
+        });
+    });
+
     var daftarpertanyaan = $('#daftarpertanyaan').DataTable({
         "responsive": true,
         "processing": true,
