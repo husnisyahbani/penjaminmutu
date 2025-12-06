@@ -27,15 +27,15 @@ class Daftaraudit extends MY_Controller {
 
             $pdf->SetFont('Arial', 'B', 22);
             $pdf->SetXY(0, 30);
-            $pdf->Cell(277,6, 'STANDAR PENYUSUNAN VISI DAN MISI',1,1,'C');
+            $pdf->Cell(297,6, 'STANDAR PENYUSUNAN VISI DAN MISI',0,1,'C');
 
             $gambar = FCPATH . 'filedata/logostikfinal.png';
 
-            $pdf->Cell(277,110, '',0,1,'C');
+            $pdf->Cell(297,120, '',0,1,'C');
             $pdf->SetFont('Arial', 'B', 16);
-            $pdf->Cell(277,6, 'PUSAT PENJAMINAN MUTU',0,1,'C');
-            $pdf->Cell(277,6, 'SEKOLAH TINGGI ILMU KESEHATAN SITI KHADIJAH',0,1,'C');
-            $pdf->Cell(277,6, 'TAHUN 2024',0,1,'C');
+            $pdf->Cell(297,6, 'PUSAT PENJAMINAN MUTU',0,1,'C');
+            $pdf->Cell(297,6, 'SEKOLAH TINGGI ILMU KESEHATAN SITI KHADIJAH',0,1,'C');
+            $pdf->Cell(297,6, 'TAHUN 2024',0,1,'C');
             
 
             // Tentukan ukuran gambar
