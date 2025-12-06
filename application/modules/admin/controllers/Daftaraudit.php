@@ -55,6 +55,14 @@ class Daftaraudit extends MY_Controller {
                 // Tampilkan gambar
                 $pdf->Image($gambar, $x, $y, $w, $h);
 
+                $pdf->AddPage();
+                $pdf->setSourceFile('./filedata/templatemutu.pdf');
+                // import page 1
+                $tplIdx = $pdf->importPage(1);
+                $pdf->SetXY(0, 0);
+                // use the imported page and place it at position 10,10 with a width of 100 mm
+                $pdf->useTemplate($tplIdx, 0, 0, 297);
+
             }
             
 
