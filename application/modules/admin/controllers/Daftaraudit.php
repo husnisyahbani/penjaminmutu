@@ -21,14 +21,27 @@ class Daftaraudit extends MY_Controller {
     public function download() {
         $ids = $this->input->post('ids');
         if(isset($ids)){
-            $pdf = new \setasign\Fpdi\Fpdi('P','mm','A4');
+            $pdf = new \setasign\Fpdi\Fpdi('L','mm','A4');
             // add a page
             $pdf->AddPage();
 
-            $pdf->SetFont('Helvetica');
-            $pdf->SetTextColor(255, 0, 0);
-            $pdf->SetXY(30, 30);
-            $pdf->Write(0, 'This is just a simple text');
+            $pdf->SetFont('Arial', 'B', 22);
+            $pdf->SetXY(0, 30);
+            $pdf->Cell(190,6, 'STANDAR PENYUSUNAN VISI DAN MISI',0,1,'C');
+
+            $gambar = FCPATH . 'filedata/logostikfinal.png';
+
+            // Tentukan ukuran gambar
+            $w = 60;  // lebar
+            $h = 60;  // tinggi
+
+            // Hitung posisi tengah
+            $x = ($pdf->GetPageWidth() - $w) / 2;
+            $y = ($pdf->GetPageHeight() - $h) / 2;
+
+            // Tampilkan gambar
+            $pdf->Image($gambar, $x, $y, $w, $h);
+
 
             $pdf->Output('I', 'generated.pdf');
         }else{
