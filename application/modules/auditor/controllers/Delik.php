@@ -24,7 +24,7 @@ class Delik extends MY_Controller {
         $dtform_id = $this->input->get('dtform_id');
         if(isset($audit_id) && isset($dtform_id)){
             $this->data['content'] = 'delik/indexnew';
-            $this->data['title'] = 'Delik';
+            $this->data['title'] = 'Daftar Tilik';
             $this->data['audit_id'] = $audit_id;
             $this->data['dtform_id'] = $dtform_id;
             $this->data['jwb_id'] = $this->dtjwb->getJwbid($audit_id,$dtform_id);
