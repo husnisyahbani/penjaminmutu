@@ -23,31 +23,41 @@ class Daftaraudit extends MY_Controller {
         if(isset($ids)){
             $pdf = new \setasign\Fpdi\Fpdi('L','mm','A4');
             // add a page
-            $pdf->AddPage();
 
-            $pdf->SetFont('Arial', 'B', 22);
-            $pdf->SetXY(0, 30);
-            $pdf->Cell(0,6, 'STANDAR PENYUSUNAN VISI DAN MISI',0,1,'C');
+            foreach($ids as $id){
+                $audit = $this->mutu->getAuditById($id);
+                $formulir = $this->formulir->getFormulirById($audit['form_id']);
+                $dtform = $this->dtform->getAllDtformByFormId($audit['form_id']);
 
-            $gambar = FCPATH . 'filedata/logostikfinal.png';
+                $pdf->AddPage();
 
-            $pdf->Cell(0,120, '',0,1,'C');
-            $pdf->SetFont('Arial', 'B', 16);
-            $pdf->Cell(0,6, 'PUSAT PENJAMINAN MUTU',0,1,'C');
-            $pdf->Cell(0,6, 'SEKOLAH TINGGI ILMU KESEHATAN SITI KHADIJAH',0,1,'C');
-            $pdf->Cell(0,6, 'TAHUN 2024',0,1,'C');
+                $pdf->SetFont('Arial', 'B', 22);
+                $pdf->SetXY(0, 30);
+                $pdf->Cell(0,6, $audit['form_nama'],0,1,'C');
+
+                $gambar = FCPATH . 'filedata/logostikfinal.png';
+
+                $pdf->Cell(0,120, '',0,1,'C');
+                $pdf->SetFont('Arial', 'B', 16);
+                $pdf->Cell(0,6, 'PUSAT PENJAMINAN MUTU',0,1,'C');
+                $pdf->Cell(0,6, 'SEKOLAH TINGGI ILMU KESEHATAN SITI KHADIJAH',0,1,'C');
+                $pdf->Cell(0,6, 'TAHUN 2024',0,1,'C');
+                
+
+                // Tentukan ukuran gambar
+                $w = 60;  // lebar
+                $h = 60;  // tinggi
+
+                // Hitung posisi tengah
+                $x = ($pdf->GetPageWidth() - $w) / 2;
+                $y = ($pdf->GetPageHeight() - $h) / 2;
+
+                // Tampilkan gambar
+                $pdf->Image($gambar, $x, $y, $w, $h);
+                
+                
+            }
             
-
-            // Tentukan ukuran gambar
-            $w = 60;  // lebar
-            $h = 60;  // tinggi
-
-            // Hitung posisi tengah
-            $x = ($pdf->GetPageWidth() - $w) / 2;
-            $y = ($pdf->GetPageHeight() - $h) / 2;
-
-            // Tampilkan gambar
-            $pdf->Image($gambar, $x, $y, $w, $h);
 
 
             $pdf->Output('I', 'generated.pdf');
