@@ -42,77 +42,71 @@ $(function () {
 
     $('#download').on('click', function() {
 
-        if (selectedIDs.length === 0) {
-            swal.fire("Oops", "Mohon Pilih Data Yang Ingin Didownload!", "error");
-            return;
-        }
+    if (selectedIDs.length === 0) {
+        swal.fire("Oops", "Mohon Pilih Data Yang Ingin Didownload!", "error");
+        return;
+    }
 
-        $.ajax({
-            url: base_url + "/daftaraudit/download",
-            type: "POST",
-            data:{
-                ids: selectedIDs
-            },
-            xhrFields: {
-                responseType: 'blob' // Penting untuk file biner
-            },
-            beforeSend: function () {
-                swal.fire({
-                    title: 'Loading',
-                    allowEscapeKey: false,
-                    allowOutsideClick: false,
-                    onOpen: () => {
-                        swal.showLoading();
-                    }
-                });
-            },
-            success: function (data, status, xhr) {
-                swal.close();
-                // const blob = new Blob([data], { type: xhr.getResponseHeader('Content-Type') });
-                // const downloadUrl = URL.createObjectURL(blob);
-
-                // // Membuat elemen anchor untuk mengunduh file
-                // const a = document.createElement('a');
-                // a.href = downloadUrl;
-                // a.download = 'ekinerja.xlsx'; // Nama file
-                // document.body.appendChild(a);
-                // a.click();
-                // document.body.removeChild(a);
-
-                // // Membersihkan URL blob
-                // URL.revokeObjectURL(downloadUrl);
-                const contentDisposition = xhr.getResponseHeader('Content-Disposition');
-                let filename = 'download.pdf'; // default jika header tidak ada
-
-                if (contentDisposition && contentDisposition.indexOf('filename=') !== -1) {
-                    let match = contentDisposition.match(/filename="?(.+)"?/);
-                    if (match.length > 1) {
-                        filename = match[1];
-                    }
+    $.ajax({
+        url: base_url + "/daftaraudit/download",
+        type: "POST",
+        data: { ids: selectedIDs },
+        xhrFields: {
+            responseType: 'blob'
+        },
+        beforeSend: function () {
+            swal.fire({
+                title: 'Loading...',
+                allowEscapeKey: false,
+                allowOutsideClick: false,
+                onOpen: () => {
+                    swal.showLoading();
                 }
+            });
+        },
+        success: function (data, status, xhr) {
+            swal.close();
 
-                // Buat blob
-                const blob = new Blob([data], { type: xhr.getResponseHeader('Content-Type') });
-                const downloadUrl = URL.createObjectURL(blob);
+            // ============================
+            // Ambil nama file dari header
+            // ============================
+            const cd = xhr.getResponseHeader('Content-Disposition');
+            let filename = 'download.pdf';
 
-                // Buat anchor untuk download
-                const a = document.createElement('a');
-                a.href = downloadUrl;
-                a.download = filename; // <<< nama file asli dari server
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-
-                // Hapus blob
-                URL.revokeObjectURL(downloadUrl);
-
-            },
-            error: function (json) {
-                swal.fire("Oops", "No connection!", "error");
+            if (cd && cd.indexOf('filename=') !== -1) {
+                const regex = /filename="?([^"]+)"?/;
+                const matches = regex.exec(cd);
+                if (matches && matches.length > 1) {
+                    filename = matches[1];
+                }
             }
-        });
 
+            // ============================
+            // Blob untuk download
+            // ============================
+            const contentType = xhr.getResponseHeader('Content-Type') || 'application/pdf';
+            const blob = new Blob([data], { type: contentType });
+            const url = URL.createObjectURL(blob);
+
+            // ============================
+            // Trigger download
+            // ============================
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+
+            URL.revokeObjectURL(url);
+        },
+        error: function () {
+            swal.fire("Oops", "No connection!", "error");
+        }
     });
+
+});
+
 
     var daftarpertanyaan = $('#daftarpertanyaan').DataTable({
         "responsive": true,

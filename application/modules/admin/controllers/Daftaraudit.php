@@ -5,7 +5,7 @@ class Daftaraudit extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'admin';
-        $this->load->js(base_url("assets/app/admin/daftaraudit.js?v=1.38"));
+        $this->load->js(base_url("assets/app/admin/daftaraudit.js?v=1.39"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
@@ -24,6 +24,13 @@ class Daftaraudit extends MY_Controller {
             $pdf = new \setasign\Fpdi\Fpdi();
             // add a page
             $pdf->AddPage();
+
+            $pdf->SetFont('Helvetica');
+            $pdf->SetTextColor(255, 0, 0);
+            $pdf->SetXY(30, 30);
+            $pdf->Write(0, 'This is just a simple text');
+
+            $pdf->Output('I', 'generated.pdf');
         }else{
             $this->session->set_flashdata('pesanerror', 'Tidak ada data yang dipilih!');
             redirect(base_url('admin/daftaraudit'));
