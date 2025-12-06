@@ -5,7 +5,7 @@ class Daftaraudit extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'admin';
-        $this->load->js(base_url("assets/app/admin/daftaraudit.js?v=1.37"));
+        $this->load->js(base_url("assets/app/admin/daftaraudit.js?v=1.38"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
@@ -15,6 +15,16 @@ class Daftaraudit extends MY_Controller {
         $role = $this->session->userdata('role');
         if (!isset($role) || $role != 'PPM') {
             redirect(base_url());
+        }
+    }
+
+    public function download() {
+        $ids = $this->input->post('ids');
+        if(isset($ids)){
+            
+        }else{
+            $this->session->set_flashdata('pesanerror', 'Tidak ada data yang dipilih!');
+            redirect(base_url('admin/daftaraudit'));
         }
     }
 

@@ -70,7 +70,9 @@
                     <header class="panel-heading">
                         <h3 class="panel-title">AUDIT</h3>
                         <div class="panel-actions panel-actions-keep">
-                            
+                            <button type="button" class="btn btn-sm btn-icon btn-danger" id="download">
+                                <i class="icon md-download" aria-hidden="true"></i>Download
+                            </button>
                             <button type="button" class="btn btn-sm btn-icon btn-success" id="tambah">
                                 <i class="icon md-plus" aria-hidden="true"></i>Tambah
                             </button>

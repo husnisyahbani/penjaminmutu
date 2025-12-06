@@ -40,6 +40,55 @@ $(function () {
         });
     });
 
+    $('#download').on('click', function() {
+
+        if (selectedIDs.length === 0) {
+            swal.fire("Oops", "Mohon Pilih Data Yang Ingin Didownload!", "error");
+            return;
+        }
+
+        $.ajax({
+            url: base_url + "/daftaraudit/download",
+            type: "POST",
+            data:{
+                ids: selectedIDs
+            },
+            xhrFields: {
+                responseType: 'blob' // Penting untuk file biner
+            },
+            beforeSend: function () {
+                swal.fire({
+                    title: 'Loading',
+                    allowEscapeKey: false,
+                    allowOutsideClick: false,
+                    onOpen: () => {
+                        swal.showLoading();
+                    }
+                });
+            },
+            success: function (data, status, xhr) {
+                swal.close();
+                const blob = new Blob([data], { type: xhr.getResponseHeader('Content-Type') });
+                const downloadUrl = URL.createObjectURL(blob);
+
+                // Membuat elemen anchor untuk mengunduh file
+                const a = document.createElement('a');
+                a.href = downloadUrl;
+                a.download = 'ekinerja.xlsx'; // Nama file
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+
+                // Membersihkan URL blob
+                URL.revokeObjectURL(downloadUrl);
+            },
+            error: function (json) {
+                swal.fire("Oops", "No connection!", "error");
+            }
+        });
+
+    });
+
     var daftarpertanyaan = $('#daftarpertanyaan').DataTable({
         "responsive": true,
         "processing": true,
