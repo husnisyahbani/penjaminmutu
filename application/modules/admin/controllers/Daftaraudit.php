@@ -130,7 +130,7 @@ class Daftaraudit extends MY_Controller {
                     if(isset($detail) && count($detail) > 0){
                     foreach($detail as $dtjwb):
                         if($dtjwb["dtjwb_temuan"] == "S"){
-                            $dtjwb['dtjwb_temuan'] = "✔";
+                            $dtjwb['dtjwb_temuan'] = "\u{2714}";
 
                                 $pdf->Row([
                                 $j,
@@ -139,13 +139,13 @@ class Daftaraudit extends MY_Controller {
                                 $dtjwb['dtjwb_pertanyaan'],
                                 $dtjwb['dtjwb_hasil'],
                                 $dtjwb['dtjwb_temuan'],
-                                $j,
-                                $j,
-                                $j,
+                                "",
+                                "",
+                                "",
                                 $dtjwb['dtjwb_catatan']
                             ]);
                         }else if($dtjwb["dtjwb_temuan"] == "TS"){
-                            $dtjwb['dtjwb_temuan'] = "✔";
+                            $dtjwb['dtjwb_temuan'] = "\u{2714}";
 
                                 $pdf->Row([
                                 $j,
@@ -155,12 +155,12 @@ class Daftaraudit extends MY_Controller {
                                 $dtjwb['dtjwb_hasil'],
                                 "",
                                 $dtjwb['dtjwb_temuan'],
-                                $j,
-                                $j,
+                                "",
+                                "",
                                 $dtjwb['dtjwb_catatan']
                             ]);
                         }else if($dtjwb["dtjwb_temuan"] == "TS MINOR"){
-                            $dtjwb['dtjwb_temuan'] = "✔";
+                            $dtjwb['dtjwb_temuan'] = "\u{2714}";
 
                                 $pdf->Row([
                                 $j,
@@ -171,11 +171,11 @@ class Daftaraudit extends MY_Controller {
                                 "",
                                 "",
                                 $dtjwb['dtjwb_temuan'],
-                                $j,
+                                "",
                                 $dtjwb['dtjwb_catatan']
                             ]);
                         }else if($dtjwb["dtjwb_temuan"] == "TS MAYOR"){
-                            $dtjwb['dtjwb_temuan'] = "✔";
+                            $dtjwb['dtjwb_temuan'] = "\u{2714}";
 
                                 $pdf->Row([
                                 $j,
