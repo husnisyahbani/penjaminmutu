@@ -128,7 +128,7 @@ class Daftaraudit extends MY_Controller {
                     foreach($detail as $dtjwb):
                         $pdf->Row([
                             $j,
-                            $jwb['jwb_tujuan'],
+                            strip_tags($jwb['jwb_tujuan']),
                             $dtjwb['dtjwb_referensi'],
                             $dtjwb['dtjwb_pertanyaan'],
                             $dtjwb['dtjwb_hasil'],
