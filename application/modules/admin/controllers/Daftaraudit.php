@@ -59,7 +59,7 @@ class Daftaraudit extends MY_Controller {
                 $path = FCPATH . "filedata/mutufix.pdf";
                 $pdf->setSourceFile($path);
                 // import page 1
-                $tplIdx = $pdf->importPage(2);
+                $tplIdx = $pdf->importPage(1);
                 $pdf->SetXY(0, 0);
                 // use the imported page and place it at position 10,10 with a width of 100 mm
                 $pdf->useTemplate($tplIdx, 0, 0, 297);
