@@ -183,7 +183,7 @@ class Delik extends MY_Controller {
         foreach ($list as $field) {
             $no++;
             $row = array();
-            $row[] = $no;
+            $row[] = '<input type="checkbox" class="pilih" value="'.$field->dtjwb_id.'"> '.$no;
             $row[] = '<span style="font-size:16px;font-weight:bold">PERTANYAAN:</span><br/>'.$field->dtjwb_pertanyaan . '<br/><span style="font-size:16px;font-weight:bold">REFERENSI:</span><br/>'.$field->dtjwb_referensi;
             $row[] = $field->dtjwb_hasil;
             $row[] = $field->dtjwb_temuan;
