@@ -106,7 +106,7 @@ class Daftaraudit extends MY_Controller {
                 $pdf->SetXY(60, 83.8);
                 $pdf->Write(6, $audit['auditee']);
 
-              
+                $pdf->SetFont('Arial', '', 10);
                 $dtform = $this->dtform->getAllDtformByFormId($audit['form_id']);
                 
                                 
@@ -128,7 +128,7 @@ class Daftaraudit extends MY_Controller {
                     foreach($detail as $dtjwb):
                         $pdf->Row([
                             $j,
-                            $j,
+                            $jwb['jwb_tujuan'],
                             $dtjwb['dtjwb_referensi'],
                             $dtjwb['dtjwb_pertanyaan'],
                             $dtjwb['dtjwb_hasil'],
