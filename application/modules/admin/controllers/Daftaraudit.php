@@ -112,25 +112,74 @@ class Daftaraudit extends MY_Controller {
                 foreach($dtform as $value){
                     $jwb = $this->auditjawab->getAuditJawabFix($audit['audit_id'],$value['dtform_id']);
                     $detail = $this->auditjawabdetail->getAuditJawabDetail($jwb['jwb_id']);
+                    // foreach($detail as $row){
+                    //     $pdf->Cell(11,6,$j,"L&R&B",0,'C');
+                    //     $pdf->Cell(31.5,6,$j,"R&B",0,'L');
+                    //     $pdf->Cell(49,6,$row['dtjwb_referensi'],"R&B",0,'L');
+                    //     $pdf->Cell(50,6,$row['dtjwb_pertanyaan'],"R&B",0,'L');
+                    //     $pdf->Cell(37.45,6,$row['dtjwb_hasil'],"R&B",0,'L');
+                    //     $pdf->Cell(11.05,6,$j,"R&B",0,'C');
+                    //     $pdf->Cell(10.05,6,$j,"R&B",0,'C');
+                    //     $pdf->Cell(12.5,6,$j,"R&B",0,'C');
+                    //     $pdf->Cell(12.5,6,$j,"R&B",0,'C');
+                    //     $pdf->Cell(52.5,6,$row['dtjwb_catatan'],"R&B",1,'L');
+                    //     $j++;
+                    //     $pdf->SetXY(8.7, 109.4+6);
+                    // }
+
                     foreach($detail as $row){
-                        $pdf->Cell(11,6,$j,"L&R&B",0,'C');
-                        $pdf->Cell(31.5,6,$j,"R&B",0,'L');
-                        $pdf->Cell(49,6,$row['dtjwb_referensi'],"R&B",0,'L');
-                        $pdf->Cell(50,6,$row['dtjwb_pertanyaan'],"R&B",0,'L');
-                        $pdf->Cell(37.45,6,$row['dtjwb_hasil'],"R&B",0,'L');
-                        $pdf->Cell(11.05,6,$j,"R&B",0,'C');
-                        $pdf->Cell(10.05,6,$j,"R&B",0,'C');
-                        $pdf->Cell(12.5,6,$j,"R&B",0,'C');
-                        $pdf->Cell(12.5,6,$j,"R&B",0,'C');
-                        $pdf->Cell(52.5,6,$row['dtjwb_catatan'],"R&B",1,'L');
+                        // Ambil data setiap kolom
+                        $col1 = $j;
+                        $col2 = $j;
+                        $col3 = $row['dtjwb_referensi'];
+                        $col4 = $row['dtjwb_pertanyaan'];
+                        $col5 = $row['dtjwb_hasil'];
+                        $col6 = $j;
+                        $col7 = $j;
+                        $col8 = $j;
+                        $col9 = $j;
+                        $col10 = $row['dtjwb_catatan'];
+
+                        // Lebar kolom
+                        $w = [
+                            11, 31.5, 49, 50, 37.45,
+                            11.05, 10.05, 12.5, 12.5, 52.5
+                        ];
+
+                        // Hitung tinggi maksimal baris
+                        $lineHeights = [];
+                        $lineHeights[] = $pdf->NbLines($w[0], $col1);
+                        $lineHeights[] = $pdf->NbLines($w[1], $col2);
+                        $lineHeights[] = $pdf->NbLines($w[2], $col3);
+                        $lineHeights[] = $pdf->NbLines($w[3], $col4);
+                        $lineHeights[] = $pdf->NbLines($w[4], $col5);
+                        $lineHeights[] = $pdf->NbLines($w[5], $col6);
+                        $lineHeights[] = $pdf->NbLines($w[6], $col7);
+                        $lineHeights[] = $pdf->NbLines($w[7], $col8);
+                        $lineHeights[] = $pdf->NbLines($w[8], $col9);
+                        $lineHeights[] = $pdf->NbLines($w[9], $col10);
+
+                        $maxHeight = max($lineHeights) * 6; // tinggi baris 6
+
+                        // Simpan posisi awal baris
+                        $x = $pdf->GetX();
+                        $y = $pdf->GetY();
+
+                        // Tulis tiap kolom MultiCell
+                        $cols = [$col1,$col2,$col3,$col4,$col5,$col6,$col7,$col8,$col9,$col10];
+
+                        for($i=0;$i<count($cols);$i++){
+                            $pdf->SetXY($x, $y);
+                            $pdf->MultiCell($w[$i], 6, $cols[$i], 1, 'L');
+                            $x += $w[$i]; // geser ke kolom berikutnya
+                        }
+
+                        // Pindah ke baris selanjutnya setinggi baris tertinggi
+                        $pdf->SetXY(8.7, $y + $maxHeight);
+
                         $j++;
                     }
-                    
-                    // $detail = $this->auitjawabdetail->getAuditJawabDetail($jwb['jwb_id']);
-                    // foreach($detail as $row){
-                    //      $pdf->Cell(10,6, $j."hai",1,0,'L');
-                    //      $j++;
-                    // }
+
                     
                 }
 
