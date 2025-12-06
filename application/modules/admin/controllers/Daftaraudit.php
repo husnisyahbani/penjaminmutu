@@ -106,8 +106,7 @@ class Daftaraudit extends MY_Controller {
                 $pdf->SetXY(60, 83.8);
                 $pdf->Write(6, $audit['auditee']);
 
-                $j = 1;
-                $pdf->SetXY(8.7, 109.4);
+              
                 $dtform = $this->dtform->getAllDtformByFormId($audit['form_id']);
                                 
                                 // Set lebar kolom
@@ -116,8 +115,9 @@ class Daftaraudit extends MY_Controller {
                     11.05, 10.05, 12.5, 12.5, 52.5
                 ]);
 
-                // Set align (opsional)
                 $pdf->SetAligns(['C','L','L','L','L','C','C','C','C','L']);
+
+                $pdf->SetXY(8.7, 109.4); // posisi awal tabel
 
                 $j = 1;
 
@@ -138,6 +138,7 @@ class Daftaraudit extends MY_Controller {
 
                     $j++;
                 }
+
 
                 $i = $i + 2;
 

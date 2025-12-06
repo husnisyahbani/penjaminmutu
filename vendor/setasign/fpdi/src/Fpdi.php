@@ -52,33 +52,35 @@ class Fpdi extends FpdfTpl
             $nb = max($nb, $this->NbLines($this->widths[$i], $data[$i]));
         $h = 6 * $nb;
 
-        // Cek jika halaman habis
-        if($this->GetY() + $h > $this->PageBreakTrigger)
-            $this->AddPage($this->CurOrientation);
+        // Check page break
+        $this->CheckPageBreak($h);
 
-        // Draw cells
+        // Save X awal (supaya tabel bisa dimulai dari SetXY manual)
+        $xStart = $this->GetX();
+        $yStart = $this->GetY();
+
         for($i=0;$i<count($data);$i++)
         {
             $w = $this->widths[$i];
             $a = isset($this->aligns[$i]) ? $this->aligns[$i] : 'L';
 
-            // Save position
             $x = $this->GetX();
             $y = $this->GetY();
 
-            // Border
+            // Draw cell border
             $this->Rect($x, $y, $w, $h);
 
-            // Content
+            // Text
             $this->MultiCell($w, 6, $data[$i], 0, $a);
 
-            // Move right
+            // Kembali ke atas kolom dan geser X ke kolom berikutnya
             $this->SetXY($x + $w, $y);
         }
 
-        // Next line
-        $this->Ln($h);
-    }
+        // Turun ke baris berikutnya
+        $this->SetXY($xStart, $yStart + $h);
+}
+
 
     function NbLines($w, $txt)
     {
