@@ -73,7 +73,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $active_group = 'default';
 $query_builder = TRUE;
 
-if (ENVIRONMENT === 'production') {
+if (ENVIRONMENT === 'development') {
     // 🔧 Koneksi lokal
     $db['default'] = array(
         'dsn'       => '',
