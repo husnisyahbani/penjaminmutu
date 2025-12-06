@@ -84,7 +84,7 @@ echo $jawab['jwb_jawaban'];}?></p>
                         <table class="table table-hover dataTable table-striped w-full" id="tilik">
                         <thead>
                             <tr>
-                                <th width="5px"><input type="checkbox" id="selectAll"> No</th>
+                                <th width="5px">No</th>
                                 <th>Pertanyaan</th>
                                 <th>Hasil</th>
                                 <th>Temuan</th>

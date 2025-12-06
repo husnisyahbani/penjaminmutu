@@ -141,7 +141,7 @@ class Daftaraudit extends MY_Controller {
         foreach ($list as $field) {
             $no++;
             $row = array();
-            $row[] = $no;
+            $row[] = '<input type="checkbox" class="pilih" value="'.$field->audit_id.'"> '.$no;
             $row[] = $field->form_nama;
             $row[] = $field->auditor;
             $row[] = $field->auditee;
