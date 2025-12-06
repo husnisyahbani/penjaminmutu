@@ -129,9 +129,8 @@ class Daftaraudit extends MY_Controller {
                     $detail = $this->auditjawabdetail->getAuditJawabDetail($jwb['jwb_id']);
                     if(isset($detail) && count($detail) > 0){
                     foreach($detail as $dtjwb):
-                        if($dtjwb["jwb_temuan"] == "S"){
-                            //$dtjwb['jwb_temuan'] = "✔";
-                            $dtjwb['jwb_temuan'] = "X";
+                        if($dtjwb["dtjwb_temuan"] == "S"){
+                            $dtjwb['dtjwb_temuan'] = "✔";
 
                                 $pdf->Row([
                                 $j,
@@ -139,15 +138,14 @@ class Daftaraudit extends MY_Controller {
                                 $dtjwb['dtjwb_referensi'],
                                 $dtjwb['dtjwb_pertanyaan'],
                                 $dtjwb['dtjwb_hasil'],
-                                $dtjwb['jwb_temuan'],
+                                $dtjwb['dtjwb_temuan'],
                                 $j,
                                 $j,
                                 $j,
                                 $dtjwb['dtjwb_catatan']
                             ]);
-                        }else if($dtjwb["jwb_temuan"] == "TS"){
-                            //$dtjwb['jwb_temuan'] = "✔";
-                            $dtjwb['jwb_temuan'] = "X";
+                        }else if($dtjwb["dtjwb_temuan"] == "TS"){
+                            $dtjwb['dtjwb_temuan'] = "✔";
 
                                 $pdf->Row([
                                 $j,
@@ -156,14 +154,13 @@ class Daftaraudit extends MY_Controller {
                                 $dtjwb['dtjwb_pertanyaan'],
                                 $dtjwb['dtjwb_hasil'],
                                 "",
-                                $dtjwb['jwb_temuan'],
+                                $dtjwb['dtjwb_temuan'],
                                 $j,
                                 $j,
                                 $dtjwb['dtjwb_catatan']
                             ]);
-                        }else if($dtjwb["jwb_temuan"] == "TS MINOR"){
-                            //$dtjwb['jwb_temuan'] = "✔";
-                            $dtjwb['jwb_temuan'] = "X";
+                        }else if($dtjwb["dtjwb_temuan"] == "TS MINOR"){
+                            $dtjwb['dtjwb_temuan'] = "✔";
 
                                 $pdf->Row([
                                 $j,
@@ -173,13 +170,12 @@ class Daftaraudit extends MY_Controller {
                                 $dtjwb['dtjwb_hasil'],
                                 "",
                                 "",
-                                $dtjwb['jwb_temuan'],
+                                $dtjwb['dtjwb_temuan'],
                                 $j,
                                 $dtjwb['dtjwb_catatan']
                             ]);
-                        }else if($dtjwb["jwb_temuan"] == "TS MAYOR"){
-                            //$dtjwb['jwb_temuan'] = "✔";
-                            $dtjwb['jwb_temuan'] = "X";
+                        }else if($dtjwb["dtjwb_temuan"] == "TS MAYOR"){
+                            $dtjwb['dtjwb_temuan'] = "✔";
 
                                 $pdf->Row([
                                 $j,
@@ -190,7 +186,7 @@ class Daftaraudit extends MY_Controller {
                                 "",
                                 "",
                                 "",
-                                $dtjwb['jwb_temuan'],
+                                $dtjwb['dtjwb_temuan'],
                                 $dtjwb['dtjwb_catatan']
                             ]);
                         }else{
