@@ -146,7 +146,8 @@ class Daftaraudit extends MY_Controller {
                                 $dtjwb['dtjwb_catatan']
                             ]);
                         }else if($dtjwb["jwb_temuan"] == "TS"){
-                            $dtjwb['jwb_temuan'] = "✔";
+                            //$dtjwb['jwb_temuan'] = "✔";
+                            $dtjwb['jwb_temuan'] = "X";
 
                                 $pdf->Row([
                                 $j,
@@ -161,7 +162,8 @@ class Daftaraudit extends MY_Controller {
                                 $dtjwb['dtjwb_catatan']
                             ]);
                         }else if($dtjwb["jwb_temuan"] == "TS MINOR"){
-                            $dtjwb['jwb_temuan'] = "✔";
+                            //$dtjwb['jwb_temuan'] = "✔";
+                            $dtjwb['jwb_temuan'] = "X";
 
                                 $pdf->Row([
                                 $j,
@@ -176,7 +178,8 @@ class Daftaraudit extends MY_Controller {
                                 $dtjwb['dtjwb_catatan']
                             ]);
                         }else if($dtjwb["jwb_temuan"] == "TS MAYOR"){
-                            $dtjwb['jwb_temuan'] = "✔";
+                            //$dtjwb['jwb_temuan'] = "✔";
+                            $dtjwb['jwb_temuan'] = "X";
 
                                 $pdf->Row([
                                 $j,
