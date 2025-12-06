@@ -125,6 +125,7 @@ class Daftaraudit extends MY_Controller {
 
                 foreach($dtform as $row){
                     $jwb = $this->auditjawab->getAuditJawabFix($audit['audit_id'],$row['dtform_id']);
+                    if(isset($jwb) && count($jwb) > 0){
                     $detail = $this->auditjawabdetail->getAuditJawabDetail($jwb['jwb_id']);
                     if(isset($detail) && count($detail) > 0){
                     foreach($detail as $dtjwb):
@@ -205,6 +206,7 @@ class Daftaraudit extends MY_Controller {
                         $j++;      
                     endforeach;
                     }
+                }
                 }
                 $i = $i + 2 + $j;
 
