@@ -32,6 +32,7 @@ class Daftaraudit extends MY_Controller {
     }
 
     public function download() {
+        
         $ids = $this->input->post('ids');
         if(isset($ids)){
            
@@ -126,25 +127,84 @@ class Daftaraudit extends MY_Controller {
                     $jwb = $this->auditjawab->getAuditJawabFix($audit['audit_id'],$row['dtform_id']);
                     $detail = $this->auditjawabdetail->getAuditJawabDetail($jwb['jwb_id']);
                     foreach($detail as $dtjwb):
-                        $pdf->Row([
-                            $j,
-                            strip_tags($jwb['jwb_tujuan']),
-                            $dtjwb['dtjwb_referensi'],
-                            $dtjwb['dtjwb_pertanyaan'],
-                            $dtjwb['dtjwb_hasil'],
-                            $j,
-                            $j,
-                            $j,
-                            $j,
-                            $dtjwb['dtjwb_catatan']
-                        ]);
-                        $j++;
+                        if($dtjwb["jwb_temuan"] == "S"){
+                            $dtjwb['jwb_temuan'] = "✔";
+
+                                $pdf->Row([
+                                $j,
+                                strip_tags($jwb['jwb_tujuan']),
+                                $dtjwb['dtjwb_referensi'],
+                                $dtjwb['dtjwb_pertanyaan'],
+                                $dtjwb['dtjwb_hasil'],
+                                $dtjwb['jwb_temuan'],
+                                $j,
+                                $j,
+                                $j,
+                                $dtjwb['dtjwb_catatan']
+                            ]);
+                        }else if($dtjwb["jwb_temuan"] == "TS"){
+                            $dtjwb['jwb_temuan'] = "✔";
+
+                                $pdf->Row([
+                                $j,
+                                strip_tags($jwb['jwb_tujuan']),
+                                $dtjwb['dtjwb_referensi'],
+                                $dtjwb['dtjwb_pertanyaan'],
+                                $dtjwb['dtjwb_hasil'],
+                                "",
+                                $dtjwb['jwb_temuan'],
+                                $j,
+                                $j,
+                                $dtjwb['dtjwb_catatan']
+                            ]);
+                        }else if($dtjwb["jwb_temuan"] == "TS MINOR"){
+                            $dtjwb['jwb_temuan'] = "✔";
+
+                                $pdf->Row([
+                                $j,
+                                strip_tags($jwb['jwb_tujuan']),
+                                $dtjwb['dtjwb_referensi'],
+                                $dtjwb['dtjwb_pertanyaan'],
+                                $dtjwb['dtjwb_hasil'],
+                                "",
+                                "",
+                                $dtjwb['jwb_temuan'],
+                                $j,
+                                $dtjwb['dtjwb_catatan']
+                            ]);
+                        }else if($dtjwb["jwb_temuan"] == "TS MAYOR"){
+                            $dtjwb['jwb_temuan'] = "✔";
+
+                                $pdf->Row([
+                                $j,
+                                strip_tags($jwb['jwb_tujuan']),
+                                $dtjwb['dtjwb_referensi'],
+                                $dtjwb['dtjwb_pertanyaan'],
+                                $dtjwb['dtjwb_hasil'],
+                                "",
+                                "",
+                                "",
+                                $dtjwb['jwb_temuan'],
+                                $dtjwb['dtjwb_catatan']
+                            ]);
+                        }else{
+                            $pdf->Row([
+                                $j,
+                                strip_tags($jwb['jwb_tujuan']),
+                                $dtjwb['dtjwb_referensi'],
+                                $dtjwb['dtjwb_pertanyaan'],
+                                $dtjwb['dtjwb_hasil'],
+                                "",
+                                "",
+                                "",
+                                "",
+                                $dtjwb['dtjwb_catatan']
+                            ]);
+                        }
+                        $j++;      
                     endforeach;
-                    
                 }
-
-
-                $i = $i + 2;
+                $i = $i + 2 + $j;
 
             }
             
