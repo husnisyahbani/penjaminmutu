@@ -138,8 +138,9 @@ class Daftaraudit extends MY_Controller {
                             $j,
                             $dtjwb['dtjwb_catatan']
                         ]);
+                        $j++;
                     endforeach;
-                    $j++;
+                    
                 }
 
 
