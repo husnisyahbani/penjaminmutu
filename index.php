@@ -56,7 +56,7 @@
  */
 	
 	
-	//define('ENVIRONMENT', 'production');
+//	define('ENVIRONMENT', 'production');
 	
 	// index.php atau bootstrap awal (sebelum menggunakan ENVIRONMENT)
 // Deteksi environment otomatis

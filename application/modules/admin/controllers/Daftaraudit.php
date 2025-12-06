@@ -7,6 +7,7 @@ class Daftaraudit extends MY_Controller {
         $this->module = 'admin';
         $this->load->js(base_url("assets/app/admin/daftaraudit.js?v=1.39"));
         $this->load->model('AuditjawabModel', 'auditjawab');
+        $this->load->model('AuditjawabDetailModel', 'auditjawabdetail');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
         $this->load->model('AkunModel', 'akun');
@@ -18,16 +19,35 @@ class Daftaraudit extends MY_Controller {
         }
     }
 
+    public function tes(){
+        $audit = $this->mutu->getAuditById("43");
+        $dtform = $this->dtform->getAllDtformByFormId($audit['form_id']);
+        foreach($dtform as $value){
+            $jwb = $this->auditjawab->getAuditJawabFix($audit['audit_id'],$value['dtform_id']);
+            $detail = $this->auditjawabdetail->getAuditJawabDetail($jwb['jwb_id']);
+            echo "<pre>";
+            print_r($jwb);
+            echo "</pre>";  
+        } 
+    }
+
     public function download() {
         $ids = $this->input->post('ids');
         if(isset($ids)){
            
             // add a page
             $pdf = new \setasign\Fpdi\Fpdi('L','mm','A4');
+            $i = 1;
             foreach($ids as $id){
                 $audit = $this->mutu->getAuditById($id);
                 // $formulir = $this->formulir->getFormulirById($audit['form_id']);
-                // $dtform = $this->dtform->getAllDtformByFormId($audit['form_id']);
+                //$dtform = $this->dtform->getAllDtformByFormId($audit['form_id']);
+                //$jwb = $this->auditjawab->getAuditJawab($audit['audit_id'],$dtform[0]['dtform_id']);
+                $tanggal = date("d", strtotime($audit['audit_update']));
+                $bulan = date("m", strtotime($audit['audit_update']));
+                $tahun = date("Y", strtotime($audit['audit_update']));
+
+                $tgl_audit = $tanggal." ".konvbln($bulan)." ".$tahun;
                 
                 $pdf->AddPage();
 
@@ -41,7 +61,7 @@ class Daftaraudit extends MY_Controller {
                 $pdf->SetFont('Arial', 'B', 16);
                 $pdf->Cell(0,6, 'PUSAT PENJAMINAN MUTU',0,1,'C');
                 $pdf->Cell(0,6, 'SEKOLAH TINGGI ILMU KESEHATAN SITI KHADIJAH',0,1,'C');
-                $pdf->Cell(0,6, 'TAHUN 2024',0,1,'C');
+                $pdf->Cell(0,6, 'TAHUN '.$tahun,0,1,'C');
                 
 
                 // Tentukan ukuran gambar
@@ -59,10 +79,62 @@ class Daftaraudit extends MY_Controller {
                 $path = FCPATH . "filedata/mutufix.pdf";
                 $pdf->setSourceFile($path);
                 // import page 1
-                $tplIdx = $pdf->importPage(1);
+                $tplIdx = $pdf->importPage($i);
                 $pdf->SetXY(0, 0);
                 // use the imported page and place it at position 10,10 with a width of 100 mm
                 $pdf->useTemplate($tplIdx, 0, 0, 297);
+
+                $pdf->SetFont('Arial', 'B', 14);
+                $pdf->SetXY(0, 49);
+                $pdf->Cell(30.6,6, '',0,0,'C');
+                $pdf->Cell(155.6,6, $audit['form_nama'],0,1,'C');
+                $pdf->SetFont('Arial', '', 11);
+                $pdf->SetXY(208, 19);
+                $pdf->Write(6, $audit['form_kode']);
+
+                $pdf->SetXY(208, 28);
+                $tgl_form = date("d-m-Y", strtotime($audit['form_update']));
+                $pdf->Write(6, $tgl_form);
+
+                $pdf->SetXY(60, 61.6);
+                $pdf->Write(6, $tgl_audit);
+
+                $pdf->SetXY(60, 69);
+                $pdf->Write(6, $audit['unit']);
+                $pdf->SetXY(60, 76.4);
+                $pdf->Write(6, $audit['auditor']);
+                $pdf->SetXY(60, 83.8);
+                $pdf->Write(6, $audit['auditee']);
+
+                $j = 1;
+                $pdf->SetXY(8.7, 109.4);
+                $dtform = $this->dtform->getAllDtformByFormId($audit['form_id']);
+                foreach($dtform as $value){
+                    $jwb = $this->auditjawab->getAuditJawabFix($audit['audit_id'],$value['dtform_id']);
+                    $detail = $this->auditjawabdetail->getAuditJawabDetail($jwb['jwb_id']);
+                    foreach($detail as $row){
+                        $pdf->Cell(11,6,$j,"L&R&B",0,'C');
+                        $pdf->Cell(31.5,6,$j,"R&B",0,'L');
+                        $pdf->Cell(49,6,$row['dtjwb_referensi'],"R&B",0,'L');
+                        $pdf->Cell(50,6,$row['dtjwb_pertanyaan'],"R&B",0,'L');
+                        $pdf->Cell(37.45,6,$row['dtjwb_hasil'],"R&B",0,'L');
+                        $pdf->Cell(11.05,6,$j,"R&B",0,'C');
+                        $pdf->Cell(10.05,6,$j,"R&B",0,'C');
+                        $pdf->Cell(12.5,6,$j,"R&B",0,'C');
+                        $pdf->Cell(12.5,6,$j,"R&B",0,'C');
+                        $pdf->Cell(52.5,6,$row['dtjwb_catatan'],"R&B",1,'L');
+                        $j++;
+                    }
+                    
+                    // $detail = $this->auitjawabdetail->getAuditJawabDetail($jwb['jwb_id']);
+                    // foreach($detail as $row){
+                    //      $pdf->Cell(10,6, $j."hai",1,0,'L');
+                    //      $j++;
+                    // }
+                    
+                }
+
+                $i = $i + 2;
 
             }
             

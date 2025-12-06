@@ -85,6 +85,13 @@ class DtformModel extends CI_Model {
         return $query->row_array();
     }
 
+    function getAllDtformByFormId($form_id){
+        $this->db->where('form_id',$form_id);
+        $this->db->from('detailform');
+        $query = $this->db->get();
+        return $query->result_array();
+    }
+
     public function edit($data) {
         $this->db->trans_start();
         $this->db->where("dtform_id",$data['dtform_id']);
