@@ -21,14 +21,14 @@ class Daftaraudit extends MY_Controller {
     public function download() {
         $ids = $this->input->post('ids');
         if(isset($ids)){
-            $pdf = new \setasign\Fpdi\Fpdi('L','mm','A4');
+           
             // add a page
-
+            $pdf = new \setasign\Fpdi\Fpdi('L','mm','A4');
             foreach($ids as $id){
                 $audit = $this->mutu->getAuditById($id);
-                $formulir = $this->formulir->getFormulirById($audit['form_id']);
-                $dtform = $this->dtform->getAllDtformByFormId($audit['form_id']);
-
+                // $formulir = $this->formulir->getFormulirById($audit['form_id']);
+                // $dtform = $this->dtform->getAllDtformByFormId($audit['form_id']);
+                
                 $pdf->AddPage();
 
                 $pdf->SetFont('Arial', 'B', 22);
@@ -54,8 +54,7 @@ class Daftaraudit extends MY_Controller {
 
                 // Tampilkan gambar
                 $pdf->Image($gambar, $x, $y, $w, $h);
-                
-                
+
             }
             
 
