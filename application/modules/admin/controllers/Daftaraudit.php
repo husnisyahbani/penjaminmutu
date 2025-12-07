@@ -144,7 +144,7 @@ class Daftaraudit extends MY_Controller {
                                 "",
                                 $dtjwb['dtjwb_catatan']
                             ]);
-                        }else if($dtjwb["dtjwb_temuan"] == "TS"){
+                        }else if($dtjwb["dtjwb_temuan"] == "OB"){
                             $dtjwb['dtjwb_temuan'] = "X";
 
                                 $pdf->Row([
