@@ -208,7 +208,7 @@ class Daftaraudit extends MY_Controller {
                     }
                 }
                 }
-                $i = $i + 2 + $j;
+               // $i = $i + 2 + $j;
 
             }
             
