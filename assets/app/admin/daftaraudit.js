@@ -18,6 +18,70 @@ $(function () {
 
     let selectedIDs = [];
 
+    $('#daftaraudit').on('click', '.selesai', function () {
+        let id = $(this).attr('id');
+        let select = [id];
+
+        $.ajax({
+        url: base_url + "/daftaraudit/download",
+        type: "POST",
+        data: { ids: select },
+        xhrFields: {
+            responseType: 'blob'
+        },
+        beforeSend: function () {
+            swal.fire({
+                title: 'Loading...',
+                allowEscapeKey: false,
+                allowOutsideClick: false,
+                onOpen: () => {
+                    swal.showLoading();
+                }
+            });
+        },
+        success: function (data, status, xhr) {
+            swal.close();
+
+            // ============================
+            // Ambil nama file dari header
+            // ============================
+            const cd = xhr.getResponseHeader('Content-Disposition');
+            let filename = 'download.pdf';
+
+            if (cd && cd.indexOf('filename=') !== -1) {
+                const regex = /filename="?([^"]+)"?/;
+                const matches = regex.exec(cd);
+                if (matches && matches.length > 1) {
+                    filename = matches[1];
+                }
+            }
+
+            // ============================
+            // Blob untuk download
+            // ============================
+            const contentType = xhr.getResponseHeader('Content-Type') || 'application/pdf';
+            const blob = new Blob([data], { type: contentType });
+            const url = URL.createObjectURL(blob);
+
+            // ============================
+            // Trigger download
+            // ============================
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+
+            URL.revokeObjectURL(url);
+        },
+        error: function () {
+            swal.fire("Oops", "No connection!", "error");
+        }
+    });
+        
+    });
+
     $('#daftaraudit').on('click', '.pilih', function () {
         let id = $(this).val();
 
