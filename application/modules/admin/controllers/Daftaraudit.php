@@ -31,7 +31,7 @@ class Daftaraudit extends MY_Controller {
         } 
     }
 
-   public function download()
+   public function downloadExcel()
 {
     require_once APPPATH.'third_party/PHPExcel.php';
     require_once APPPATH.'third_party/PHPExcel/IOFactory.php';
@@ -46,7 +46,7 @@ class Daftaraudit extends MY_Controller {
 
     foreach ($ids as $id) {
 
-        // ================== BUAT SHEET BARU ==================
+        /* ===================== BUAT SHEET ===================== */
         if ($sheetIndex == 0) {
             $sheet = $excel->setActiveSheetIndex(0);
         } else {
@@ -57,7 +57,6 @@ class Daftaraudit extends MY_Controller {
         $audit = $this->mutu->getAuditById($id);
         if (!$audit) continue;
 
-        // Nama sheet (maks 31 karakter)
         $sheetName = substr(preg_replace('/[^A-Za-z0-9 ]/', '', $audit['form_kode']), 0, 31);
         $sheet->setTitle($sheetName ?: 'Audit_'.$sheetIndex);
 
@@ -71,7 +70,7 @@ class Daftaraudit extends MY_Controller {
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
         $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
 
-        /* ===================== HEADER INFO ===================== */
+        /* ===================== INFO AUDIT ===================== */
         $sheet->mergeCells('A3:B3'); $sheet->mergeCells('A4:B4');
         $sheet->mergeCells('A5:B5'); $sheet->mergeCells('A6:B6');
 
@@ -105,8 +104,22 @@ class Daftaraudit extends MY_Controller {
         $sheet->setCellValue('K'.$startRow, 'Catatan');
 
         $sheet->getStyle("A$startRow:K$startRow")->getFont()->setBold(true);
+        $sheet->getRowDimension($startRow)->setRowHeight(30);
         $sheet->getStyle("A$startRow:K$startRow")
               ->getAlignment()->setHorizontal('center')->setWrapText(true);
+
+        /* ===================== LEBAR KOLOM (PRINT FRIENDLY) ===================== */
+        $sheet->getColumnDimension('A')->setWidth(5);
+        $sheet->getColumnDimension('B')->setWidth(22);
+        $sheet->getColumnDimension('C')->setWidth(22);
+        $sheet->getColumnDimension('D')->setWidth(18);
+        $sheet->getColumnDimension('E')->setWidth(30);
+        $sheet->getColumnDimension('F')->setWidth(28);
+        $sheet->getColumnDimension('G')->setWidth(5);
+        $sheet->getColumnDimension('H')->setWidth(5);
+        $sheet->getColumnDimension('I')->setWidth(7);
+        $sheet->getColumnDimension('J')->setWidth(7);
+        $sheet->getColumnDimension('K')->setWidth(32);
 
         /* ===================== ISI DATA ===================== */
         $rowExcel = $startRow + 1;
@@ -152,9 +165,7 @@ class Daftaraudit extends MY_Controller {
             }
         }
 
-        /* ===================== BORDER & FREEZE ===================== */
-        $sheet->freezePane('A9');
-
+        /* ===================== BORDER ===================== */
         $sheet->getStyle("A$startRow:K".($rowExcel-1))
               ->applyFromArray([
                   'borders'=>[
@@ -164,18 +175,37 @@ class Daftaraudit extends MY_Controller {
                   ]
               ]);
 
+        /* ===================== PRINT SETUP (A4 LANDSCAPE) ===================== */
+        $sheet->getPageSetup()
+              ->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE)
+              ->setPaperSize(PHPExcel_Worksheet_PageSetup::PAPERSIZE_A4)
+              ->setFitToWidth(1)
+              ->setFitToHeight(false);
+
+        $sheet->getPageMargins()->setTop(0.5);
+        $sheet->getPageMargins()->setBottom(0.5);
+        $sheet->getPageMargins()->setLeft(0.3);
+        $sheet->getPageMargins()->setRight(0.3);
+
+        // Header tabel ikut di setiap halaman
+        $sheet->getPageSetup()->setRowsToRepeatAtTop([$startRow, $startRow]);
+
+        // Freeze saat scroll (bukan print)
+        $sheet->freezePane('A9');
+
         $sheetIndex++;
     }
 
     /* ===================== DOWNLOAD ===================== */
     header('Content-Type: application/vnd.ms-excel');
-    header('Content-Disposition: attachment;filename="Audit_Mutu_MultiSheet.xls"');
+    header('Content-Disposition: attachment;filename="Audit_Mutu_A4_Landscape.xls"');
     header('Cache-Control: max-age=0');
 
     PHPExcel_IOFactory::createWriter($excel, 'Excel5')
         ->save('php://output');
     exit;
 }
+
 
 
 
