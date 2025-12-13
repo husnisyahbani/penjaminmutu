@@ -34,7 +34,7 @@ class Daftaraudit extends MY_Controller {
     public function download()
 {
     // ===== LOAD PHPExcel MANUAL =====
-    require_once APPPATH.'third_party/PHPExcel/PHPExcel.php';
+    require_once APPPATH.'third_party/PHPExcel.php';
     require_once APPPATH.'third_party/PHPExcel/PHPExcel/IOFactory.php';
 
     $ids = $this->input->post('ids');
