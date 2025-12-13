@@ -31,9 +31,8 @@ class Daftaraudit extends MY_Controller {
         } 
     }
 
-    public function download()
+   public function download()
 {
-    // ===== LOAD PHPExcel MANUAL =====
     require_once APPPATH.'third_party/PHPExcel.php';
     require_once APPPATH.'third_party/PHPExcel/IOFactory.php';
 
@@ -43,92 +42,82 @@ class Daftaraudit extends MY_Controller {
     }
 
     $excel = new PHPExcel();
-    $excel->setActiveSheetIndex(0);
-    $sheet = $excel->getActiveSheet();
-    $sheet->setTitle('Audit Mutu');
-
-    // Ambil audit pertama
-    $audit = $this->mutu->getAuditById($ids[0]);
-
-    $tglAudit = date('d ', strtotime($audit['audit_update'])) .
-                konvbln(date('m', strtotime($audit['audit_update']))) .
-                date(' Y', strtotime($audit['audit_update']));
-
-    /* =====================================================
-     * HEADER JUDUL
-     * ===================================================== */
-    $sheet->mergeCells('A1:J1');
-    $sheet->setCellValue('A1', $audit['form_nama']);
-    $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
-    $sheet->getStyle('A1')->getAlignment()
-          ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-
-    /* =====================================================
-     * INFORMASI AUDIT (A–C LABEL, D–J ISI)
-     * ===================================================== */
-    $sheet->mergeCells('A3:C3'); $sheet->mergeCells('D3:J3');
-    $sheet->mergeCells('A4:C4'); $sheet->mergeCells('D4:J4');
-    $sheet->mergeCells('A5:C5'); $sheet->mergeCells('D5:J5');
-    $sheet->mergeCells('A6:C6'); $sheet->mergeCells('D6:J6');
-
-    $sheet->setCellValue('A3', 'Tanggal Audit');
-    $sheet->setCellValue('D3', $tglAudit);
-
-    $sheet->setCellValue('A4', 'Unit Kerja');
-    $sheet->setCellValue('D4', $audit['unit']);
-
-    $sheet->setCellValue('A5', 'Auditor');
-    $sheet->setCellValue('D5', $audit['auditor']);
-
-    $sheet->setCellValue('A6', 'Auditee');
-    $sheet->setCellValue('D6', $audit['auditee']);
-
-    $sheet->getStyle('A3:A6')->getFont()->setBold(true);
-    $sheet->getStyle('A3:J6')->getAlignment()
-          ->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-
-    /* =====================================================
-     * HEADER TABEL
-     * ===================================================== */
-    $startRow = 8;
-    $headers = [
-        'A' => 'No',
-        'B' => 'Tujuan',
-        'C' => 'Referensi',
-        'D' => 'Pertanyaan',
-        'E' => 'Hasil',
-        'F' => 'S',
-        'G' => 'OB',
-        'H' => 'TS Minor',
-        'I' => 'TS Mayor',
-        'J' => 'Catatan'
-    ];
-
-    foreach ($headers as $col => $text) {
-        $sheet->setCellValue($col.$startRow, $text);
-        $sheet->getStyle($col.$startRow)->getFont()->setBold(true);
-        $sheet->getStyle($col.$startRow)->getAlignment()
-              ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)
-              ->setWrapText(true);
-        $sheet->getColumnDimension($col)->setAutoSize(true);
-    }
-
-    /* =====================================================
-     * ISI DATA
-     * ===================================================== */
-    $rowExcel = $startRow + 1;
-    $no = 1;
+    $sheetIndex = 0;
 
     foreach ($ids as $id) {
 
+        // ================== BUAT SHEET BARU ==================
+        if ($sheetIndex == 0) {
+            $sheet = $excel->setActiveSheetIndex(0);
+        } else {
+            $sheet = $excel->createSheet($sheetIndex);
+            $excel->setActiveSheetIndex($sheetIndex);
+        }
+
         $audit = $this->mutu->getAuditById($id);
+        if (!$audit) continue;
+
+        // Nama sheet (maks 31 karakter)
+        $sheetName = substr(preg_replace('/[^A-Za-z0-9 ]/', '', $audit['form_kode']), 0, 31);
+        $sheet->setTitle($sheetName ?: 'Audit_'.$sheetIndex);
+
+        $tglAudit = date('d ', strtotime($audit['audit_update'])) .
+                    konvbln(date('m', strtotime($audit['audit_update']))) .
+                    date(' Y', strtotime($audit['audit_update']));
+
+        /* ===================== JUDUL ===================== */
+        $sheet->mergeCells('A1:K1');
+        $sheet->setCellValue('A1', $audit['form_nama']);
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
+
+        /* ===================== HEADER INFO ===================== */
+        $sheet->mergeCells('A3:B3'); $sheet->mergeCells('A4:B4');
+        $sheet->mergeCells('A5:B5'); $sheet->mergeCells('A6:B6');
+
+        $sheet->setCellValue('A3', 'Tanggal Audit');
+        $sheet->setCellValue('C3', $tglAudit);
+
+        $sheet->setCellValue('A4', 'Unit Kerja');
+        $sheet->setCellValue('C4', $audit['unit']);
+
+        $sheet->setCellValue('A5', 'Auditor');
+        $sheet->setCellValue('C5', $audit['auditor']);
+
+        $sheet->setCellValue('A6', 'Auditee');
+        $sheet->setCellValue('C6', $audit['auditee']);
+
+        $sheet->getStyle('A3:A6')->getFont()->setBold(true);
+
+        /* ===================== HEADER TABEL ===================== */
+        $startRow = 8;
+
+        $sheet->setCellValue('A'.$startRow, 'No');
+        $sheet->mergeCells('B'.$startRow.':C'.$startRow);
+        $sheet->setCellValue('B'.$startRow, 'Tujuan');
+        $sheet->setCellValue('D'.$startRow, 'Referensi');
+        $sheet->setCellValue('E'.$startRow, 'Pertanyaan');
+        $sheet->setCellValue('F'.$startRow, 'Hasil');
+        $sheet->setCellValue('G'.$startRow, 'S');
+        $sheet->setCellValue('H'.$startRow, 'OB');
+        $sheet->setCellValue('I'.$startRow, 'TS Minor');
+        $sheet->setCellValue('J'.$startRow, 'TS Mayor');
+        $sheet->setCellValue('K'.$startRow, 'Catatan');
+
+        $sheet->getStyle("A$startRow:K$startRow")->getFont()->setBold(true);
+        $sheet->getStyle("A$startRow:K$startRow")
+              ->getAlignment()->setHorizontal('center')->setWrapText(true);
+
+        /* ===================== ISI DATA ===================== */
+        $rowExcel = $startRow + 1;
+        $no = 1;
+
         $dtform = $this->dtform->getAllDtformByFormId($audit['form_id']);
 
         foreach ($dtform as $row) {
 
             $jwb = $this->auditjawab
                         ->getAuditJawabFix($audit['audit_id'], $row['dtform_id']);
-
             if (!$jwb) continue;
 
             $detail = $this->auditjawabdetail
@@ -136,58 +125,58 @@ class Daftaraudit extends MY_Controller {
 
             foreach ($detail as $dtjwb) {
 
-                $S = $OB = $TSMIN = $TSMAY = '';
+                $S=$OB=$TSMIN=$TSMAY='';
 
-                if ($dtjwb['dtjwb_temuan'] == 'S')        $S = 'X';
-                if ($dtjwb['dtjwb_temuan'] == 'OB')       $OB = 'X';
-                if ($dtjwb['dtjwb_temuan'] == 'TS MINOR') $TSMIN = 'X';
-                if ($dtjwb['dtjwb_temuan'] == 'TS MAYOR') $TSMAY = 'X';
+                if ($dtjwb['dtjwb_temuan']=='S') $S='X';
+                if ($dtjwb['dtjwb_temuan']=='OB') $OB='X';
+                if ($dtjwb['dtjwb_temuan']=='TS MINOR') $TSMIN='X';
+                if ($dtjwb['dtjwb_temuan']=='TS MAYOR') $TSMAY='X';
 
                 $sheet->setCellValue('A'.$rowExcel, $no);
+                $sheet->mergeCells('B'.$rowExcel.':C'.$rowExcel);
                 $sheet->setCellValue('B'.$rowExcel, strip_tags($jwb['jwb_tujuan']));
-                $sheet->setCellValue('C'.$rowExcel, $dtjwb['dtjwb_referensi']);
-                $sheet->setCellValue('D'.$rowExcel, $dtjwb['dtjwb_pertanyaan']);
-                $sheet->setCellValue('E'.$rowExcel, $dtjwb['dtjwb_hasil']);
-                $sheet->setCellValue('F'.$rowExcel, $S);
-                $sheet->setCellValue('G'.$rowExcel, $OB);
-                $sheet->setCellValue('H'.$rowExcel, $TSMIN);
-                $sheet->setCellValue('I'.$rowExcel, $TSMAY);
-                $sheet->setCellValue('J'.$rowExcel, $dtjwb['dtjwb_catatan']);
+                $sheet->setCellValue('D'.$rowExcel, $dtjwb['dtjwb_referensi']);
+                $sheet->setCellValue('E'.$rowExcel, $dtjwb['dtjwb_pertanyaan']);
+                $sheet->setCellValue('F'.$rowExcel, $dtjwb['dtjwb_hasil']);
+                $sheet->setCellValue('G'.$rowExcel, $S);
+                $sheet->setCellValue('H'.$rowExcel, $OB);
+                $sheet->setCellValue('I'.$rowExcel, $TSMIN);
+                $sheet->setCellValue('J'.$rowExcel, $TSMAY);
+                $sheet->setCellValue('K'.$rowExcel, $dtjwb['dtjwb_catatan']);
 
-                $sheet->getStyle("B$rowExcel:J$rowExcel")
+                $sheet->getStyle("B$rowExcel:K$rowExcel")
                       ->getAlignment()->setWrapText(true);
 
                 $rowExcel++;
                 $no++;
             }
         }
+
+        /* ===================== BORDER & FREEZE ===================== */
+        $sheet->freezePane('A9');
+
+        $sheet->getStyle("A$startRow:K".($rowExcel-1))
+              ->applyFromArray([
+                  'borders'=>[
+                      'allborders'=>[
+                          'style'=>PHPExcel_Style_Border::BORDER_THIN
+                      ]
+                  ]
+              ]);
+
+        $sheetIndex++;
     }
 
-    /* =====================================================
-     * BORDER & FREEZE
-     * ===================================================== */
-    $sheet->freezePane('A9');
-
-    $sheet->getStyle("A$startRow:J".($rowExcel-1))
-          ->applyFromArray([
-              'borders' => [
-                  'allborders' => [
-                      'style' => PHPExcel_Style_Border::BORDER_THIN
-                  ]
-              ]
-          ]);
-
-    /* =====================================================
-     * DOWNLOAD
-     * ===================================================== */
+    /* ===================== DOWNLOAD ===================== */
     header('Content-Type: application/vnd.ms-excel');
-    header('Content-Disposition: attachment;filename="Audit_Mutu.xls"');
+    header('Content-Disposition: attachment;filename="Audit_Mutu_MultiSheet.xls"');
     header('Cache-Control: max-age=0');
 
-    $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel5');
-    $writer->save('php://output');
+    PHPExcel_IOFactory::createWriter($excel, 'Excel5')
+        ->save('php://output');
     exit;
 }
+
 
 
 /*
