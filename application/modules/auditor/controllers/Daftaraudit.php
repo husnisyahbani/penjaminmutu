@@ -226,7 +226,7 @@ class Daftaraudit extends MY_Controller {
 
     /* ===================== DOWNLOAD ===================== */
     header('Content-Type: application/vnd.ms-excel');
-    header('Content-Disposition: attachment;filename="Audit_Mutu_A4_Landscape.xls"');
+    header('Content-Disposition: attachment;filename="Audit_Mutu_'.$audit['unit'].'.xls"');
     header('Cache-Control: max-age=0');
 
     PHPExcel_IOFactory::createWriter($excel, 'Excel5')
