@@ -5,8 +5,9 @@ class Daftaraudit extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditor';
-        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=1.59"));
+        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=1.60"));
         $this->load->model('AuditjawabModel', 'auditjawab');
+        $this->load->model('AuditJawabDetailModel', 'auditjawabdetail');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
         $this->load->model('AkunModel', 'akun');
@@ -34,6 +35,204 @@ class Daftaraudit extends MY_Controller {
             $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
             $this->template($this->data, $this->module); 
     }
+
+    public function download()
+{
+    require_once APPPATH.'third_party/PHPExcel.php';
+    require_once APPPATH.'third_party/PHPExcel/IOFactory.php';
+
+    $ids = $this->input->post('ids');
+    if (!$ids || count($ids) == 0) {
+        show_error('Data audit tidak ditemukan');
+    }
+
+    $excel = new PHPExcel();
+    $sheetIndex = 0;
+
+    foreach ($ids as $id) {
+
+        /* ===================== SHEET BARU ===================== */
+        if ($sheetIndex == 0) {
+            $sheet = $excel->setActiveSheetIndex(0);
+        } else {
+            $sheet = $excel->createSheet($sheetIndex);
+            $excel->setActiveSheetIndex($sheetIndex);
+        }
+
+        $audit = $this->mutu->getAuditById($id);
+        if (!$audit) continue;
+
+        $sheetName = substr(preg_replace('/[^A-Za-z0-9 ]/', '', $audit['form_kode']), 0, 31);
+        $sheet->setTitle($sheetName ?: 'Audit_'.$sheetIndex);
+
+        $tglAudit = date('d ', strtotime($audit['audit_update'])) .
+                    konvbln(date('m', strtotime($audit['audit_update']))) .
+                    date(' Y', strtotime($audit['audit_update']));
+
+        /* ===================== JUDUL ===================== */
+        $sheet->mergeCells('A1:K1');
+        $sheet->setCellValue('A1', $audit['form_nama']);
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A1')->getAlignment()
+              ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+
+        /* ===================== INFO AUDIT ===================== */
+        $sheet->mergeCells('A3:B3');
+        $sheet->mergeCells('A4:B4');
+        $sheet->mergeCells('A5:B5');
+        $sheet->mergeCells('A6:B6');
+
+        $sheet->setCellValue('A3', 'Tanggal Audit');
+        $sheet->setCellValue('C3', $tglAudit);
+
+        $sheet->setCellValue('A4', 'Unit Kerja');
+        $sheet->setCellValue('C4', $audit['unit']);
+
+        $sheet->setCellValue('A5', 'Auditor');
+        $sheet->setCellValue('C5', $audit['auditor']);
+
+        $sheet->setCellValue('A6', 'Auditee');
+        $sheet->setCellValue('C6', $audit['auditee']);
+
+        $sheet->getStyle('A3:A6')->getFont()->setBold(true);
+        $sheet->getStyle('A3:C6')->getAlignment()
+              ->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
+
+        /* ===================== HEADER TABEL ===================== */
+        $startRow = 8;
+
+        $sheet->setCellValue('A'.$startRow, 'No');
+        $sheet->mergeCells('B'.$startRow.':C'.$startRow);
+        $sheet->setCellValue('B'.$startRow, 'Tujuan');
+        $sheet->setCellValue('D'.$startRow, 'Referensi');
+        $sheet->setCellValue('E'.$startRow, 'Pertanyaan');
+        $sheet->setCellValue('F'.$startRow, 'Hasil');
+        $sheet->setCellValue('G'.$startRow, 'S');
+        $sheet->setCellValue('H'.$startRow, 'OB');
+        $sheet->setCellValue('I'.$startRow, 'TS Minor');
+        $sheet->setCellValue('J'.$startRow, 'TS Mayor');
+        $sheet->setCellValue('K'.$startRow, 'Catatan');
+
+        $sheet->getStyle("A$startRow:K$startRow")->getFont()->setBold(true);
+        $sheet->getRowDimension($startRow)->setRowHeight(30);
+        $sheet->getStyle("A$startRow:K$startRow")->getAlignment()
+              ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)
+              ->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)
+              ->setWrapText(true);
+
+        /* ===================== LEBAR KOLOM ===================== */
+        $sheet->getColumnDimension('A')->setWidth(5);
+        $sheet->getColumnDimension('B')->setWidth(22);
+        $sheet->getColumnDimension('C')->setWidth(22);
+        $sheet->getColumnDimension('D')->setWidth(18);
+        $sheet->getColumnDimension('E')->setWidth(30);
+        $sheet->getColumnDimension('F')->setWidth(28);
+        $sheet->getColumnDimension('G')->setWidth(5);
+        $sheet->getColumnDimension('H')->setWidth(5);
+        $sheet->getColumnDimension('I')->setWidth(7);
+        $sheet->getColumnDimension('J')->setWidth(7);
+        $sheet->getColumnDimension('K')->setWidth(32);
+
+        /* ===================== ISI DATA ===================== */
+        $rowExcel = $startRow + 1;
+        $no = 1;
+
+        $dtform = $this->dtform->getAllDtformByFormId($audit['form_id']);
+
+        foreach ($dtform as $row) {
+
+            $jwb = $this->auditjawab
+                        ->getAuditJawabFix($audit['audit_id'], $row['dtform_id']);
+            if (!$jwb) continue;
+
+            $detail = $this->auditjawabdetail
+                           ->getAuditJawabDetail($jwb['jwb_id']);
+
+            foreach ($detail as $dtjwb) {
+
+                $S = $OB = $TSMIN = $TSMAY = '';
+
+                if ($dtjwb['dtjwb_temuan'] == 'S')        $S = 'X';
+                if ($dtjwb['dtjwb_temuan'] == 'OB')       $OB = 'X';
+                if ($dtjwb['dtjwb_temuan'] == 'TS MINOR') $TSMIN = 'X';
+                if ($dtjwb['dtjwb_temuan'] == 'TS MAYOR') $TSMAY = 'X';
+
+                $sheet->setCellValue('A'.$rowExcel, $no);
+                $sheet->mergeCells('B'.$rowExcel.':C'.$rowExcel);
+                $sheet->setCellValue('B'.$rowExcel, strip_tags($jwb['jwb_tujuan']));
+                $sheet->setCellValue('D'.$rowExcel, $dtjwb['dtjwb_referensi']);
+                $sheet->setCellValue('E'.$rowExcel, $dtjwb['dtjwb_pertanyaan']);
+                $sheet->setCellValue('F'.$rowExcel, $dtjwb['dtjwb_hasil']);
+                $sheet->setCellValue('G'.$rowExcel, $S);
+                $sheet->setCellValue('H'.$rowExcel, $OB);
+                $sheet->setCellValue('I'.$rowExcel, $TSMIN);
+                $sheet->setCellValue('J'.$rowExcel, $TSMAY);
+                $sheet->setCellValue('K'.$rowExcel, $dtjwb['dtjwb_catatan']);
+
+                /* ===== ALIGNMENT FINAL ===== */
+
+                // No, S, OB, TS -> TOP + CENTER
+                $sheet->getStyle("A$rowExcel")->getAlignment()
+                      ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)
+                      ->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
+
+                $sheet->getStyle("G$rowExcel:J$rowExcel")->getAlignment()
+                      ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)
+                      ->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
+
+                // Teks panjang -> TOP + LEFT + WRAP
+                $sheet->getStyle("B$rowExcel:F$rowExcel")->getAlignment()
+                      ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT)
+                      ->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP)
+                      ->setWrapText(true);
+
+                $sheet->getStyle("K$rowExcel")->getAlignment()
+                      ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT)
+                      ->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP)
+                      ->setWrapText(true);
+
+                $rowExcel++;
+                $no++;
+            }
+        }
+
+        /* ===================== BORDER ===================== */
+        $sheet->getStyle("A$startRow:K".($rowExcel-1))
+              ->applyFromArray([
+                  'borders' => [
+                      'allborders' => [
+                          'style' => PHPExcel_Style_Border::BORDER_THIN
+                      ]
+                  ]
+              ]);
+
+        /* ===================== PRINT SETUP ===================== */
+        $sheet->getPageSetup()
+              ->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE)
+              ->setPaperSize(PHPExcel_Worksheet_PageSetup::PAPERSIZE_A4)
+              ->setFitToWidth(1)
+              ->setFitToHeight(false);
+
+        $sheet->getPageMargins()->setTop(0.5);
+        $sheet->getPageMargins()->setBottom(0.5);
+        $sheet->getPageMargins()->setLeft(0.3);
+        $sheet->getPageMargins()->setRight(0.3);
+
+        $sheet->getPageSetup()->setRowsToRepeatAtTop([$startRow, $startRow]);
+        $sheet->freezePane('A9');
+
+        $sheetIndex++;
+    }
+
+    /* ===================== DOWNLOAD ===================== */
+    header('Content-Type: application/vnd.ms-excel');
+    header('Content-Disposition: attachment;filename="Audit_Mutu_A4_Landscape.xls"');
+    header('Cache-Control: max-age=0');
+
+    PHPExcel_IOFactory::createWriter($excel, 'Excel5')
+        ->save('php://output');
+    exit;
+}
 
     public function detail($id) {
         if(isset($id)){
