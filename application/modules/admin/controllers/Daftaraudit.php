@@ -31,7 +31,7 @@ class Daftaraudit extends MY_Controller {
         } 
     }
 
-   public function downloadExcel()
+   public function download()
 {
     require_once APPPATH.'third_party/PHPExcel.php';
     require_once APPPATH.'third_party/PHPExcel/IOFactory.php';
