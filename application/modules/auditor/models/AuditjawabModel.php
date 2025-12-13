@@ -120,6 +120,13 @@ class AuditjawabModel extends CI_Model {
         return $query->row_array();
     }
 
+    public function getAuditJawabFix($audit_id,$dtform_id){
+        $this->db->where("auditjawab.audit_id",$audit_id);
+        $this->db->where("auditjawab.dtform_id",$dtform_id);
+        $query = $this->db->get('auditjawab');
+        return $query->row_array();
+    }
+
      public function jawab($data) {
         $this->db->trans_start();
         $this->db->where("audit_id",$data['audit_id']);
