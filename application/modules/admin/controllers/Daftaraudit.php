@@ -33,7 +33,7 @@ class Daftaraudit extends MY_Controller {
 
     public function download()
 {
-    $this->load->library('PHPExcel');
+   require_once APPPATH.'third_party/PHPExcel.php';
 
     $ids = $this->input->post('ids');
     if (!isset($ids) || count($ids) == 0) {
@@ -121,7 +121,9 @@ class Daftaraudit extends MY_Controller {
     foreach ($header as $h) {
         $sheet->setCellValue($col.$startRow, $h);
         $sheet->getStyle($col.$startRow)->getFont()->setBold(true);
-        $sheet->getAlignment()->setWrapText(true);
+        $sheet->getStyle($col.$startRow)
+      ->getAlignment()
+      ->setWrapText(true);
         $sheet->getColumnDimension($col)->setAutoSize(true);
         $col++;
     }
