@@ -40,41 +40,93 @@ class Fpdi extends FpdfTpl
         $this->aligns = $a;
     }
 
+    // function Row($data)
+    // {
+    //     $nb = 0;
+    //     for($i=0;$i<count($data);$i++)
+    //         $nb = max($nb, $this->NbLines($this->widths[$i], $data[$i]));
+    //     $h = 6 * $nb;
+
+    //     // Check page break
+    //     $this->CheckPageBreak($h);
+
+    //     // Save starting X & Y
+    //     $xStart = $this->GetX();
+    //     $yStart = $this->GetY();
+
+    //     for($i = 0; $i < count($data); $i++)
+    //     {
+    //         $w = $this->widths[$i];
+    //         $a = isset($this->aligns[$i]) ? $this->aligns[$i] : 'L';
+
+    //         $x = $this->GetX();
+    //         $y = $this->GetY();
+
+    //         // Draw cell border
+    //         $this->Rect($x, $y, $w, $h);
+
+    //         // Output text
+    //         $this->MultiCell($w, 6, $data[$i], 0, $a);
+
+    //         // Move cursor back to top-right of the cell
+    //         $this->SetXY($x + $w, $y);
+    //     }
+
+    //     // Move to next row
+    //     $this->SetXY($xStart, $yStart + $h);
+    // }
+
     function Row($data)
-    {
-        $nb = 0;
-        for($i=0;$i<count($data);$i++)
-            $nb = max($nb, $this->NbLines($this->widths[$i], $data[$i]));
-        $h = 6 * $nb;
-
-        // Check page break
-        $this->CheckPageBreak($h);
-
-        // Save starting X & Y
-        $xStart = $this->GetX();
-        $yStart = $this->GetY();
-
-        for($i = 0; $i < count($data); $i++)
-        {
-            $w = $this->widths[$i];
-            $a = isset($this->aligns[$i]) ? $this->aligns[$i] : 'L';
-
-            $x = $this->GetX();
-            $y = $this->GetY();
-
-            // Draw cell border
-            $this->Rect($x, $y, $w, $h);
-
-            // Output text
-            $this->MultiCell($w, 6, $data[$i], 0, $a);
-
-            // Move cursor back to top-right of the cell
-            $this->SetXY($x + $w, $y);
-        }
-
-        // Move to next row
-        $this->SetXY($xStart, $yStart + $h);
+{
+    // Hitung tinggi baris
+    $nb = 0;
+    for ($i = 0; $i < count($data); $i++) {
+        $nb = max($nb, $this->NbLines($this->widths[$i], $data[$i]));
     }
+    $h = 6 * $nb;
+
+    // ====== KUNCI UTAMA ======
+    // Jika TIDAK MUAT → PINDAH HALAMAN SEBELUM CETAK ROW
+    if ($this->GetY() + $h > $this->PageBreakTrigger) {
+        $this->AddPage($this->CurOrientation);
+        // posisi X formulir Anda
+        $this->SetX(8.7);
+    }
+
+    // Simpan posisi awal
+    $xStart = $this->GetX();
+    $yStart = $this->GetY();
+
+    // ===== MATIKAN AUTO PAGE BREAK MULTICELL =====
+    $autoPageBreak = $this->AutoPageBreak;
+    $this->SetAutoPageBreak(false);
+
+    // Cetak semua kolom
+    for ($i = 0; $i < count($data); $i++) {
+
+        $w = $this->widths[$i];
+        $a = isset($this->aligns[$i]) ? $this->aligns[$i] : 'L';
+
+        $x = $this->GetX();
+        $y = $this->GetY();
+
+        // Border FULL tinggi baris
+        $this->Rect($x, $y, $w, $h);
+
+        // Isi cell
+        $this->MultiCell($w, 6, $data[$i], 0, $a);
+
+        // Kembali ke atas kolom
+        $this->SetXY($x + $w, $y);
+    }
+
+    // Aktifkan kembali auto page break
+    $this->SetAutoPageBreak($autoPageBreak);
+
+    // Turun ke baris berikutnya
+    $this->SetXY($xStart, $yStart + $h);
+}
+
 
 
     function CheckPageBreak($h)
