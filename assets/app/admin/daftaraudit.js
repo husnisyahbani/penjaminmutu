@@ -18,7 +18,7 @@ $(function () {
 
     let selectedIDs = [];
 
-    $('#daftaraudit').on('click', '.selesai', function () {
+    $('#daftaraudit').on('click', '.download', function () {
         let id = $(this).attr('id');
         let select = [id];
 
