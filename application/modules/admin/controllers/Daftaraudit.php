@@ -46,7 +46,7 @@ class Daftaraudit extends MY_Controller {
 
     foreach ($ids as $id) {
 
-        /* ===================== BUAT SHEET ===================== */
+        /* ===================== SHEET BARU ===================== */
         if ($sheetIndex == 0) {
             $sheet = $excel->setActiveSheetIndex(0);
         } else {
@@ -68,11 +68,14 @@ class Daftaraudit extends MY_Controller {
         $sheet->mergeCells('A1:K1');
         $sheet->setCellValue('A1', $audit['form_nama']);
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
-        $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
+        $sheet->getStyle('A1')->getAlignment()
+              ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 
         /* ===================== INFO AUDIT ===================== */
-        $sheet->mergeCells('A3:B3'); $sheet->mergeCells('A4:B4');
-        $sheet->mergeCells('A5:B5'); $sheet->mergeCells('A6:B6');
+        $sheet->mergeCells('A3:B3');
+        $sheet->mergeCells('A4:B4');
+        $sheet->mergeCells('A5:B5');
+        $sheet->mergeCells('A6:B6');
 
         $sheet->setCellValue('A3', 'Tanggal Audit');
         $sheet->setCellValue('C3', $tglAudit);
@@ -87,6 +90,8 @@ class Daftaraudit extends MY_Controller {
         $sheet->setCellValue('C6', $audit['auditee']);
 
         $sheet->getStyle('A3:A6')->getFont()->setBold(true);
+        $sheet->getStyle('A3:C6')->getAlignment()
+              ->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
 
         /* ===================== HEADER TABEL ===================== */
         $startRow = 8;
@@ -105,10 +110,12 @@ class Daftaraudit extends MY_Controller {
 
         $sheet->getStyle("A$startRow:K$startRow")->getFont()->setBold(true);
         $sheet->getRowDimension($startRow)->setRowHeight(30);
-        $sheet->getStyle("A$startRow:K$startRow")
-              ->getAlignment()->setHorizontal('center')->setWrapText(true);
+        $sheet->getStyle("A$startRow:K$startRow")->getAlignment()
+              ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)
+              ->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)
+              ->setWrapText(true);
 
-        /* ===================== LEBAR KOLOM (PRINT FRIENDLY) ===================== */
+        /* ===================== LEBAR KOLOM ===================== */
         $sheet->getColumnDimension('A')->setWidth(5);
         $sheet->getColumnDimension('B')->setWidth(22);
         $sheet->getColumnDimension('C')->setWidth(22);
@@ -138,12 +145,12 @@ class Daftaraudit extends MY_Controller {
 
             foreach ($detail as $dtjwb) {
 
-                $S=$OB=$TSMIN=$TSMAY='';
+                $S = $OB = $TSMIN = $TSMAY = '';
 
-                if ($dtjwb['dtjwb_temuan']=='S') $S='X';
-                if ($dtjwb['dtjwb_temuan']=='OB') $OB='X';
-                if ($dtjwb['dtjwb_temuan']=='TS MINOR') $TSMIN='X';
-                if ($dtjwb['dtjwb_temuan']=='TS MAYOR') $TSMAY='X';
+                if ($dtjwb['dtjwb_temuan'] == 'S')        $S = 'X';
+                if ($dtjwb['dtjwb_temuan'] == 'OB')       $OB = 'X';
+                if ($dtjwb['dtjwb_temuan'] == 'TS MINOR') $TSMIN = 'X';
+                if ($dtjwb['dtjwb_temuan'] == 'TS MAYOR') $TSMAY = 'X';
 
                 $sheet->setCellValue('A'.$rowExcel, $no);
                 $sheet->mergeCells('B'.$rowExcel.':C'.$rowExcel);
@@ -157,8 +164,27 @@ class Daftaraudit extends MY_Controller {
                 $sheet->setCellValue('J'.$rowExcel, $TSMAY);
                 $sheet->setCellValue('K'.$rowExcel, $dtjwb['dtjwb_catatan']);
 
-                $sheet->getStyle("B$rowExcel:K$rowExcel")
-                      ->getAlignment()->setWrapText(true);
+                /* ===== ALIGNMENT FINAL ===== */
+
+                // No, S, OB, TS -> TOP + CENTER
+                $sheet->getStyle("A$rowExcel")->getAlignment()
+                      ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)
+                      ->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
+
+                $sheet->getStyle("G$rowExcel:J$rowExcel")->getAlignment()
+                      ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)
+                      ->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
+
+                // Teks panjang -> TOP + LEFT + WRAP
+                $sheet->getStyle("B$rowExcel:F$rowExcel")->getAlignment()
+                      ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT)
+                      ->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP)
+                      ->setWrapText(true);
+
+                $sheet->getStyle("K$rowExcel")->getAlignment()
+                      ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT)
+                      ->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP)
+                      ->setWrapText(true);
 
                 $rowExcel++;
                 $no++;
@@ -168,14 +194,14 @@ class Daftaraudit extends MY_Controller {
         /* ===================== BORDER ===================== */
         $sheet->getStyle("A$startRow:K".($rowExcel-1))
               ->applyFromArray([
-                  'borders'=>[
-                      'allborders'=>[
-                          'style'=>PHPExcel_Style_Border::BORDER_THIN
+                  'borders' => [
+                      'allborders' => [
+                          'style' => PHPExcel_Style_Border::BORDER_THIN
                       ]
                   ]
               ]);
 
-        /* ===================== PRINT SETUP (A4 LANDSCAPE) ===================== */
+        /* ===================== PRINT SETUP ===================== */
         $sheet->getPageSetup()
               ->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE)
               ->setPaperSize(PHPExcel_Worksheet_PageSetup::PAPERSIZE_A4)
@@ -187,10 +213,7 @@ class Daftaraudit extends MY_Controller {
         $sheet->getPageMargins()->setLeft(0.3);
         $sheet->getPageMargins()->setRight(0.3);
 
-        // Header tabel ikut di setiap halaman
         $sheet->getPageSetup()->setRowsToRepeatAtTop([$startRow, $startRow]);
-
-        // Freeze saat scroll (bukan print)
         $sheet->freezePane('A9');
 
         $sheetIndex++;
@@ -205,6 +228,7 @@ class Daftaraudit extends MY_Controller {
         ->save('php://output');
     exit;
 }
+
 
 
 
