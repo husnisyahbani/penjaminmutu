@@ -31,6 +31,163 @@ class Daftaraudit extends MY_Controller {
         } 
     }
 
+    public function download()
+{
+    $this->load->library('PHPExcel');
+
+    $ids = $this->input->post('ids');
+    if (!isset($ids) || count($ids) == 0) {
+        $this->session->set_flashdata('pesanerror', 'Tidak ada data yang dipilih!');
+            redirect(base_url('admin/daftaraudit'));
+    }
+
+    $excel = new PHPExcel();
+    $tahun = date('Y');
+
+    /* =====================================================
+     * SHEET 1 : COVER
+     * ===================================================== */
+    $excel->setActiveSheetIndex(0);
+    $sheetCover = $excel->getActiveSheet();
+    $sheetCover->setTitle('Cover');
+
+    // Ambil audit pertama (untuk cover)
+    $audit = $this->mutu->getAuditById($ids[0]);
+
+    $tanggal = date("d", strtotime($audit['audit_update']));
+    $bulan   = date("m", strtotime($audit['audit_update']));
+    $tahun   = date("Y", strtotime($audit['audit_update']));
+    $tglAudit = $tanggal . " " . konvbln($bulan) . " " . $tahun;
+
+    // Layout cover
+    $sheetCover->mergeCells('A1:J3');
+    $sheetCover->mergeCells('A5:J5');
+    $sheetCover->mergeCells('A6:J6');
+    $sheetCover->mergeCells('A7:J7');
+
+    $sheetCover->setCellValue('A1', $audit['form_nama']);
+    $sheetCover->setCellValue('A5', 'PUSAT PENJAMINAN MUTU');
+    $sheetCover->setCellValue('A6', 'SEKOLAH TINGGI ILMU KESEHATAN SITI KHADIJAH');
+    $sheetCover->setCellValue('A7', 'TAHUN '.$tahun);
+
+    $sheetCover->getStyle('A1')->getFont()->setSize(22)->setBold(true);
+    $sheetCover->getStyle('A5:A7')->getFont()->setSize(14)->setBold(true);
+
+    $sheetCover->getStyle('A1:A7')->getAlignment()
+        ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)
+        ->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+
+    // Logo
+    $logoPath = FCPATH . 'filedata/logostikfinal.png';
+    if (file_exists($logoPath)) {
+        $logo = new PHPExcel_Worksheet_Drawing();
+        $logo->setName('Logo STIK');
+        $logo->setPath($logoPath);
+        $logo->setHeight(160);
+        $logo->setCoordinates('E9');
+        $logo->setWorksheet($sheetCover);
+    }
+
+    /* =====================================================
+     * SHEET 2 : FORM AUDIT
+     * ===================================================== */
+    $sheet = $excel->createSheet();
+    $sheet->setTitle('Form Audit');
+    $excel->setActiveSheetIndex(1);
+
+    // Header form
+    $sheet->mergeCells('A1:J1');
+    $sheet->setCellValue('A1', $audit['form_nama']);
+    $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+    $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
+
+    $sheet->setCellValue('A3', 'Tanggal Audit');
+    $sheet->setCellValue('C3', $tglAudit);
+    $sheet->setCellValue('A4', 'Unit Kerja');
+    $sheet->setCellValue('C4', $audit['unit']);
+    $sheet->setCellValue('A5', 'Auditor');
+    $sheet->setCellValue('C5', $audit['auditor']);
+    $sheet->setCellValue('A6', 'Auditee');
+    $sheet->setCellValue('C6', $audit['auditee']);
+
+    // Header tabel
+    $startRow = 8;
+    $header = [
+        'No','Tujuan','Referensi','Pertanyaan','Hasil Observasi',
+        'S','OB','TS Minor','TS Mayor','Catatan'
+    ];
+
+    $col = 'A';
+    foreach ($header as $h) {
+        $sheet->setCellValue($col.$startRow, $h);
+        $sheet->getStyle($col.$startRow)->getFont()->setBold(true);
+        $sheet->getAlignment()->setWrapText(true);
+        $sheet->getColumnDimension($col)->setAutoSize(true);
+        $col++;
+    }
+
+    // Data
+    $rowExcel = $startRow + 1;
+    $no = 1;
+
+    foreach ($ids as $id) {
+
+        $audit = $this->mutu->getAuditById($id);
+        $dtform = $this->dtform->getAllDtformByFormId($audit['form_id']);
+
+        foreach ($dtform as $row) {
+
+            $jwb = $this->auditjawab->getAuditJawabFix(
+                $audit['audit_id'],
+                $row['dtform_id']
+            );
+
+            if (!$jwb) continue;
+
+            $detail = $this->auditjawabdetail
+                           ->getAuditJawabDetail($jwb['jwb_id']);
+
+            foreach ($detail as $dtjwb) {
+
+                $S = $OB = $TSMIN = $TSMAY = '';
+
+                if ($dtjwb['dtjwb_temuan'] == 'S') $S = 'X';
+                if ($dtjwb['dtjwb_temuan'] == 'OB') $OB = 'X';
+                if ($dtjwb['dtjwb_temuan'] == 'TS MINOR') $TSMIN = 'X';
+                if ($dtjwb['dtjwb_temuan'] == 'TS MAYOR') $TSMAY = 'X';
+
+                $sheet->fromArray([
+                    $no,
+                    strip_tags($jwb['jwb_tujuan']),
+                    $dtjwb['dtjwb_referensi'],
+                    $dtjwb['dtjwb_pertanyaan'],
+                    $dtjwb['dtjwb_hasil'],
+                    $S, $OB, $TSMIN, $TSMAY,
+                    $dtjwb['dtjwb_catatan']
+                ], null, 'A'.$rowExcel);
+
+                $sheet->getStyle("B$rowExcel:J$rowExcel")
+                      ->getAlignment()->setWrapText(true);
+
+                $rowExcel++;
+                $no++;
+            }
+        }
+    }
+
+    /* =====================================================
+     * DOWNLOAD
+     * ===================================================== */
+    header('Content-Type: application/vnd.ms-excel');
+    header('Content-Disposition: attachment;filename="Audit_Mutu_'.$tahun.'.xls"');
+    header('Cache-Control: max-age=0');
+
+    $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel5');
+    $writer->save('php://output');
+    exit;
+}
+
+/*
     public function download() {
         
         $ids = $this->input->post('ids');
@@ -220,7 +377,7 @@ class Daftaraudit extends MY_Controller {
             redirect(base_url('admin/daftaraudit'));
         }
     }
-
+*/
     public function index() {
             $this->data['content'] = 'daftaraudit/index';
             $this->data['title'] = 'Daftar Audit';
