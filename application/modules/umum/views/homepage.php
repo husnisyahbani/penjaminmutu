@@ -38,11 +38,48 @@
       z-index: 999;
       transition: top 0.3s;
     }
+
+    /* =========================
+   NAVBAR HOVER HIJAU
+   ========================= */
+
+/* Menu utama */
+.navbar .nav-link {
+  transition: all 0.3s ease;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
+  color: #198754 !important; /* hijau bootstrap */
+}
+
+/* Dropdown toggle hover */
+.navbar .dropdown-toggle:hover {
+  color: #198754 !important;
+}
+
+/* Dropdown item */
+.dropdown-menu .dropdown-item {
+  transition: all 0.2s ease;
+}
+
+.dropdown-menu .dropdown-item:hover,
+.dropdown-menu .dropdown-item:focus {
+  background-color: #e9f7ef; /* hijau lembut */
+  color: #198754;
+}
+
+/* Aktif menu */
+.navbar .nav-link.active {
+  color: #198754 !important;
+  font-weight: 600;
+}
+
   </style>
 </head>
 <body>
 
-<header class="main-header fixed-top">
+<!-- <header class="main-header fixed-top">
   <nav class="navbar navbar-expand-lg bg-white shadow-lg rounded-5 px-lg-4 mx-lg-5 mt-3 mt-lg-5">
     <div class="container-fluid">
       <a class="navbar-brand px-0" href="<?php echo base_url();?>">
@@ -66,7 +103,149 @@
       </div>
     </div>
   </nav>
+</header> -->
+
+<header class="main-header fixed-top">
+  <nav class="navbar navbar-expand-lg bg-white shadow-lg rounded-5 px-lg-4 mx-lg-5 mt-3 mt-lg-5">
+    <div class="container-fluid">
+
+      <!-- LOGO -->
+      <a class="navbar-brand px-0" href="<?php echo base_url();?>">
+        <img src="<?php echo asset_url();?>/assets/images/logostik.png" 
+             alt="STIK SITI KHADIJAH Logo" height="80">
+      </a>
+
+      <!-- TOGGLER -->
+      <button class="navbar-toggler" type="button" 
+              data-bs-toggle="collapse" 
+              data-bs-target="#menuUtama"
+              aria-controls="menuUtama" 
+              aria-expanded="false" 
+              aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- MENU -->
+      <div class="collapse navbar-collapse" id="menuUtama">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+
+          <!-- BERANDA -->
+          <li class="nav-item">
+            <a class="nav-link py-3 px-4 active" 
+               aria-current="page" 
+               href="<?php echo base_url();?>">
+              Beranda
+            </a>
+          </li>
+
+          <!-- INFORMASI PUBLIK -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle py-3 px-4" 
+               href="#" 
+               id="dropdownInformasiPublik" 
+               role="button" 
+               data-bs-toggle="dropdown" 
+               aria-expanded="false">
+              Informasi Publik
+            </a>
+
+            <ul class="dropdown-menu shadow rounded-4 border-0"
+                aria-labelledby="dropdownInformasiPublik">
+
+              <li>
+                <a class="dropdown-item py-2 px-4"
+                   href="<?php echo base_url('publik/berita'); ?>">
+                  Berita
+                </a>
+              </li>
+
+              <li>
+                <a class="dropdown-item py-2 px-4"
+                   href="<?php echo base_url('publik/pengumuman'); ?>">
+                  Pengumuman
+                </a>
+              </li>
+
+              
+
+            </ul>
+          </li>
+
+          <!-- DROPDOWN TENTANG KAMI -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle py-3 px-4" 
+               href="#" 
+               id="dropdownTentangKami" 
+               role="button" 
+               data-bs-toggle="dropdown" 
+               aria-expanded="false">
+              Tentang Kami
+            </a>
+
+            <ul class="dropdown-menu shadow rounded-4 border-0"
+                aria-labelledby="dropdownTentangKami">
+
+              <li>
+                <a class="dropdown-item py-2 px-4"
+                   href="<?php echo base_url('tentang/profil'); ?>">
+                  Profil
+                </a>
+              </li>
+
+              <li>
+                <a class="dropdown-item py-2 px-4"
+                   href="<?php echo base_url('tentang/sk'); ?>">
+                  SK
+                </a>
+              </li>
+
+              <li>
+                <a class="dropdown-item py-2 px-4"
+                   href="<?php echo base_url('tentang/struktur'); ?>">
+                  Struktur Organisasi
+                </a>
+              </li>
+
+              <li>
+                <a class="dropdown-item py-2 px-4"
+                   href="<?php echo base_url('tentang/struktur'); ?>">
+                  Visi & Misi & Sasaran Mutu
+                </a>
+              </li>
+
+              <li>
+                <a class="dropdown-item py-2 px-4"
+                   href="<?php echo base_url('tentang/struktur'); ?>">
+                  Program Kerja
+                </a>
+              </li>
+
+            </ul>
+          </li>
+
+          <!-- LOGIN -->
+          <li class="nav-item">
+            <a class="nav-link py-3 px-4" 
+               href="<?php echo base_url();?>#fitur">
+              Login
+            </a>
+          </li>
+
+          <!-- KONTAK -->
+          <li class="nav-item">
+            <a class="nav-link py-3 px-4" 
+               href="<?php echo base_url();?>#kontak">
+              Kontak
+            </a>
+          </li>
+
+        </ul>
+      </div>
+
+    </div>
+  </nav>
 </header>
+
 
 <section id="hero" class="py-5 bg-primary green-gradasi">
   <div class="container py-5 mt-4">
