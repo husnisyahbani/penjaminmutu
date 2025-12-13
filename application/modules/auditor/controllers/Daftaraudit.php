@@ -348,11 +348,15 @@ class Daftaraudit extends MY_Controller {
             $row[] = $field->form_nama;
             $row[] = $field->auditor;
             $row[] = $field->auditee;
-            $row[] = $field->unit;
+            $row[] = $field->unit; 
 
-            if($field->audit_status == "PROSES" || $field->audit_status == "SELESAI"){
+            if($field->audit_status == "PROSES"){
                 $row[] = '<button class="detail btn btn-sm btn-icon btn-success"
             data-toggle="tooltip" data-original-title="DETAIL" id=' . $field->audit_id.'><i class="icon md-book" aria-hidden="true"></i></button>';
+            }else if($field->audit_status == "SELESAI"){
+                $row[] = '<button class="detail btn btn-sm btn-icon btn-success"
+            data-toggle="tooltip" data-original-title="DETAIL" id=' . $field->audit_id.'><i class="icon md-book" aria-hidden="true"></i></button> <button class="download btn btn-sm btn-icon btn-success"
+            data-toggle="tooltip" data-original-title="DELETE" id=' . $field->audit_id.'><i class="icon md-download" aria-hidden="true"></i></button>';
             }else{
                 $row[] = '<button class="btn btn-warning btn-xs waves-effect waves-classic"
             data-toggle="tooltip" data-original-title="Wait">Menunggu Proses</button>';
