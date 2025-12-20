@@ -194,14 +194,14 @@
 
               <li>
                 <a class="dropdown-item py-2 px-4"
-                   href="<?php echo base_url(); ?>#sk">
+                   href="<?php echo base_url('tentang/sk'); ?>">
                   SK
                 </a>
               </li>
 
               <li>
                 <a class="dropdown-item py-2 px-4"
-                   href="<?php echo base_url(); ?>#struktur">
+                   href="<?php echo base_url('tentang/struktur'); ?>">
                   Struktur Organisasi
                 </a>
               </li>
@@ -299,119 +299,6 @@
           <p>
             <a href="<?php echo base_url("login");?>" class="mt-3 px-5 rounded-5 btn btn-lg red-gradasi text-white align-self-baseline">Login sebagai Auditee</a>
           </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="sk" class="py-5">
-    <div class="container py-5">
-      <div class="row py-5 justify-content-center align-items-center">
-        <div class="col-12">
-          <h1 class="text-center my-5">Surat Keputusan</h1>
-        </div>
-        <div class="col-12 align-center">
-          <table style="
-    width:80%;
-    margin:30px auto;
-    border-collapse:collapse;
-    font-family:'Segoe UI', Tahoma, sans-serif;
-    background:#ffffff;
-    box-shadow:0 4px 12px rgba(0,0,0,0.1);
-    border-radius:10px;
-    overflow:hidden;
-">
-    <thead>
-        <tr style="background:#2c7be5; color:#ffffff;">
-            <th style="padding:12px; text-align:center;">No</th>
-            <th style="padding:12px; text-align:left;">Nama</th>
-            <th style="padding:12px; text-align:center;">Download</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr style="border-bottom:1px solid #eaeaea;">
-            <td style="padding:12px; text-align:center;">1</td>
-            <td style="padding:12px;">Surat Keputusan Pembentukan LPM STIK SITI KHADIJAH</td>
-            <td style="padding:12px; text-align:center;">
-                <a href="<?php echo asset_url();?>/assets/images/SK_PEMBENTUKAN.pdf" style="
-                    background:#28a745;
-                    color:#ffffff;
-                    padding:8px 14px;
-                    text-decoration:none;
-                    border-radius:6px;
-                    font-size:14px;
-                    display:inline-block;
-                ">Download</a>
-            </td>
-        </tr>
-        <tr style="background:#f9fbfd; border-bottom:1px solid #eaeaea;">
-            <td style="padding:12px; text-align:center;">2</td>
-            <td style="padding:12px;">Surat Keputusan Pengangkatan Tim Gugus Kendali Mutu</td>
-            <td style="padding:12px; text-align:center;">
-                <a href="<?php echo asset_url();?>/assets/images/SK_GKM.pdf" style="
-                    background:#17a2b8;
-                    color:#ffffff;
-                    padding:8px 14px;
-                    text-decoration:none;
-                    border-radius:6px;
-                    font-size:14px;
-                    display:inline-block;
-                ">Download</a>
-            </td>
-        </tr>
-        <tr style="border-bottom:1px solid #eaeaea;">
-            <td style="padding:12px; text-align:center;">3</td>
-            <td style="padding:12px;">Surat Keputusan Perubahan Nama</td>
-            <td style="padding:12px; text-align:center;">
-                <a href="<?php echo asset_url();?>/assets/images/SK_PPM.pdf" style="
-                    background:#ffc107;
-                    color:#212529;
-                    padding:8px 14px;
-                    text-decoration:none;
-                    border-radius:6px;
-                    font-size:14px;
-                    display:inline-block;
-                ">Download</a>
-            </td>
-        </tr>
-        <tr>
-            <td style="padding:12px; text-align:center;">4</td>
-            <td style="padding:12px;">Surat Keputusan Pengangkatan Tim Auditor Internal</td>
-            <td style="padding:12px; text-align:center;">
-                <a href="<?php echo asset_url();?>/assets/images/SK_AUDITOR.pdf" style="
-                    background:#dc3545;
-                    color:#ffffff;
-                    padding:8px 14px;
-                    text-decoration:none;
-                    border-radius:6px;
-                    font-size:14px;
-                    display:inline-block;
-                ">Download</a>
-            </td>
-        </tr>
-    </tbody>
-</table>
-
-
-        </div>
-        <div class="col-md-8 text-center">
-          
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="struktur" class="py-5">
-    <div class="container py-5">
-      <div class="row py-5 justify-content-center align-items-center">
-        <div class="col-12">
-          <h1 class="text-center my-5">Struktur Organisasi</h1>
-        </div>
-        <div class="col-12 text-center">
-          <img srcset="<?php echo asset_url();?>/assets/images/strukturorganisasi.png 2x" src="<?php echo asset_url();?>/assets/images/struktur.png" alt="PENJAMIN MUTU STIK SITI KHADIJAH" class="img-fluid mb-4">
-        </div>
-        <div class="col-md-8 text-center">
-          
         </div>
       </div>
     </div>
