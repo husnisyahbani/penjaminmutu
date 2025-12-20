@@ -408,7 +408,7 @@
           <h1 class="text-center my-5">Struktur Organisasi</h1>
         </div>
         <div class="col-12 text-center">
-          <img srcset="<?php echo asset_url();?>/assets/images/strukturorganisasi.png 2x" src="<?php echo asset_url();?>/assets/images/struktur.png" alt="PENJAMIN MUTU STIK SITI KHADIJAH" class="img-fluid mb-4">
+          <img srcset="<?php echo asset_url();?>/assets/images/strukturorganisasi_fix.png 2x" src="<?php echo asset_url();?>/assets/images/strukturorganisasi_fix.png" alt="PENJAMIN MUTU STIK SITI KHADIJAH" class="img-fluid mb-4">
         </div>
         <div class="col-md-8 text-center">
           
