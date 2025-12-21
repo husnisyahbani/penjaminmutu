@@ -141,7 +141,7 @@
           <!-- INFORMASI PUBLIK -->
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle py-3 px-4" 
-               href="#" 
+               href="javascript:void(0)" 
                id="dropdownInformasiPublik" 
                role="button" 
                data-bs-toggle="dropdown" 
