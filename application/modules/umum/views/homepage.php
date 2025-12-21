@@ -475,8 +475,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       // ❌ Jangan tutup navbar jika:
       if (
-        target.classList.contains('dropdown-toggle') || // klik dropdown
-        target.classList.contains('dropdown-item') ||   // klik item dropdown
+        target.classList.contains('dropdown-toggle') ||   // klik item dropdown
         href === '#' ||
         href === 'javascript:void(0)'
       ) {
