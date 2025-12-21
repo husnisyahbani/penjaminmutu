@@ -454,38 +454,44 @@
 
 <!-- Bootstrap Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 <!-- Scroll & Navbar Control -->
 <script>
+/* Scroll ke atas */
 function animateScroll() {
   window.scroll({ top: 0, behavior: 'smooth' });
 }
 
-// Navbar hide/show saat scroll
-let lastScrollTop = 0;
-const navbar = document.querySelector('.main-header');
+/* Auto close navbar HANYA untuk link biasa (bukan dropdown) */
+document.addEventListener('DOMContentLoaded', function () {
 
-// window.addEventListener('scroll', function() {
-//   let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-  
-//   if (scrollTop > lastScrollTop && scrollTop > 100) {
-//     navbar.style.top = "-200px";
-//   } else {
-//     navbar.style.top = "0";
-//   }
-//   lastScrollTop = scrollTop;
-// });
+  const navbarCollapse = document.querySelector('.navbar-collapse');
 
-// Tutup navbar otomatis setelah klik link
-const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
-const navbarCollapse = document.querySelector('.navbar-collapse');
-navLinks.forEach(link => {
-  link.addEventListener('click', () => {
-    const bsCollapse = new bootstrap.Collapse(navbarCollapse, { toggle: false });
-    bsCollapse.hide();
-  });
+  // Tutup navbar saat klik link navigasi biasa
+  document
+    .querySelectorAll('.navbar-nav .nav-link:not(.dropdown-toggle)')
+    .forEach(link => {
+      link.addEventListener('click', () => {
+        const bsCollapse = new bootstrap.Collapse(navbarCollapse, {
+          toggle: false
+        });
+        bsCollapse.hide();
+      });
+    });
+
+  // Cegah dropdown menutup navbar di mobile
+  if (window.innerWidth < 992) {
+    document
+      .querySelectorAll('.navbar .dropdown-toggle')
+      .forEach(dropdown => {
+        dropdown.addEventListener('click', function (e) {
+          e.stopPropagation();
+        });
+      });
+  }
+
 });
 </script>
+
 
 </body>
 </html>
