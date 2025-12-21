@@ -138,6 +138,60 @@
             </a>
           </li>
 
+          <!-- SPMI -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle py-3 px-4" 
+               href="javascript:void(0)" 
+               id="dropdownSPMI" 
+               role="button" 
+               data-bs-toggle="dropdown" 
+               aria-expanded="false">
+              SPMI
+            </a>
+
+            <ul class="dropdown-menu shadow rounded-4 border-0"
+                aria-labelledby="dropdownSPMI">
+
+              <li>
+                <a class="dropdown-item py-2 px-4"
+                   href="<?php echo base_url('penetapan'); ?>">
+                  Penetapan
+                </a>
+              </li>
+
+              <li>
+                <a class="dropdown-item py-2 px-4"
+                   href="<?php echo base_url('pelaksanaan'); ?>">
+                  Pelaksanaan
+                </a>
+              </li>
+
+              <li>
+                <a class="dropdown-item py-2 px-4"
+                   href="<?php echo base_url('evaluasi'); ?>">
+                  Evaluasi
+                </a>
+              </li>
+
+              <li>
+                <a class="dropdown-item py-2 px-4"
+                   href="<?php echo base_url('pengendalian'); ?>">
+                  Pengendalian
+                </a>
+              </li>
+
+              <li>
+                <a class="dropdown-item py-2 px-4"
+                   href="<?php echo base_url('peningkatan'); ?>">
+                  Peningkatan
+                </a>
+              </li>
+
+              
+
+            </ul>
+          </li>
+
           <!-- INFORMASI PUBLIK -->
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle py-3 px-4" 
