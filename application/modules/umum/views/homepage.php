@@ -454,43 +454,45 @@
 
 <!-- Bootstrap Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Scroll & Navbar Control -->
+
 <script>
-/* Scroll ke atas */
 function animateScroll() {
   window.scroll({ top: 0, behavior: 'smooth' });
 }
 
-/* Auto close navbar HANYA untuk link biasa (bukan dropdown) */
 document.addEventListener('DOMContentLoaded', function () {
 
   const navbarCollapse = document.querySelector('.navbar-collapse');
 
-  // Tutup navbar saat klik link navigasi biasa
-  document
-    .querySelectorAll('.navbar-nav .nav-link:not(.dropdown-toggle)')
-    .forEach(link => {
-      link.addEventListener('click', () => {
-        const bsCollapse = new bootstrap.Collapse(navbarCollapse, {
-          toggle: false
-        });
-        bsCollapse.hide();
-      });
-    });
+  // Tangani SEMUA klik di dalam navbar
+  document.querySelector('.navbar-nav')
+    .addEventListener('click', function (e) {
 
-  // Cegah dropdown menutup navbar di mobile
-  if (window.innerWidth < 992) {
-    document
-      .querySelectorAll('.navbar .dropdown-toggle')
-      .forEach(dropdown => {
-        dropdown.addEventListener('click', function (e) {
-          e.stopPropagation();
-        });
+      const target = e.target.closest('a');
+      if (!target) return;
+
+      const href = target.getAttribute('href');
+
+      // ❌ Jangan tutup navbar jika:
+      if (
+        target.classList.contains('dropdown-toggle') || // klik dropdown
+        target.classList.contains('dropdown-item') ||   // klik item dropdown
+        href === '#' ||
+        href === 'javascript:void(0)'
+      ) {
+        return;
+      }
+
+      // ✅ Tutup navbar HANYA untuk link navigasi nyata
+      const bsCollapse = new bootstrap.Collapse(navbarCollapse, {
+        toggle: false
       });
-  }
+      bsCollapse.hide();
+    });
 
 });
 </script>
+
 
 
 </body>
