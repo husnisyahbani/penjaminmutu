@@ -319,7 +319,7 @@
           Selamat Datang di SIJAMU, Media Informasi, Monitoring, dan evaluasi mutu untuk mendukung pelaksanaan Sistem Penjamin Mutu Internal STIK SITI KHADIJAH secara terintegrasi, transparan, dan berkelanjutan dalam mewujudkan pendidikan tinggi yang bermutu
         </p>
         <p class="text-lg-end">
-          <a class="btn btn-warning btn-lg px-5 py-3 rounded-5" href="<?php echo base_url();?>#fitur" role="button">Pelajari lebih lanjut</a>
+          <a class="btn btn-warning btn-lg px-5 py-3 rounded-5" style="font-weight: bold; color: white;" href="<?php echo base_url();?>#fitur" role="button">Pelajari lebih lanjut</a>
         </p>
       </div>
     </div>
