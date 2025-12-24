@@ -75,6 +75,51 @@
             
          </ul>
         </li>
+
+
+        <li class="site-menu-item has-sub <?php if(isset($website)){echo $website;} ?>">
+          <a href="javascript:void(0)">
+                  <i class="site-menu-icon md-view-compact" aria-hidden="true"></i>
+                  <span class="site-menu-title">Website</span>
+                          <span class="site-menu-arrow"></span>
+         </a>
+
+         <ul class="site-menu-sub">
+           <li class="site-menu-item <?php if(isset($berita)){echo $berita;} ?>">
+             <a class="animsition-link" href="<?php echo base_url($module.'/berita');?>">
+               <span class="site-menu-title">Berita</span>
+             </a>
+          </li>
+          
+        
+           <li class="site-menu-item <?php if(isset($sk)){echo $sk;} ?>">
+             <a class="animsition-link" href="<?php echo base_url($module.'/sk');?>">
+               <span class="site-menu-title">Surat Keputusan</span>
+             </a>
+          </li>
+            
+            <li class="site-menu-item <?php if(isset($organisasi)){echo $organisasi;} ?>">
+              <a class="animsition-link" href="<?php echo base_url($module.'/organisasi');?>">
+                <span class="site-menu-title">Struktur Organisasi</span>
+              </a>
+            </li>
+
+            <li class="site-menu-item <?php if(isset($visimisi)){echo $visimisi;} ?>">
+              <a class="animsition-link" href="<?php echo base_url($module.'/visimisi');?>">
+                <span class="site-menu-title">Visi & Misi</span>
+              </a>
+            </li>
+
+            <li class="site-menu-item <?php if(isset($proker)){echo $proker;} ?>">
+              <a class="animsition-link" href="<?php echo base_url($module.'/proker');?>">
+                <span class="site-menu-title">Program Kerja</span>
+              </a>
+            </li>
+
+            
+            
+         </ul>
+        </li>
         
         
         
