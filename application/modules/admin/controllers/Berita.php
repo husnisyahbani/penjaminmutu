@@ -55,6 +55,7 @@ class Berita extends MY_Controller {
                     $this->data['content'] = 'berita/add_berita';
                     $this->data['title'] = 'Berita';
                     $this->data['berita'] = 'active';
+                    $this->data['website'] = 'active';
                     $this->data['js'] = $this->load->get_js_files();
                     $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
                     $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
@@ -96,6 +97,7 @@ class Berita extends MY_Controller {
             $this->data['content'] = 'berita/edit_berita';
             $this->data['title'] = 'Berita';
             $this->data['berita'] = 'active';
+            $this->data['website'] = 'active';
             $this->data['js'] = $this->load->get_js_files();
             $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
             $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
