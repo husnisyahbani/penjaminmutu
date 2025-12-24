@@ -15,7 +15,7 @@ class Berita extends MY_Controller {
     }
 
     public function index() {
-        $this->data['content'] = 'daberitata';
+        $this->data['content'] = 'berita/index';
         $this->data['title'] = 'Berita';
         $this->data['js'] = $this->load->get_js_files();
         $this->data['berita'] = 'active';
