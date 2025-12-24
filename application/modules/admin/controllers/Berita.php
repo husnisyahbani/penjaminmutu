@@ -44,19 +44,21 @@ class Berita extends MY_Controller {
                     $data['berita_isi'] = trim($this->input->post('berita_isi'));
 
                     if($this->beritamodel->add($data)){
-                        $query = array("status" => true, "pesan" => "Berhasil");
+                        $msg = 'Berhasil';
+                        $this->session->set_flashdata('pesanberhasil', $msg);
                     }else{
-                        $query = array("status" => false, "pesan" => "Gagal");
+                        $msg = 'Gagal';
+                        $this->session->set_flashdata('pesanerror', $msg);
                     }
-
-                    header('Access-Control-Allow-Origin: *');
-                    header('Content-Type: application/json');
-                    echo json_encode($query);
+                    redirect(base_url($this->module."/berita"));
                 }else{
-                    $query = array("status" => false, "pesan" => "Silahkan Tambahkan File Berita");
-                    header('Access-Control-Allow-Origin: *');
-                    header('Content-Type: application/json');
-                    echo json_encode($query);
+                    $this->data['content'] = 'berita/add_berita';
+                    $this->data['title'] = 'Berita';
+                    $this->data['berita'] = 'active';
+                    $this->data['js'] = $this->load->get_js_files();
+                    $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
+                    $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
+                    $this->template($this->data, $this->module);
                 } 
     }
 
@@ -81,36 +83,24 @@ class Berita extends MY_Controller {
             $data['berita_isi'] = trim($this->input->post('berita_isi'));
             
             if($this->beritamodel->edit($data)){
-                $query = array("status" => true, "pesan" => "Berhasil");
+                $msg = 'Berhasil';
+                $this->session->set_flashdata('pesanberhasil', $msg);
             }else{
-                $query = array("status" => false, "pesan" => "Gagal");
+                $msg = 'Gagal';
+                $this->session->set_flashdata('pesanerror', $msg);
             }
 
-            header('Access-Control-Allow-Origin: *');
-            header('Content-Type: application/json');
-            echo json_encode($query);
+            redirect(base_url($this->module."/berita"));
 
         }else{
-            $query = array("status" => false, "pesan" => "Akses Ditolak");
-                    header('Access-Control-Allow-Origin: *');
-                    header('Content-Type: application/json');
-                    echo json_encode($query);
+            $this->data['content'] = 'berita/edit_berita';
+            $this->data['title'] = 'Berita';
+            $this->data['berita'] = 'active';
+            $this->data['js'] = $this->load->get_js_files();
+            $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
+            $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
+            $this->template($this->data, $this->module);
         } 
-    }
-
-    public function getBerita($id) {
-        if(isset($id)){
-            $query = $this->beritamodel->getBerita($id);
-            $query['status'] = true;
-            header('Access-Control-Allow-Origin: *');
-            header('Content-Type: application/json');
-            echo json_encode($query);
-        }else{
-            $query = array("status"=>false);
-            header('Access-Control-Allow-Origin: *');
-            header('Content-Type: application/json');
-            echo json_encode($query); 
-        }
     }
 
     public function hapus() {
