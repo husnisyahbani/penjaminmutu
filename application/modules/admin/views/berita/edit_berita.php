@@ -13,7 +13,7 @@
                         <h3 class="panel-title">Edit Berita </h3>
                     </div>
                     <div class="panel-body">
-                        <form class="form-horizontal" id="formeditdata" autocomplete="off" action="<?php if(isset($result[0]['data_id'])) echo base_url() . 'admin/data/editdata?id='.$result[0]['data_id'];?>" method="post" enctype="multipart/form-data">
+                        <form class="form-horizontal" id="formeditberita" autocomplete="off" action="<?php if(isset($result[0]['data_id'])) echo base_url() . 'admin/data/editdata?id='.$result[0]['data_id'];?>" method="post" enctype="multipart/form-data">
 
                             <div class="form-group row">
                                 <label class="col-md-3 form-control-label">Berita</label>

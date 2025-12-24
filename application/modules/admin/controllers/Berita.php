@@ -5,7 +5,7 @@ class Berita extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'admin';
-        $this->load->js(base_url("assets/app/admin/berita.js?v=1.11"));
+        $this->load->js(base_url("assets/app/admin/berita.js?v=1.0.0"));
         $this->load->model('BeritaModel', 'beritamodel');
 
         $role = $this->session->userdata('role');
@@ -60,8 +60,7 @@ class Berita extends MY_Controller {
                 } 
     }
 
-    public function edit() {
-        $berita_id = $this->input->post('berita_id');
+    public function edit($berita_id = null) {
         if($berita_id){
             $data = array();
             $config['upload_path'] = 'filedata';
