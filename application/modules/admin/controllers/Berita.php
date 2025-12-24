@@ -118,7 +118,7 @@ class Berita extends MY_Controller {
         $this->beritamodel->hapus($id);
     }
 
-    public function listdata($id = null) {
+    public function listberita($id = null) {
         $post = array();
         $post['search'] = $this->input->post('search');
         $post['order'] = $this->input->post('order');
