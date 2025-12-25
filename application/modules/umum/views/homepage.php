@@ -494,17 +494,41 @@
         foreach($group as $b){
     ?>
         <div class="col-md-4 mb-4">
-          <div class="card" style="border-radius:10px;overflow:hidden;box-shadow:0 5px 10px rgba(0,0,0,0.2);">
-            <img src="<?= base_url("filedata")."/".$b['berita_file'] ?>" class="card-img-top">
-            <div class="card-body">
-              <span style="font-size:13px;color:#888;"><?= $b['berita_create'] ?></span>
-              <h5 style="margin-top:5px;"><?= $b['berita_judul'] ?></h5>
-              <p style="font-size:14px;color:#555;">
-                <?= $b['berita_deskripsi'] ?>
-              </p>
-            </div>
-          </div>
-        </div>
+  <div class="card" style="border-radius:10px;overflow:hidden;box-shadow:0 5px 10px rgba(0,0,0,0.2);">
+
+    <img src="<?= $b['berita_file'] ?>" 
+         style="width:100%;height:220px;object-fit:cover;">
+
+    <div class="card-body">
+
+      <span style="font-size:13px;color:#888;display:block;margin-bottom:5px;">
+        <?= $b['berita_create'] ?>
+      </span>
+
+      <!-- JUDUL FIX HEIGHT -->
+      <h5 style="
+        margin-top:5px;
+        font-size:18px;
+        min-height:48px;
+        max-height:48px;
+        overflow:hidden;">
+        <?= $b['berita_judul'] ?>
+      </h5>
+
+      <!-- DESKRIPSI FIX HEIGHT -->
+      <p style="
+        font-size:14px;
+        color:#555;
+        min-height:70px;
+        max-height:70px;
+        overflow:hidden;">
+        <?= $b['berita_deskripsi'] ?>
+      </p>
+
+    </div>
+  </div>
+</div>
+
     <?php
         }
         echo '</div></div>';
