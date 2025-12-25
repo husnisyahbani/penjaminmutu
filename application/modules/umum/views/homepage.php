@@ -208,7 +208,7 @@
 
               <li>
                 <a class="dropdown-item py-2 px-4"
-                   href="<?php echo base_url('publik/berita'); ?>">
+                   href="<?php echo base_url(); ?>#berita">
                   Berita
                 </a>
               </li>
@@ -470,6 +470,56 @@
       </div>
     </div>
   </section>
+
+  <section id="berita" class="py-5">
+    <div class="container py-5">
+      <div class="row">
+
+    <!-- CARD 1 -->
+    <div class="col-md-4 mb-4">
+      <div class="card" style="border-radius:10px;overflow:hidden;box-shadow:0 5px 10px rgba(0,0,0,0.2);">
+        <img src="https://via.placeholder.com/400x250" class="card-img-top" alt="thumbnail">
+        <div class="card-body">
+          <span style="font-size:13px;color:#888;">25 Desember 2025</span>
+          <h5 class="card-title" style="margin-top:5px;">Judul Berita Utama</h5>
+          <p class="card-text" style="font-size:14px;color:#555;">
+            Ini adalah deskripsi singkat berita yang memberikan gambaran isi artikel secara ringkas dan jelas.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 2 -->
+    <div class="col-md-4 mb-4">
+      <div class="card" style="border-radius:10px;overflow:hidden;box-shadow:0 5px 10px rgba(0,0,0,0.2);">
+        <img src="https://via.placeholder.com/400x250" class="card-img-top" alt="thumbnail">
+        <div class="card-body">
+          <span style="font-size:13px;color:#888;">24 Desember 2025</span>
+          <h5 class="card-title" style="margin-top:5px;">Berita Kedua Menarik</h5>
+          <p class="card-text" style="font-size:14px;color:#555;">
+            Deskripsi singkat tentang berita kedua yang informatif dan mudah dipahami oleh pembaca.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 3 -->
+    <div class="col-md-4 mb-4">
+      <div class="card" style="border-radius:10px;overflow:hidden;box-shadow:0 5px 10px rgba(0,0,0,0.2);">
+        <img src="https://via.placeholder.com/400x250" class="card-img-top" alt="thumbnail">
+        <div class="card-body">
+          <span style="font-size:13px;color:#888;">23 Desember 2025</span>
+          <h5 class="card-title" style="margin-top:5px;">Berita Ketiga Terbaru</h5>
+          <p class="card-text" style="font-size:14px;color:#555;">
+            Ringkasan singkat berita ketiga yang memberikan informasi padat dan jelas kepada pembaca.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+      </div>
+    </div>
 
   <section id="kontak" class="py-5">
     <div class="container py-5">
