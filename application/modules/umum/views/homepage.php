@@ -473,95 +473,59 @@
 
   <section id="berita" class="py-5">
     <div class="container py-5">
-      <!-- RUNNING BLOG -->
-<div style="background:#d9534f;color:#fff;padding:8px;">
+      <div style="background:#d9534f;color:#fff;padding:8px;">
   <marquee behavior="scroll" direction="left" style="font-size:16px;">
-      Breaking News: Sistem Informasi Terbaru Diluncurkan • Pengumuman Akademik Penting • Jadwal Perkuliahan Diperbarui
+      Breaking News • Informasi Penting • Update Terbaru
   </marquee>
 </div>
 
 <div class="container mt-4">
 
-  <div id="newsSlider" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2500" style="width:100%;">
-    <div class="carousel-inner">
+<div id="newsSlider" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2500">
 
-      <!-- SLIDE 1 -->
-      <div class="carousel-item active">
-        <div class="row justify-content-center">
+  <div class="carousel-inner">
 
-          <div class="col-md-4">
-            <div class="card" style="border-radius:10px;overflow:hidden;box-shadow:0 5px 10px rgba(0,0,0,0.2);">
-              <img src="https://via.placeholder.com/400x250" class="card-img-top">
-              <div class="card-body">
-                <span style="font-size:13px;color:#888;">25 Desember 2025</span>
-                <h5 style="margin-top:5px;">Judul Berita Pertama</h5>
-                <p style="font-size:14px;color:#555;">
-                  Deskripsi singkat berita pertama yang informatif dan mudah dipahami.
-                </p>
-              </div>
+    <?php
+    $chunk = array_chunk($berita, 2); // 2 card per slide
+    $active = "active";
+
+    foreach($chunk as $group){
+        echo '<div class="carousel-item '.$active.'"><div class="row justify-content-center">';
+        foreach($group as $b){
+    ?>
+        <div class="col-md-4 mb-4">
+          <div class="card" style="border-radius:10px;overflow:hidden;box-shadow:0 5px 10px rgba(0,0,0,0.2);">
+            <img src="<?= $b['berita_file'] ?>" class="card-img-top">
+            <div class="card-body">
+              <span style="font-size:13px;color:#888;"><?= $b['berita_create'] ?></span>
+              <h5 style="margin-top:5px;"><?= $b['berita_judul'] ?></h5>
+              <p style="font-size:14px;color:#555;">
+                <?= $b['berita_deskripsi'] ?>
+              </p>
             </div>
           </div>
-
-          <div class="col-md-4">
-            <div class="card" style="border-radius:10px;overflow:hidden;box-shadow:0 5px 10px rgba(0,0,0,0.2);">
-              <img src="https://via.placeholder.com/400x250" class="card-img-top">
-              <div class="card-body">
-                <span style="font-size:13px;color:#888;">25 Desember 2025</span>
-                <h5 style="margin-top:5px;">Judul Berita Kedua</h5>
-                <p style="font-size:14px;color:#555;">
-                  Ringkasan singkat berita kedua dengan informasi padat dan jelas.
-                </p>
-              </div>
-            </div>
-          </div>
-
         </div>
-      </div>
-
-      <!-- SLIDE 2 -->
-      <div class="carousel-item">
-        <div class="row justify-content-center">
-
-          <div class="col-md-4">
-            <div class="card" style="border-radius:10px;overflow:hidden;box-shadow:0 5px 10px rgba(0,0,0,0.2);">
-              <img src="https://via.placeholder.com/400x250" class="card-img-top">
-              <div class="card-body">
-                <span style="font-size:13px;color:#888;">24 Desember 2025</span>
-                <h5 style="margin-top:5px;">Judul Berita Ketiga</h5>
-                <p style="font-size:14px;color:#555;">
-                  Deskripsi singkat berita ketiga tentang update terbaru.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-md-4">
-            <div class="card" style="border-radius:10px;overflow:hidden;box-shadow:0 5px 10px rgba(0,0,0,0.2);">
-              <img src="https://via.placeholder.com/400x250" class="card-img-top">
-              <div class="card-body">
-                <span style="font-size:13px;color:#888;">24 Desember 2025</span>
-                <h5 style="margin-top:5px;">Judul Berita Keempat</h5>
-                <p style="font-size:14px;color:#555;">
-                  Ringkasan berita menarik lainnya yang bermanfaat bagi pembaca.
-                </p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-    </div>
-
-    <!-- NAVIGATION -->
-    <button class="carousel-control-prev" type="button" data-bs-target="#newsSlider" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon"></span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#newsSlider" data-bs-slide="next">
-      <span class="carousel-control-next-icon"></span>
-    </button>
+    <?php
+        }
+        echo '</div></div>';
+        $active = ""; // next slide tidak active
+    }
+    ?>
 
   </div>
+
+  <!-- BUTTON -->
+  <button class="carousel-control-prev" type="button" data-bs-target="#newsSlider" data-bs-slide="prev"
+   style="width:50px;height:50px;background:rgba(0,0,0,0.6);border-radius:50%;top:45%;">
+    <span class="carousel-control-prev-icon" style="filter:invert(1);"></span>
+  </button>
+
+  <button class="carousel-control-next" type="button" data-bs-target="#newsSlider" data-bs-slide="next"
+   style="width:50px;height:50px;background:rgba(0,0,0,0.6);border-radius:50%;top:45%;">
+    <span class="carousel-control-next-icon" style="filter:invert(1);"></span>
+  </button>
+
+</div>
 </div>
       </div>
     </div>

@@ -5,7 +5,7 @@ class Homepage extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'umum';
-        $this->load->model('UsersModel', 'users');
+        $this->load->model('BeritaModel', 'beritamodel');
         $this->load->js(base_url("assets/app/umum/login.js"));
     }
 
@@ -16,7 +16,8 @@ class Homepage extends MY_Controller {
                 // $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
                 // $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
                 // $this->template($this->data, $this->module);
-                $this->load->view('homepage');
+                $berita = $this->beritamodel->getAllBerita();
+                $this->load->view('homepage', array('berita' => $berita));
     }
 
 }
