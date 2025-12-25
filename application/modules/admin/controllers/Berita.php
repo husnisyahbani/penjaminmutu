@@ -100,19 +100,16 @@ class Berita extends MY_Controller {
             $data['berita_judul']  = $this->input->post('berita_judul');
             $data['berita_deskripsi'] = $this->input->post('berita_deskripsi');
             $data['berita_isi'] = trim($this->input->post('berita_isi'));
-
-            echo '<pre>';
-            print_r($data);     
             
-            // if($this->beritamodel->edit($data)){
-            //     $msg = 'Berhasil';
-            //     $this->session->set_flashdata('pesanberhasil', $msg);
-            // }else{
-            //     $msg = 'Gagal';
-            //     $this->session->set_flashdata('pesanerror', $msg);
-            // }
+            if($this->beritamodel->edit($data)){
+                $msg = 'Berhasil';
+                $this->session->set_flashdata('pesanberhasil', $msg);
+            }else{
+                $msg = 'Gagal';
+                $this->session->set_flashdata('pesanerror', $msg);
+            }
 
-            // redirect(base_url($this->module."/berita"));
+            redirect(base_url($this->module."/berita"));
 
         }else{
             $this->data['content'] = 'berita/edit_berita';
