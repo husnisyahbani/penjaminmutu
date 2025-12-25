@@ -5,7 +5,7 @@ class Berita extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'admin';
-        $this->load->js(base_url("assets/app/admin/berita.js?v=1.0.0"));
+        $this->load->js(base_url("assets/app/admin/berita.js?v=1.0.1"));
         $this->load->model('BeritaModel', 'beritamodel');
 
         $role = $this->session->userdata('role');
@@ -130,7 +130,6 @@ class Berita extends MY_Controller {
             $row[] = $field->berita_deskripsi;
             $row[] = '<a class="btn btn-sm btn-icon btn-success"
             data-toggle="tooltip" data-original-title="Detail" href="'.base_url('filedata/').$field->berita_file.'" target="_blank"><i class="icon md-download" aria-hidden="true"></i> Download</a>' ;
-            $row[] = $field->berita_isi;
             $row[] = date("d-m-Y H:i:s", strtotime($field->berita_create));
             $row[] = '<button class="edit btn btn-sm btn-icon btn-pure btn-default on-default edit-row"
             data-toggle="tooltip" data-original-title="Edit" id=' . $field->berita_id . '><i class="icon md-edit" aria-hidden="true"></i></button><button class="delete btn btn-sm btn-icon btn-pure btn-default on-default remove-row"

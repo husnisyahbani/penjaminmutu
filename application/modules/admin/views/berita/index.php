@@ -25,7 +25,6 @@
                             <th>Judul</th>
                             <th>Deskripsi</th>
                             <th>Gambar</th>
-                            <th>Isi</th>
                             <th width="200px">Tanggal</th>
                             <th width="150px">Aksi</th>
                         </tr>
