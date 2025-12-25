@@ -495,7 +495,7 @@
     ?>
         <div class="col-md-4 mb-4">
           <div class="card" style="border-radius:10px;overflow:hidden;box-shadow:0 5px 10px rgba(0,0,0,0.2);">
-            <img src="<?= $b['berita_file'] ?>" class="card-img-top">
+            <img src="<?= base_url("filedata")."/".$b['berita_file'] ?>" class="card-img-top">
             <div class="card-body">
               <span style="font-size:13px;color:#888;"><?= $b['berita_create'] ?></span>
               <h5 style="margin-top:5px;"><?= $b['berita_judul'] ?></h5>
