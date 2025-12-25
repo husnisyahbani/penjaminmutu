@@ -13,7 +13,7 @@
                         <h3 class="panel-title">Edit Berita </h3>
                     </div>
                     <div class="panel-body">
-                        <form class="form-horizontal" id="formeditberita" autocomplete="off" action="<?php if(isset($result['data_id'])) echo base_url() .$module. 'admin/berita/edit?id='.$result['berita_id'];?>" method="post" enctype="multipart/form-data">
+                        <form class="form-horizontal" id="formeditberita" autocomplete="off" action="<?php if(isset($result['berita_id'])) echo base_url() .$module. 'admin/berita/edit?id='.$result['berita_id'];?>" method="post" enctype="multipart/form-data">
 
                             <div class="form-group row">
                                 <label class="col-md-3 form-control-label">Berita</label>
@@ -51,7 +51,7 @@
 
 
                             <div class="text-right">
-                                <button type="submit" class="btn btn-primary" id="validateButton" name="submitberita">Submit</button>
+                                <button type="submit" class="btn btn-primary" id="validateButton" name="submitberita" value="submit">Submit</button>
                             </div>
                         </form>
                     </div>

@@ -25,6 +25,23 @@ class Berita extends MY_Controller {
         $this->template($this->data, $this->module);
     }
 
+    private function limit_200_words($text){
+    // Hilangkan spasi berlebih
+    $text = trim(preg_replace('/\s+/', ' ', $text));
+
+    $words = explode(' ', $text);
+    $count = count($words);
+
+    if($count <= 200){
+        return $text; // tidak lebih dari 200 kata
+    }
+
+    // Ambil 200 kata pertama lalu tambah ...
+    $limited = array_slice($words, 0, 200);
+    return implode(' ', $limited) . ' ...';
+}
+
+
     public function tambah() {
                 $data = array();
                 $config['upload_path'] = 'filedata';
@@ -64,7 +81,8 @@ class Berita extends MY_Controller {
     }
 
     public function edit($berita_id = null) {
-        if($berita_id){
+        $submitberita = $this->input->post('submitberita');
+        if($submitberita){
             $data = array();
             $config['upload_path'] = 'filedata';
             $config['allowed_types'] = '*';
@@ -98,6 +116,7 @@ class Berita extends MY_Controller {
             $this->data['title'] = 'Berita';
             $this->data['berita'] = 'active';
             $this->data['website'] = 'active';
+            $this->data['result'] = $this->beritamodel->getBeritaById($berita_id);
             $this->data['js'] = $this->load->get_js_files();
             $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
             $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
@@ -127,7 +146,7 @@ class Berita extends MY_Controller {
             $row = array();
             $row[] = $no;
             $row[] = $field->berita_judul;
-            $row[] = $field->berita_deskripsi;
+            $row[] = $this->limit_200_words($field->berita_deskripsi);
             $row[] = '<a class="btn btn-sm btn-icon btn-success"
             data-toggle="tooltip" data-original-title="Detail" href="'.base_url('filedata/').$field->berita_file.'" target="_blank"><i class="icon md-download" aria-hidden="true"></i> Download</a>' ;
             $row[] = date("d-m-Y H:i:s", strtotime($field->berita_create));

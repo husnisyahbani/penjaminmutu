@@ -75,7 +75,7 @@ class BeritaModel extends CI_Model {
         return($this->db->affected_rows() != 1) ? false : true;
     }
 
-    function getData($id) {
+    function getBeritaById($id) {
         $this->db->where('berita_id',$id);
         $this->db->from('berita');
         $query = $this->db->get();
