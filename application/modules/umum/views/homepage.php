@@ -539,7 +539,7 @@
   </div>
 
   <!-- BUTTON -->
-  <button class="carousel-control-prev" type="button" data-bs-target="#newsSlider" data-bs-slide="prev"
+  <!-- <button class="carousel-control-prev" type="button" data-bs-target="#newsSlider" data-bs-slide="prev"
    style="width:50px;height:50px;background:rgba(0,0,0,0.6);border-radius:50%;top:45%;">
     <span class="carousel-control-prev-icon" style="filter:invert(1);"></span>
   </button>
@@ -547,7 +547,19 @@
   <button class="carousel-control-next" type="button" data-bs-target="#newsSlider" data-bs-slide="next"
    style="width:50px;height:50px;background:rgba(0,0,0,0.6);border-radius:50%;top:45%;">
     <span class="carousel-control-next-icon" style="filter:invert(1);"></span>
+  </button> -->
+
+  <div style="text-align:center;margin-top:10px;">
+  <button type="button" data-bs-target="#newsSlider" data-bs-slide="prev"
+    style="padding:8px 18px;border:none;border-radius:30px;background:#333;color:#fff;margin-right:8px;">
+    ‹ Prev
   </button>
+
+  <button type="button" data-bs-target="#newsSlider" data-bs-slide="next"
+    style="padding:8px 18px;border:none;border-radius:30px;background:#333;color:#fff;">
+    Next ›
+  </button>
+</div>
 
 </div>
 </div>
