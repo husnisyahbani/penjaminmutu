@@ -208,7 +208,7 @@
 
               <li>
                 <a class="dropdown-item py-2 px-4"
-                   href="<?php echo base_url(); ?>#berita">
+                   href="<?php echo base_url('publik/berita'); ?>">
                   Berita
                 </a>
               </li>
@@ -473,51 +473,96 @@
 
   <section id="berita" class="py-5">
     <div class="container py-5">
-      <div class="row">
+      <!-- RUNNING BLOG -->
+<div style="background:#d9534f;color:#fff;padding:8px;">
+  <marquee behavior="scroll" direction="left" style="font-size:16px;">
+      Breaking News: Sistem Informasi Terbaru Diluncurkan • Pengumuman Akademik Penting • Jadwal Perkuliahan Diperbarui
+  </marquee>
+</div>
 
-    <!-- CARD 1 -->
-    <div class="col-md-4 mb-4">
-      <div class="card" style="border-radius:10px;overflow:hidden;box-shadow:0 5px 10px rgba(0,0,0,0.2);">
-        <img src="https://via.placeholder.com/400x250" class="card-img-top" alt="thumbnail">
-        <div class="card-body">
-          <span style="font-size:13px;color:#888;">25 Desember 2025</span>
-          <h5 class="card-title" style="margin-top:5px;">Judul Berita Utama</h5>
-          <p class="card-text" style="font-size:14px;color:#555;">
-            Ini adalah deskripsi singkat berita yang memberikan gambaran isi artikel secara ringkas dan jelas.
-          </p>
+<div class="container mt-4">
+
+  <div id="newsSlider" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2500" style="width:100%;">
+    <div class="carousel-inner">
+
+      <!-- SLIDE 1 -->
+      <div class="carousel-item active">
+        <div class="row justify-content-center">
+
+          <div class="col-md-4">
+            <div class="card" style="border-radius:10px;overflow:hidden;box-shadow:0 5px 10px rgba(0,0,0,0.2);">
+              <img src="https://via.placeholder.com/400x250" class="card-img-top">
+              <div class="card-body">
+                <span style="font-size:13px;color:#888;">25 Desember 2025</span>
+                <h5 style="margin-top:5px;">Judul Berita Pertama</h5>
+                <p style="font-size:14px;color:#555;">
+                  Deskripsi singkat berita pertama yang informatif dan mudah dipahami.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="card" style="border-radius:10px;overflow:hidden;box-shadow:0 5px 10px rgba(0,0,0,0.2);">
+              <img src="https://via.placeholder.com/400x250" class="card-img-top">
+              <div class="card-body">
+                <span style="font-size:13px;color:#888;">25 Desember 2025</span>
+                <h5 style="margin-top:5px;">Judul Berita Kedua</h5>
+                <p style="font-size:14px;color:#555;">
+                  Ringkasan singkat berita kedua dengan informasi padat dan jelas.
+                </p>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
-    </div>
 
-    <!-- CARD 2 -->
-    <div class="col-md-4 mb-4">
-      <div class="card" style="border-radius:10px;overflow:hidden;box-shadow:0 5px 10px rgba(0,0,0,0.2);">
-        <img src="https://via.placeholder.com/400x250" class="card-img-top" alt="thumbnail">
-        <div class="card-body">
-          <span style="font-size:13px;color:#888;">24 Desember 2025</span>
-          <h5 class="card-title" style="margin-top:5px;">Berita Kedua Menarik</h5>
-          <p class="card-text" style="font-size:14px;color:#555;">
-            Deskripsi singkat tentang berita kedua yang informatif dan mudah dipahami oleh pembaca.
-          </p>
+      <!-- SLIDE 2 -->
+      <div class="carousel-item">
+        <div class="row justify-content-center">
+
+          <div class="col-md-4">
+            <div class="card" style="border-radius:10px;overflow:hidden;box-shadow:0 5px 10px rgba(0,0,0,0.2);">
+              <img src="https://via.placeholder.com/400x250" class="card-img-top">
+              <div class="card-body">
+                <span style="font-size:13px;color:#888;">24 Desember 2025</span>
+                <h5 style="margin-top:5px;">Judul Berita Ketiga</h5>
+                <p style="font-size:14px;color:#555;">
+                  Deskripsi singkat berita ketiga tentang update terbaru.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="card" style="border-radius:10px;overflow:hidden;box-shadow:0 5px 10px rgba(0,0,0,0.2);">
+              <img src="https://via.placeholder.com/400x250" class="card-img-top">
+              <div class="card-body">
+                <span style="font-size:13px;color:#888;">24 Desember 2025</span>
+                <h5 style="margin-top:5px;">Judul Berita Keempat</h5>
+                <p style="font-size:14px;color:#555;">
+                  Ringkasan berita menarik lainnya yang bermanfaat bagi pembaca.
+                </p>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
+
     </div>
 
-    <!-- CARD 3 -->
-    <div class="col-md-4 mb-4">
-      <div class="card" style="border-radius:10px;overflow:hidden;box-shadow:0 5px 10px rgba(0,0,0,0.2);">
-        <img src="https://via.placeholder.com/400x250" class="card-img-top" alt="thumbnail">
-        <div class="card-body">
-          <span style="font-size:13px;color:#888;">23 Desember 2025</span>
-          <h5 class="card-title" style="margin-top:5px;">Berita Ketiga Terbaru</h5>
-          <p class="card-text" style="font-size:14px;color:#555;">
-            Ringkasan singkat berita ketiga yang memberikan informasi padat dan jelas kepada pembaca.
-          </p>
-        </div>
-      </div>
-    </div>
+    <!-- NAVIGATION -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#newsSlider" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#newsSlider" data-bs-slide="next">
+      <span class="carousel-control-next-icon"></span>
+    </button>
 
   </div>
+</div>
       </div>
     </div>
 
