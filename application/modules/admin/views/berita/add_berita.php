@@ -13,7 +13,7 @@
                         <h3 class="panel-title">Tambah Berita </h3>
                     </div>
                     <div class="panel-body">
-                        <form class="form-horizontal" id="formaddberita" autocomplete="off" action="<?php echo base_url() . 'admin/data/tambahdata';?>" method="post" enctype="multipart/form-data">
+                        <form class="form-horizontal" id="formaddberita" autocomplete="off" action="<?php echo base_url() . 'admin/data/tambah';?>" method="post" enctype="multipart/form-data">
 
                             <div class="form-group row">
                                 <label class="col-md-3 form-control-label">Berita</label>

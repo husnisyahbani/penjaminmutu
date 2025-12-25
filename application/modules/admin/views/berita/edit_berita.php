@@ -13,12 +13,12 @@
                         <h3 class="panel-title">Edit Berita </h3>
                     </div>
                     <div class="panel-body">
-                        <form class="form-horizontal" id="formeditberita" autocomplete="off" action="<?php if(isset($result[0]['data_id'])) echo base_url() . 'admin/data/editdata?id='.$result[0]['data_id'];?>" method="post" enctype="multipart/form-data">
+                        <form class="form-horizontal" id="formeditberita" autocomplete="off" action="<?php if(isset($result['data_id'])) echo base_url() .$module. 'admin/berita/edit?id='.$result['berita_id'];?>" method="post" enctype="multipart/form-data">
 
                             <div class="form-group row">
                                 <label class="col-md-3 form-control-label">Berita</label>
                                 <div class="col-md-9">
-                                    <input type="file" id="input-file-now" name="upload_file" data-plugin="dropify" data-default-file="<?php if (isset($result[0]['data_file'])) {echo base_url ().$result[0]['data_file'];} ?>"/>
+                                    <input type="file" id="input-file-now" name="upload_file" data-plugin="dropify" data-default-file="<?php if (isset($result['berita_file'])) {echo base_url ().$result['berita_file'];} ?>"/>
                                 </div>
                             </div>
                             
