@@ -486,7 +486,7 @@
   <div class="carousel-inner">
 
     <?php
-    $chunk = array_chunk($berita, 2); // 2 card per slide
+    $chunk = array_chunk($berita, 3); // 2 card per slide
     $active = "active";
 
     foreach($chunk as $group){
