@@ -69,7 +69,7 @@ body{
       <?php if(!empty($result)) { ?>
         <?php foreach($result as $r){ ?>
 
-          <a href="<?= base_url('berita/detail/'.$r['berita_id']) ?>" 
+          <a href="<?= base_url('berita?id='.$r['berita_id']) ?>" 
              style="text-decoration:none;color:#000;">
 
             <div class="card mb-3 shadow-sm sidebar-thumb" 
