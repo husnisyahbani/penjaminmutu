@@ -523,7 +523,7 @@ foreach($chunk as $group){
         <?= $b['berita_deskripsi'] ?>
       </p>
 
-      <a href="<?= base_url('berita/detail/'.$b['berita_id']) ?>" 
+      <a href="<?= base_url('berita/'.$b['berita_id']) ?>" 
          style="
           display:inline-block;
           padding:8px 18px;

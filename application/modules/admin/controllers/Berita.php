@@ -80,6 +80,18 @@ class Berita extends MY_Controller {
                 } 
     }
 
+    public function baca($berita_id = null) {
+        $this->data['content'] = 'berita/baca_berita';
+        $this->data['title'] = 'Berita';
+        $this->data['berita'] = 'active';
+        $this->data['website'] = 'active';
+        $this->data['result'] = $this->beritamodel->getBeritaById($berita_id);
+        $this->data['js'] = $this->load->get_js_files();
+        $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
+        $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
+        $this->template($this->data, $this->module);
+    }
+
     public function edit($berita_id = null) {
         $submitberita = $this->input->post('submitberita');
         if($submitberita){

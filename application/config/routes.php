@@ -53,6 +53,7 @@ $route['default_controller'] = 'umum/Homepage';
 $route['homepage'] = 'umum/Homepage';
 $route['login'] = 'umum/Login';
 $route['admin'] = 'admin/Data';
+$route['berita'] = 'umum/Berita';
 $route['auditee'] = 'auditee/Dashboard';
 $route['auditor'] = 'auditor/Daftaraudit';
 $route['konsultasi'] = 'umum/Konsultasi';
