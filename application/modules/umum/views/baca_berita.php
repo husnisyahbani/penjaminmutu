@@ -12,7 +12,7 @@ body{
 }
 .sidebar-thumb h6{
   font-size:14px;
-  max-height:42px;
+  max-height:80px;
   overflow:hidden;
 }
 .sidebar-thumb img{

@@ -14,7 +14,8 @@ class Berita extends MY_Controller {
         }
     }
 
-    public function index($berita_id = null) {
+    public function index() {
+        $berita_id = $this->input->get('id');    
         $berita = $this->beritamodel->getBeritaById($berita_id);
         $result = $this->beritamodel->getAllBerita();
         $this->data['js'] = $this->load->get_js_files();
