@@ -17,7 +17,7 @@ body{
 }
 .sidebar-thumb img{
   width:100%;
-  height:110px;
+  height:100%;
   object-fit:cover;
 }
 </style>
