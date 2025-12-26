@@ -12,12 +12,12 @@ body{
 }
 .sidebar-thumb h6{
   font-size:14px;
-  max-height:80px;
+  max-height:100px;
   overflow:hidden;
 }
 .sidebar-thumb img{
   width:100%;
-  height:80px;
+  height:110px;
   object-fit:cover;
 }
 </style>
