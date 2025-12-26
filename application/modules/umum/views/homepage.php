@@ -485,15 +485,15 @@
 
   <div class="carousel-inner">
 
-    <?php
-    $chunk = array_chunk($berita, 2); // 2 card per slide
-    $active = "active";
+<?php
+$chunk = array_chunk($berita, 2); // 2 card per slide
+$active = "active";
 
-    foreach($chunk as $group){
-        echo '<div class="carousel-item '.$active.'"><div class="row justify-content-center">';
-        foreach($group as $b){
-    ?>
-        <div class="col-md-4 mb-4">
+foreach($chunk as $group){
+    echo '<div class="carousel-item '.$active.'"><div class="row justify-content-center">';
+    foreach($group as $b){
+?>
+<div class="col-md-4 mb-4">
   <div class="card" style="border-radius:10px;overflow:hidden;box-shadow:0 5px 10px rgba(0,0,0,0.2);">
 
     <img src="<?= base_url("filedata")."/".$b['berita_file'] ?>" 
@@ -505,7 +505,6 @@
         <?= $b['berita_create'] ?>
       </span>
 
-      <!-- JUDUL FIX HEIGHT -->
       <h5 style="
         margin-top:5px;
         font-size:18px;
@@ -515,7 +514,6 @@
         <?= $b['berita_judul'] ?>
       </h5>
 
-      <!-- DESKRIPSI FIX HEIGHT -->
       <p style="
         font-size:14px;
         color:#555;
@@ -525,18 +523,34 @@
         <?= $b['berita_deskripsi'] ?>
       </p>
 
+      <a href="<?= base_url('berita/detail/'.$b['berita_id']) ?>" 
+         style="
+          display:inline-block;
+          padding:8px 18px;
+          background:linear-gradient(135deg,#4e73df,#1cc88a);
+          color:#fff;
+          font-size:13px;
+          font-weight:600;
+          text-decoration:none;
+          border-radius:50px;
+          box-shadow:0 4px 8px rgba(0,0,0,0.2);
+          transition:all .3s;">
+          Baca Selengkapnya →
+      </a>
+
     </div>
   </div>
 </div>
 
-    <?php
-        }
-        echo '</div></div>';
-        $active = ""; // next slide tidak active
+<?php
     }
-    ?>
+    echo '</div></div>';
+    $active = ""; 
+}
+?>
 
-  </div>
+</div>
+
 
   <!-- BUTTON -->
   <!-- <button class="carousel-control-prev" type="button" data-bs-target="#newsSlider" data-bs-slide="prev"
