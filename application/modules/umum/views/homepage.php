@@ -215,7 +215,7 @@
 
               <li>
                 <a class="dropdown-item py-2 px-4"
-                   href="<?php echo base_url('publik/pengumuman'); ?>">
+                   href="<?php echo base_url(); ?>#pengumuman">
                   Pengumuman
                 </a>
               </li>
