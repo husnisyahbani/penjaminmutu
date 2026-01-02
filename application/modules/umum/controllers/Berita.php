@@ -7,11 +7,6 @@ class Berita extends MY_Controller {
         $this->module = 'admin';
         $this->load->js(base_url("assets/app/admin/berita.js?v=1.0.1"));
         $this->load->model('BeritaModel', 'beritamodel');
-
-        $role = $this->session->userdata('role');
-        if (!isset($role) || $role != 'PPM') {
-            redirect(base_url());
-        }
     }
 
     public function index() {
