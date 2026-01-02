@@ -493,7 +493,7 @@ foreach($chunk as $group){
     echo '<div class="carousel-item '.$active.'"><div class="row justify-content-center">';
     foreach($group as $b){
 ?>
-<div class="col-md-4 mb-4">
+<div class="col-md-6 mb-6">
   <div class="card" style="border-radius:10px;overflow:hidden;box-shadow:0 5px 10px rgba(0,0,0,0.2);">
 
     <img src="<?= base_url("filedata")."/".$b['berita_file'] ?>" 
