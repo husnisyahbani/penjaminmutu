@@ -508,8 +508,8 @@ foreach($chunk as $group){
       <h5 style="
         margin-top:5px;
         font-size:18px;
-        min-height:48px;
-        max-height:60px;
+        min-height:80px;
+        max-height:80px;
         overflow:hidden;">
         <?= $b['berita_judul'] ?>
       </h5>
