@@ -4,8 +4,8 @@ class Berita extends MY_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->module = 'admin';
-        $this->load->js(base_url("assets/app/admin/berita.js?v=1.0.1"));
+        $this->module = 'umum';
+        $this->load->js(base_url("assets/app/umum/berita.js?v=1.0.1"));
         $this->load->model('BeritaModel', 'beritamodel');
     }
 

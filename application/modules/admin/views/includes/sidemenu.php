@@ -90,6 +90,13 @@
                <span class="site-menu-title">Berita</span>
              </a>
           </li>
+
+          <ul class="site-menu-sub">
+           <li class="site-menu-item <?php if(isset($pengumuman)){echo $pengumuman;} ?>">
+             <a class="animsition-link" href="<?php echo base_url($module.'/pengumuman');?>">
+               <span class="site-menu-title">Pengumuman</span>
+             </a>
+          </li>
           
         
            <li class="site-menu-item <?php if(isset($sk)){echo $sk;} ?>">

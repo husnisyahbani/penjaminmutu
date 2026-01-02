@@ -552,16 +552,7 @@ foreach($chunk as $group){
 </div>
 
 
-  <!-- BUTTON -->
-  <!-- <button class="carousel-control-prev" type="button" data-bs-target="#newsSlider" data-bs-slide="prev"
-   style="width:50px;height:50px;background:rgba(0,0,0,0.6);border-radius:50%;top:45%;">
-    <span class="carousel-control-prev-icon" style="filter:invert(1);"></span>
-  </button>
-
-  <button class="carousel-control-next" type="button" data-bs-target="#newsSlider" data-bs-slide="next"
-   style="width:50px;height:50px;background:rgba(0,0,0,0.6);border-radius:50%;top:45%;">
-    <span class="carousel-control-next-icon" style="filter:invert(1);"></span>
-  </button> -->
+  
 
   <div style="text-align:center;margin-top:10px;">
   <button type="button" data-bs-target="#newsSlider" data-bs-slide="prev"
@@ -579,6 +570,112 @@ foreach($chunk as $group){
 </div>
       </div>
     </div>
+
+</section>
+
+
+<section id="pengumuman" class="py-5">
+    <div class="container py-5">
+      <div style="background:#d9534f;color:#fff;padding:8px;">
+  <marquee behavior="scroll" direction="left" style="font-size:16px;">
+      Pengumuman Penting
+  </marquee>
+</div>
+
+<div class="container mt-4">
+
+<div id="pengumumanSlider" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2500">
+
+  <div class="carousel-inner">
+
+<?php
+$chunk = array_chunk($pengumuman, 2); // 2 card per slide
+$active = "active";
+
+foreach($chunk as $group){
+    echo '<div class="carousel-item '.$active.'"><div class="row justify-content-center">';
+    foreach($group as $b){
+?>
+<div class="col-md-6 mb-6">
+  <div class="card" style="border-radius:10px;overflow:hidden;box-shadow:0 5px 10px rgba(0,0,0,0.2);">
+
+    <img src="<?= base_url("filedata")."/".$b['pengumuman_file'] ?>" 
+         style="width:100%;height:220px;object-fit:cover;">
+
+    <div class="card-body">
+
+      <span style="font-size:13px;color:#888;display:block;margin-bottom:5px;">
+        <?= $b['pengumuman_create'] ?>
+      </span>
+
+      <h5 style="
+        margin-top:5px;
+        font-size:18px;
+        min-height:80px;
+        max-height:80px;
+        overflow:hidden;">
+        <?= $b['pengumuman_judul'] ?>
+      </h5>
+
+      <p style="
+        font-size:14px;
+        color:#555;
+        min-height:80px;
+        max-height:80px;
+        overflow:hidden;">
+        <?= $b['pengumuman_deskripsi'] ?>
+      </p>
+
+      <a href="<?= base_url('pengumuman?id='.$b['pengumuman_id']) ?>" 
+         style="
+          display:inline-block;
+          padding:8px 18px;
+          background:linear-gradient(135deg,#4e73df,#1cc88a);
+          color:#fff;
+          font-size:13px;
+          font-weight:600;
+          text-decoration:none;
+          border-radius:50px;
+          box-shadow:0 4px 8px rgba(0,0,0,0.2);
+          transition:all .3s;">
+          Baca Selengkapnya →
+      </a>
+
+    </div>
+  </div>
+</div>
+
+<?php
+    }
+    echo '</div></div>';
+    $active = ""; 
+}
+?>
+
+</div>
+
+
+  
+
+  <div style="text-align:center;margin-top:10px;">
+  <button type="button" data-bs-target="#pengumumanSlider" data-bs-slide="prev"
+    style="padding:8px 18px;border:none;border-radius:30px;background:#333;color:#fff;margin-right:8px;">
+    ‹ Prev
+  </button>
+
+  <button type="button" data-bs-target="#pengumumanSlider" data-bs-slide="next"
+    style="padding:8px 18px;border:none;border-radius:30px;background:#333;color:#fff;">
+    Next ›
+  </button>
+</div>
+
+</div>
+</div>
+      </div>
+    </div>
+
+</section>
+    
 
   <section id="kontak" class="py-5">
     <div class="container py-5">
