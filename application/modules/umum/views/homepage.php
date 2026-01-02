@@ -509,7 +509,7 @@ foreach($chunk as $group){
         margin-top:5px;
         font-size:18px;
         min-height:48px;
-        max-height:48px;
+        max-height:60px;
         overflow:hidden;">
         <?= $b['berita_judul'] ?>
       </h5>
@@ -517,8 +517,8 @@ foreach($chunk as $group){
       <p style="
         font-size:14px;
         color:#555;
-        min-height:70px;
-        max-height:70px;
+        min-height:80px;
+        max-height:80px;
         overflow:hidden;">
         <?= $b['berita_deskripsi'] ?>
       </p>
