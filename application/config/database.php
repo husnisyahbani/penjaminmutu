@@ -100,9 +100,9 @@ if (ENVIRONMENT === 'development') {
     // 🚀 Koneksi production (hosting)
     $db['default'] = array(
         'dsn'       => '',
-        'hostname'  => '103.49.239.63',
-        'username'  => 'stiksiti_igni339',
-        'password'  => 'Kgw90g)q6tJJ',
+        'hostname' => '116.193.191.133',
+	    'username' => 'sstiksiti_igni339',
+	    'password' => 'Q7li5aS5R5',
         'database'  => 'stiksiti_akademik',
         'dbdriver'  => 'mysqli',
         'dbprefix'  => 'mutu_',
