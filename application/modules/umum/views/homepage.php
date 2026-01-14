@@ -79,32 +79,6 @@
 </head>
 <body>
 
-<!-- <header class="main-header fixed-top">
-  <nav class="navbar navbar-expand-lg bg-white shadow-lg rounded-5 px-lg-4 mx-lg-5 mt-3 mt-lg-5">
-    <div class="container-fluid">
-      <a class="navbar-brand px-0" href="<?php echo base_url();?>">
-        <img src="<?php echo asset_url();?>/assets/images/logostik.png" alt="STIK SITI KHADIJAH Logo" height="80">
-      </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuUtama" aria-controls="menuUtama" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="menuUtama">
-        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link py-3 px-4 active" aria-current="page" href="<?php echo base_url();?>">Beranda</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link py-3 px-4" href="<?php echo base_url();?>#fitur">Login</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link py-3 px-4" href="<?php echo base_url();?>#kontak">Kontak</a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-</header> -->
-
 <header class="main-header fixed-top">
   <nav class="navbar navbar-expand-lg bg-white shadow-lg rounded-5 px-lg-4 mx-lg-5 mt-3 mt-lg-5">
     <div class="container-fluid">
@@ -383,66 +357,31 @@
         </tr>
     </thead>
     <tbody>
-        <tr style="border-bottom:1px solid #eaeaea;">
-            <td style="padding:12px; text-align:center;">1</td>
-            <td style="padding:12px;">Surat Keputusan Pembentukan LPM STIK SITI KHADIJAH</td>
-            <td style="padding:12px; text-align:center;">
-                <a href="<?php echo asset_url();?>/assets/images/SK_PEMBENTUKAN.pdf" style="
-                    background:#28a745;
-                    color:#ffffff;
-                    padding:8px 14px;
-                    text-decoration:none;
-                    border-radius:6px;
-                    font-size:14px;
-                    display:inline-block;
-                ">Download</a>
-            </td>
-        </tr>
-        <tr style="background:#f9fbfd; border-bottom:1px solid #eaeaea;">
-            <td style="padding:12px; text-align:center;">2</td>
-            <td style="padding:12px;">Surat Keputusan Pengangkatan Tim Gugus Kendali Mutu</td>
-            <td style="padding:12px; text-align:center;">
-                <a href="<?php echo asset_url();?>/assets/images/SK_GKM.pdf" style="
-                    background:#17a2b8;
-                    color:#ffffff;
-                    padding:8px 14px;
-                    text-decoration:none;
-                    border-radius:6px;
-                    font-size:14px;
-                    display:inline-block;
-                ">Download</a>
-            </td>
-        </tr>
-        <tr style="border-bottom:1px solid #eaeaea;">
-            <td style="padding:12px; text-align:center;">3</td>
-            <td style="padding:12px;">Surat Keputusan Perubahan Nama</td>
-            <td style="padding:12px; text-align:center;">
-                <a href="<?php echo asset_url();?>/assets/images/SK_PPM.pdf" style="
-                    background:#ffc107;
-                    color:#212529;
-                    padding:8px 14px;
-                    text-decoration:none;
-                    border-radius:6px;
-                    font-size:14px;
-                    display:inline-block;
-                ">Download</a>
-            </td>
-        </tr>
-        <tr>
-            <td style="padding:12px; text-align:center;">4</td>
-            <td style="padding:12px;">Surat Keputusan Pengangkatan Tim Auditor Internal</td>
-            <td style="padding:12px; text-align:center;">
-                <a href="<?php echo asset_url();?>/assets/images/SK_AUDITOR.pdf" style="
-                    background:#dc3545;
-                    color:#ffffff;
-                    padding:8px 14px;
-                    text-decoration:none;
-                    border-radius:6px;
-                    font-size:14px;
-                    display:inline-block;
-                ">Download</a>
-            </td>
-        </tr>
+        <?php 
+$no = 1;
+foreach($sk as $row): 
+?>
+<tr style="border-bottom:1px solid #eaeaea; <?php echo ($no % 2 == 0) ? 'background:#f9fbfd;' : ''; ?>">
+    <td style="padding:12px; text-align:center;"><?php echo $no++; ?></td>
+
+    <td style="padding:12px;">
+        <?php echo $row['sk_judul']; ?>
+    </td>
+
+    <td style="padding:12px; text-align:center;">
+        <a href="<?php echo asset_url();?>/filedata/<?php echo $row['sk_file']; ?>" style="
+            background:#28a745;
+            color:#ffffff;
+            padding:8px 14px;
+            text-decoration:none;
+            border-radius:6px;
+            font-size:14px;
+            display:inline-block;
+        ">Download</a>
+    </td>
+</tr>
+<?php endforeach; ?>
+
     </tbody>
 </table>
 

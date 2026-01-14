@@ -4,21 +4,21 @@ if (!defined('BASEPATH')) {
     exit('No direct script access allowed');
 }
 
-class BeritaModel extends CI_Model {
+class SkModel extends CI_Model {
 
     function __construct() {
         parent::__construct();
     }
 
-    var $column_search = array('berita_judul','berita_deskripsi','berita_file','berita_isi','berita_create');
-    var $column_order = array(null,'berita_judul','berita_deskripsi',null,'berita_isi','berita_create',null);
-    var $order = array('berita_create' => 'desc');
+    var $column_search = array('sk_judul','sk_create');
+    var $column_order = array(null,'sk_judul',null,'sk_create',null);
+    var $order = array('sk_create' => 'desc');
 
     private function _get_datatables_query($search, $ordering) {
         $i = 0;
 
         foreach ($this->column_search as $item) { // looping awal
-            if ($search['value']) { // jika datatable mengirimkan pencarian dengan metode POST
+            if ($search['value']) { // jika sktable mengirimkan pencarian dengan metode POST
                 if ($i === 0) { // looping awal
                     $this->db->group_start();
                     $this->db->like($item, $search['value']);
@@ -45,56 +45,46 @@ class BeritaModel extends CI_Model {
         if ($length != -1) {
             $this->db->limit($length, $start);
         }
-        
-        $this->db->from('berita');
+        $this->db->from('sk');
         $query = $this->db->get();
         return $query->result();
     }
 
     function count_filtered($search, $ordering) {
         $this->_get_datatables_query($search, $ordering);
-        $this->db->from('berita');
+        $this->db->from('sk');
         $query = $this->db->get();
         return $query->num_rows();
     }
 
     public function count_all() {
-        $this->db->from('berita');
+        $this->db->from('sk');
         return $this->db->count_all_results();
     }
 
-    public function add($data) {
-        $this->db->insert('berita',$data);
+    public function add($sk) {
+        $this->db->insert('sk',$sk);
         return($this->db->affected_rows() != 1) ? false : true;
     }
 
     public function hapus($id) {
-        $this->db->where('berita_id',$id);
-        $this->db->from('berita');
+        $this->db->where('sk_id',$id);
+        $this->db->from('sk');
         $this->db->delete();
         return($this->db->affected_rows() != 1) ? false : true;
     }
 
-    function getBeritaById($id) {
-        $this->db->where('berita_id',$id);
-        $this->db->from('berita');
+    function getData($id) {
+        $this->db->where('sk_id',$id);
+        $this->db->from('sk');
         $query = $this->db->get();
         return $query->row_array();
     }
 
-    function getAllBerita() {
-    $this->db->from('berita');
-    $this->db->order_by('berita_create', 'DESC'); // atau nama field tanggal kamu
-    $this->db->limit(10);
-    $query = $this->db->get();
-    return $query->result_array();
-}
-
-
-    public function edit($data) {
+    public function edit($sk) {
         $this->db->trans_start();
-        $this->db->where("berita_id",$data['berita_id']);
-        $this->db->update('berita',$data);
+        $this->db->where("sk_id",$sk['sk_id']);
+        $this->db->update('sk',$sk);
         $this->db->trans_complete();
         return $this->db->trans_status();
     }
