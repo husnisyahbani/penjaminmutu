@@ -444,7 +444,7 @@ foreach($sk as $row):
   <section id="visi-misi" class="py-5">
     <div class="container my-5">
     <div class="vm-section">
-      <h1 class="text-center my-5">VISI & MISI</h1>
+      <h1 class="text-center my-5">Visi & Misi</h1>
 
         <!-- VISI -->
         <div class="vm-vision mb-5">
