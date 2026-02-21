@@ -49,6 +49,7 @@ class DataModel extends CI_Model {
         $this->db->select('data_uraian');
         $this->db->select('data_keterangan');
         $this->db->select('data_file');
+        $this->db->select('isshow');
         $this->db->select('data_kategori');
         $this->db->select('data_create');
         $this->db->from('data');
@@ -65,6 +66,7 @@ class DataModel extends CI_Model {
         $this->db->select('data_keterangan');
         $this->db->select('data_file');
         $this->db->select('data_kategori');
+        $this->db->select('isshow');
         $this->db->select('data_create');
         $this->db->from('data');
         if(isset($id))
@@ -78,6 +80,7 @@ class DataModel extends CI_Model {
         $this->db->select('data_uraian');
         $this->db->select('data_keterangan');
         $this->db->select('data_file');
+        $this->db->select('isshow');
         $this->db->select('data_kategori');
         $this->db->select('data_create');
         $this->db->from('data');
