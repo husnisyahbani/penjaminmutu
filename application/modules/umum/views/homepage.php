@@ -75,6 +75,37 @@
         font-weight: 600;
       }
 
+      .vm-section {
+        background: #f8fafc;
+        border-radius: 16px;
+        padding: 40px;
+    }
+
+    .vm-title {
+        font-weight: 600;
+        letter-spacing: .3px;
+    }
+
+    .vm-divider {
+        width: 60px;
+        height: 4px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+    .vm-vision {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 32px;
+        box-shadow: 0 8px 24px rgba(0,0,0,.04);
+    }
+
+    .vm-mission li {
+        padding-left: 8px;
+        margin-bottom: 14px;
+        line-height: 1.7;
+    }
+
   </style>
 </head>
 <body>
@@ -411,71 +442,42 @@ foreach($sk as $row):
   </section>
 
   <section id="visi-misi" class="py-5">
-    <div class="container py-5">
-      <div class="row py-5 justify-content-center align-items-center">
-        <div class="col-12 text-center">
-          <div class="container my-5">
-    <div class="row g-4">
+    <div class="container my-5">
+    <div class="vm-section">
 
         <!-- VISI -->
-        <div class="col-md-12">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <h4 class="card-title text-primary mb-3">
-                        <i class="bi bi-eye-fill me-2"></i>Visi
-                    </h4>
-                    <p class="card-text text-muted">
-                        Menjadi pusat penjaminan mutu yang unggul dalam mengembangkan dan
-                        mengawal budaya mutu berkelanjutan guna mendukung terwujudnya
-                        <strong>STIK Siti Khadijah</strong> yang berkualitas dan berdaya saing.
-                    </p>
-                </div>
-            </div>
+        <div class="vm-vision mb-5">
+            <h3 class="vm-title text-primary mb-2">Visi</h3>
+            <div class="vm-divider bg-primary"></div>
+            <p class="text-secondary fs-6 mb-0">
+                Menjadi pusat penjaminan mutu yang unggul dalam mengembangkan dan
+                mengawal budaya mutu berkelanjutan guna mendukung terwujudnya
+                <strong>STIK Siti Khadijah</strong> yang berkualitas dan berdaya saing.
+            </p>
         </div>
 
         <!-- MISI -->
-        <div class="col-md-12">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <h4 class="card-title text-success mb-3">
-                        <i class="bi bi-bullseye me-2"></i>Misi
-                    </h4>
-                    <ol class="list-group list-group-numbered list-group-flush">
-                        <li class="list-group-item">
-                            Mengembangkan dan mengimplementasikan Sistem Penjaminan Mutu Internal (SPMI)
-                            secara konsisten dan berkelanjutan sesuai dengan standar nasional pendidikan tinggi.
-                        </li>
-                        <li class="list-group-item">
-                            Menyusun, menetapkan, dan mengembangkan standar mutu akademik dan non-akademik
-                            sebagai pedoman penyelenggaraan kegiatan institusi.
-                        </li>
-                        <li class="list-group-item">
-                            Melaksanakan monitoring, evaluasi, dan Audit Mutu Internal (AMI) secara berkala
-                            terhadap program studi dan unit kerja.
-                        </li>
-                        <li class="list-group-item">
-                            Mendorong terlaksananya siklus PPEPP (Penetapan, Pelaksanaan, Evaluasi,
-                            Pengendalian, dan Peningkatan) sebagai budaya mutu di seluruh unit.
-                        </li>
-                        <li class="list-group-item">
-                            Meningkatkan kompetensi sumber daya manusia dalam bidang penjaminan mutu
-                            melalui pelatihan, pendampingan, dan penyegaran auditor.
-                        </li>
-                        <li class="list-group-item">
-                            Mendukung peningkatan mutu Tridharma Perguruan Tinggi dan tata kelola institusi
-                            dalam rangka pencapaian akreditasi yang unggul.
-                        </li>
-                    </ol>
-                </div>
-            </div>
+        <div class="vm-vision">
+            <h3 class="vm-title text-success mb-2">Misi</h3>
+            <div class="vm-divider bg-success"></div>
+            <ol class="vm-mission text-secondary ps-3">
+                <li>Mengembangkan dan mengimplementasikan Sistem Penjaminan Mutu Internal (SPMI)
+                    secara konsisten dan berkelanjutan sesuai standar nasional pendidikan tinggi.</li>
+                <li>Menyusun, menetapkan, dan mengembangkan standar mutu akademik dan non-akademik
+                    sebagai pedoman penyelenggaraan kegiatan institusi.</li>
+                <li>Melaksanakan monitoring, evaluasi, dan Audit Mutu Internal (AMI) secara berkala
+                    terhadap program studi dan unit kerja.</li>
+                <li>Mendorong terlaksananya siklus PPEPP (Penetapan, Pelaksanaan, Evaluasi,
+                    Pengendalian, dan Peningkatan) sebagai budaya mutu di seluruh unit.</li>
+                <li>Meningkatkan kompetensi sumber daya manusia dalam bidang penjaminan mutu
+                    melalui pelatihan, pendampingan, dan penyegaran auditor.</li>
+                <li>Mendukung peningkatan mutu Tridharma Perguruan Tinggi dan tata kelola institusi
+                    dalam rangka pencapaian akreditasi yang unggul.</li>
+            </ol>
         </div>
 
     </div>
 </div>
-        </div>
-        
-      </div>
-    </div>
   </section>
 
   <section id="berita" class="py-5">
