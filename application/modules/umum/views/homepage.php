@@ -413,9 +413,6 @@ foreach($sk as $row):
   <section id="visi-misi" class="py-5">
     <div class="container py-5">
       <div class="row py-5 justify-content-center align-items-center">
-        <div class="col-12">
-          <h1 class="text-center my-5">Visi & Misi</h1>
-        </div>
         <div class="col-12 text-center">
           <div class="container my-5">
     <div class="row g-4">
