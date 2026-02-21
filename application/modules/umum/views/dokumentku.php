@@ -355,7 +355,7 @@
                               Download
                           </a>
                         </td>
-                        <td><?= date("d-m-Y H:i:s", strtotime($out['data_create'])) ?></td>
+                        <td><?= date("d-m-Y", strtotime($out['data_create'])) ?></td>
                     </tr>
                   <?php } ?>
 
