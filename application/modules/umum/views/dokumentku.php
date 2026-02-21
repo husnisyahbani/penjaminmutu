@@ -322,7 +322,7 @@
 
 <section class="py-5 bg-primary green-gradasi">
     <div class="container my-5">
-       <h1 class="text-center my-5"></h1>
+       <br/><br/><br/><br/>
     <div class="table-wrapper">
 
         <h5 class="mb-4 fw-semibold text-dark">
