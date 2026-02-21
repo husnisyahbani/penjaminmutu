@@ -340,7 +340,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                  <?php foreach($data as $index => $dokumen) { ?>
+                  <?php foreach($dataku as $index => $dokumen) { ?>
                     <tr>
                         <td><?= $index + 1 ?></td>
                         <td><?= $dokumen['data_uraian'] ?></td>
