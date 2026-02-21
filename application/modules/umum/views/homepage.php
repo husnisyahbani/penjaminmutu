@@ -437,7 +437,7 @@
     </div>
   </section>
 
-<section id="profile" class="py-5">
+<section id="profil" class="py-5">
   <div class="container my-5">
     <div class="profile-section">
         <div class="row g-4 align-items-center">
