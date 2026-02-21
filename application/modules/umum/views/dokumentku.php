@@ -346,8 +346,14 @@
                         <td><?= $out['data_uraian'] ?></td>
                         <td><?= $out['data_keterangan'] ?></td>
                         <td>
-                          <a class="btn btn-sm btn-icon btn-success"
-                              data-toggle="tooltip" data-original-title="Detail" href="<?php echo base_url('filedata/'.$out['data_file']); ?>" target="_blank"><i class="icon md-download" aria-hidden="true"></i> Download</a>
+                          <a href="<?= base_url('filedata/'.$out['data_file']); ?>"
+                            target="_blank"
+                            class="btn btn-sm rounded-pill px-3
+                                    text-success border border-success bg-transparent
+                                    d-inline-flex align-items-center gap-2">
+                              <i class="bi bi-download"></i>
+                              Download
+                          </a>
                         </td>
                         <td><?= date("d-m-Y H:i:s", strtotime($out['data_create'])) ?></td>
                     </tr>
