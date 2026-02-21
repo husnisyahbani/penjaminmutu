@@ -33,7 +33,7 @@ class DataModel extends CI_Model {
     function getAllPelaksanaan() {
         $this->db->from('data');
         $this->db->where('data_kategori','PELAKSANAAN');
-        $this->db->where('show',1);
+        $this->db->where('show','1');
         $query = $this->db->get();
         return $query->row_array();
     }
@@ -41,7 +41,7 @@ class DataModel extends CI_Model {
     function getAllEvaluasi() {
         $this->db->from('data');
         $this->db->where('data_kategori','EVALUASI');
-        $this->db->where('show',1);
+        $this->db->where('show','1');
         $query = $this->db->get();
         return $query->row_array();
     }
@@ -49,7 +49,7 @@ class DataModel extends CI_Model {
     function getAllPengendalian() {
         $this->db->from('data');
         $this->db->where('data_kategori','PENGENDALIAN');
-        $this->db->where('show',1);
+        $this->db->where('show','1');
         $query = $this->db->get();
         return $query->row_array();
     }
@@ -57,7 +57,7 @@ class DataModel extends CI_Model {
     function getAllPeningkatan() {
         $this->db->from('data');
         $this->db->where('data_kategori','PENINGKATAN');
-        $this->db->where('show',1);
+        $this->db->where('show', '1');
         $query = $this->db->get();
         return $query->row_array();
     }

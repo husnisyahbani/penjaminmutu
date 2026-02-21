@@ -355,29 +355,9 @@
                     </tr>
                   <?php } ?>
 
-                    <tr>
-                        <td>2</td>
-                        <td>Pedoman Audit Mutu Internal</td>
-                        <td>Panduan pelaksanaan Audit Mutu Internal</td>
-                        <td>
-                            <span class="file-badge">
-                                <i class="bi bi-file-earmark-word"></i> DOCX
-                            </span>
-                        </td>
-                        <td>20 Feb 2026</td>
-                    </tr>
+                    
 
-                    <tr>
-                        <td>3</td>
-                        <td>Laporan Rapat Tinjauan Manajemen</td>
-                        <td>Dokumentasi hasil RTM semester genap</td>
-                        <td>
-                            <span class="file-badge">
-                                <i class="bi bi-file-earmark-text"></i> PDF
-                            </span>
-                        </td>
-                        <td>05 Mar 2026</td>
-                    </tr>
+                    
                 </tbody>
             </table>
         </div>
