@@ -155,4 +155,22 @@ class DataModel extends CI_Model {
         return $this->db->trans_status();
     }
 
+    public function show($data_id) {
+        $this->db->trans_start();
+        $data = array("isshow"=>"1");
+        $this->db->where("data_id",$data_id);
+        $this->db->update('data',$data);
+        $this->db->trans_complete();
+        return $this->db->trans_status();
+    }
+
+    public function hide($data_id) {
+        $this->db->trans_start();
+        $data = array("isshow"=>"0");
+        $this->db->where("data_id",$data_id);
+        $this->db->update('data',$data);
+        $this->db->trans_complete();
+        return $this->db->trans_status();
+    }
+
 }
