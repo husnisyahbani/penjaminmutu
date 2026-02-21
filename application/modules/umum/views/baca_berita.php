@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <title><?= $berita_judul ?></title>
+<meta name="description" content="<?= $berita_judul ?>">
+<meta name="keyword" content="Sistem audit stik siti khadijah">
+<meta name="author" content="STIK SITI KHADIJAH">
+<link href="<?php echo base_url("/assets/assets/images/logostik.png");?>" rel="icon" type="image/x-icon">
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -111,6 +115,15 @@ body{
   </div>
 
 </div>
+<footer class="shadow-lg rounded-5 my-5 mx-5">
+    <div class="container py-3">
+      <div class="row">
+        <div class="col-12">
+          <p class="text-center m-0">Dikembangkan oleh <a href="https://stik-sitikhadijah.ac.id">STIK SITI KHADIJAH</a></p>
+        </div>
+      </div>
+    </div>
+  </footer>
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
