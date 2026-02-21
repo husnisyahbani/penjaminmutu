@@ -52,6 +52,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $route['default_controller'] = 'umum/Homepage';
 $route['homepage'] = 'umum/Homepage';
 $route['login'] = 'umum/Login';
+$route['penetapan'] = 'umum/Penetapan';
 $route['admin'] = 'admin/Data';
 $route['berita'] = 'umum/Berita';
 $route['pengumuman'] = 'umum/Pengumuman';
