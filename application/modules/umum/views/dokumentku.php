@@ -443,19 +443,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
-<script>
-document.querySelectorAll('.preview-pdf').forEach(btn => {
-  btn.addEventListener('click', function () {
-
-    const title = this.dataset.title;
-    const modalTitle = document.getElementById('pdfModalTitle');
-
-    modalTitle.textContent = title;
-
-    // kode render pdf lanjut di sini
-  });
-});
-</script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
@@ -466,6 +453,11 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
 
 document.querySelectorAll('.preview-pdf').forEach(btn => {
   btn.addEventListener('click', function () {
+
+    const title = this.dataset.title;
+    const modalTitle = document.getElementById('pdfModalTitle');
+
+    modalTitle.textContent = title;
 
     const url = this.dataset.file;
     const container = document.getElementById('pdfContainer');
