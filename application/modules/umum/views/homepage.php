@@ -513,7 +513,6 @@ foreach($sk as $row):
     <div class="container my-5">
     <div class="tupoksi-section">
       <h1 class="text-center my-5">Tugas Pokok dan Fungsi</h1>
-        <div class="tupoksi-divider"></div>
 
         <ol class="tupoksi-list text-secondary ps-0">
             <li>Merencanakan, melaksanakan, dan mengembangkan penyelenggaraan pendidikan
