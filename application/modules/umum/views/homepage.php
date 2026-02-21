@@ -551,12 +551,12 @@ foreach($sk as $row):
 <section id="sasaran-mutu" class="py-5">
   <div class="container my-5">
     <div class="vm-section">
-
+        <h1 class="text-center my-5">Sasaran Mutu</h1>
         <!-- SASARAN UMUM -->
         <div class="vm-vision mb-5">
             <h3 class="vm-title text-primary mb-2">Sasaran Mutu – Umum</h3>
             <div class="vm-divider bg-primary"></div>
-            <p class="text-secondary fs-6 mb-0">
+            <p class="text-primary fs-6 mb-0">
                 Mewujudkan terlaksananya Sistem Penjaminan Mutu Internal (SPMI) secara konsisten
                 dan berkelanjutan guna menjamin dan meningkatkan mutu penyelenggaraan
                 Tridharma Perguruan Tinggi serta tata kelola institusi di lingkungan
