@@ -43,37 +43,37 @@
    NAVBAR HOVER HIJAU
    ========================= */
 
-/* Menu utama */
-.navbar .nav-link {
-  transition: all 0.3s ease;
-}
+      /* Menu utama */
+      .navbar .nav-link {
+        transition: all 0.3s ease;
+      }
 
-.navbar .nav-link:hover,
-.navbar .nav-link:focus {
-  color: #198754 !important; /* hijau bootstrap */
-}
+      .navbar .nav-link:hover,
+      .navbar .nav-link:focus {
+        color: #198754 !important; /* hijau bootstrap */
+      }
 
-/* Dropdown toggle hover */
-.navbar .dropdown-toggle:hover {
-  color: #198754 !important;
-}
+      /* Dropdown toggle hover */
+      .navbar .dropdown-toggle:hover {
+        color: #198754 !important;
+      }
 
-/* Dropdown item */
-.dropdown-menu .dropdown-item {
-  transition: all 0.2s ease;
-}
+      /* Dropdown item */
+      .dropdown-menu .dropdown-item {
+        transition: all 0.2s ease;
+      }
 
-.dropdown-menu .dropdown-item:hover,
-.dropdown-menu .dropdown-item:focus {
-  background-color: #e9f7ef; /* hijau lembut */
-  color: #198754;
-}
+      .dropdown-menu .dropdown-item:hover,
+      .dropdown-menu .dropdown-item:focus {
+        background-color: #e9f7ef; /* hijau lembut */
+        color: #198754;
+      }
 
-/* Aktif menu */
-.navbar .nav-link.active {
-  color: #198754 !important;
-  font-weight: 600;
-}
+      /* Aktif menu */
+      .navbar .nav-link.active {
+        color: #198754 !important;
+        font-weight: 600;
+      }
 
   </style>
 </head>
@@ -236,8 +236,8 @@
 
               <li>
                 <a class="dropdown-item py-2 px-4"
-                   href="<?php echo base_url('tentang/struktur'); ?>">
-                  Visi & Misi & Sasaran Mutu
+                   href="<?php echo base_url(); ?>#visi-misi">
+                  Visi & Misi
                 </a>
               </li>
 
@@ -406,6 +406,77 @@ foreach($sk as $row):
         <div class="col-md-8 text-center">
           
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="visi-misi" class="py-5">
+    <div class="container py-5">
+      <div class="row py-5 justify-content-center align-items-center">
+        <div class="col-12">
+          <h1 class="text-center my-5">Visi & Misi</h1>
+        </div>
+        <div class="col-12 text-center">
+          <div class="container my-5">
+    <div class="row g-4">
+
+        <!-- VISI -->
+        <div class="col-md-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h4 class="card-title text-primary mb-3">
+                        <i class="bi bi-eye-fill me-2"></i>Visi
+                    </h4>
+                    <p class="card-text text-muted">
+                        Menjadi pusat penjaminan mutu yang unggul dalam mengembangkan dan
+                        mengawal budaya mutu berkelanjutan guna mendukung terwujudnya
+                        <strong>STIK Siti Khadijah</strong> yang berkualitas dan berdaya saing.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- MISI -->
+        <div class="col-md-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h4 class="card-title text-success mb-3">
+                        <i class="bi bi-bullseye me-2"></i>Misi
+                    </h4>
+                    <ol class="list-group list-group-numbered list-group-flush">
+                        <li class="list-group-item">
+                            Mengembangkan dan mengimplementasikan Sistem Penjaminan Mutu Internal (SPMI)
+                            secara konsisten dan berkelanjutan sesuai dengan standar nasional pendidikan tinggi.
+                        </li>
+                        <li class="list-group-item">
+                            Menyusun, menetapkan, dan mengembangkan standar mutu akademik dan non-akademik
+                            sebagai pedoman penyelenggaraan kegiatan institusi.
+                        </li>
+                        <li class="list-group-item">
+                            Melaksanakan monitoring, evaluasi, dan Audit Mutu Internal (AMI) secara berkala
+                            terhadap program studi dan unit kerja.
+                        </li>
+                        <li class="list-group-item">
+                            Mendorong terlaksananya siklus PPEPP (Penetapan, Pelaksanaan, Evaluasi,
+                            Pengendalian, dan Peningkatan) sebagai budaya mutu di seluruh unit.
+                        </li>
+                        <li class="list-group-item">
+                            Meningkatkan kompetensi sumber daya manusia dalam bidang penjaminan mutu
+                            melalui pelatihan, pendampingan, dan penyegaran auditor.
+                        </li>
+                        <li class="list-group-item">
+                            Mendukung peningkatan mutu Tridharma Perguruan Tinggi dan tata kelola institusi
+                            dalam rangka pencapaian akreditasi yang unggul.
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+        </div>
+        
       </div>
     </div>
   </section>
