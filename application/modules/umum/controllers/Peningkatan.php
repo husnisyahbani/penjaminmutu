@@ -1,6 +1,6 @@
 <?php
 
-class Penetapan extends MY_Controller {
+class Peningkatan extends MY_Controller {
 
     public function __construct() {
         parent::__construct();
@@ -9,9 +9,9 @@ class Penetapan extends MY_Controller {
     }
 
     public function index() {
-        $penetapan = $this->datamodel->getAllPenetapan();
+        $peningkatan = $this->datamodel->getAllPeningkatan();
         //var_dump($penetapan);
-        $this->load->view('dokumentku', array('dataku' => $penetapan, 'judul' => 'Penetapan'));
+        $this->load->view('dokumentku', array('dataku' => $peningkatan, 'judul' => 'Peningkatan'));
     }
 
 }

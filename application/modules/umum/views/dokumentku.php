@@ -325,7 +325,7 @@
     <div class="table-wrapper">
 
         <h5 class="mb-4 fw-semibold text-dark">
-            Daftar Dokumen Penjaminan Mutu
+            Daftar Dokumen <?= isset($judul) ? $judul : '' ?>
         </h5>
 
         <div class="table-responsive">
