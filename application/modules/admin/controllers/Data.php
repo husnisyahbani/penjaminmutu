@@ -122,12 +122,12 @@ class Data extends MY_Controller {
 
     public function show() {
         $id = $this->input->post('id');
-        $this->datamodel->tampil($id);
+        $this->datamodel->show($id);
     }
 
     public function hide() {
         $id = $this->input->post('id');
-        $this->datamodel->tampil($id);
+        $this->datamodel->hide($id);
     }
 
     public function listdata($id = null) {
