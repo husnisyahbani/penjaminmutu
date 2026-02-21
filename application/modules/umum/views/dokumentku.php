@@ -370,7 +370,7 @@
 </div>
 </section>
 
-<div class="modal fade" id="pdfPreviewModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="pdfPreviewModal" tabindex="-1">
   <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content rounded-4">
 
@@ -379,8 +379,8 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
-      <div class="modal-body bg-light text-center">
-        <canvas id="pdfCanvas"></canvas>
+      <div class="modal-body bg-light">
+        <div id="pdfContainer" class="d-flex flex-column align-items-center gap-4"></div>
       </div>
 
     </div>
@@ -442,34 +442,53 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
 const pdfjsLib = window['pdfjs-dist/build/pdf'];
+
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-const canvas = document.getElementById('pdfCanvas');
-const ctx = canvas.getContext('2d');
-
 document.querySelectorAll('.preview-pdf').forEach(btn => {
   btn.addEventListener('click', function () {
-    const url = this.dataset.file;
 
+    const url = this.dataset.file;
+    const container = document.getElementById('pdfContainer');
+
+    // Bersihkan halaman lama
+    container.innerHTML = '';
+
+    // Tampilkan modal
     const modal = new bootstrap.Modal(
       document.getElementById('pdfPreviewModal')
     );
     modal.show();
 
     pdfjsLib.getDocument(url).promise.then(pdf => {
-      pdf.getPage(1).then(page => {
-        const viewport = page.getViewport({ scale: 1.5 });
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
 
-        page.render({
-          canvasContext: ctx,
-          viewport: viewport
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        pdf.getPage(pageNum).then(page => {
+
+          const scale = 1.3;
+          const viewport = page.getViewport({ scale });
+
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+
+          canvas.classList.add('shadow-sm', 'rounded');
+          container.appendChild(canvas);
+
+          page.render({
+            canvasContext: context,
+            viewport: viewport
+          });
+
         });
-      });
+      }
+
     });
   });
 });
