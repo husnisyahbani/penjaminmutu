@@ -106,6 +106,13 @@
         font-size: 0.85rem;
     }
 
+    .main-header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 999;
+    }
+
   </style>
 </head>
 <body>
@@ -312,8 +319,9 @@
   </nav>
 </header>
 
-<section class="py-5">
+<section class="py-5 bg-primary green-gradasi">
     <div class="container my-5">
+       <h1 class="text-center my-5">Sasaran Mutu</h1>
     <div class="table-wrapper">
 
         <h5 class="mb-4 fw-semibold text-dark">
