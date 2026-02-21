@@ -10,8 +10,7 @@ class Penetapan extends MY_Controller {
 
     public function index() {
         $penetapan = $this->datamodel->getAllPenetapan();
-        $this->data['data'] = $penetapan;
-        $this->load->view('dokument', $this->data);
+        $this->load->view('dokument', array('data' => $penetapan));
     }
 
 }
