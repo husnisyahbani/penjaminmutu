@@ -134,6 +134,45 @@
         line-height: 1.7;
     }
 
+    .profile-section {
+        background: #f8fafc;
+        border-radius: 20px;
+        padding: 40px;
+    }
+
+    .profile-card {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 36px;
+        box-shadow: 0 10px 30px rgba(0,0,0,.04);
+        height: 100%;
+    }
+
+    .profile-title {
+        font-weight: 600;
+        letter-spacing: .3px;
+    }
+
+    .profile-divider {
+        width: 70px;
+        height: 4px;
+        border-radius: 12px;
+        background: linear-gradient(90deg, #0d6efd, #20c997);
+        margin-bottom: 20px;
+    }
+
+    .carousel img {
+        border-radius: 18px;
+        object-fit: cover;
+        height: 420px;
+    }
+
+    @media (max-width: 768px) {
+        .carousel img {
+            height: 260px;
+        }
+    }
+
   </style>
 </head>
 <body>
@@ -397,6 +436,77 @@
       </div>
     </div>
   </section>
+
+<section id="profile" class="py-5">
+  <div class="container my-5">
+    <div class="profile-section">
+        <div class="row g-4 align-items-center">
+
+            <!-- NARASI KIRI -->
+            <div class="col-lg-6">
+                <div class="profile-card">
+                    <h3 class="profile-title text-dark mb-2">
+                        Profil Pusat Penjaminan Mutu
+                    </h3>
+                    <div class="profile-divider"></div>
+
+                    <p class="text-secondary lh-lg">
+                        <strong>Pusat Penjaminan Mutu (PPM) STIK Siti Khadijah</strong> merupakan unit
+                        struktural yang bertanggung jawab dalam merencanakan, melaksanakan,
+                        mengevaluasi, mengendalikan, dan meningkatkan mutu penyelenggaraan
+                        Tridharma Perguruan Tinggi serta tata kelola institusi.
+                    </p>
+
+                    <p class="text-secondary lh-lg mb-0">
+                        PPM berperan sebagai penggerak utama dalam implementasi
+                        <strong>Sistem Penjaminan Mutu Internal (SPMI)</strong> secara berkelanjutan.
+                        Dalam menjalankan fungsinya, PPM memastikan seluruh kegiatan akademik dan
+                        non-akademik berjalan sesuai standar yang ditetapkan, peraturan
+                        perundang-undangan, serta kebijakan nasional pendidikan tinggi. Selain itu,
+                        PPM menjadi pusat koordinasi pelaksanaan Audit Mutu Internal sebagai
+                        instrumen evaluasi dan peningkatan mutu institusi.
+                    </p>
+                </div>
+            </div>
+
+            <!-- FOTO SLIDER KANAN -->
+            <div class="col-lg-6">
+                <div class="profile-card p-3">
+                    <div id="ppmCarousel" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+
+                            <div class="carousel-item active">
+                                <img src="img/ppm-1.jpg" class="d-block w-100" alt="PPM STIK">
+                            </div>
+
+                            <div class="carousel-item">
+                                <img src="img/ppm-2.jpg" class="d-block w-100" alt="Audit Mutu">
+                            </div>
+
+                            <div class="carousel-item">
+                                <img src="img/ppm-3.jpg" class="d-block w-100" alt="Rapat Mutu">
+                            </div>
+
+                        </div>
+
+                        <button class="carousel-control-prev" type="button"
+                            data-bs-target="#ppmCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon"></span>
+                        </button>
+
+                        <button class="carousel-control-next" type="button"
+                            data-bs-target="#ppmCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</section>
 
   <section id="sk" class="py-5">
     <div class="container py-5">
