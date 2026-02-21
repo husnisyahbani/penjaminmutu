@@ -25,9 +25,14 @@
                             <div class="form-group row">
                                 <label class="col-md-3 form-control-label">Tanggal</label>
                                 <div class="col-md-9">
-                                    <input type="date" class="form-control" id="berita_create" name="berita_create" data-fv-notempty="true"
-                                           data-fv-notempty-message="Wajib Diisi" value="<?php if (isset($result['berita_create'])) echo $result['berita_create']; ?>"/>
-                                    
+                                    <input type="date"
+                                        class="form-control"
+                                        id="berita_create"
+                                        name="berita_create"
+                                        required
+                                        value="<?= isset($result['berita_create'])
+                                            ? date('Y-m-d', strtotime($result['berita_create']))
+                                            : '' ?>">
                                 </div>
                             </div>
                             
