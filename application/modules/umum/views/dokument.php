@@ -333,7 +333,6 @@
                 <thead>
                     <tr>
                         <th style="width:60px">No</th>
-                        <th>Judul</th>
                         <th>Uraian</th>
                         <th>Keterangan</th>
                         <th style="width:140px">File</th>
@@ -344,7 +343,6 @@
                   <?php foreach($data as $index => $dokumen) { ?>
                     <tr>
                         <td><?= $index + 1 ?></td>
-                        <td><?= $dokumen['data_judul'] ?></td>
                         <td><?= $dokumen['data_uraian'] ?></td>
                         <td><?= $dokumen['data_keterangan'] ?></td>
                         <td>
