@@ -22,44 +22,54 @@ class DataModel extends CI_Model {
         return($this->db->affected_rows() != 1) ? false : true;
     }
 
-    function getAllPenetapan() {
-        $this->db->from('mutu_data');
-        $this->db->where('data_kategori','PENETAPAN');
-        $this->db->where('show','1');
-        $query = $this->db->get();
-        return $query->row_array();
-    }
+   function getAllPenetapan() {
+    return $this->db
+        ->from('mutu_data')
+        ->where('data_kategori', 'PENETAPAN')
+        ->where('show', '1')
+        ->order_by('data_tanggal', 'DESC')
+        ->get()
+        ->result_array();   // ← INI KUNCI
+}
 
     function getAllPelaksanaan() {
-        $this->db->from('mutu_data');
-        $this->db->where('data_kategori','PELAKSANAAN');
-        $this->db->where('show','1');
-        $query = $this->db->get();
-        return $query->row_array();
-    }
+    return $this->db
+        ->from('mutu_data')
+        ->where('data_kategori', 'PELAKSANAAN')
+        ->where('show', '1')
+        ->order_by('data_tanggal', 'DESC')
+        ->get()
+        ->result_array();   // ← INI KUNCI
+}
 
     function getAllEvaluasi() {
-        $this->db->from('mutu_data');
-        $this->db->where('data_kategori','EVALUASI');
-        $this->db->where('show','1');
-        $query = $this->db->get();
-        return $query->row_array();
+        return $this->db
+        ->from('mutu_data')
+        ->where('data_kategori', 'EVALUASI')
+        ->where('show', '1')
+        ->order_by('data_tanggal', 'DESC')
+        ->get()
+        ->result_array();   // ← INI KUNCI
     }
 
     function getAllPengendalian() {
-        $this->db->from('mutu_data');
-        $this->db->where('data_kategori','PENGENDALIAN');
-        $this->db->where('show','1');
-        $query = $this->db->get();
-        return $query->row_array();
+        return $this->db
+        ->from('mutu_data')
+        ->where('data_kategori', 'PENGENDALIAN')
+        ->where('show', '1')
+        ->order_by('data_tanggal', 'DESC')
+        ->get()
+        ->result_array();   // ← INI KUNCI
     }
 
     function getAllPeningkatan() {
-        $this->db->from('mutu_data');
-        $this->db->where('data_kategori','PENINGKATAN');
-        $this->db->where('show', '1');
-        $query = $this->db->get();
-        return $query->row_array();
+        return $this->db
+        ->from('mutu_data')
+        ->where('data_kategori', 'PENINGKATAN')
+        ->where('show', '1')
+        ->order_by('data_tanggal', 'DESC')
+        ->get()
+        ->result_array();   // ← INI KUNCI
     }
 
     function getData($id) {
