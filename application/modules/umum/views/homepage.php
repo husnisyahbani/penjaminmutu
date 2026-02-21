@@ -313,7 +313,7 @@
 
               <li>
                 <a class="dropdown-item py-2 px-4"
-                   href="<?php echo base_url('tentang/profil'); ?>">
+                   href="<?php echo base_url(); ?>#profil">
                   Profil
                 </a>
               </li>
@@ -476,15 +476,11 @@
                         <div class="carousel-inner">
 
                             <div class="carousel-item active">
-                                <img src="img/ppm-1.jpg" class="d-block w-100" alt="PPM STIK">
+                                <img src="<?php echo asset_url();?>/assets/images/personil.jpg" class="d-block w-100" alt="PPM STIK">
                             </div>
 
                             <div class="carousel-item">
-                                <img src="img/ppm-2.jpg" class="d-block w-100" alt="Audit Mutu">
-                            </div>
-
-                            <div class="carousel-item">
-                                <img src="img/ppm-3.jpg" class="d-block w-100" alt="Rapat Mutu">
+                                <img src="<?php echo asset_url();?>/assets/images/personil2.jpg" class="d-block w-100" alt="Audit Mutu">
                             </div>
 
                         </div>
