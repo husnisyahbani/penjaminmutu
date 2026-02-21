@@ -141,6 +141,15 @@ class Data extends MY_Controller {
             $row[] = '<a class="btn btn-sm btn-icon btn-success"
             data-toggle="tooltip" data-original-title="Detail" href="'.base_url('filedata/').$field->data_file.'" target="_blank"><i class="icon md-download" aria-hidden="true"></i> Download</a>' ;
             $row[] = $field->data_kategori;
+
+            if($field->isshow == 1){
+                $row[] = '<button class="hide btn btn-sm btn-icon btn-pure btn-default on-default remove-row"
+                      data-toggle="tooltip" data-original-title="Hide" id=' . $field->data_id . '><i class="icon md-eye-off" aria-hidden="true"></i></button>';
+            }else{
+                $row[] = '<button class="show btn btn-sm btn-icon btn-pure btn-default on-default edit-row"
+                data-toggle="tooltip" data-original-title="Show" id=' . $field->data_id . '><i class="icon md-eye" aria-hidden="true"></i></button>';
+            }
+            
             $row[] = date("d-m-Y H:i:s", strtotime($field->data_create));
             $row[] = '<button class="edit btn btn-sm btn-icon btn-pure btn-default on-default edit-row"
             data-toggle="tooltip" data-original-title="Edit" id=' . $field->data_id . '><i class="icon md-edit" aria-hidden="true"></i></button><button class="delete btn btn-sm btn-icon btn-pure btn-default on-default remove-row"
