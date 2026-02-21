@@ -5,7 +5,7 @@ class Evaluasi extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'admin';
-        $this->load->js(base_url("assets/app/admin/evaluasi.js?v=1.1"));
+        $this->load->js(base_url("assets/app/admin/evaluasi.js?v=1.2"));
         $this->load->model('DataModel', 'datamodel');
 
         $role = $this->session->userdata('role');
