@@ -106,6 +106,34 @@
         line-height: 1.7;
     }
 
+    .tupoksi-section {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0,0,0,.04);
+    }
+
+    .tupoksi-title {
+        font-weight: 600;
+        letter-spacing: .3px;
+    }
+
+    .tupoksi-divider {
+        width: 70px;
+        height: 4px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        background: linear-gradient(90deg, #0d6efd, #20c997);
+    }
+
+    .tupoksi-list li {
+        padding: 14px 18px;
+        margin-bottom: 12px;
+        border-radius: 14px;
+        background: #f8fafc;
+        line-height: 1.7;
+    }
+
   </style>
 </head>
 <body>
@@ -274,8 +302,8 @@
 
               <li>
                 <a class="dropdown-item py-2 px-4"
-                   href="<?php echo base_url('tentang/struktur'); ?>">
-                  Program Kerja
+                   href="<?php echo base_url(); ?>#tupoksi">
+                  Tupoksi
                 </a>
               </li>
 
@@ -476,6 +504,40 @@ foreach($sk as $row):
                     dalam rangka pencapaian akreditasi yang unggul.</li>
             </ol>
         </div>
+
+    </div>
+</div>
+  </section>
+
+  <section id="tupoksi" class="py-5">
+    <div class="container my-5">
+    <div class="tupoksi-section">
+
+        <h3 class="tupoksi-title text-dark mb-2">Tugas Pokok dan Fungsi</h3>
+        <div class="tupoksi-divider"></div>
+
+        <ol class="tupoksi-list text-secondary ps-0">
+            <li>Merencanakan, melaksanakan, dan mengembangkan penyelenggaraan pendidikan
+                berdasarkan peraturan dan pedoman sistem penjaminan mutu.</li>
+
+            <li>Menyusun perangkat penjamin mutu.</li>
+
+            <li>Memonitor dan mengevaluasi pelaksanaan penyelenggaraan
+                Tridharma Perguruan Tinggi.</li>
+
+            <li>Melaksanakan dan mengembangkan Audit Mutu Internal (AMI).</li>
+
+            <li>Menyiapkan auditor Audit Mutu Internal.</li>
+
+            <li>Menyelenggarakan rapat tinjauan manajemen.</li>
+
+            <li>Memonitor dan mengevaluasi pelaksanaan hasil rapat tinjauan manajemen.</li>
+
+            <li>Mendampingi proses akreditasi dan reakreditasi institusi,
+                program studi, dan unit pelayanan pendidikan lainnya.</li>
+
+            <li>Mengembangkan sistem informasi pendukung Sistem Penjaminan Mutu Internal (SPMI).</li>
+        </ol>
 
     </div>
 </div>
