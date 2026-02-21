@@ -5,7 +5,7 @@ class Data extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'admin';
-        $this->load->js(base_url("assets/app/admin/data.js?v=1.12"));
+        $this->load->js(base_url("assets/app/admin/data.js?v=1.13"));
         $this->load->model('DataModel', 'datamodel');
 
         $role = $this->session->userdata('role');
