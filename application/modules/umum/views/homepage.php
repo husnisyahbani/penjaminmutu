@@ -722,7 +722,7 @@ foreach($chunk as $group){
     <div class="card-body">
 
       <span style="font-size:13px;color:#888;display:block;margin-bottom:5px;">
-        <?= $b['berita_create'] ?>
+        <?= date('d-m-Y', strtotime($b['berita_create'])) ?>
       </span>
 
       <h5 style="

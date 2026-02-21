@@ -40,7 +40,7 @@ body{
         <div class="card-body">
 
           <span style="font-size:13px;color:#888;">
-            <?= $berita['berita_create'] ?>
+            <?= date('d-m-Y', strtotime($berita['berita_create'])) ?>
           </span>
 
           <h2 style="margin-top:10px;">
