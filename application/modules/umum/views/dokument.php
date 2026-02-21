@@ -334,23 +334,26 @@
                     <tr>
                         <th style="width:60px">No</th>
                         <th>Judul</th>
+                        <th>Uraian</th>
                         <th>Keterangan</th>
                         <th style="width:140px">File</th>
                         <th style="width:140px">Tanggal</th>
                     </tr>
                 </thead>
                 <tbody>
+                  <?php foreach($data as $index => $dokumen) { ?>
                     <tr>
-                        <td>1</td>
-                        <td>Standar Mutu Akademik</td>
-                        <td>Dokumen standar akademik institusi</td>
+                        <td><?= $index + 1 ?></td>
+                        <td><?= $dokumen['data_judul'] ?></td>
+                        <td><?= $dokumen['data_uraian'] ?></td>
+                        <td><?= $dokumen['data_keterangan'] ?></td>
                         <td>
-                            <span class="file-badge">
-                                <i class="bi bi-file-earmark-pdf"></i> PDF
-                            </span>
+                          <a class="btn btn-sm btn-icon btn-success"
+                              data-toggle="tooltip" data-original-title="Detail" href="<?php echo base_url('filedata/'.$dokumen['data_file']); ?>" target="_blank"><i class="icon md-download" aria-hidden="true"></i> Download</a>
                         </td>
-                        <td>12 Jan 2026</td>
+                        <td><?= date("d-m-Y H:i:s", strtotime($dokumen['data_tanggal'])) ?></td>
                     </tr>
+                  <?php } ?>
 
                     <tr>
                         <td>2</td>
