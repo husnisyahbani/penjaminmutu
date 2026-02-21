@@ -156,7 +156,7 @@ class Data extends MY_Controller {
             
             $row[] = date("d-m-Y H:i:s", strtotime($field->data_create));
 
-            if($field->isshow == 1){
+            if($field->isshow === '1'){
                 $row[] = '<button class="hide btn btn-sm btn-icon btn-pure btn-default on-default remove-row"
                       data-toggle="tooltip" data-original-title="Hide" id=' . $field->data_id . '><i class="icon md-eye-off" aria-hidden="true"></i></button> <button class="edit btn btn-sm btn-icon btn-pure btn-default on-default edit-row"
             data-toggle="tooltip" data-original-title="Edit" id=' . $field->data_id . '><i class="icon md-edit" aria-hidden="true"></i></button><button class="delete btn btn-sm btn-icon btn-pure btn-default on-default remove-row"
