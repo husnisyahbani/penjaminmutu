@@ -350,9 +350,10 @@
                           <a href="javascript:void(0)"
                             class="btn btn-sm rounded-pill
                                     bg-primary bg-opacity-10 text-primary
-                                    d-inline-flex align-items-center gap-2 preview-pdf"
-                            data-file="<?= base_url('filedata/'.$out['data_file']); ?>">
-                            <i class="bi bi-eye"></i> Preview
+                                    preview-pdf"
+                            data-file="<?= base_url('filedata/'.$out['data_file']); ?>"
+                            data-title="<?= htmlspecialchars($out['data_uraian'], ENT_QUOTES); ?>">
+                            <i class="bi bi-eye"></i> Lihat
                           </a>
                         </td>
                         <td><?= date("d-m-Y", strtotime($out['data_create'])) ?></td>
@@ -439,6 +440,20 @@ document.addEventListener('DOMContentLoaded', function () {
       bsCollapse.hide();
     });
 
+});
+</script>
+
+<script>
+document.querySelectorAll('.preview-pdf').forEach(btn => {
+  btn.addEventListener('click', function () {
+
+    const title = this.dataset.title;
+    const modalTitle = document.getElementById('pdfModalTitle');
+
+    modalTitle.textContent = title;
+
+    // kode render pdf lanjut di sini
+  });
 });
 </script>
 
