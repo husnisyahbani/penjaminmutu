@@ -340,16 +340,16 @@
                     </tr>
                 </thead>
                 <tbody>
-                  <?php foreach($dataku as $index => $dokumen) { ?>
+                  <?php foreach($dataku as $index => $out) { ?>
                     <tr>
                         <td><?= $index + 1 ?></td>
-                        <td><?= $dokumen['data_uraian'] ?></td>
-                        <td><?= $dokumen['data_keterangan'] ?></td>
+                        <td><?= $out['data_uraian'] ?></td>
+                        <td><?= $out['data_keterangan'] ?></td>
                         <td>
                           <a class="btn btn-sm btn-icon btn-success"
-                              data-toggle="tooltip" data-original-title="Detail" href="<?php echo base_url('filedata/'.$dokumen['data_file']); ?>" target="_blank"><i class="icon md-download" aria-hidden="true"></i> Download</a>
+                              data-toggle="tooltip" data-original-title="Detail" href="<?php echo base_url('filedata/'.$out['data_file']); ?>" target="_blank"><i class="icon md-download" aria-hidden="true"></i> Download</a>
                         </td>
-                        <td><?= date("d-m-Y H:i:s", strtotime($dokumen['data_tanggal'])) ?></td>
+                        <td><?= date("d-m-Y H:i:s", strtotime($out['data_tanggal'])) ?></td>
                     </tr>
                   <?php } ?>
 
