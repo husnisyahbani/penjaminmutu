@@ -337,7 +337,6 @@
                         <th>Uraian</th>
                         <th>Keterangan</th>
                         <th style="width:140px">File</th>
-                        <th style="width:140px">Tanggal</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -356,7 +355,6 @@
                             <i class="bi bi-eye"></i> Lihat
                           </a>
                         </td>
-                        <td><?= date("d-m-Y", strtotime($out['data_create'])) ?></td>
                     </tr>
                   <?php } ?>
 
