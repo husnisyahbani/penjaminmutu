@@ -23,7 +23,17 @@ $(function () {
     $("#data").on("click", ".delete", function () {
         var id = $(this).attr('id');
         hapusdata(id);
-    });   
+    });
+    
+    $("#data").on("click", ".show", function () {
+        var id = $(this).attr('id');
+        showdata(id);
+    });
+
+    $("#data").on("click", ".hide", function () {
+        var id = $(this).attr('id');
+        hidedata(id);
+    });
 
     $("#tambahdata").on("click", function () {
          $('#dataAddModal').modal('show');
@@ -90,6 +100,73 @@ $(function () {
                             swal.fire({
                                 title: "Hapus",
                                 text: "Data Telah Terhapus!",
+                                type: "success",
+                                preConfirm: function () {
+                                    datalist.ajax.reload();
+                                }
+                            });
+                        })
+                        .error(function (data) {
+                            swal.fire("Oops", "No connection!", "error");
+                        });
+            }
+        });
+    }
+
+    function showdata($id)
+    {
+        swal.fire({
+            title: "Anda Yakin?",
+            text: "Anda Yakin Ingin Menampilkan Data Ini?",
+            type: "warning",
+            showCancelButton: true,
+            showLoaderOnConfirm: true,
+            confirmButtonText: "Ya, Tampilkan!",
+            cancelButtonText: 'Tidak',
+            preConfirm: function () {
+                $.ajax({
+                    url: base_url + "/data/show",
+                    type: "POST",
+                    data: { id: $id}
+                })
+                        .done(function (data) {
+                            swal.fire({
+                                title: "Tampilkan",
+                                text: "Data Telah Ditampilkan!",
+                                type: "success",
+                                preConfirm: function () {
+                                    datalist.ajax.reload();
+                                }
+                            });
+                        })
+                        .error(function (data) {
+                            swal.fire("Oops", "No connection!", "error");
+                        });
+            }
+        });
+    }
+
+
+    function hidedata($id)
+    {
+        swal.fire({
+            title: "Anda Yakin?",
+            text: "Anda Yakin Ingin Menyembunyikan Data Ini?",
+            type: "warning",
+            showCancelButton: true,
+            showLoaderOnConfirm: true,
+            confirmButtonText: "Ya, Sembunyikan!",
+            cancelButtonText: 'Tidak',
+            preConfirm: function () {
+                $.ajax({
+                    url: base_url + "/data/hide",
+                    type: "POST",
+                    data: { id: $id}
+                })
+                        .done(function (data) {
+                            swal.fire({
+                                title: "Sembunyikan",
+                                text: "Data Telah Disembunyikan!",
                                 type: "success",
                                 preConfirm: function () {
                                     datalist.ajax.reload();
