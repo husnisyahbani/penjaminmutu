@@ -307,6 +307,13 @@
                 </a>
               </li>
 
+              <li>
+                <a class="dropdown-item py-2 px-4"
+                   href="<?php echo base_url(); ?>#sasaran-mutu">
+                  Sasaran Mutu
+                </a>
+              </li>
+
             </ul>
           </li>
 
@@ -540,6 +547,43 @@ foreach($sk as $row):
     </div>
 </div>
   </section>
+
+<section id="sasaran-mutu" class="py-5">
+  <div class="container my-5">
+    <div class="vm-section">
+
+        <!-- SASARAN UMUM -->
+        <div class="vm-vision mb-5">
+            <h3 class="vm-title text-primary mb-2">Sasaran Mutu – Umum</h3>
+            <div class="vm-divider bg-primary"></div>
+            <p class="text-secondary fs-6 mb-0">
+                Mewujudkan terlaksananya Sistem Penjaminan Mutu Internal (SPMI) secara konsisten
+                dan berkelanjutan guna menjamin dan meningkatkan mutu penyelenggaraan
+                Tridharma Perguruan Tinggi serta tata kelola institusi di lingkungan
+                <strong>STIK Siti Khadijah</strong>.
+            </p>
+        </div>
+
+        <!-- SASARAN KHUSUS -->
+        <div class="vm-vision">
+            <h3 class="vm-title text-success mb-2">Sasaran Mutu – Khusus</h3>
+            <div class="vm-divider bg-success"></div>
+            <ol class="vm-mission text-secondary ps-3">
+                <li>Terlaksananya penyelenggaraan pendidikan sesuai dengan kebijakan dan standar SPMI.</li>
+                <li>Tersusunnya perangkat penjaminan mutu yang lengkap dan mutakhir.</li>
+                <li>Terlaksananya monitoring dan evaluasi Tridharma Perguruan Tinggi secara berkala.</li>
+                <li>Terlaksananya Audit Mutu Internal (AMI) secara sistematis dan berkelanjutan.</li>
+                <li>Tersedianya auditor mutu internal yang kompeten.</li>
+                <li>Terselenggaranya Rapat Tinjauan Manajemen (RTM) secara rutin.</li>
+                <li>Terlaksananya tindak lanjut hasil Rapat Tinjauan Manajemen.</li>
+                <li>Terlaksananya pendampingan akreditasi dan reakreditasi secara optimal.</li>
+                <li>Berkembangnya sistem informasi pendukung SPMI yang efektif.</li>
+            </ol>
+        </div>
+
+    </div>
+</div>
+</section>
 
   <section id="berita" class="py-5">
     <div class="container py-5">
