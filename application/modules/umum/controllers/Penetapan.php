@@ -1,6 +1,6 @@
 <?php
 
-class Berita extends MY_Controller {
+class Penetapan extends MY_Controller {
 
     public function __construct() {
         parent::__construct();
