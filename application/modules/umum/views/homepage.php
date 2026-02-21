@@ -512,8 +512,7 @@ foreach($sk as $row):
   <section id="tupoksi" class="py-5">
     <div class="container my-5">
     <div class="tupoksi-section">
-
-        <h3 class="tupoksi-title text-dark mb-2">Tugas Pokok dan Fungsi</h3>
+      <h1 class="text-center my-5">Tugas Pokok dan Fungsi</h1>
         <div class="tupoksi-divider"></div>
 
         <ol class="tupoksi-list text-secondary ps-0">
