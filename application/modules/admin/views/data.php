@@ -26,7 +26,6 @@
                             <th>Keterangan</th>
                             <th>File</th>
                             <th>Bagian</th>
-                            <th>Tampil</th>
                             <th width="200px">Tanggal</th>
                             <th width="150px">Aksi</th>
                         </tr>
