@@ -141,7 +141,7 @@ class Pelaksanaan extends MY_Controller {
             $row[] = '<a class="btn btn-sm btn-icon btn-success"
             data-toggle="tooltip" data-original-title="Detail" href="'.base_url('filedata/').$field->data_file.'" target="_blank"><i class="icon md-download" aria-hidden="true"></i> Download</a>' ;
             $row[] = $field->data_kategori;
-            $row[] = date("d-m-Y H:i:s", strtotime($field->data_create));
+            // $row[] = date("d-m-Y H:i:s", strtotime($field->data_create));
             if($field->isshow === '1'){
                 $row[] = '<button class="hide btn btn-sm btn-icon btn-pure btn-default on-default remove-row"
                       data-toggle="tooltip" data-original-title="Hide" id=' . $field->data_id . '><i class="icon md-eye-off" aria-hidden="true"></i></button> <button class="edit btn btn-sm btn-icon btn-pure btn-default on-default edit-row"

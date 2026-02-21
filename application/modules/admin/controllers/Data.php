@@ -154,7 +154,7 @@ class Data extends MY_Controller {
 
             
             
-            $row[] = date("d-m-Y H:i:s", strtotime($field->data_create));
+            // $row[] = date("d-m-Y H:i:s", strtotime($field->data_create));
 
             if($field->isshow === '1'){
                 $row[] = '<button class="hide btn btn-sm btn-icon btn-pure btn-default on-default remove-row"
