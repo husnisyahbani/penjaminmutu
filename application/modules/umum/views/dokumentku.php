@@ -349,7 +349,7 @@
                           <a class="btn btn-sm btn-icon btn-success"
                               data-toggle="tooltip" data-original-title="Detail" href="<?php echo base_url('filedata/'.$out['data_file']); ?>" target="_blank"><i class="icon md-download" aria-hidden="true"></i> Download</a>
                         </td>
-                        <td><?= date("d-m-Y H:i:s", strtotime($out['data_tanggal'])) ?></td>
+                        <td><?= date("d-m-Y H:i:s", strtotime($out['data_create'])) ?></td>
                     </tr>
                   <?php } ?>
 
