@@ -341,7 +341,7 @@
                 </thead>
                 <tbody>
                   <?php foreach($dataku as $index => $out) { ?>
-                    <!-- <tr>
+                    <tr>
                         <td><?= $index + 1 ?></td>
                         <td><?= $out['data_uraian'] ?></td>
                         <td><?= $out['data_keterangan'] ?></td>
@@ -350,7 +350,7 @@
                               data-toggle="tooltip" data-original-title="Detail" href="<?php echo base_url('filedata/'.$out['data_file']); ?>" target="_blank"><i class="icon md-download" aria-hidden="true"></i> Download</a>
                         </td>
                         <td><?= date("d-m-Y H:i:s", strtotime($out['data_create'])) ?></td>
-                    </tr> -->
+                    </tr>
                   <?php } ?>
 
                     

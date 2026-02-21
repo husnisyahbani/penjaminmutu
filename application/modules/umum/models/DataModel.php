@@ -27,7 +27,7 @@ class DataModel extends CI_Model {
         ->from('mutu_data')
         ->where('data_kategori', 'PENETAPAN')
         ->where('show', '1')
-        ->order_by('data_tanggal', 'DESC')
+        ->order_by('data_create', 'DESC')
         ->get()
         ->result_array();   // ← INI KUNCI
 }
@@ -37,7 +37,7 @@ class DataModel extends CI_Model {
         ->from('mutu_data')
         ->where('data_kategori', 'PELAKSANAAN')
         ->where('show', '1')
-        ->order_by('data_tanggal', 'DESC')
+        ->order_by('data_create', 'DESC')
         ->get()
         ->result_array();   // ← INI KUNCI
 }
@@ -47,7 +47,7 @@ class DataModel extends CI_Model {
         ->from('mutu_data')
         ->where('data_kategori', 'EVALUASI')
         ->where('show', '1')
-        ->order_by('data_tanggal', 'DESC')
+        ->order_by('data_create', 'DESC')
         ->get()
         ->result_array();   // ← INI KUNCI
     }
@@ -57,7 +57,7 @@ class DataModel extends CI_Model {
         ->from('mutu_data')
         ->where('data_kategori', 'PENGENDALIAN')
         ->where('show', '1')
-        ->order_by('data_tanggal', 'DESC')
+        ->order_by('data_create', 'DESC')
         ->get()
         ->result_array();   // ← INI KUNCI
     }
@@ -67,7 +67,7 @@ class DataModel extends CI_Model {
         ->from('mutu_data')
         ->where('data_kategori', 'PENINGKATAN')
         ->where('show', '1')
-        ->order_by('data_tanggal', 'DESC')
+        ->order_by('data_create', 'DESC')
         ->get()
         ->result_array();   // ← INI KUNCI
     }
