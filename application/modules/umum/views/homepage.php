@@ -449,7 +449,7 @@ foreach($sk as $row):
         <div class="vm-vision mb-5">
             <h3 class="vm-title text-primary mb-2">Visi</h3>
             <div class="vm-divider bg-primary"></div>
-            <p class="text-secondary fs-6 mb-0">
+            <p class="text-primary fs-6 mb-0">
                 Menjadi pusat penjaminan mutu yang unggul dalam mengembangkan dan
                 mengawal budaya mutu berkelanjutan guna mendukung terwujudnya
                 <strong>STIK Siti Khadijah</strong> yang berkualitas dan berdaya saing.
