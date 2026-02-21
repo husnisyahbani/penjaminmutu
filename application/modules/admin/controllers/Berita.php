@@ -112,6 +112,7 @@ class Berita extends MY_Controller {
             $data['berita_judul']  = $this->input->post('berita_judul');
             $data['berita_deskripsi'] = $this->input->post('berita_deskripsi');
             $data['berita_isi'] = trim($this->input->post('berita_isi'));
+            $data['berita_create'] = $this->input->post('berita_create');
             
             if($this->beritamodel->edit($data)){
                 $msg = 'Berhasil';

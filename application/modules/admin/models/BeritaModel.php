@@ -90,6 +90,7 @@ class BeritaModel extends CI_Model {
     }
 
     public function edit($data) {
+        $data['berita_update'] = $data['berita_create'];
         $this->db->trans_start();
         $this->db->where("berita_id",$data['berita_id']);
         $this->db->update('berita',$data);
