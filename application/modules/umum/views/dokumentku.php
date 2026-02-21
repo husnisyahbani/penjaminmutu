@@ -12,6 +12,7 @@
 
   <!-- Bootstrap 5 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
   <!-- CSS Landing Page -->
   <link rel="stylesheet" href="./assets/desain/landing.css">
@@ -321,7 +322,7 @@
 
 <section class="py-5 bg-primary green-gradasi">
     <div class="container my-5">
-       <h1 class="text-center my-5">Sasaran Mutu</h1>
+       <h1 class="text-center my-5"></h1>
     <div class="table-wrapper">
 
         <h5 class="mb-4 fw-semibold text-dark">
@@ -346,13 +347,12 @@
                         <td><?= $out['data_uraian'] ?></td>
                         <td><?= $out['data_keterangan'] ?></td>
                         <td>
-                          <a href="<?= base_url('filedata/'.$out['data_file']); ?>"
-                            target="_blank"
-                            class="btn btn-sm rounded-pill px-3
-                                    text-success border border-success bg-transparent
-                                    d-inline-flex align-items-center gap-2">
-                              <i class="bi bi-download"></i>
-                              Download
+                          <a href="javascript:void(0)"
+                            class="btn btn-sm rounded-pill
+                                    bg-primary bg-opacity-10 text-primary
+                                    d-inline-flex align-items-center gap-2 preview-pdf"
+                            data-file="<?= base_url('filedata/'.$out['data_file']); ?>">
+                            <i class="bi bi-eye"></i> Preview
                           </a>
                         </td>
                         <td><?= date("d-m-Y", strtotime($out['data_create'])) ?></td>
@@ -369,6 +369,23 @@
     </div>
 </div>
 </section>
+
+<div class="modal fade" id="pdfPreviewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content rounded-4">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Preview Dokumen</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body bg-light text-center">
+        <canvas id="pdfCanvas"></canvas>
+      </div>
+
+    </div>
+  </div>
+</div>
 
 
 
@@ -422,6 +439,39 @@ document.addEventListener('DOMContentLoaded', function () {
       bsCollapse.hide();
     });
 
+});
+</script>
+
+<script>
+const pdfjsLib = window['pdfjs-dist/build/pdf'];
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+const canvas = document.getElementById('pdfCanvas');
+const ctx = canvas.getContext('2d');
+
+document.querySelectorAll('.preview-pdf').forEach(btn => {
+  btn.addEventListener('click', function () {
+    const url = this.dataset.file;
+
+    const modal = new bootstrap.Modal(
+      document.getElementById('pdfPreviewModal')
+    );
+    modal.show();
+
+    pdfjsLib.getDocument(url).promise.then(pdf => {
+      pdf.getPage(1).then(page => {
+        const viewport = page.getViewport({ scale: 1.5 });
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        page.render({
+          canvasContext: ctx,
+          viewport: viewport
+        });
+      });
+    });
+  });
 });
 </script>
 
