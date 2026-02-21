@@ -162,7 +162,7 @@ class Berita extends MY_Controller {
             $row[] = $this->limit_200_words($field->berita_deskripsi);
             $row[] = '<a class="btn btn-sm btn-icon btn-success"
             data-toggle="tooltip" data-original-title="Detail" href="'.base_url('filedata/').$field->berita_file.'" target="_blank"><i class="icon md-download" aria-hidden="true"></i> Download</a>' ;
-            $row[] = date("d-m-Y H:i:s", strtotime($field->berita_create));
+            $row[] = date("d-m-Y", strtotime($field->berita_create));
             $row[] = '<button class="edit btn btn-sm btn-icon btn-pure btn-default on-default edit-row"
             data-toggle="tooltip" data-original-title="Edit" id=' . $field->berita_id . '><i class="icon md-edit" aria-hidden="true"></i></button><button class="delete btn btn-sm btn-icon btn-pure btn-default on-default remove-row"
                       data-toggle="tooltip" data-original-title="Remove" id=' . $field->berita_id . '><i class="icon md-delete" aria-hidden="true"></i></button>';
