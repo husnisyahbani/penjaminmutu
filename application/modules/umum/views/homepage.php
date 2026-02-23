@@ -446,12 +446,12 @@
             <div class="col-lg-6">
                 <div class="profile-card">
                     <h3 class="profile-title text-dark mb-2">
-                        Profil Pusat Penjaminan Mutu
+                        Profil Pusat Penjamin Mutu
                     </h3>
                     <div class="profile-divider"></div>
 
                     <p class="text-secondary lh-lg">
-                        <strong>Pusat Penjaminan Mutu (PPM) STIK Siti Khadijah</strong> merupakan unit
+                        <strong>Pusat Penjamin Mutu (PPM) STIK Siti Khadijah</strong> merupakan unit
                         struktural yang bertanggung jawab dalam merencanakan, melaksanakan,
                         mengevaluasi, mengendalikan, dan meningkatkan mutu penyelenggaraan
                         Tridharma Perguruan Tinggi serta tata kelola institusi.
@@ -459,7 +459,7 @@
 
                     <p class="text-secondary lh-lg mb-0">
                         PPM berperan sebagai penggerak utama dalam implementasi
-                        <strong>Sistem Penjaminan Mutu Internal (SPMI)</strong> secara berkelanjutan.
+                        <strong>Sistem Penjamin Mutu Internal (SPMI)</strong> secara berkelanjutan.
                         Dalam menjalankan fungsinya, PPM memastikan seluruh kegiatan akademik dan
                         non-akademik berjalan sesuai standar yang ditetapkan, peraturan
                         perundang-undangan, serta kebijakan nasional pendidikan tinggi. Selain itu,
