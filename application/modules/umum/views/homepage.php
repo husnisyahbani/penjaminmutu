@@ -320,6 +320,13 @@
 
               <li>
                 <a class="dropdown-item py-2 px-4"
+                   href="<?php echo base_url(); ?>#pengelola">
+                  Pengelola Pusat Penjamin Mutu
+                </a>
+              </li>
+
+              <li>
+                <a class="dropdown-item py-2 px-4"
                    href="<?php echo base_url(); ?>#sk">
                   SK
                 </a>
@@ -503,6 +510,22 @@
 </div>
 
 </section>
+
+<section id="pengelola" class="py-5">
+    <div class="container py-5">
+      <div class="row py-5 justify-content-center align-items-center">
+        <div class="col-12">
+          <h1 class="text-center my-5">PENGELOLA PUSAT PENJAMINAN MUTU STIK SITI KHADIJAH</h1>
+        </div>
+        <div class="col-12 text-center">
+          <img srcset="<?php echo asset_url();?>/assets/images/tim.png 2x" src="<?php echo asset_url();?>/assets/images/tim.png" alt="PENJAMIN MUTU STIK SITI KHADIJAH" class="img-fluid mb-4">
+        </div>
+        <div class="col-md-8 text-center">
+          
+        </div>
+      </div>
+    </div>
+  </section>
 
   <section id="sk" class="py-5">
     <div class="container py-5">
