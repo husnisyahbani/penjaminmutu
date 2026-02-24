@@ -518,10 +518,7 @@
           <h1 class="text-center my-5">PENGELOLA PUSAT PENJAMINAN MUTU STIK SITI KHADIJAH</h1>
         </div>
         <div class="col-12 text-center">
-          <img srcset="<?php echo asset_url();?>/assets/images/tim.png 2x" src="<?php echo asset_url();?>/assets/images/tim.png" alt="PENJAMIN MUTU STIK SITI KHADIJAH" class="img-fluid mb-4">
-        </div>
-        <div class="col-md-8 text-center">
-          
+          <img  src="<?php echo asset_url();?>/assets/images/tim.png" alt="PENJAMIN MUTU STIK SITI KHADIJAH">
         </div>
       </div>
     </div>
