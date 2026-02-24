@@ -515,7 +515,7 @@
     <div class="container py-5">
       <div class="row py-5 justify-content-center align-items-center">
         <div class="col-12">
-          <h1 class="text-center my-5">PENGELOLA PUSAT PENJAMINAN MUTU STIK SITI KHADIJAH</h1>
+          <h3 class="text-center my-5">PENGELOLA PUSAT PENJAMINAN MUTU STIK SITI KHADIJAH</h3>
         </div>
         <div class="col-12 text-center">
           <img  src="<?php echo asset_url();?>/assets/images/tim.png" alt="PENJAMIN MUTU STIK SITI KHADIJAH">
