@@ -123,6 +123,12 @@
               </a>
             </li>
 
+            <li class="site-menu-item <?php if(isset($pengaturanhome)){echo $pengaturanhome;} ?>">
+              <a class="animsition-link" href="<?php echo base_url($module.'/pengaturanhome');?>">
+                <span class="site-menu-title">Pengaturan Home</span>
+              </a>
+            </li>
+
             
             
          </ul>
