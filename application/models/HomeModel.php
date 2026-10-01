@@ -118,24 +118,24 @@ class HomeModel extends CI_Model
             ),
 
             'pengelola' => array(
-                'judul'      => 'Pengelola',
+                'judul'      => 'Susunan Personel',
                 'ikon'       => 'md-accounts',
-                'keterangan' => 'Struktur pengelola Pusat Penjaminan Mutu.',
+                'keterangan' => 'Susunan personel Pusat Penjaminan Mutu STIK Siti Khadijah yang bertugas menjalankan siklus penjaminan mutu internal. Tampil sebagai bagian "Pengelola Pusat Penjaminan Mutu" pada halaman depan.',
                 'fields'     => array(
-                    'pengelola_judul'     => array('label' => 'Judul Section', 'tipe' => 'text', 'default' => 'Pengelola Pusat Penjaminan Mutu'),
-                    'pengelola_deskripsi' => array('label' => 'Deskripsi', 'tipe' => 'textarea', 'default' => 'Susunan personel Pusat Penjaminan Mutu STIK Siti Khadijah yang bertugas menjalankan siklus penjaminan mutu internal.'),
-                    'pengelola_gambar'    => array('label' => 'Gambar Struktur Pengelola', 'tipe' => 'image', 'default' => 'assets/assets/images/tim.png'),
+                    'pengelola_judul'     => array('label' => 'Judul di Halaman Depan', 'tipe' => 'text', 'default' => 'Pengelola Pusat Penjaminan Mutu', 'bantuan' => 'Judul bagian susunan personel pada halaman depan.'),
+                    'pengelola_deskripsi' => array('label' => 'Deskripsi Susunan Personel', 'tipe' => 'textarea', 'default' => 'Susunan personel Pusat Penjaminan Mutu STIK Siti Khadijah yang bertugas menjalankan siklus penjaminan mutu internal.'),
+                    'pengelola_gambar'    => array('label' => 'Gambar Susunan Personel', 'tipe' => 'image', 'default' => 'assets/assets/images/tim.png', 'bantuan' => 'Foto susunan personel / tim Pusat Penjaminan Mutu.'),
                 ),
             ),
 
             'struktur' => array(
-                'judul'      => 'Struktur Organisasi',
+                'judul'      => 'Bagan Struktur Organisasi',
                 'ikon'       => 'md-device-hub',
-                'keterangan' => 'Bagan struktur organisasi penjaminan mutu.',
+                'keterangan' => 'Bagan struktur organisasi Pusat Penjaminan Mutu beserta garis koordinasi dengan unit kerja. Tampil sebagai bagian "Struktur Organisasi" pada halaman depan.',
                 'fields'     => array(
-                    'struktur_judul'     => array('label' => 'Judul Section', 'tipe' => 'text', 'default' => 'Struktur Organisasi'),
-                    'struktur_deskripsi' => array('label' => 'Deskripsi', 'tipe' => 'textarea', 'default' => 'Bagan organisasi Pusat Penjaminan Mutu beserta garis koordinasi dengan unit kerja di lingkungan institusi.'),
-                    'struktur_gambar'    => array('label' => 'Gambar Struktur Organisasi', 'tipe' => 'image', 'default' => 'assets/assets/images/strukturorganisasi_fix.png'),
+                    'struktur_judul'     => array('label' => 'Judul di Halaman Depan', 'tipe' => 'text', 'default' => 'Struktur Organisasi', 'bantuan' => 'Judul bagian bagan struktur pada halaman depan.'),
+                    'struktur_deskripsi' => array('label' => 'Deskripsi Bagan', 'tipe' => 'textarea', 'default' => 'Bagan organisasi Pusat Penjaminan Mutu beserta garis koordinasi dengan unit kerja di lingkungan institusi.'),
+                    'struktur_gambar'    => array('label' => 'Gambar Bagan Struktur', 'tipe' => 'image', 'default' => 'assets/assets/images/strukturorganisasi_fix.png', 'bantuan' => 'Berkas bagan struktur organisasi (PNG/JPG).'),
                 ),
             ),
 
