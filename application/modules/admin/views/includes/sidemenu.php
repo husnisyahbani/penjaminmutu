@@ -1,8 +1,15 @@
 <style type="text/css">
-  /* Sub menu Pengaturan Home: tema hanya mengatur item level pertama,
-     jadi item anak diberi indentasi + penanda sendiri. */
-  .site-menu .site-menu-child > a { padding-left: 44px !important; font-size: 13px; }
-  .site-menu .site-menu-child > a .site-menu-title:before { content: "–"; margin-right: 8px; opacity: .55; }
+  /* Label kelompok di dalam sub menu Website (mis. "Tampilan Beranda"). */
+  .site-menu .site-menu-group {
+    padding: 14px 25px 6px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: rgba(15, 23, 42, .38);
+    pointer-events: none;
+  }
+  .site-menubar-dark .site-menu .site-menu-group { color: rgba(255, 255, 255, .45); }
 </style>
 
 <div class="site-menubar">
@@ -112,15 +119,19 @@
              </a>
           </li>
             
-            <li class="site-menu-item <?php if(isset($organisasi)){echo $organisasi;} ?>">
-              <a class="animsition-link" href="<?php echo base_url($module.'/organisasi');?>">
+            <?php /* Struktur Organisasi & Visi/Misi beranda.
+                     Tautan lama (admin/organisasi) belum tersedia dan
+                     admin/visimisi belum memiliki view, jadi diarahkan ke
+                     halaman pengaturan beranda yang menanganinya. */ ?>
+            <li class="site-menu-item <?php if(isset($organisasi) || (isset($ph_tab) && $ph_tab === 'organisasi')){echo 'active';} ?>">
+              <a class="animsition-link" href="<?php echo base_url($module.'/pengaturanhome/organisasi');?>">
                 <span class="site-menu-title">Struktur Organisasi</span>
               </a>
             </li>
 
-            <li class="site-menu-item <?php if(isset($visimisi)){echo $visimisi;} ?>">
-              <a class="animsition-link" href="<?php echo base_url($module.'/visimisi');?>">
-                <span class="site-menu-title">Visi & Misi</span>
+            <li class="site-menu-item <?php if(isset($visimisi) || (isset($ph_tab) && $ph_tab === 'visimisi')){echo 'active';} ?>">
+              <a class="animsition-link" href="<?php echo base_url($module.'/pengaturanhome/visimisi');?>">
+                <span class="site-menu-title">Visi &amp; Misi</span>
               </a>
             </li>
 
@@ -130,32 +141,27 @@
               </a>
             </li>
 
-            <li class="site-menu-item <?php if(isset($pengaturanhome)){echo $pengaturanhome;} ?>">
-              <a class="animsition-link" href="<?php echo base_url($module.'/pengaturanhome');?>">
-                <span class="site-menu-title">Pengaturan Home</span>
-              </a>
-            </li>
-
             <?php
-            /* Sub menu Pengaturan Home - setiap bagian punya halaman sendiri
-               (lihat admin/Pengaturanhome.php pada method render()). */
+            /* Pengaturan tampilan BERANDA - tiap bagian adalah menu tersendiri
+               (tidak ada menu induk "Pengaturan Home").
+               Halaman: admin/Pengaturanhome.php -> method render(). */
             $ph_menu = array(
-                'identitas'  => 'Identitas &amp; Tema',
-                'hero'       => 'Hero / Banner',
-                'akses'      => 'Kartu Akses',
-                'profil'     => 'Profil &amp; Galeri',
-                'visimisi'   => 'Visi &amp; Misi',
-                'tupoksi'    => 'Tupoksi',
-                'sasaran'    => 'Sasaran Mutu',
-                'organisasi' => 'Pengelola &amp; Struktur',
-                'informasi'  => 'SK, Berita &amp; Pengumuman',
-                'kontak'     => 'Kontak &amp; Footer',
-                'section'    => 'Tampilkan Section',
+                'identitas' => 'Identitas &amp; Tema',
+                'hero'      => 'Hero / Banner',
+                'akses'     => 'Kartu Akses',
+                'profil'    => 'Profil &amp; Galeri',
+                'tupoksi'   => 'Tupoksi',
+                'sasaran'   => 'Sasaran Mutu',
+                'informasi' => 'Judul SK, Berita &amp; Pengumuman',
+                'kontak'    => 'Kontak &amp; Footer',
+                'section'   => 'Tampilkan Section',
             );
             ?>
 
+            <li class="site-menu-group">Tampilan Beranda</li>
+
             <?php foreach ($ph_menu as $ph_slug => $ph_label): ?>
-              <li class="site-menu-item site-menu-child <?php if(isset($ph_tab) && $ph_tab === $ph_slug){echo 'active';} ?>">
+              <li class="site-menu-item <?php if(isset($ph_tab) && $ph_tab === $ph_slug){echo 'active';} ?>">
                 <a class="animsition-link" href="<?php echo base_url($module.'/pengaturanhome/'.$ph_slug);?>">
                   <span class="site-menu-title"><?php echo $ph_label; ?></span>
                 </a>

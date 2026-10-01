@@ -1,9 +1,10 @@
 <?php
 
 /**
- * Pengaturan Home
+ * Pengaturan Tampilan Beranda
  *
- * CRUD pengaturan tampilan halaman depan (menu: Website > Pengaturan Home).
+ * CRUD pengaturan halaman depan. Setiap bagian adalah menu tersendiri di
+ * bawah menu Website (kelompok "Tampilan Beranda") - lihat render().
  * Terdiri dari dua jenis data:
  *  - pengaturan  : nilai tunggal (judul, teks, gambar, warna, tombol)
  *  - item        : konten berulang (kartu akses, galeri, misi, tupoksi, sasaran)
@@ -93,10 +94,9 @@ class Pengaturanhome extends MY_Controller
         }
 
         $this->data['content'] = 'pengaturanhome/index';
-        $this->data['title'] = 'Pengaturan Home - ' . $aktif['label'];
+        $this->data['title'] = $aktif['label'];
         $this->data['js'] = $this->load->get_js_files();
-        $this->data['pengaturanhome'] = 'active';
-        $this->data['website'] = 'active';
+        $this->data['website'] = 'active'; // menu induk (Website) tetap tersorot
         $this->data['ph_tab'] = $aktif['id'];
 
         $this->data['terpasang'] = $this->homemodel->installed();
@@ -120,15 +120,15 @@ class Pengaturanhome extends MY_Controller
     private function tabs()
     {
         return array(
-            array('id' => 'identitas', 'label' => 'Identitas', 'ikon' => 'md-view-compact', 'pengaturan' => array('umum'), 'item' => array()),
-            array('id' => 'hero', 'label' => 'Hero', 'ikon' => 'md-image', 'pengaturan' => array('hero'), 'item' => array()),
+            array('id' => 'identitas', 'label' => 'Identitas & Tema', 'ikon' => 'md-view-compact', 'pengaturan' => array('umum'), 'item' => array()),
+            array('id' => 'hero', 'label' => 'Hero / Banner', 'ikon' => 'md-image', 'pengaturan' => array('hero'), 'item' => array()),
             array('id' => 'akses', 'label' => 'Kartu Akses', 'ikon' => 'md-account-box', 'pengaturan' => array('akses'), 'item' => array('kartu')),
             array('id' => 'profil', 'label' => 'Profil & Galeri', 'ikon' => 'md-info-outline', 'pengaturan' => array('profil'), 'item' => array('slider')),
             array('id' => 'visimisi', 'label' => 'Visi & Misi', 'ikon' => 'md-eye', 'pengaturan' => array('visi'), 'item' => array('misi')),
             array('id' => 'tupoksi', 'label' => 'Tupoksi', 'ikon' => 'md-assignment', 'pengaturan' => array('tupoksi'), 'item' => array('tupoksi')),
             array('id' => 'sasaran', 'label' => 'Sasaran Mutu', 'ikon' => 'md-flag', 'pengaturan' => array('sasaran'), 'item' => array('sasaran')),
-            array('id' => 'organisasi', 'label' => 'Pengelola & Struktur', 'ikon' => 'md-accounts', 'pengaturan' => array('pengelola', 'struktur'), 'item' => array()),
-            array('id' => 'informasi', 'label' => 'SK, Berita & Pengumuman', 'ikon' => 'md-file-text', 'pengaturan' => array('dokumen', 'berita', 'pengumuman'), 'item' => array()),
+            array('id' => 'organisasi', 'label' => 'Struktur Organisasi', 'ikon' => 'md-accounts', 'pengaturan' => array('pengelola', 'struktur'), 'item' => array()),
+            array('id' => 'informasi', 'label' => 'Judul SK, Berita & Pengumuman', 'ikon' => 'md-file-text', 'pengaturan' => array('dokumen', 'berita', 'pengumuman'), 'item' => array()),
             array('id' => 'kontak', 'label' => 'Kontak & Footer', 'ikon' => 'md-phone', 'pengaturan' => array('kontak'), 'item' => array()),
             array('id' => 'section', 'label' => 'Tampilkan Section', 'ikon' => 'md-eye-off', 'pengaturan' => array('section'), 'item' => array()),
         );

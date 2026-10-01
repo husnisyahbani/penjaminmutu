@@ -83,9 +83,7 @@ if (!function_exists('ph_potong')) {
     <div class="panel">
 
       <header class="panel-heading">
-        <h3 class="panel-title">
-          Pengaturan Home <span class="text-muted">/ <?php echo htmlspecialchars($tab_aktif['label']); ?></span>
-        </h3>
+        <h3 class="panel-title"><?php echo htmlspecialchars($tab_aktif['label']); ?></h3>
         <div class="panel-actions panel-actions-keep">
           <a class="btn btn-sm btn-icon btn-outline btn-default" href="<?php echo base_url(); ?>" target="_blank" rel="noopener">
             <i class="icon md-open-in-new" aria-hidden="true"></i> Lihat Halaman
@@ -101,9 +99,10 @@ if (!function_exists('ph_potong')) {
       <div class="panel-body">
 
         <p class="text-muted mb-4">
-          Semua teks, gambar, warna, dan section pada halaman depan dapat diubah dari halaman ini.
-          Perubahan langsung tampil pada <a href="<?php echo base_url(); ?>" target="_blank" rel="noopener">halaman depan</a>
-          setelah tombol <strong>Simpan</strong> pada tiap tab ditekan.
+          Mengatur <strong><?php echo htmlspecialchars($tab_aktif['label']); ?></strong> pada halaman depan.
+          Perubahan langsung tampil di <a href="<?php echo base_url(); ?>" target="_blank" rel="noopener">halaman depan</a>
+          setelah tombol <strong>Simpan</strong> ditekan.
+          Bagian pengaturan lainnya tersedia pada menu <strong>Website</strong>.
         </p>
 
         <?php if (!$terpasang): ?>
@@ -120,18 +119,7 @@ if (!function_exists('ph_potong')) {
           </div>
         <?php endif; ?>
 
-        <!-- Sub menu: setiap bagian punya URL sendiri -->
-        <ul class="nav nav-tabs nav-tabs-line" role="tablist">
-          <?php foreach ($tabs as $tab): ?>
-            <li class="nav-item" role="presentation">
-              <a class="nav-link <?php echo ($tab['id'] === $tab_aktif['id']) ? 'active' : ''; ?>"
-                 href="<?php echo base_url($module . '/pengaturanhome/' . $tab['id']); ?>">
-                <i class="icon <?php echo $tab['ikon']; ?>" aria-hidden="true"></i>
-                <?php echo htmlspecialchars($tab['label']); ?>
-              </a>
-            </li>
-          <?php endforeach; ?>
-        </ul>
+
 
         <div class="tab-content pt-20">
 
