@@ -5,7 +5,9 @@ class Dashboard extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditee';
-        $this->load->js(base_url("assets/app/auditee/daftaraudit.js?v=1.34"));
+        $this->load->js(base_url("assets/app/auditee/daftaraudit.js?v=1.35"));
+        // Informasi tombol aksi saat hover (lihat assets/app/tabel-aksi.css)
+        $this->load->js(base_url("assets/app/tabel-aksi.js?v=1.0"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
@@ -24,7 +26,7 @@ class Dashboard extends MY_Controller {
             $this->data['js'] = $this->load->get_js_files();
             $this->data['dashboard'] = 'active';
             $this->data['totalterkirim'] = $this->mutu->totalTerkirim();
-            $this->data['totalterProses'] = $this->mutu->totalProses();
+            $this->data['totalproses'] = $this->mutu->totalProses();
             $this->data['totalselesai'] = $this->mutu->totalSelesai();
             $this->data['totaldraft'] = $this->mutu->totalDraft();
             $this->data['listauditor'] = $this->akun->getAllAuditor();
@@ -147,18 +149,41 @@ class Dashboard extends MY_Controller {
             $row[] = $field->auditor;
             $row[] = $field->auditee;
             $row[] = $field->unit;
-            $row[] = '<button class="detail btn btn-sm btn-icon btn-success"
-            data-toggle="tooltip" data-original-title="DETAIL" id=' . $field->audit_id.'><i class="icon md-book" aria-hidden="true"></i> Detail</button>';
-            if($field->audit_status == "DRAFT"){
-                $row[] = '<button class="kirim btn btn-sm btn-icon btn-success"
-            data-toggle="tooltip" data-original-title="KIRIM" id=' . $field->audit_id.'><i class="icon md-play" aria-hidden="true"></i> Kirim</button>';
-            }else if($field->audit_status == "TERKIRIM"){                                        
-                $row[] = '<button type="button" class="btn btn-danger btn-sm btn-icon"><i class="icon md-timer" aria-hidden="true"></i>Terkirim</button>';
-            }else if($field->audit_status == "PROSES"){
-                $row[] = '<button type="button" class="btn btn-warning btn-sm btn-icon"><i class="icon md-home" aria-hidden="true"></i>Diproses</button>';
-            }else if($field->audit_status == "SELESAI"){
-                $row[] = '<button type="button" class="selesai btn btn-success btn-sm btn-icon" id="'.$field->audit_id.'"><i class="icon md-download" aria-hidden="true"></i>Selesai</button>';
+
+            /* ================= TOMBOL AKSI =================
+               Pola seragam seperti halaman auditor: btn btn-sm btn-icon
+               btn-<warna> + ikon saja, keterangan muncul saat kursor
+               diarahkan (data-info diolah assets/app/tabel-aksi.js).
+               Dibungkus .tabel-aksi supaya selalu satu baris. */
+            $btn_detail = '<button type="button" class="detail btn btn-sm btn-icon btn-primary" '
+                . 'data-info="Lihat rincian dan jawab pertanyaan" '
+                . 'aria-label="Detail" id="' . $field->audit_id . '">'
+                . '<i class="icon md-book" aria-hidden="true"></i></button>';
+
+            $btn_kirim = '<button type="button" class="kirim btn btn-sm btn-icon btn-success" '
+                . 'data-info="Kirim hasil evaluasi ke auditor" '
+                . 'aria-label="Kirim" id="' . $field->audit_id . '">'
+                . '<i class="icon md-mail-send" aria-hidden="true"></i></button>';
+
+            // ---- kolom Aksi: seluruh tombol, sesuai status ----
+            $aksi = $btn_detail;
+            if ($field->audit_status == "DRAFT") {
+                $aksi .= $btn_kirim;   // auditee masih dapat mengirim hasil
             }
+
+            $row[] = '<div class="tabel-aksi">' . $aksi . '</div>';
+
+            // ---- kolom Status: hanya badge (tanpa tombol) ----
+            $badge = array(
+                'DRAFT'    => 'badge-default',
+                'TERKIRIM' => 'badge-info',
+                'PROSES'   => 'badge-warning',
+                'SELESAI'  => 'badge-success',
+            );
+
+            $kunci = strtoupper(trim($field->audit_status));
+            $kelas = isset($badge[$kunci]) ? $badge[$kunci] : 'badge-default';
+            $row[] = '<span class="badge ' . $kelas . '">' . ucfirst(strtolower($kunci)) . '</span>';
             
             
             $data[] = $row;

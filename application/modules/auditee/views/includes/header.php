@@ -79,6 +79,9 @@ document.addEventListener("DOMContentLoaded", function(){
 
     
     <!-- Fonts -->
+    <!-- Kartu statistik & tombol aksi tabel (dipakai bersama admin/auditor/auditee) -->
+    <link rel="stylesheet" href="<?php echo asset_url();?>app/kartu-statistik.css">
+    <link rel="stylesheet" href="<?php echo asset_url();?>app/tabel-aksi.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>global/fonts/material-design/material-design.min.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>global/fonts/brand-icons/brand-icons.min.css">
     <link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Roboto:300,400,500,300italic'>
