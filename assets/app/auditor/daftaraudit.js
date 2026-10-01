@@ -130,7 +130,7 @@ $(function () {
     {
         swal.fire({
             title: "Anda Yakin?",
-            text: "Anda Yakin Ingin Mengembalikan Evaluasi Ini?",
+            text: "Anda Yakin Ingin Mengembalikan Evaluasi Ini Kepada Auditee?",
             type: "warning",
             showCancelButton: true,
             showLoaderOnConfirm: true,
@@ -145,8 +145,8 @@ $(function () {
                         .done(function (data) {
                             if(data.status){
                                     swal.fire({
-                                        title: "Hapus",
-                                        text: "Evaluasi Telah Dikembalikan!",
+                                        title: "Berhasil",
+                                        text: "Evaluasi telah dikembalikan ke auditee!",
                                         type: "success",
                                         preConfirm: function () {
                                             daftaraudit.ajax.reload();
@@ -155,7 +155,7 @@ $(function () {
                             }else{
                                 swal.fire({
                                         title: "Gagal",
-                                        text: "Evaluasi Tidak dapat dikembalikan!",
+                                        text: "Evaluasi tidak dapat dikembalikan ke auditee!",
                                         type: "danger",
                                         preConfirm: function () {
                                             daftaraudit.ajax.reload();

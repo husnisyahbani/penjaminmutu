@@ -5,7 +5,7 @@ class Daftaraudit extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditor';
-        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=1.60"));
+        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=1.61"));
         // Informasi tombol aksi saat hover (lihat assets/app/tabel-aksi.css)
         $this->load->js(base_url("assets/app/tabel-aksi.js?v=1.0"));
         $this->load->model('AuditjawabModel', 'auditjawab');
@@ -380,7 +380,7 @@ class Daftaraudit extends MY_Controller {
                 . '<i class="icon md-play" aria-hidden="true"></i></button>';
 
             $btn_kembali = '<button type="button" class="kembali btn btn-sm btn-icon btn-danger" '
-                . 'data-info="Kembalikan ke auditor" '
+                . 'data-info="Kembalikan ke auditee" '
                 . 'aria-label="Kembalikan" id="' . $field->audit_id . '">'
                 . '<i class="icon md-undo" aria-hidden="true"></i></button>';
 
