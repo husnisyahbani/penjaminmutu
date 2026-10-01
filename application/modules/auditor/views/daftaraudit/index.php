@@ -1,65 +1,55 @@
 <div class="page">
     <div class="page-content container-fluid">
         
+        <?php
+        /* Kartu statistik - memakai gaya yang sama dengan dashboard admin
+           (assets/app/kartu-statistik.css). */
+        $kartu_audit = array(
+            array(
+                'judul' => 'Audit Draft',
+                'nilai' => isset($totaldraft) ? $totaldraft : 0,
+                'ikon'  => 'md-edit',
+                'warna' => '#90a4ae',
+                'ket'   => 'Belum diajukan',
+            ),
+            array(
+                'judul' => 'Audit Terkirim',
+                'nilai' => isset($totalterkirim) ? $totalterkirim : 0,
+                'ikon'  => 'md-play-circle',
+                'warna' => '#1e88e5',
+                'ket'   => 'Menunggu diproses',
+            ),
+            array(
+                'judul' => 'Audit Proses',
+                'nilai' => isset($totalproses) ? $totalproses : 0,
+                'ikon'  => 'md-refresh',
+                'warna' => '#fb8c00',
+                'ket'   => 'Sedang dinilai',
+            ),
+            array(
+                'judul' => 'Audit Selesai',
+                'nilai' => isset($totalselesai) ? $totalselesai : 0,
+                'ikon'  => 'md-check-circle',
+                'warna' => '#43a047',
+                'ket'   => 'Penilaian tuntas',
+            ),
+        );
+        ?>
+
         <div class="row" data-plugin="matchHeight" data-by-row="true">
 
+          <?php foreach ($kartu_audit as $k): ?>
             <div class="col-xl-3 col-md-6">
-                <div class="card card-block p-25 bg-blue-600">
-                    <div class="counter counter-lg counter-inverse">
-                        <div class="counter-label text-uppercase">AUDIT DRAFT</div>
-                        <div class="counter-number-group">
-                            <span class="counter-number-related"></span>
-                            <span class="counter-number">
-                            <?php if(isset($totaldraft)){echo number_format($totaldraft,0,',','.');}else{echo '0';}?>
-                            </span>
-                        </div>
-                    </div>
+              <div class="kartu-stat" style="background-color:<?php echo $k['warna']; ?>;">
+                <i class="icon <?php echo $k['ikon']; ?> kartu-stat__ikon" aria-hidden="true"></i>
+                <div style="overflow:hidden;">
+                  <div class="kartu-stat__angka"><?php echo number_format($k['nilai'], 0, ',', '.'); ?></div>
+                  <div class="kartu-stat__judul"><?php echo $k['judul']; ?></div>
+                  <div class="kartu-stat__ket"><?php echo $k['ket']; ?></div>
                 </div>
+              </div>
             </div>
-
-            <div class="col-xl-3 col-md-6">
-                <div class="card card-block p-25 bg-red-600">
-                    <div class="counter counter-lg counter-inverse">
-                        <div class="counter-label text-uppercase">AUDIT TERKIRIM</div>
-                        <div class="counter-number-group">
-                            <span class="counter-number-related"></span>
-                            <span class="counter-number">
-                            <?php if(isset($totalterkirim)){echo number_format($totalterkirim,0,',','.');}else{echo '0';}?>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-3 col-md-6">
-                <div class="card card-block p-25 bg-orange-600">
-                    <div class="counter counter-lg counter-inverse">
-                        <div class="counter-label text-uppercase">AUDIT PROSES</div>
-                        <div class="counter-number-group">
-                            <span class="counter-number-related"></span>
-                            <span class="counter-number">
-                            <?php if(isset($totalproses)){echo number_format($totalproses,0,',','.');}else{echo '0';}?>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-3 col-md-6">
-                <div class="card card-block p-25 bg-green-600">
-                    <div class="counter counter-lg counter-inverse">
-                        <div class="counter-label text-uppercase">AUDIT SELESAI</div>
-                        <div class="counter-number-group">
-                            <span class="counter-number-related"></span>
-                            <span class="counter-number">
-                            <?php if(isset($totalselesai)){echo number_format($totalselesai,0,',','.');}else{echo '0';}?>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            
+          <?php endforeach; ?>
 
         </div>
         <div class="row"  data-by-row="true">
@@ -68,7 +58,7 @@
 
                 <div class="panel">
                     <header class="panel-heading">
-                        <h3 class="panel-title">AUDIT</h3>
+                        <h3 class="panel-title">Daftar Audit</h3>
                         <div class="panel-actions panel-actions-keep">
                             
                             <button type="button" class="btn btn-sm btn-icon btn-success" id="tambah">
@@ -85,8 +75,8 @@
                                     <th >Auditor</th>
                                     <th >Auditee</th>
                                     <th >Unit</th>
-                                    <th width="10%"> Aksi</th>
-                                    <th width="20%"> Status</th>
+                                    <th width="24%"> Aksi</th>
+                                    <th width="12%"> Status</th>
                                 </tr>
                             </thead>
 

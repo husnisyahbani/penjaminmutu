@@ -81,25 +81,6 @@ foreach ($stat_kategori as $bagian) {
 }
 ?>
 
-<style type="text/css">
-  /* Kartu statistik dashboard: warna diberikan langsung (inline) supaya
-     selalu tampil, tidak bergantung kelas utility tema. */
-  .dsh-kartu {
-    display: block;
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 6px;
-    color: #fff !important;
-    text-decoration: none !important;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, .14);
-    transition: transform .15s ease, box-shadow .15s ease;
-  }
-  .dsh-kartu:hover { transform: translateY(-2px); box-shadow: 0 7px 16px rgba(0, 0, 0, .2); }
-  .dsh-kartu .dsh-ikon { float: left; font-size: 32px; line-height: 1; margin: 2px 16px 22px 0; opacity: .9; }
-  .dsh-kartu .dsh-angka { font-size: 24px; font-weight: 600; line-height: 1.2; }
-  .dsh-kartu .dsh-judul { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; opacity: .92; }
-  .dsh-kartu .dsh-ket { font-size: 12px; opacity: .78; margin-top: 2px; }
-</style>
 
     <!-- Page -->
     <div class="page">
@@ -110,13 +91,13 @@ foreach ($stat_kategori as $bagian) {
         <div class="row">
           <?php foreach ($kartu as $k): ?>
             <div class="col-xl-3 col-md-6">
-              <a class="dsh-kartu" href="<?php echo $k['tautan']; ?>"
+              <a class="kartu-stat" href="<?php echo $k['tautan']; ?>"
                  style="background-color:<?php echo $k['warna']; ?>;">
-                <i class="icon <?php echo $k['ikon']; ?> dsh-ikon" aria-hidden="true"></i>
+                <i class="icon <?php echo $k['ikon']; ?> kartu-stat__ikon" aria-hidden="true"></i>
                 <div style="overflow:hidden;">
-                  <div class="dsh-angka"><?php echo dsh_angka($k['nilai']); ?></div>
-                  <div class="dsh-judul"><?php echo $k['judul']; ?></div>
-                  <div class="dsh-ket"><?php echo $k['ket']; ?></div>
+                  <div class="kartu-stat__angka"><?php echo dsh_angka($k['nilai']); ?></div>
+                  <div class="kartu-stat__judul"><?php echo $k['judul']; ?></div>
+                  <div class="kartu-stat__ket"><?php echo $k['ket']; ?></div>
                 </div>
               </a>
             </div>
