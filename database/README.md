@@ -19,11 +19,11 @@ Cara pakai:
 3. Sesuaikan nama tabel bila prefix pada `application/config/database.php`
    bukan `mutu_`.
 4. Setelah diimpor, pengaturan dapat diubah dari aplikasi melalui menu-menu
-   pada kelompok **Website → Tampilan Beranda** (Identitas & Tema, Hero /
+   pada menu **Tampilan Beranda** (Identitas & Tema, Hero /
    Banner, Kartu Akses, dst.).
 
 > Tabel juga dapat dibuat langsung dari aplikasi: buka salah satu menu
-> pengaturan beranda (**Website → Tampilan Beranda**), lalu klik tombol
+> pengaturan beranda (menu **Tampilan Beranda**), lalu klik tombol
 > **Buat Tabel Pengaturan** (muncul otomatis bila tabel belum ada). Selama
 > tabel belum dibuat, halaman depan tetap tampil normal menggunakan konten
 > bawaan.
