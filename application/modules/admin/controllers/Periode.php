@@ -28,6 +28,7 @@ class Periode extends MY_Controller {
         $this->data['auditmenu'] = 'active';
         $this->data['periode']  = 'active';   // penanda menu aktif (bukan daftar data)
         $this->data['terpasang'] = $this->periode->installed();
+        $this->data['periode_aktif'] = $this->periode->aktifId() ? $this->periode->getById($this->periode->aktifId()) : NULL;
         $this->data['tahun']     = $this->periode->pilihanTahun();
         $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
         $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
@@ -83,6 +84,11 @@ class Periode extends MY_Controller {
                 $btn_aktif = '<button type="button" class="aktifkan btn btn-sm btn-icon btn-success" '
                     . 'data-info="Jadikan periode aktif" aria-label="Set aktif" id="' . $field->periode_id . '">'
                     . '<i class="icon md-check-circle" aria-hidden="true"></i></button>';
+            } else {
+                // Periode yang sedang aktif dapat dibatalkan kembali.
+                $btn_aktif = '<button type="button" class="batalkan btn btn-sm btn-icon btn-warning" '
+                    . 'data-info="Batalkan status aktif periode ini" aria-label="Batalkan aktif" id="' . $field->periode_id . '">'
+                    . '<i class="icon md-close" aria-hidden="true"></i></button>';
             }
 
             $btn_edit = '<button type="button" class="edit btn btn-sm btn-icon btn-primary" '
@@ -195,6 +201,41 @@ class Periode extends MY_Controller {
             echo json_encode(array('status' => TRUE, 'pesan' => $pesan));
         } else {
             echo json_encode(array('status' => FALSE, 'pesan' => 'Periode gagal diaktifkan.'));
+        }
+    }
+
+    /**
+     * Batalkan status aktif sebuah periode.
+     * Karena hanya satu periode yang boleh aktif, membatalkan berarti
+     * tidak ada periode aktif dan Daftar Audit menampilkan seluruh data.
+     */
+    public function nonaktifkan() {
+        $this->output->set_content_type('application/json');
+
+        $id = (int) $this->input->post('id');
+        if (empty($id)) {
+            echo json_encode(array('status' => FALSE, 'pesan' => 'Periode tidak diketahui.'));
+            return;
+        }
+
+        $periode = $this->periode->getById($id);
+        if (!$periode) {
+            echo json_encode(array('status' => FALSE, 'pesan' => 'Periode tidak ditemukan.'));
+            return;
+        }
+
+        if (!$periode['periode_aktif']) {
+            echo json_encode(array('status' => FALSE, 'pesan' => 'Periode ini tidak sedang aktif.'));
+            return;
+        }
+
+        if ($this->periode->setAktif(0)) {
+            echo json_encode(array(
+                'status' => TRUE,
+                'pesan'  => 'Status aktif periode dibatalkan; Daftar Audit kini menampilkan seluruh data.',
+            ));
+        } else {
+            echo json_encode(array('status' => FALSE, 'pesan' => 'Status aktif gagal dibatalkan.'));
         }
     }
 

@@ -50,6 +50,9 @@ Catatan:
 - Hanya satu periode yang aktif. Periode aktif menjadi **filter bawaan** pada
   halaman **Audit → Daftar Audit**; bila tidak ada periode aktif, halaman
   tersebut menampilkan seluruh audit.
+- Status aktif dapat dibatalkan kembali lewat tombol **Batalkan Aktif** pada
+  halaman **Audit → Periode** (di kepala halaman atau pada kolom Aksi baris
+  periode yang aktif).
 - Audit yang baru dibuat (dari admin, auditor, maupun auditee) otomatis
   ditempatkan pada periode yang sedang aktif bila ada.
 - Tabel dan kolom di atas juga dapat dibuat langsung dari aplikasi: buka menu
