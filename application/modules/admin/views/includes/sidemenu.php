@@ -1,10 +1,3 @@
-<style type="text/css">
-  /* Sub menu: ikon kecil sesuai fungsi + indentasi agar sejajar. */
-  .site-menu-sub .site-menu-item > a { display: flex; align-items: center; padding: 0 25px 0 40px; }
-  .site-menu-sub .site-menu-item > a .icon { flex: 0 0 18px; margin-right: 10px; font-size: 15px; text-align: center; opacity: .75; }
-  .site-menu-sub .site-menu-item > a .site-menu-title { max-width: 145px; }
-</style>
-
 <div class="site-menubar">
       <ul class="site-menu">
 
