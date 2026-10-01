@@ -7,7 +7,8 @@
  *
  * @var array $stat_utama      angka utama
  * @var array $stat_kategori   jumlah dokumen per kategori
- * @var array $grafik_dokumen  data grafik (label, nilai, warna)
+ * @var array $grafik_audit    data grafik status audit (label, nilai, warna)
+ * @var array $dokumen_terbaru lima dokumen mutu terbaru
  * @var array $stat_audit      status audit mutu internal
  * @var array $stat_pengguna   jumlah pengguna per peran
  * @var array $stat_dokumen    dokumen tampil / disembunyikan
@@ -19,6 +20,22 @@ if (!function_exists('dsh_angka')) {
     function dsh_angka($angka)
     {
         return number_format((int) $angka, 0, ',', '.');
+    }
+}
+
+if (!function_exists('dsh_potong')) {
+    /**
+     * Potong teks panjang (pengganti mb_strimwidth agar aman tanpa mbstring).
+     */
+    function dsh_potong($teks, $panjang = 40)
+    {
+        $teks = trim((string) $teks);
+
+        if (strlen($teks) <= $panjang) {
+            return $teks;
+        }
+
+        return rtrim(substr($teks, 0, $panjang - 1)) . '…';
     }
 }
 
@@ -110,27 +127,30 @@ foreach ($stat_kategori as $bagian) {
 
           <!-- ==================== SISI KIRI ==================== -->
           <div class="col-xl-3 col-md-6">
+            <?php /* Dokumen mutu per kategori: statistik samping (bukan grafik) */ ?>
             <div class="panel">
               <header class="panel-heading">
-                <h3 class="panel-title">Status Audit Mutu Internal</h3>
+                <h3 class="panel-title">Dokumen Mutu per Kategori</h3>
                 <div class="panel-actions panel-actions-keep">
-                  <span class="badge badge-default"><?php echo dsh_angka($stat_utama['audit']); ?> total</span>
+                  <span class="badge badge-default"><?php echo dsh_angka($stat_utama['dokumen']); ?> dokumen</span>
                 </div>
               </header>
               <div class="panel-body pt-0">
                 <table class="table table-hover w-full mb-0">
                   <tbody>
-                    <?php foreach ($stat_audit as $status): ?>
+                    <?php foreach ($stat_kategori as $bagian): ?>
                       <tr>
                         <td style="border-top:none;">
-                          <span class="badge badge-<?php echo $status['warna']; ?>">&nbsp;</span>
-                          <?php echo $status['label']; ?>
+                          <span style="display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:8px;background:<?php echo $bagian['warna']; ?>;"></span>
+                          <?php echo $bagian['label']; ?>
                         </td>
-                        <td class="text-right font-weight-600" style="border-top:none;">
-                          <?php echo dsh_angka($status['jumlah']); ?>
-                        </td>
+                        <td class="text-right font-weight-600" style="border-top:none;"><?php echo dsh_angka($bagian['jumlah']); ?></td>
                       </tr>
                     <?php endforeach; ?>
+                    <tr>
+                      <td class="font-weight-600">Total</td>
+                      <td class="text-right font-weight-600"><?php echo dsh_angka($stat_utama['dokumen']); ?></td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -165,27 +185,27 @@ foreach ($stat_kategori as $bagian) {
           <div class="col-xl-6 col-md-12">
             <div class="panel">
               <header class="panel-heading">
-                <h3 class="panel-title">Dokumen Mutu per Kategori</h3>
+                <h3 class="panel-title">Status Audit Mutu Internal</h3>
                 <div class="panel-actions panel-actions-keep">
-                  <span class="badge badge-default"><?php echo dsh_angka($stat_utama['dokumen']); ?> dokumen</span>
+                  <span class="badge badge-default"><?php echo dsh_angka($stat_utama['audit']); ?> audit</span>
                 </div>
               </header>
               <div class="panel-body">
                 <div style="position:relative;height:340px;">
-                  <canvas id="grafikDokumen"></canvas>
+                  <canvas id="grafikAudit"></canvas>
                 </div>
               </div>
               <div class="panel-body pt-0">
-                <?php if ($stat_utama['dokumen'] < 1): ?>
-                  <p class="mb-0" style="opacity:.65;">Belum ada dokumen mutu yang tersimpan.</p>
-                <?php else: ?>
-                  <p class="mb-0" style="opacity:.65;">
-                    Sebaran dokumen mengikuti siklus penjaminan mutu (PPEPP).
-                    <?php if ($stat_kategori['LAINNYA']['jumlah'] > 0): ?>
-                      Termasuk <?php echo dsh_angka($stat_kategori['LAINNYA']['jumlah']); ?> dokumen kategori lain / informasi.
-                    <?php endif; ?>
-                  </p>
-                <?php endif; ?>
+                <p class="mb-0" style="opacity:.65;">
+                  Jumlah audit mutu internal menurut statusnya:
+                  <?php
+                  $potong_status = array();
+                  foreach ($stat_audit as $status) {
+                      $potong_status[] = $status['label'] . ' ' . dsh_angka($status['jumlah']);
+                  }
+                  echo implode(' &middot; ', $potong_status);
+                  ?>.
+                </p>
               </div>
             </div>
           </div>
@@ -221,22 +241,33 @@ foreach ($stat_kategori as $bagian) {
 
             <div class="panel">
               <header class="panel-heading">
-                <h3 class="panel-title">Jumlah per Kategori</h3>
+                <h3 class="panel-title">Dokumen Mutu Terbaru</h3>
+                <div class="panel-actions panel-actions-keep">
+                  <a class="btn btn-sm btn-outline btn-default" href="<?php echo base_url('admin/data'); ?>">Semua</a>
+                </div>
               </header>
               <div class="panel-body pt-0">
-                <table class="table table-hover w-full mb-0">
-                  <tbody>
-                    <?php foreach ($stat_kategori as $bagian): ?>
-                      <tr>
-                        <td style="border-top:none;">
-                          <span style="display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:8px;background:<?php echo $bagian['warna']; ?>;"></span>
-                          <?php echo $bagian['label']; ?>
-                        </td>
-                        <td class="text-right font-weight-600" style="border-top:none;"><?php echo dsh_angka($bagian['jumlah']); ?></td>
-                      </tr>
-                    <?php endforeach; ?>
-                  </tbody>
-                </table>
+                <?php if (empty($dokumen_terbaru)): ?>
+                  <p class="mb-0" style="opacity:.65;">Belum ada dokumen mutu.</p>
+                <?php else: ?>
+                  <table class="table table-hover w-full mb-0">
+                    <tbody>
+                      <?php foreach ($dokumen_terbaru as $dok): ?>
+                        <tr>
+                          <td style="border-top:none;">
+                            <?php echo htmlspecialchars(dsh_potong($dok['data_uraian'], 42)); ?>
+                            <div style="font-size:11px;opacity:.65;">
+                              <?php echo htmlspecialchars($dok['data_kategori']); ?>
+                              <?php if (!empty($dok['data_create'])): ?>
+                                &middot; <?php echo date('d/m/Y', strtotime($dok['data_create'])); ?>
+                              <?php endif; ?>
+                            </div>
+                          </td>
+                        </tr>
+                      <?php endforeach; ?>
+                    </tbody>
+                  </table>
+                <?php endif; ?>
               </div>
             </div>
           </div>
@@ -248,5 +279,5 @@ foreach ($stat_kategori as $bagian) {
     <!-- End Page -->
 
     <script type="text/javascript">
-      window.DASHBOARD_GRAFIK = <?php echo json_encode($grafik_dokumen, JSON_UNESCAPED_UNICODE); ?>;
+      window.DASHBOARD_AUDIT = <?php echo json_encode($grafik_audit, JSON_UNESCAPED_UNICODE); ?>;
     </script>

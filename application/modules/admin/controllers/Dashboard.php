@@ -33,12 +33,15 @@ class Dashboard extends MY_Controller
         $this->data['js'] = $this->load->get_js_files();
         $this->data['dashboard'] = 'active';
 
+        $audit = $this->status_audit();
+
         $this->data['stat_utama'] = $this->ringkasan();
         $this->data['stat_kategori'] = $kategori;
-        $this->data['grafik_dokumen'] = $this->data_grafik($kategori);
-        $this->data['stat_audit'] = $this->status_audit();
+        $this->data['stat_audit'] = $audit;
+        $this->data['grafik_audit'] = $this->data_grafik_audit($audit);
         $this->data['stat_pengguna'] = $this->pengguna_per_peran();
         $this->data['stat_dokumen'] = $this->status_dokumen();
+        $this->data['dokumen_terbaru'] = $this->dokumen_terbaru();
 
         $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
         $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
@@ -90,10 +93,10 @@ class Dashboard extends MY_Controller
         $this->load->model('MutuauditModel', 'mutuauditmodel');
 
         return array(
-            'draft'    => array('label' => 'Draft',    'jumlah' => (int) $this->mutuauditmodel->totalDraft(),    'warna' => 'default'),
-            'terkirim' => array('label' => 'Terkirim', 'jumlah' => (int) $this->mutuauditmodel->totalTerkirim(), 'warna' => 'info'),
-            'proses'   => array('label' => 'Proses',   'jumlah' => (int) $this->mutuauditmodel->totalProses(),   'warna' => 'warning'),
-            'selesai'  => array('label' => 'Selesai',  'jumlah' => (int) $this->mutuauditmodel->totalSelesai(),  'warna' => 'success'),
+            'draft'    => array('label' => 'Draft',    'jumlah' => (int) $this->mutuauditmodel->totalDraft(),    'warna' => 'default', 'hex' => '#90a4ae'),
+            'terkirim' => array('label' => 'Terkirim', 'jumlah' => (int) $this->mutuauditmodel->totalTerkirim(), 'warna' => 'info',    'hex' => '#1e88e5'),
+            'proses'   => array('label' => 'Proses',   'jumlah' => (int) $this->mutuauditmodel->totalProses(),   'warna' => 'warning', 'hex' => '#fb8c00'),
+            'selesai'  => array('label' => 'Selesai',  'jumlah' => (int) $this->mutuauditmodel->totalSelesai(),  'warna' => 'success', 'hex' => '#43a047'),
         );
     }
 
@@ -140,19 +143,37 @@ class Dashboard extends MY_Controller
     }
 
     /**
-     * Data grafik batang (label, nilai, warna) untuk Chart.js.
+     * Data grafik batang status audit mutu internal (label, nilai, warna)
+     * untuk Chart.js.
      */
-    private function data_grafik($kategori)
+    private function data_grafik_audit($audit)
     {
-        $grafik = array('label' => array(), 'nilai' => array(), 'warna' => array());
+        $grafik = array(
+            'label'  => array(),
+            'nilai'  => array(),
+            'warna'  => array(),
+            'satuan' => 'audit',
+        );
 
-        foreach ($kategori as $bagian) {
+        foreach ($audit as $bagian) {
             $grafik['label'][] = $bagian['label'];
             $grafik['nilai'][] = $bagian['jumlah'];
-            $grafik['warna'][] = $bagian['warna'];
+            $grafik['warna'][] = $bagian['hex'];
         }
 
         return $grafik;
+    }
+
+    /**
+     * Lima dokumen mutu terbaru untuk panel samping.
+     */
+    private function dokumen_terbaru()
+    {
+        return $this->db->select('data_uraian, data_kategori, data_create')
+            ->from('data')
+            ->order_by('data_create', 'DESC')
+            ->limit(5)
+            ->get()->result_array();
     }
 
     /**

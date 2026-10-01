@@ -1,29 +1,31 @@
 /**
- * Dashboard - grafik batang dokumen mutu per kategori.
+ * Dashboard - grafik batang status audit mutu internal.
  *
- * Data grafik disiapkan oleh controller Dashboard (window.DASHBOARD_GRAFIK).
+ * Data grafik disiapkan oleh controller Dashboard (window.DASHBOARD_AUDIT).
  * Memakai Chart.js bawaan tema (assets/global/vendor/chart-js).
  */
 (function () {
     'use strict';
 
     /**
-     * Gambar grafik batang pada canvas #grafikDokumen.
+     * Gambar grafik batang pada canvas #grafikAudit.
      */
     function gambarGrafik() {
-        var canvas = document.getElementById('grafikDokumen');
-        var data = window.DASHBOARD_GRAFIK;
+        var canvas = document.getElementById('grafikAudit');
+        var data = window.DASHBOARD_AUDIT;
 
         if (!canvas || typeof Chart === 'undefined' || !data) {
             return;
         }
+
+        var satuan = data.satuan || 'audit';
 
         new Chart(canvas.getContext('2d'), {
             type: 'bar',
             data: {
                 labels: data.label,
                 datasets: [{
-                    label: 'Jumlah dokumen',
+                    label: 'Jumlah audit',
                     data: data.nilai,
                     backgroundColor: data.warna,
                     borderWidth: 0,
@@ -37,7 +39,7 @@
                 tooltips: {
                     callbacks: {
                         label: function (item) {
-                            return ' ' + item.yLabel + ' dokumen';
+                            return ' ' + item.yLabel + ' ' + satuan;
                         }
                     }
                 },
