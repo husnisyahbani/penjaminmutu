@@ -1,5 +1,5 @@
 /* Daftar Periode Audit (menu Audit > Periode).
-   Tabel server-side + tambah/ubah/set aktif/hapus periode. */
+   Tabel server-side + tambah/ubah/set aktif/batalkan aktif/hapus periode. */
 $(function () {
 
     var periodelist = $('#periode').DataTable({
@@ -31,6 +31,10 @@ $(function () {
 
     $('#periode').on('click', '.aktifkan', function () {
         aktifkan($(this).attr('id'));
+    });
+
+    $('#periode').on('click', '.batalkan', function () {
+        batalkan($(this).attr('id'));
     });
 
     $('#periode').on('click', '.delete', function () {
@@ -109,6 +113,39 @@ $(function () {
             preConfirm: function () {
                 return $.ajax({
                     url: base_url + '/periode/aktifkan',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {id: id}
+                }).then(function (data) {
+                    if (!data.status) {
+                        swal.showValidationMessage(data.pesan);
+                        return false;
+                    }
+                    return data;
+                });
+            }
+        }).then(function (hasil) {
+            if (hasil.value) {
+                swal.fire({title: 'Berhasil', text: hasil.value.pesan, type: 'success'});
+                periodelist.ajax.reload();
+            }
+        });
+    }
+
+    /* ---------------- batalkan status aktif ---------------- */
+
+    function batalkan(id) {
+        swal.fire({
+            title: 'Batalkan Status Aktif?',
+            text: 'Setelah dibatalkan tidak ada periode aktif, sehingga halaman Daftar Audit menampilkan seluruh data.',
+            type: 'warning',
+            showCancelButton: true,
+            showLoaderOnConfirm: true,
+            confirmButtonText: 'Ya, Batalkan!',
+            cancelButtonText: 'Tidak',
+            preConfirm: function () {
+                return $.ajax({
+                    url: base_url + '/periode/nonaktifkan',
                     type: 'POST',
                     dataType: 'json',
                     data: {id: id}

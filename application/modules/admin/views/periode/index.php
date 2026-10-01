@@ -43,6 +43,7 @@
                             Periode yang ditandai <span class="badge badge-success">Aktif</span> dipakai sebagai
                             filter bawaan pada halaman <a href="<?php echo base_url('admin/daftaraudit'); ?>">Daftar Audit</a>.
                             Bila tidak ada periode aktif, Daftar Audit menampilkan seluruh data.
+                            Status aktif dapat dibatalkan lewat tombol pada kolom <strong>Aksi</strong> baris periode yang aktif.
                         </p>
                         <table class="table table-hover dataTable w-full" id="periode">
                             <thead>
