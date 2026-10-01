@@ -83,7 +83,9 @@ if (!function_exists('ph_potong')) {
     <div class="panel">
 
       <header class="panel-heading">
-        <h3 class="panel-title"><?php echo htmlspecialchars($title); ?></h3>
+        <h3 class="panel-title">
+          Pengaturan Home <span class="text-muted">/ <?php echo htmlspecialchars($tab_aktif['label']); ?></span>
+        </h3>
         <div class="panel-actions panel-actions-keep">
           <a class="btn btn-sm btn-icon btn-outline btn-default" href="<?php echo base_url(); ?>" target="_blank" rel="noopener">
             <i class="icon md-open-in-new" aria-hidden="true"></i> Lihat Halaman
@@ -118,15 +120,12 @@ if (!function_exists('ph_potong')) {
           </div>
         <?php endif; ?>
 
-        <!-- TAB -->
+        <!-- Sub menu: setiap bagian punya URL sendiri -->
         <ul class="nav nav-tabs nav-tabs-line" role="tablist">
-          <?php foreach ($tabs as $i => $tab): ?>
+          <?php foreach ($tabs as $tab): ?>
             <li class="nav-item" role="presentation">
-              <a class="nav-link <?php echo $i === 0 ? 'active' : ''; ?>"
-                 id="tab-<?php echo $tab['id']; ?>-link"
-                 data-toggle="tab"
-                 href="#tab-<?php echo $tab['id']; ?>"
-                 role="tab">
+              <a class="nav-link <?php echo ($tab['id'] === $tab_aktif['id']) ? 'active' : ''; ?>"
+                 href="<?php echo base_url($module . '/pengaturanhome/' . $tab['id']); ?>">
                 <i class="icon <?php echo $tab['ikon']; ?>" aria-hidden="true"></i>
                 <?php echo htmlspecialchars($tab['label']); ?>
               </a>
@@ -136,8 +135,9 @@ if (!function_exists('ph_potong')) {
 
         <div class="tab-content pt-20">
 
-          <?php foreach ($tabs as $i => $tab): ?>
-            <div class="tab-pane <?php echo $i === 0 ? 'active' : ''; ?>"
+          <?php foreach ($tabs as $tab): ?>
+            <?php if ($tab['id'] !== $tab_aktif['id']) { continue; } // hanya bagian aktif ?>
+            <div class="tab-pane active"
                  id="tab-<?php echo $tab['id']; ?>"
                  role="tabpanel">
 
@@ -281,9 +281,26 @@ if (!function_exists('ph_potong')) {
                 </div>
               <?php endforeach; ?>
 
-              <?php if (empty($tab['pengaturan']) && empty($tab['item'])): ?>
-                <p class="text-muted">Tidak ada pengaturan pada tab ini.</p>
-              <?php endif; ?>
+              <!-- navigasi antar bagian -->
+              <hr class="mt-30">
+              <div class="d-flex flex-wrap justify-content-between align-items-center" style="gap:12px;">
+                <div>
+                  <?php if ($tab_sebelum): ?>
+                    <a class="btn btn-outline btn-default"
+                       href="<?php echo base_url($module . '/pengaturanhome/' . $tab_sebelum['id']); ?>">
+                      <i class="icon md-chevron-left" aria-hidden="true"></i> <?php echo htmlspecialchars($tab_sebelum['label']); ?>
+                    </a>
+                  <?php endif; ?>
+                </div>
+                <div>
+                  <?php if ($tab_berikut): ?>
+                    <a class="btn btn-outline btn-primary"
+                       href="<?php echo base_url($module . '/pengaturanhome/' . $tab_berikut['id']); ?>">
+                      <?php echo htmlspecialchars($tab_berikut['label']); ?> <i class="icon md-chevron-right" aria-hidden="true"></i>
+                    </a>
+                  <?php endif; ?>
+                </div>
+              </div>
 
             </div>
           <?php endforeach; ?>

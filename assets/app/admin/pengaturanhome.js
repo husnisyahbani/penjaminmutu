@@ -4,28 +4,8 @@
    ========================================================================== */
 $(function () {
 
-    /* ---------- tab terakhir tetap aktif setelah halaman dimuat ulang ---------- */
-    function aktifkanTabDariHash() {
-        var hash = window.location.hash;
-
-        if (!hash) { return; }
-
-        var $tab = $('.nav-tabs a[href="' + hash + '"]');
-
-        if ($tab.length) {
-            $tab.tab('show');
-        }
-    }
-
-    aktifkanTabDariHash();
-
-    $('.nav-tabs a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-        var target = $(e.target).attr('href');
-
-        if (target && window.history.replaceState) {
-            window.history.replaceState(null, '', target);
-        }
-    });
+    /* Catatan: antar bagian (sub menu) berpindah dengan memuat halaman baru,
+       jadi tidak ada lagi pengelolaan tab di sisi klien. */
 
     /* ---------- notifikasi ---------- */
     function muat(pesan) {

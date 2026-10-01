@@ -30,17 +30,83 @@ class Pengaturanhome extends MY_Controller
 
     public function index()
     {
+        $this->render('identitas');
+    }
+
+    public function identitas() { $this->render('identitas'); }
+    public function hero()      { $this->render('hero'); }
+    public function akses()     { $this->render('akses'); }
+    public function profil()    { $this->render('profil'); }
+    public function visimisi()  { $this->render('visimisi'); }
+    public function tupoksi()   { $this->render('tupoksi'); }
+    public function sasaran()   { $this->render('sasaran'); }
+    public function organisasi(){ $this->render('organisasi'); }
+    public function informasi() { $this->render('informasi'); }
+    public function kontak()    { $this->render('kontak'); }
+    public function section()   { $this->render('section'); }
+
+    /**
+     * Tampilkan satu bagian pengaturan.
+     *
+     * Setiap bagian punya URL sendiri sehingga dapat dipakai langsung sebagai
+     * sub menu Website:
+     *   admin/pengaturanhome/identitas   -> Identitas & Tema
+     *   admin/pengaturanhome/hero        -> Hero / Banner
+     *   admin/pengaturanhome/akses       -> Kartu Akses
+     *   admin/pengaturanhome/profil      -> Profil & Galeri
+     *   admin/pengaturanhome/visimisi    -> Visi & Misi
+     *   admin/pengaturanhome/tupoksi     -> Tupoksi
+     *   admin/pengaturanhome/sasaran     -> Sasaran Mutu
+     *   admin/pengaturanhome/organisasi  -> Pengelola & Struktur
+     *   admin/pengaturanhome/informasi   -> SK, Berita & Pengumuman
+     *   admin/pengaturanhome/kontak      -> Kontak & Footer
+     *   admin/pengaturanhome/section     -> Tampilkan / Sembunyikan Section
+     *
+     * @param string $tab id bagian (lihat tabs())
+     */
+    private function render($tab)
+    {
+        $tabs = $this->tabs();
+        $peta = array();
+
+        foreach ($tabs as $urutan => $bagian) {
+            $bagian['urutan'] = $urutan;
+            $peta[$bagian['id']] = $bagian;
+        }
+
+        // id bagian tidak dikenal -> kembali ke bagian pertama
+        if (!isset($peta[$tab])) {
+            redirect(base_url($this->module . '/pengaturanhome'));
+        }
+
+        $aktif = $peta[$tab];
+        $sebelum = NULL;
+        $berikut = NULL;
+
+        foreach ($tabs as $urutan => $bagian) {
+            if ($urutan < $aktif['urutan']) {
+                $sebelum = $bagian;
+            } elseif ($berikut === NULL && $urutan > $aktif['urutan']) {
+                $berikut = $bagian;
+                break;
+            }
+        }
+
         $this->data['content'] = 'pengaturanhome/index';
-        $this->data['title'] = 'Pengaturan Home';
+        $this->data['title'] = 'Pengaturan Home - ' . $aktif['label'];
         $this->data['js'] = $this->load->get_js_files();
         $this->data['pengaturanhome'] = 'active';
         $this->data['website'] = 'active';
+        $this->data['ph_tab'] = $aktif['id'];
 
         $this->data['terpasang'] = $this->homemodel->installed();
-        $this->data['tabs'] = $this->tabs();
+        $this->data['tabs'] = $tabs;
+        $this->data['tab_aktif'] = $aktif;
+        $this->data['tab_sebelum'] = $sebelum;
+        $this->data['tab_berikut'] = $berikut;
         $this->data['grup_pengaturan'] = $this->homemodel->get_settings_grouped();
         $this->data['grup_item'] = $this->homemodel->item_blueprint();
-        $this->data['items'] = $this->semua_item();
+        $this->data['items'] = $this->item_tab($aktif);
 
         $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
         $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
@@ -69,14 +135,14 @@ class Pengaturanhome extends MY_Controller
     }
 
     /**
-     * Semua item dikelompokkan per grup (untuk tabel di tab).
+     * Item untuk grup yang dipakai bagian aktif (untuk tabel di halaman ini).
+     * Halaman admin hanya menampilkan data yang tersimpan di database.
      */
-    private function semua_item()
+    private function item_tab($tab)
     {
         $out = array();
 
-        foreach ($this->homemodel->item_blueprint() as $grup => $bagian) {
-            // halaman admin hanya menampilkan data yang tersimpan di database
+        foreach ($tab['item'] as $grup) {
             $out[$grup] = $this->homemodel->get_items($grup, FALSE, FALSE);
         }
 

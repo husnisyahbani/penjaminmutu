@@ -1,3 +1,10 @@
+<style type="text/css">
+  /* Sub menu Pengaturan Home: tema hanya mengatur item level pertama,
+     jadi item anak diberi indentasi + penanda sendiri. */
+  .site-menu .site-menu-child > a { padding-left: 44px !important; font-size: 13px; }
+  .site-menu .site-menu-child > a .site-menu-title:before { content: "–"; margin-right: 8px; opacity: .55; }
+</style>
+
 <div class="site-menubar">
       <ul class="site-menu">
         
@@ -128,6 +135,32 @@
                 <span class="site-menu-title">Pengaturan Home</span>
               </a>
             </li>
+
+            <?php
+            /* Sub menu Pengaturan Home - setiap bagian punya halaman sendiri
+               (lihat admin/Pengaturanhome.php pada method render()). */
+            $ph_menu = array(
+                'identitas'  => 'Identitas &amp; Tema',
+                'hero'       => 'Hero / Banner',
+                'akses'      => 'Kartu Akses',
+                'profil'     => 'Profil &amp; Galeri',
+                'visimisi'   => 'Visi &amp; Misi',
+                'tupoksi'    => 'Tupoksi',
+                'sasaran'    => 'Sasaran Mutu',
+                'organisasi' => 'Pengelola &amp; Struktur',
+                'informasi'  => 'SK, Berita &amp; Pengumuman',
+                'kontak'     => 'Kontak &amp; Footer',
+                'section'    => 'Tampilkan Section',
+            );
+            ?>
+
+            <?php foreach ($ph_menu as $ph_slug => $ph_label): ?>
+              <li class="site-menu-item site-menu-child <?php if(isset($ph_tab) && $ph_tab === $ph_slug){echo 'active';} ?>">
+                <a class="animsition-link" href="<?php echo base_url($module.'/pengaturanhome/'.$ph_slug);?>">
+                  <span class="site-menu-title"><?php echo $ph_label; ?></span>
+                </a>
+              </li>
+            <?php endforeach; ?>
 
             
             
