@@ -96,8 +96,12 @@ class Pengaturanhome extends MY_Controller
         $this->data['content'] = 'pengaturanhome/index';
         $this->data['title'] = $aktif['label'];
         $this->data['js'] = $this->load->get_js_files();
-        $this->data['website'] = 'active'; // menu induk (Website) tetap tersorot
         $this->data['ph_tab'] = $aktif['id'];
+
+        // "Struktur Organisasi" & "Visi & Misi" bertaut dari menu Konten,
+        // bagian lainnya bertaut dari menu Tampilan Beranda.
+        $this->data['konten_aktif'] = in_array($aktif['id'], array('organisasi', 'visimisi'), TRUE) ? 'active' : NULL;
+        $this->data['website'] = $this->data['konten_aktif'];
 
         $this->data['terpasang'] = $this->homemodel->installed();
         $this->data['tabs'] = $tabs;

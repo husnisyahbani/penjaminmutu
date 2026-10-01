@@ -1,17 +1,3 @@
-<style type="text/css">
-  /* Label kelompok di dalam sub menu Website (mis. "Tampilan Beranda"). */
-  .site-menu .site-menu-group {
-    padding: 14px 25px 6px;
-    font-size: 10.5px;
-    font-weight: 700;
-    letter-spacing: .13em;
-    text-transform: uppercase;
-    color: rgba(15, 23, 42, .38);
-    pointer-events: none;
-  }
-  .site-menubar-dark .site-menu .site-menu-group { color: rgba(255, 255, 255, .45); }
-</style>
-
 <div class="site-menubar">
       <ul class="site-menu">
         
@@ -91,10 +77,12 @@
         </li>
 
 
+        <!-- ==================== KONTEN ==================== -->
+        <?php /* $website sudah berisi 'active' bila halaman dibuka dari menu ini */ ?>
         <li class="site-menu-item has-sub <?php if(isset($website)){echo $website;} ?>">
           <a href="javascript:void(0)">
                   <i class="site-menu-icon md-view-compact" aria-hidden="true"></i>
-                  <span class="site-menu-title">Website</span>
+                  <span class="site-menu-title">Konten</span>
                           <span class="site-menu-arrow"></span>
          </a>
 
@@ -105,20 +93,18 @@
              </a>
           </li>
 
-          
            <li class="site-menu-item <?php if(isset($pengumuman)){echo $pengumuman;} ?>">
              <a class="animsition-link" href="<?php echo base_url($module.'/pengumuman');?>">
                <span class="site-menu-title">Pengumuman</span>
              </a>
           </li>
-          
-        
+
            <li class="site-menu-item <?php if(isset($sk)){echo $sk;} ?>">
              <a class="animsition-link" href="<?php echo base_url($module.'/sk');?>">
                <span class="site-menu-title">Surat Keputusan</span>
              </a>
           </li>
-            
+
             <?php /* Struktur Organisasi & Visi/Misi beranda.
                      Tautan lama (admin/organisasi) belum tersedia dan
                      admin/visimisi belum memiliki view, jadi diarahkan ke
@@ -140,41 +126,44 @@
                 <span class="site-menu-title">Program Kerja</span>
               </a>
             </li>
-
-            <?php
-            /* Pengaturan tampilan BERANDA - tiap bagian adalah menu tersendiri
-               (tidak ada menu induk "Pengaturan Home").
-               Halaman: admin/Pengaturanhome.php -> method render(). */
-            $ph_menu = array(
-                'identitas' => 'Identitas &amp; Tema',
-                'hero'      => 'Hero / Banner',
-                'akses'     => 'Kartu Akses',
-                'profil'    => 'Profil &amp; Galeri',
-                'tupoksi'   => 'Tupoksi',
-                'sasaran'   => 'Sasaran Mutu',
-                'informasi' => 'Judul SK, Berita &amp; Pengumuman',
-                'kontak'    => 'Kontak &amp; Footer',
-                'section'   => 'Tampilkan Section',
-            );
-            ?>
-
-            <li class="site-menu-group">Tampilan Beranda</li>
-
-            <?php foreach ($ph_menu as $ph_slug => $ph_label): ?>
-              <li class="site-menu-item <?php if(isset($ph_tab) && $ph_tab === $ph_slug){echo 'active';} ?>">
-                <a class="animsition-link" href="<?php echo base_url($module.'/pengaturanhome/'.$ph_slug);?>">
-                  <span class="site-menu-title"><?php echo $ph_label; ?></span>
-                </a>
-              </li>
-            <?php endforeach; ?>
-
-            
-            
          </ul>
         </li>
-        
-        
-        
+
+        <?php
+        /* ==================== TAMPILAN BERANDA ====================
+           Menu induk tersendiri. Tiap bagian adalah sub menu dengan halaman
+           (URL) sendiri: admin/Pengaturanhome.php -> method render(). */
+        $ph_menu = array(
+            'identitas' => 'Identitas &amp; Tema',
+            'hero'      => 'Hero / Banner',
+            'akses'     => 'Kartu Akses',
+            'profil'    => 'Profil &amp; Galeri',
+            'tupoksi'   => 'Tupoksi',
+            'sasaran'   => 'Sasaran Mutu',
+            'informasi' => 'Judul SK, Berita &amp; Pengumuman',
+            'kontak'    => 'Kontak &amp; Footer',
+            'section'   => 'Tampilkan Section',
+        );
+        ?>
+
+        <li class="site-menu-item has-sub <?php if(isset($ph_tab) && !isset($konten_aktif)){echo 'active';} ?>">
+          <a href="javascript:void(0)">
+                  <i class="site-menu-icon md-desktop-mac" aria-hidden="true"></i>
+                  <span class="site-menu-title">Tampilan Beranda</span>
+                          <span class="site-menu-arrow"></span>
+         </a>
+
+         <ul class="site-menu-sub">
+           <?php foreach ($ph_menu as $ph_slug => $ph_label): ?>
+             <li class="site-menu-item <?php if(isset($ph_tab) && $ph_tab === $ph_slug){echo 'active';} ?>">
+               <a class="animsition-link" href="<?php echo base_url($module.'/pengaturanhome/'.$ph_slug);?>">
+                 <span class="site-menu-title"><?php echo $ph_label; ?></span>
+               </a>
+             </li>
+           <?php endforeach; ?>
+         </ul>
+        </li>
+
         <li class="site-menu-item <?php if(isset($akun)){echo $akun;} ?>">
           <a class="animsition-link" href="<?php echo base_url($module.'/akun');?>">
                   <i class="site-menu-icon md-view-compact" aria-hidden="true"></i>
