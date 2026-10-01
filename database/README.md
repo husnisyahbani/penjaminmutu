@@ -57,3 +57,38 @@ Catatan:
 - Tabel dan kolom di atas juga dapat dibuat langsung dari aplikasi: buka menu
   **Audit → Periode**, lalu klik tombol **Buat Tabel Periode** (muncul
   otomatis bila tabel belum ada). Aman dijalankan berulang kali.
+
+## `migrasi_lingkup.sql`
+
+Memindahkan lingkup pertanyaan dari satu kolom teks menjadi **banyak butir**
+pada tabel tersendiri, dan menghubungkan jawaban audit ke butir tersebut:
+
+| Objek                        | Isi                                                                       |
+| ---------------------------- | ------------------------------------------------------------------------- |
+| `mutu_lingkup`               | butir lingkup: `dtform_id`, `lingkup_urut`, `lingkup_isi`                  |
+| `mutu_auditjawab`.`lingkup_id` | relasi jawaban ke butir; `NULL` = jawaban tingkat pertanyaan             |
+| `mutu_auditjawabdetail`.`lingkup_id` | penanda baris tilik lama yang sudah dipindahkan ke bentuk baru     |
+| `mutu_detailform`.`dtform_lingkup` | kolom lama, boleh kosong, dihapus setelah migrasi                  |
+
+Cara pakai:
+
+1. Impor berkas `database/migrasi_lingkup.sql` melalui phpMyAdmin.
+2. Buka menu **Audit → Formulir Audit** (halaman pertanyaan) atau langsung
+   `admin/migrasi`, lalu klik **Jalankan Migrasi**. Aplikasi memecah isi kolom
+   lama menjadi baris `mutu_lingkup` (satu baris per butir) dan memindahkan
+   baris daftar tilik lama ke jawaban per butir bila teksnya cocok. Aman
+   dijalankan berulang kali.
+3. Periksa hasilnya (jumlah butir, contoh pemecahan) pada halaman yang sama.
+4. Bila sudah benar, klik **Hapus Kolom Lama** untuk membuang
+   `mutu_detailform.dtform_lingkup`.
+
+Catatan:
+
+- Jawaban yang sudah ada tidak hilang: baris tilik lama yang teks pertanyaannya
+  cocok dengan sebuah butir dipindahkan ke jawaban butir tersebut, sedangkan
+  yang tidak cocok tetap tersimpan dan tetap ditampilkan (kolom `lingkup_id`
+  bernilai `NULL`).
+- Butir yang sudah dipakai jawaban audit tidak ikut terhapus saat pertanyaan
+  disunting, supaya hasil audit tidak kehilangan relasinya.
+- Daftar tilik pada halaman audit (auditor/admin) terisi otomatis dari butir
+  lingkup, jadi tidak ada lagi tombol **Tambah Tilik**.

@@ -68,9 +68,9 @@
                         <table class="table table-hover dataTable w-full" id="ptk">
                             <thead>
                                 <tr>
-                                    <th >No</th>
+                                    <th width="1%">No</th>
                                     <th >Formulir</th>
-                                    <th >Pertanyaan</th>
+                                    <th >Butir Lingkup</th>
                                     <th >Hasil</th>
                                     <th >Temuan</th>
                                     <th> Catatan</th>
@@ -104,7 +104,7 @@
     aria-labelledby="exampleFormModalLabel"
     role="dialog"
     tabindex="-1">
-    <div class="modal-dialog modal-simple">
+    <div class="modal-dialog modal-lg">
         <form id="formedit" class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -114,22 +114,27 @@
             </div>
             <div class="modal-body">
 
+                <input type="hidden" id="ptk_lingkup_id" name="lingkup_id"/>
+                <input type="hidden" id="ptk_dtform_id" name="dtform_id"/>
+
                 <div class="row">
-                    <div class="col-md-12 center">
+                    <div class="col-md-12">
+                        <h4 class="example-title">Butir Lingkup</h4>
+                        <div id="ptk_butir" class="ptk-teks"></div>
+                    </div>
+                    <div class="col-md-12">
                         <h4 class="example-title">Hasil</h4>
-                        <textarea id="hasil" class="editor" name="hasil" readonly></textarea>
+                        <div id="ptk_hasil" class="ptk-teks"></div>
                     </div>
-                    <div class="col-md-12 center">
+                    <div class="col-md-12">
                         <h4 class="example-title">Catatan</h4>
-                        <textarea id="hasil" class="editor" name="hasil" readonly></textarea>
+                        <div id="ptk_catatan" class="ptk-teks"></div>
                     </div>
-                    <div class="col-md-12 center">
-                        <h4 class="example-title">Koreksi</h4>
+                    <div class="col-md-12">
+                        <h4 class="example-title">Rencana Koreksi</h4>
                         <textarea id="ptk_koreksi" class="editor" name="ptk_koreksi"></textarea>
                     </div>
                 </div>
-
-                
 
             </div>
 
@@ -142,3 +147,8 @@
         </div>
     </form>
 </div>
+
+<style>
+    .ptk-teks { min-height: 20px; word-break: break-word; }
+    .ptk-koreksi { margin-bottom: 6px; }
+</style>

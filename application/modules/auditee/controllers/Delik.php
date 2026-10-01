@@ -5,12 +5,13 @@ class Delik extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditee';
-        $this->load->js(base_url("assets/app/auditee/delik.js?v=1.16"));
+        $this->load->js(base_url("assets/app/auditee/delik.js?v=2.0"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
         $this->load->model('AkunModel', 'akun');
         $this->load->model('FormulirModel', 'formulir');
+        $this->load->model('LingkupModel', 'lingkup');
 
         $role = $this->session->userdata('role');
         if (!isset($role) || $role != 'AUDITEE') {
@@ -37,6 +38,8 @@ class Delik extends MY_Controller {
             $this->data['result'] = $this->mutu->getAuditById($audit_id);
             $this->data['jawab'] = $this->auditjawab->getAuditJawab($audit_id,$dtform_id);
             $this->data['soal'] = $this->formulir->getSoalFormulir($dtform_id);
+            // Butir lingkup (struktur baru) untuk tab Evaluasi.
+            $this->data['lingkup'] = $this->lingkup->daftarHtml($dtform_id);
             $this->data['js'] = $this->load->get_js_files();
             $this->data['audit'] = 'active';//auditmenu
             $this->data['auditmenu'] = 'active';

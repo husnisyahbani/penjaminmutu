@@ -1,3 +1,11 @@
+/* Daftar tilik (delik) - struktur baru.
+ *
+ * Baris daftar tilik berasal dari butir lingkup pertanyaan (tabel lingkup),
+ * jadi tidak ada lagi tombol "Tambah Tilik": begitu halaman dibuka, semua
+ * butir muncul dan tinggal diisi Hasil / Temuan / Catatan.
+ *
+ * Simpan nilai: POST /delik/simpantilik {jwb_id, lingkup_id, kolom, nilai}
+ */
 $(function () {
 
     var tiliklist = $('#tilik').DataTable({
@@ -7,1020 +15,196 @@ $(function () {
         "searching": true,
         "order": [],
         "columnDefs": [
-            {"targets": [0,5], "orderable": false}
+            {"targets": [0, 5], "orderable": false},
+            {"targets": [5], "className": "text-center tabel-aksi-sel"}
         ],
         "ajax": {
-            "url": base_url + "/delik/listdelik/"+jwb_id,
+            "url": base_url + "/delik/listdelik/" + jwb_id,
             "type": "POST"
         }
     });
 
-    $("#tambahtilik").on("click", function () {
-        $('#tilikModal').modal('show');
-    });
+    /* Butir yang sedang dibuka pada modal. */
+    var lingkup_id = 0;
 
-    $("#tilik").on("click", ".edithasil", function () {
-        var id = $(this).attr('id');
-        gethasilById(id);
-    });
+    /* ---------------- buka modal edit ---------------- */
 
-    function gethasilById($id)
-    {
+    function buka(modal, tombol) {
+        lingkup_id = tombol.attr('lingkup_id');
+
         $.ajax({
-            url: base_url + "/delik/getjawabById/"+$id,
+            url: base_url + "/delik/gettilik/" + jwb_id + "/" + lingkup_id,
             type: "GET",
+            dataType: "json",
+            success: function (data) {
+                if (!data.status) {
+                    swal.fire("Oops", data.pesan || "Gagal!", "error");
+                    return;
+                }
+                $('#nilai_lingkup').text(data.lingkup_isi || '');
+                $('#edit_dtjwb_hasil').val(data.jwb_hasil);
+                $('#edit_dtjwb_temuan').val(data.jwb_temuan);
+                $('#edit_dtjwb_catatan').val(data.jwb_catatan);
+                $(modal).modal('show');
+            },
+            error: function () {
+                swal.fire("Oops", "No connection!", "error");
+            }
+        });
+    }
+
+    $('#tilik').on('click', '.edithasil', function () {
+        buka('#editHasilModal', $(this));
+    });
+
+    $('#tilik').on('click', '.edittemuan', function () {
+        buka('#editTemuanModal', $(this));
+    });
+
+    $('#tilik').on('click', '.editcatatan', function () {
+        buka('#editCatatanModal', $(this));
+    });
+
+    /* ---------------- simpan satu kolom ---------------- */
+
+    function simpan(kolom, nilai, modal, $form) {
+        $.ajax({
+            url: base_url + "/delik/simpantilik",
+            type: "POST",
+            dataType: "json",
+            data: {
+                jwb_id: jwb_id,
+                lingkup_id: lingkup_id,
+                kolom: kolom,
+                nilai: nilai
+            },
             beforeSend: function () {
+                $(modal).modal('hide');
                 swal.fire({
-                    title: 'Loading',
+                    title: 'Menyimpan...',
                     allowEscapeKey: false,
                     allowOutsideClick: false,
-                    onOpen: () => {
+                    onOpen: function () {
                         swal.showLoading();
                     }
                 });
             },
             success: function (data) {
                 swal.close();
-                var list = data == null ? [] : (data instanceof Array ? data : [data]);
-                    $.each(list, function (index, org_types) {
-                        if(org_types.status){
-                            $("#edit_dtjwb_hasil").val(org_types.dtjwb_hasil);
-                            $("#hasil_dtjwb_id").val(org_types.dtjwb_id);
-                            $('#editHasilModal').modal('show');
-                        }else{
-                            swal.fire("Oops", "Gagal", "error");
-                        }
+                if (data.status) {
+                    tiliklist.ajax.reload();
+                    swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Data telah tersimpan.',
+                        showConfirmButton: false,
+                        timer: 1200
                     });
-                    
+                } else {
+                    swal.fire("Oops", data.pesan || "Gagal!", "error");
+                }
+                if ($form) {
+                    $form.formValidation('disableSubmitButtons', false).formValidation('resetForm', true);
+                }
             },
-            error: function (json) {
-                swal.fire("Oops", "No connection!", "error");
-                
-            }
-        }); 
-    }
-
-
-    $("#tilik").on("click", ".editpertanyaan", function () {
-        var id = $(this).attr('id');
-        getjawabById(id);
-    });
-
-    function getjawabById($id)
-    {
-        $.ajax({
-            url: base_url + "/delik/getjawabById/"+$id,
-            type: "GET",
-            beforeSend: function () {
-                swal.fire({
-                    title: 'Loading',
-                    allowEscapeKey: false,
-                    allowOutsideClick: false,
-                    onOpen: () => {
-                        swal.showLoading();
-                    }
-                });
-            },
-            success: function (data) {
+            error: function () {
                 swal.close();
-                var list = data == null ? [] : (data instanceof Array ? data : [data]);
-                    $.each(list, function (index, org_types) {
-                        if(org_types.status){
-                            $("#edit_dtjwb_pertanyaan").val(org_types.dtjwb_pertanyaan);
-                            $("#edit_dtjwb_referensi").val(org_types.dtjwb_referensi);
-                            $("#pertanyaan_dtjwb_id").val(org_types.dtjwb_id);
-                            $('#editPertanyaanModal').modal('show');
-                        }else{
-                            swal.fire("Oops", "Gagal", "error");
-                        }
-                    });
-                    
-            },
-            error: function (json) {
                 swal.fire("Oops", "No connection!", "error");
-                
-            }
-        }); 
-    }
-
-    $("#tilik").on("click", ".delete", function () {
-        var id = $(this).attr('id');
-        hapus(id);
-    });
-
-    function hapus($id)
-    {
-        swal.fire({
-            title: "Anda Yakin?",
-            text: "Anda Yakin Ingin Menghapus Data Tilik Ini?",
-            type: "warning",
-            showCancelButton: true,
-            showLoaderOnConfirm: true,
-            confirmButtonText: "Ya, Hapus!",
-            cancelButtonText: 'Tidak',
-            preConfirm: function () {
-                $.ajax({
-                    url: base_url + "/delik/hapus",
-                    type: "POST",
-                    data: { id: $id}
-                })
-                        .done(function (data) {
-                            swal.close();
-                            tiliklist.ajax.reload();
-                            if(data.status == true){
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Berhasil!',
-                                    text: 'Data telah terhapus.',
-                                    showConfirmButton: false,
-                                    timer: 1200
-                                });
-                            }
-                        })
-                        .error(function (data) {
-                            swal.fire("Oops", "No connection!", "error");
-                        });
+                if ($form) {
+                    $form.formValidation('disableSubmitButtons', false).formValidation('resetForm', true);
+                }
             }
         });
     }
 
-    $("#tilik").on("click", ".edittemuan", function () {
-        var id = $(this).attr('id');
-        gettemuanById(id);
-    });
-
-    function gettemuanById($id)
-    {
-        $.ajax({
-            url: base_url + "/delik/getjawabById/"+$id,
-            type: "GET",
-            beforeSend: function () {
-                swal.fire({
-                    title: 'Loading',
-                    allowEscapeKey: false,
-                    allowOutsideClick: false,
-                    onOpen: () => {
-                        swal.showLoading();
-                    }
-                });
-            },
-            success: function (data) {
-                swal.close();
-                var list = data == null ? [] : (data instanceof Array ? data : [data]);
-                    $.each(list, function (index, org_types) {
-                        if(org_types.status){
-                            $("#edit_dtjwb_temuan").val(org_types.dtjwb_temuan);
-                            $("#temuan_dtjwb_id").val(org_types.dtjwb_id);
-                            $('#editTemuanModal').modal('show');
-                        }else{
-                            swal.fire("Oops", "Gagal", "error");
-                        }
-                    });
-                    
-            },
-            error: function (json) {
-                swal.fire("Oops", "No connection!", "error");
-                
-            }
-        }); 
+    function pasangForm(id, kolom, modal, input) {
+        $(id).formValidation({
+            framework: "bootstrap4",
+            excluded: [':disabled'],
+            err: {clazz: 'invalid-feedback'},
+            control: {valid: 'is-valid', invalid: 'is-invalid'},
+            row: {invalid: 'has-danger'}
+        }).on('success.form.fv', function (e) {
+            e.preventDefault();
+            var $form = $(e.target);
+            simpan(kolom, $(input).val(), modal, $form);
+            return false;
+        });
     }
 
+    pasangForm('#formhasil', 'jwb_hasil', '#editHasilModal', '#edit_dtjwb_hasil');
+    pasangForm('#formtemuan', 'jwb_temuan', '#editTemuanModal', '#edit_dtjwb_temuan');
+    pasangForm('#formcatatan', 'jwb_catatan', '#editCatatanModal', '#edit_dtjwb_catatan');
 
-    $("#tilik").on("click", ".editcatatan", function () {
-        var id = $(this).attr('id');
-        getcatatanById(id);
-    });
+    /* ---------------- tujuan (tingkat pertanyaan) ---------------- */
 
-    function getcatatanById($id)
-    {
-        $.ajax({
-            url: base_url + "/delik/getjawabById/"+$id,
-            type: "GET",
-            beforeSend: function () {
-                swal.fire({
-                    title: 'Loading',
-                    allowEscapeKey: false,
-                    allowOutsideClick: false,
-                    onOpen: () => {
-                        swal.showLoading();
-                    }
-                });
-            },
-            success: function (data) {
-                swal.close();
-                var list = data == null ? [] : (data instanceof Array ? data : [data]);
-                    $.each(list, function (index, org_types) {
-                        if(org_types.status){
-                            $("#edit_dtjwb_catatan").val(org_types.dtjwb_catatan);
-                            $("#catatan_dtjwb_id").val(org_types.dtjwb_id);
-                            $('#editCatatanModal').modal('show');
-                        }else{
-                            swal.fire("Oops", "Gagal", "error");
-                        }
-                    });
-                    
-            },
-            error: function (json) {
-                swal.fire("Oops", "No connection!", "error");
-                
-            }
-        }); 
-    }
-
-    $("#formpertanyaan").formValidation({
-        framework: "bootstrap4",
-        excluded: [':disabled', ':hidden', ':not(:visible)'], // ðŸ”§ tambahkan agar summernote tidak dianggap kosong
-        err: {
-            clazz: 'invalid-feedback'
-        },
-        control: {
-            valid: 'is-valid',
-            invalid: 'is-invalid'
-        },
-        row: {
-            invalid: 'has-danger'
-        }
-    }).on('success.form.fv', function (e) {
-        e.preventDefault();
-
-        var $form = $(e.target);
-        var formData = new FormData(e.target);
-
-        $.ajax({
-            url: base_url + "/delik/pertanyaan",
-            type: "POST",
-            data: formData,
-            processData: false,
-            contentType: false,
-            beforeSend: function () {
-                $("#editPertanyaanModal").modal('hide');
-                Swal.fire({
-                    title: 'Loading...',
-                    allowEscapeKey: false,
-                    allowOutsideClick: false,
-                    onOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-            },
-            success: function (data) {
-                Swal.close();
-
-                var list = data == null ? [] : (data instanceof Array ? data : [data]);
-                $.each(list, function (index, res) {
-                    if (res.status) {
-                        tiliklist.ajax.reload();
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil!',
-                            text: 'Data telah tersimpan.',
-                            showConfirmButton: false,
-                            timer: 1200
-                        });
-                    } else {
-                        Swal.fire("Oops", res.pesan, "error");
-                    }
-                });
-
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-            },
-            error: function () {
-                Swal.fire("Oops", "No connection!", "error");
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-            }
-        });
-
-        return false;
-    });
-
-    $("#formhasil").formValidation({
-        framework: "bootstrap4",
-        excluded: [':disabled', ':hidden', ':not(:visible)'], // ðŸ”§ tambahkan agar summernote tidak dianggap kosong
-        err: {
-            clazz: 'invalid-feedback'
-        },
-        control: {
-            valid: 'is-valid',
-            invalid: 'is-invalid'
-        },
-        row: {
-            invalid: 'has-danger'
-        }
-    }).on('success.form.fv', function (e) {
-        e.preventDefault();
-
-        var $form = $(e.target);
-        var formData = new FormData(e.target);
-
-        $.ajax({
-            url: base_url + "/delik/hasil",
-            type: "POST",
-            data: formData,
-            processData: false,
-            contentType: false,
-            beforeSend: function () {
-                $("#editHasilModal").modal('hide');
-                Swal.fire({
-                    title: 'Loading...',
-                    allowEscapeKey: false,
-                    allowOutsideClick: false,
-                    onOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-            },
-            success: function (data) {
-                Swal.close();
-
-                var list = data == null ? [] : (data instanceof Array ? data : [data]);
-                $.each(list, function (index, res) {
-                    if (res.status) {
-                        tiliklist.ajax.reload();
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil!',
-                            text: 'Data telah tersimpan.',
-                            showConfirmButton: false,
-                            timer: 1200
-                        });
-                    } else {
-                        Swal.fire("Oops", res.pesan, "error");
-                    }
-                });
-
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-            },
-            error: function () {
-                Swal.fire("Oops", "No connection!", "error");
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-            }
-        });
-
-        return false;
-    });
-
-    $("#formtemuan").formValidation({
-        framework: "bootstrap4",
-        excluded: [':disabled', ':hidden', ':not(:visible)'], // ðŸ”§ tambahkan agar summernote tidak dianggap kosong
-        err: {
-            clazz: 'invalid-feedback'
-        },
-        control: {
-            valid: 'is-valid',
-            invalid: 'is-invalid'
-        },
-        row: {
-            invalid: 'has-danger'
-        }
-    }).on('success.form.fv', function (e) {
-        e.preventDefault();
-
-        var $form = $(e.target);
-        var formData = new FormData(e.target);
-
-        $.ajax({
-            url: base_url + "/delik/temuan",
-            type: "POST",
-            data: formData,
-            processData: false,
-            contentType: false,
-            beforeSend: function () {
-                $("#editTemuanModal").modal('hide');
-                Swal.fire({
-                    title: 'Loading...',
-                    allowEscapeKey: false,
-                    allowOutsideClick: false,
-                    onOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-            },
-            success: function (data) {
-                Swal.close();
-
-                var list = data == null ? [] : (data instanceof Array ? data : [data]);
-                $.each(list, function (index, res) {
-                    if (res.status) {
-                        tiliklist.ajax.reload();
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil!',
-                            text: 'Data telah tersimpan.',
-                            showConfirmButton: false,
-                            timer: 1200
-                        });
-                    } else {
-                        Swal.fire("Oops", res.pesan, "error");
-                    }
-                });
-
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-            },
-            error: function () {
-                Swal.fire("Oops", "No connection!", "error");
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-            }
-        });
-
-        return false;
-    });
-
-    $("#formcatatan").formValidation({
-        framework: "bootstrap4",
-        excluded: [':disabled', ':hidden', ':not(:visible)'], // ðŸ”§ tambahkan agar summernote tidak dianggap kosong
-        err: {
-            clazz: 'invalid-feedback'
-        },
-        control: {
-            valid: 'is-valid',
-            invalid: 'is-invalid'
-        },
-        row: {
-            invalid: 'has-danger'
-        }
-    }).on('success.form.fv', function (e) {
-        e.preventDefault();
-
-        var $form = $(e.target);
-        var formData = new FormData(e.target);
-
-        $.ajax({
-            url: base_url + "/delik/catatan",
-            type: "POST",
-            data: formData,
-            processData: false,
-            contentType: false,
-            beforeSend: function () {
-                $("#editCatatanModal").modal('hide');
-                Swal.fire({
-                    title: 'Loading...',
-                    allowEscapeKey: false,
-                    allowOutsideClick: false,
-                    onOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-            },
-            success: function (data) {
-                Swal.close();
-
-                var list = data == null ? [] : (data instanceof Array ? data : [data]);
-                $.each(list, function (index, res) {
-                    if (res.status) {
-                        tiliklist.ajax.reload();
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil!',
-                            text: 'Data telah tersimpan.',
-                            showConfirmButton: false,
-                            timer: 1200
-                        });
-                    } else {
-                        Swal.fire("Oops", res.pesan, "error");
-                    }
-                });
-
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-            },
-            error: function () {
-                Swal.fire("Oops", "No connection!", "error");
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-            }
-        });
-
-        return false;
-    });
-
-    $("#formtilik").formValidation({
-        framework: "bootstrap4",
-        excluded: [':disabled', ':hidden', ':not(:visible)'], // ðŸ”§ tambahkan agar summernote tidak dianggap kosong
-        err: {
-            clazz: 'invalid-feedback'
-        },
-        control: {
-            valid: 'is-valid',
-            invalid: 'is-invalid'
-        },
-        row: {
-            invalid: 'has-danger'
-        }
-    }).on('success.form.fv', function (e) {
-        e.preventDefault();
-
-        var $form = $(e.target);
-        var formData = new FormData(e.target);
-
-        $.ajax({
-            url: base_url + "/delik/tambahtilik",
-            type: "POST",
-            data: formData,
-            processData: false,
-            contentType: false,
-            beforeSend: function () {
-                $("#tilikModal").modal('hide');
-                Swal.fire({
-                    title: 'Loading...',
-                    allowEscapeKey: false,
-                    allowOutsideClick: false,
-                    onOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-            },
-            success: function (data) {
-                Swal.close();
-
-                var list = data == null ? [] : (data instanceof Array ? data : [data]);
-                $.each(list, function (index, res) {
-                    if (res.status) {
-                        tiliklist.ajax.reload();
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil!',
-                            text: 'Data telah tersimpan.',
-                            showConfirmButton: false,
-                            timer: 1200
-                        });
-                    } else {
-                        Swal.fire("Oops", res.pesan, "error");
-                    }
-                });
-
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-            },
-            error: function () {
-                Swal.fire("Oops", "No connection!", "error");
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-            }
-        });
-
-        return false;
-    });
-
-    $("#edittujuan").on("click", function () {
-        // Ambil isi dari elemen <p id="tujuan">
-        var isiTujuan = $("#tujuan").html();
-
-        // Tampilkan modal
+    $('#edittujuan').on('click', function () {
         $('#tujuanModal').modal('show');
+    });
 
-        // Setelah modal tampil, masukkan isi ke Summernote
-        $('#tujuanModal').on('shown.bs.modal', function () {
-            $('#jwb_tujuan').summernote('code', isiTujuan);
+    $("#formtujuan").formValidation({
+        framework: "bootstrap4",
+        excluded: [':disabled'],
+        err: {clazz: 'invalid-feedback'},
+        control: {valid: 'is-valid', invalid: 'is-invalid'},
+        row: {invalid: 'has-danger'}
+    }).on('success.form.fv', function (e) {
+        e.preventDefault();
+
+        var $form = $(e.target);
+        var formData = new FormData(e.target);
+
+        $.ajax({
+            url: base_url + "/delik/tujuan",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            beforeSend: function () {
+                $("#tujuanModal").modal('hide');
+                swal.fire({
+                    title: 'Menyimpan...',
+                    allowEscapeKey: false,
+                    allowOutsideClick: false,
+                    onOpen: function () {
+                        swal.showLoading();
+                    }
+                });
+            },
+            success: function (data) {
+                swal.close();
+                var list = data == null ? [] : (data instanceof Array ? data : [data]);
+                $.each(list, function (index, res) {
+                    if (res.status) {
+                        swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: 'Tujuan telah tersimpan.',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(function () {
+                            window.location.reload();
+                        });
+                    } else {
+                        swal.fire("Oops", res.pesan, "error");
+                    }
+                });
+                $form.formValidation('disableSubmitButtons', false).formValidation('resetForm', true);
+            },
+            error: function () {
+                swal.close();
+                swal.fire("Oops", "No connection!", "error");
+                $form.formValidation('disableSubmitButtons', false).formValidation('resetForm', true);
+            }
         });
+
+        return false;
     });
 
-    $("#kembali").on("click", function () {
+    /* ---------------- kembali ---------------- */
+
+    $('#kembali').on('click', function () {
         var id = $(this).attr('audit_id');
-        window.location.href = base_url+'/daftaraudit/detail/'+id;
+        window.location.href = base_url + '/daftaraudit/detail/' + id;
     });
-
-
-
-   $("#formtujuan").formValidation({
-    framework: "bootstrap4",
-    excluded: [':disabled', ':hidden', ':not(:visible)'], // ðŸ”§ tambahkan agar summernote tidak dianggap kosong
-    err: {
-        clazz: 'invalid-feedback'
-    },
-    control: {
-        valid: 'is-valid',
-        invalid: 'is-invalid'
-    },
-    row: {
-        invalid: 'has-danger'
-    }
-}).on('success.form.fv', function (e) {
-    e.preventDefault();
-
-    var $form = $(e.target);
-    var formData = new FormData(e.target);
-
-    var isiTujuan = $('#jwb_tujuan').summernote('code');
-    formData.set('jwb_tujuan', isiTujuan);
-
-    $.ajax({
-        url: base_url + "/delik/tujuan",
-        type: "POST",
-        data: formData,
-        processData: false,
-        contentType: false,
-        beforeSend: function () {
-            $("#tujuanModal").modal('hide');
-            Swal.fire({
-                title: 'Loading...',
-                allowEscapeKey: false,
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-        },
-        success: function (data) {
-            Swal.close();
-
-            var list = data == null ? [] : (data instanceof Array ? data : [data]);
-            $.each(list, function (index, res) {
-                if (res.status) {
-                    $("#tujuan").html(isiTujuan);
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil!',
-                        text: 'Data telah tersimpan.',
-                        showConfirmButton: false,
-                        timer: 1200
-                    });
-                } else {
-                    Swal.fire("Oops", res.pesan, "error");
-                }
-            });
-
-            $form.formValidation('disableSubmitButtons', false)
-                .formValidation('resetForm', true);
-        },
-        error: function () {
-            Swal.fire("Oops", "No connection!", "error");
-            $form.formValidation('disableSubmitButtons', false)
-                .formValidation('resetForm', true);
-        }
-    });
-
-    return false;
-});
-
-
-$("#formreferensi").formValidation({
-    framework: "bootstrap4",
-    excluded: [':disabled', ':hidden', ':not(:visible)'], // ðŸ”§ tambahkan agar summernote tidak dianggap kosong
-    err: {
-        clazz: 'invalid-feedback'
-    },
-    control: {
-        valid: 'is-valid',
-        invalid: 'is-invalid'
-    },
-    row: {
-        invalid: 'has-danger'
-    }
-}).on('success.form.fv', function (e) {
-    e.preventDefault();
-
-    var $form = $(e.target);
-    var formData = new FormData(e.target);
-
-    var isiReferensi = $('#jwb_referensi').summernote('code');
-    formData.set('jwb_referensi', isiReferensi);
-
-    $.ajax({
-        url: base_url + "/delik/referensi",
-        type: "POST",
-        data: formData,
-        processData: false,
-        contentType: false,
-        beforeSend: function () {
-            $("#referensiModal").modal('hide');
-            Swal.fire({
-                title: 'Loading...',
-                allowEscapeKey: false,
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-        },
-        success: function (data) {
-            Swal.close();
-
-            var list = data == null ? [] : (data instanceof Array ? data : [data]);
-            $.each(list, function (index, res) {
-                if (res.status) {
-                    $("#referensi").html(isiReferensi);
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil!',
-                        text: 'Data telah tersimpan.',
-                        showConfirmButton: false,
-                        timer: 1200
-                    });
-                } else {
-                    Swal.fire("Oops", res.pesan, "error");
-                }
-            });
-
-            $form.formValidation('disableSubmitButtons', false)
-                .formValidation('resetForm', true);
-        },
-        error: function () {
-            Swal.fire("Oops", "No connection!", "error");
-            $form.formValidation('disableSubmitButtons', false)
-                .formValidation('resetForm', true);
-        }
-    });
-
-    return false;
-});
-
-
-$("#formpertanyaan").formValidation({
-    framework: "bootstrap4",
-    excluded: [':disabled', ':hidden', ':not(:visible)'], // ðŸ”§ tambahkan agar summernote tidak dianggap kosong
-    err: {
-        clazz: 'invalid-feedback'
-    },
-    control: {
-        valid: 'is-valid',
-        invalid: 'is-invalid'
-    },
-    row: {
-        invalid: 'has-danger'
-    }
-}).on('success.form.fv', function (e) {
-    e.preventDefault();
-
-    var $form = $(e.target);
-    var formData = new FormData(e.target);
-
-    var isiPertanyaan = $('#jwb_pertanyaan').summernote('code');
-    formData.set('jwb_pertanyaan', isiPertanyaan);
-
-    $.ajax({
-        url: base_url + "/delik/pertanyaan",
-        type: "POST",
-        data: formData,
-        processData: false,
-        contentType: false,
-        beforeSend: function () {
-            $("#pertanyaanModal").modal('hide');
-            Swal.fire({
-                title: 'Loading...',
-                allowEscapeKey: false,
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-        },
-        success: function (data) {
-            Swal.close();
-
-            var list = data == null ? [] : (data instanceof Array ? data : [data]);
-            $.each(list, function (index, res) {
-                if (res.status) {
-                    $("#pertanyaan").html(isiPertanyaan);
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil!',
-                        text: 'Data telah tersimpan.',
-                        showConfirmButton: false,
-                        timer: 1200
-                    });
-                } else {
-                    Swal.fire("Oops", res.pesan, "error");
-                }
-            });
-
-            $form.formValidation('disableSubmitButtons', false)
-                .formValidation('resetForm', true);
-        },
-        error: function () {
-            Swal.fire("Oops", "No connection!", "error");
-            $form.formValidation('disableSubmitButtons', false)
-                .formValidation('resetForm', true);
-        }
-    });
-
-    return false;
-});
-
-
-$("#formhasil").formValidation({
-    framework: "bootstrap4",
-    excluded: [':disabled', ':hidden', ':not(:visible)'], // ðŸ”§ tambahkan agar summernote tidak dianggap kosong
-    err: {
-        clazz: 'invalid-feedback'
-    },
-    control: {
-        valid: 'is-valid',
-        invalid: 'is-invalid'
-    },
-    row: {
-        invalid: 'has-danger'
-    }
-}).on('success.form.fv', function (e) {
-    e.preventDefault();
-
-    var $form = $(e.target);
-    var formData = new FormData(e.target);
-
-    var isiHasil = $('#jwb_hasil').summernote('code');
-    formData.set('jwb_hasil', isiHasil);
-
-    $.ajax({
-        url: base_url + "/delik/hasil",
-        type: "POST",
-        data: formData,
-        processData: false,
-        contentType: false,
-        beforeSend: function () {
-            $("#hasilModal").modal('hide');
-            Swal.fire({
-                title: 'Loading...',
-                allowEscapeKey: false,
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-        },
-        success: function (data) {
-            Swal.close();
-
-            var list = data == null ? [] : (data instanceof Array ? data : [data]);
-            $.each(list, function (index, res) {
-                if (res.status) {
-                    $("#hasil").html(isiHasil);
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil!',
-                        text: 'Data telah tersimpan.',
-                        showConfirmButton: false,
-                        timer: 1200
-                    });
-                } else {
-                    Swal.fire("Oops", res.pesan, "error");
-                }
-            });
-
-            $form.formValidation('disableSubmitButtons', false)
-                .formValidation('resetForm', true);
-        },
-        error: function () {
-            Swal.fire("Oops", "No connection!", "error");
-            $form.formValidation('disableSubmitButtons', false)
-                .formValidation('resetForm', true);
-        }
-    });
-
-    return false;
-});
-
-
-$("#formtemuan").formValidation({
-    framework: "bootstrap4",
-    excluded: [':disabled', ':hidden', ':not(:visible)'], // ðŸ”§ tambahkan agar summernote tidak dianggap kosong
-    err: {
-        clazz: 'invalid-feedback'
-    },
-    control: {
-        valid: 'is-valid',
-        invalid: 'is-invalid'
-    },
-    row: {
-        invalid: 'has-danger'
-    }
-}).on('success.form.fv', function (e) {
-    e.preventDefault();
-
-    var $form = $(e.target);
-    var formData = new FormData(e.target);
-    var isiTemuan = $('#jwb_temuan').val();
-
-    $.ajax({
-        url: base_url + "/delik/temuan",
-        type: "POST",
-        data: formData,
-        processData: false,
-        contentType: false,
-        beforeSend: function () {
-            $("#temuanModal").modal('hide');
-            Swal.fire({
-                title: 'Loading...',
-                allowEscapeKey: false,
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-        },
-        success: function (data) {
-            Swal.close();
-
-            var list = data == null ? [] : (data instanceof Array ? data : [data]);
-            $.each(list, function (index, res) {
-                if (res.status) {
-                    $("#temuan").text(isiTemuan);
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil!',
-                        text: 'Data telah tersimpan.',
-                        showConfirmButton: false,
-                        timer: 1200
-                    });
-                } else {
-                    Swal.fire("Oops", res.pesan, "error");
-                }
-            });
-
-            $form.formValidation('disableSubmitButtons', false)
-                .formValidation('resetForm', true);
-        },
-        error: function () {
-            Swal.fire("Oops", "No connection!", "error");
-            $form.formValidation('disableSubmitButtons', false)
-                .formValidation('resetForm', true);
-        }
-    });
-
-    return false;
-});
-
-
-$("#formcatatan").formValidation({
-    framework: "bootstrap4",
-    excluded: [':disabled', ':hidden', ':not(:visible)'], // ðŸ”§ tambahkan agar summernote tidak dianggap kosong
-    err: {
-        clazz: 'invalid-feedback'
-    },
-    control: {
-        valid: 'is-valid',
-        invalid: 'is-invalid'
-    },
-    row: {
-        invalid: 'has-danger'
-    }
-}).on('success.form.fv', function (e) {
-    e.preventDefault();
-
-    var $form = $(e.target);
-    var formData = new FormData(e.target);
-
-    var isiCatatan = $('#jwb_catatan').summernote('code');
-    formData.set('jwb_catatan', isiCatatan);
-
-    $.ajax({
-        url: base_url + "/delik/catatan",
-        type: "POST",
-        data: formData,
-        processData: false,
-        contentType: false,
-        beforeSend: function () {
-            $("#catatanModal").modal('hide');
-            Swal.fire({
-                title: 'Loading...',
-                allowEscapeKey: false,
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-        },
-        success: function (data) {
-            Swal.close();
-
-            var list = data == null ? [] : (data instanceof Array ? data : [data]);
-            $.each(list, function (index, res) {
-                if (res.status) {
-                    $("#catatan").html(isiCatatan);
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil!',
-                        text: 'Data telah tersimpan.',
-                        showConfirmButton: false,
-                        timer: 1200
-                    });
-                } else {
-                    Swal.fire("Oops", res.pesan, "error");
-                }
-            });
-
-            $form.formValidation('disableSubmitButtons', false)
-                .formValidation('resetForm', true);
-        },
-        error: function () {
-            Swal.fire("Oops", "No connection!", "error");
-            $form.formValidation('disableSubmitButtons', false)
-                .formValidation('resetForm', true);
-        }
-    });
-
-    return false;
-});
-
-
 });

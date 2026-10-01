@@ -10,9 +10,11 @@ class PtkModel extends CI_Model {
         parent::__construct();
     }
 
-    var $column_search = array('dtform_pertanyaan','dtform_lingkup','jwb_jawaban','jwb_hasil','jwb_temuan','jwb_catatan');
-    var $column_order = array(null,'dtform_pertanyaan','dtform_lingkup','jwb_jawaban','jwb_hasil','jwb_temuan','jwb_catatan');
-    var $order = array('audit_id' => 'asc');
+    /* Satu baris = satu butir lingkup yang punya temuan (struktur baru). */
+    var $column_search = array('f.form_nama','dt.dtform_pertanyaan','lg.lingkup_isi','jb.jwb_hasil','jb.jwb_temuan','jb.jwb_catatan','jb.jwb_koreksi');
+    var $column_order = array(null,'f.form_nama','dt.dtform_pertanyaan','lg.lingkup_isi','jb.jwb_hasil','jb.jwb_temuan','jb.jwb_catatan','jb.jwb_koreksi');
+    /* audit_id juga ada di tabel jawaban -> harus memakai alias. */
+    var $order = array('au.audit_id' => 'asc');
 
     private function _get_datatables_query($search, $ordering) {
         $i = 0;
@@ -40,75 +42,44 @@ class PtkModel extends CI_Model {
         }
     }
 
+    private function _query_ptk() {
+        $this->db->select('au.audit_id, au.audit_status');
+        $this->db->select('dt.dtform_id, dt.dtform_pertanyaan');
+        $this->db->select('f.form_nama');
+        $this->db->select('lg.lingkup_id, lg.lingkup_isi');
+        $this->db->select('jb.jwb_id, jb.jwb_hasil, jb.jwb_temuan, jb.jwb_catatan, jb.jwb_koreksi');
+        $this->db->from('audit au');
+        $this->db->join('detailform dt', 'dt.form_id = au.form_id', 'inner');
+        $this->db->join('formulir f', 'f.form_id = au.form_id', 'left');
+        $this->db->join('lingkup lg', 'lg.dtform_id = dt.dtform_id', 'inner');
+        $this->db->join('auditjawab jb', 'jb.audit_id = au.audit_id AND jb.lingkup_id = lg.lingkup_id', 'inner');
+        $this->db->where("jb.jwb_temuan IN ('OB','TS MINOR','TS MAYOR')");
+
+        $users_id = $this->session->userdata('users_id');
+        if (isset($users_id)) {
+            $this->db->where('au.auditee_id', $users_id);
+        }
+    }
+
     function get_datatables($length, $start, $search, $ordering) {
         $this->_get_datatables_query($search, $ordering);
         if ($length != -1) {
             $this->db->limit($length, $start);
         }
-        $this->db->select("audit_id");
-        $this->db->select("audit_status");
-        $this->db->select("dt.dtform_id as dtform_id");
-        $this->db->select("dt.dtform_pertanyaan as dtform_pertanyaan");
-        $this->db->select("dt.dtform_lingkup as dtform_lingkup");
-        $this->db->select("(SELECT jwb_catatan from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id) as jwb_catatan");
-        $this->db->select("(SELECT jwb_temuan 
-                    FROM mutu_auditjawab 
-                    WHERE audit_id = au.audit_id 
-                      AND dtform_id = dt.dtform_id
-                      AND jwb_temuan IN ('OB','TS MINOR','TS MAYOR')
-                    LIMIT 1) as jwb_temuan");
-        $this->db->select("(SELECT jwb_hasil from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id) as jwb_hasil");
-        $this->db->select("(SELECT jwb_jawaban from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id) as jwb_jawaban");
-        $this->db->from('audit au');
-        $this->db->join('detailform dt', 'dt.form_id = au.form_id', 'left');
-        $users_id = $this->session->userdata('users_id');
-        if(isset($users_id)){
-            $this->db->where('au.auditee_id',$users_id);
-        }
+        $this->_query_ptk();
         $query = $this->db->get();
         return $query->result();
     }
 
     function count_filtered($search, $ordering) {
         $this->_get_datatables_query($search, $ordering);
-        $this->db->select("audit_id");
-        $this->db->select("audit_status");
-        $this->db->select("dt.dtform_id as dtform_id");
-        $this->db->select("dt.dtform_pertanyaan as dtform_pertanyaan");
-        $this->db->select("dt.dtform_lingkup as dtform_lingkup");
-        $this->db->select("(SELECT jwb_catatan from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id) as jwb_catatan");
-        $this->db->select("(SELECT jwb_temuan 
-                    FROM mutu_auditjawab 
-                    WHERE audit_id = au.audit_id 
-                      AND dtform_id = dt.dtform_id
-                      AND jwb_temuan IN ('OB','TS MINOR','TS MAYOR')
-                    LIMIT 1) as jwb_temuan");
-
-        $this->db->select("(SELECT jwb_hasil from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id) as jwb_hasil");
-        $this->db->select("(SELECT jwb_jawaban from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id) as jwb_jawaban");
-        $this->db->from('audit au');
-        $this->db->join('detailform dt', 'dt.form_id = au.form_id', 'left');
-        $users_id = $this->session->userdata('users_id');
-        if(isset($users_id)){
-            $this->db->where('au.auditee_id',$users_id);
-        }
+        $this->_query_ptk();
         $query = $this->db->get();
         return $query->num_rows();
     }
 
     public function count_all() {
-        $this->db->select("(SELECT jwb_temuan 
-                    FROM mutu_auditjawab 
-                    WHERE audit_id = au.audit_id 
-                      AND dtform_id = dt.dtform_id
-                      AND jwb_temuan IN ('OB','TS MINOR','TS MAYOR')
-                    LIMIT 1) as jwb_temuan");
-
-        $this->db->from('audit');
-        $users_id = $this->session->userdata('users_id');
-        if(isset($users_id)){
-            $this->db->where('audit.auditee_id',$users_id);
-        }
+        $this->_query_ptk();
         return $this->db->count_all_results();
     }
 
@@ -127,10 +98,24 @@ class PtkModel extends CI_Model {
      public function koreksi($data) {
         $this->db->trans_start();
         $this->db->where("audit_id",$data['audit_id']);
-        $this->db->where("dtform_id",$data['dtform_id']);
+        if (!empty($data['lingkup_id'])) {
+            // Struktur baru: koreksi menempel pada baris butir lingkup.
+            $this->db->where("lingkup_id",$data['lingkup_id']);
+        } else {
+            $this->db->where("dtform_id",$data['dtform_id']);
+            $this->db->where('lingkup_id IS NULL', NULL, FALSE);
+        }
         $this->db->update('auditjawab',$data);
         $this->db->trans_complete();
         return $this->db->trans_status();
+    }
+
+    /** Butir tilik + nilai (untuk modal koreksi). */
+    public function getButir($audit_id, $lingkup_id) {
+        $this->_query_ptk();
+        $this->db->where('au.audit_id', $audit_id);
+        $this->db->where('lg.lingkup_id', $lingkup_id);
+        return $this->db->get()->row_array();
     }
 
     public function is_exist($data) {
@@ -152,6 +137,7 @@ class PtkModel extends CI_Model {
         if(isset($users_id)){
             $this->db->where('ma.auditee_id',$users_id);
         }
+        $this->db->where('lingkup_id IS NOT NULL', NULL, FALSE);
         $this->db->where("jwb_temuan","OB");
         $query = $this->db->get();
         return $query->num_rows();
@@ -164,6 +150,7 @@ class PtkModel extends CI_Model {
         if(isset($users_id)){
             $this->db->where('ma.auditee_id',$users_id);
         }
+        $this->db->where('lingkup_id IS NOT NULL', NULL, FALSE);
         $this->db->where("jwb_temuan","TS MINOR");
         $query = $this->db->get();
         return $query->num_rows();
@@ -176,6 +163,7 @@ class PtkModel extends CI_Model {
         if(isset($users_id)){
             $this->db->where('ma.auditee_id',$users_id);
         }
+        $this->db->where('lingkup_id IS NOT NULL', NULL, FALSE);
         $this->db->where("jwb_temuan","TS MAYOR");
         $query = $this->db->get();
         return $query->num_rows();

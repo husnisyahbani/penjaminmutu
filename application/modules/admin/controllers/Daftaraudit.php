@@ -142,8 +142,8 @@ class Daftaraudit extends MY_Controller {
                         ->getAuditJawabFix($audit['audit_id'], $row['dtform_id']);
             if (!$jwb) continue;
 
-            $detail = $this->auditjawabdetail
-                           ->getAuditJawabDetail($jwb['jwb_id']);
+            /* Struktur baru: butir lingkup + sisa baris lama. */
+            $detail = $this->auditjawab->barisTilik($audit['audit_id'], $row['dtform_id']);
 
             foreach ($detail as $dtjwb) {
 
@@ -331,7 +331,7 @@ class Daftaraudit extends MY_Controller {
                 foreach($dtform as $row){
                     $jwb = $this->auditjawab->getAuditJawabFix($audit['audit_id'],$row['dtform_id']);
                     if(isset($jwb) && count($jwb) > 0){
-                    $detail = $this->auditjawabdetail->getAuditJawabDetail($jwb['jwb_id']);
+                    $detail = $this->auditjawab->barisTilik($audit['audit_id'],$row['dtform_id']);
                     if(isset($detail) && count($detail) > 0){
                     foreach($detail as $dtjwb):
                         if($dtjwb["dtjwb_temuan"] == "S"){

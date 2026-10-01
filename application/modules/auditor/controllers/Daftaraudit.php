@@ -148,8 +148,8 @@ class Daftaraudit extends MY_Controller {
                         ->getAuditJawabFix($audit['audit_id'], $row['dtform_id']);
             if (!$jwb) continue;
 
-            $detail = $this->auditjawabdetail
-                           ->getAuditJawabDetail($jwb['jwb_id']);
+            /* Struktur baru: butir lingkup + sisa baris lama. */
+            $detail = $this->auditjawab->barisTilik($audit['audit_id'], $row['dtform_id']);
 
             foreach ($detail as $dtjwb) {
 

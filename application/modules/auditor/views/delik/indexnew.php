@@ -37,7 +37,10 @@
                 <div class="panel">
                   <div class="panel-body">
                     <p><?php if(isset($jawab['dtform_pertanyaan'])) echo $jawab['dtform_pertanyaan'];?></p>
-                    <p><?php if(isset($jawab['dtform_lingkup'])) echo $jawab['dtform_lingkup'];?></p>
+                    <?php if(!empty($jawab['dtform_lingkup'])): ?>
+                      <p class="font-weight-600 mb-5">Butir lingkup yang dinilai:</p>
+                      <?php echo $jawab['dtform_lingkup']; ?>
+                    <?php endif; ?>
                   </div>
                 </div>
               </div>
@@ -75,30 +78,20 @@ echo $jawab['jwb_jawaban'];}?></p>
               <div class="tab-pane" id="exampleTabsFour" role="tabpanel">
                 <div class="panel">
                   <header class="panel-heading">
-                    <div class="panel-actions panel-actions-keep">
-
-                      <button
-                        type="button"
-                        class="btn btn-sm btn-icon btn-success"
-                        data-toggle="tooltip"
-                        data-original-title="Tambah Tilik"
-                        id="tambahtilik">
-                        <i class="icon md-plus" aria-hidden="true"></i> Tambah Tilik
-                      </button>
-
-                    </div>
+                    <h3 class="panel-title" style="font-size:14px;padding:15px 0;">
+                      Butir daftar tilik diambil dari lingkup pertanyaan (menu Formulir Audit).
+                    </h3>
                   </header>
-                  <br/>
                   <div class="panel-body">
                         <table class="table table-hover dataTable table-striped w-full" id="tilik">
                         <thead>
                             <tr>
-                                <th width="5px">No</th>
-                                <th>Pertanyaan</th>
+                                <th width="1%">No</th>
+                                <th>Butir Lingkup</th>
                                 <th>Hasil</th>
                                 <th>Temuan</th>
                                 <th>Catatan</th>
-                                <th>Aksi</th>
+                                <th width="1%" class="tabel-aksi-sel">Aksi</th>
                             </tr>
                         </thead>
 
@@ -160,95 +153,7 @@ echo $jawab['jwb_jawaban'];}?></p>
   </div>
 </div>
 
-<div
-  class="modal fade"
-  id="tilikModal"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="exampleFormModalLabel"
-  aria-hidden="true">
-  <div class="modal-dialog modal-simple modal-lg" role="document">
-    <div class="modal-content">
-      <form id="formtilik">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">×</span>
-          </button>
-          <h4 class="modal-title" id="exampleFormModalLabel">Tambah Tilik</h4>
-        </div>
 
-        <div class="modal-body">
-          
-          <div class="row">
-            <div class="col-md-12 form-group center">
-              <h4 class="example-title">Referensi</h4>
-                        <input type="text" class="form-control" id="dtjwb_referensi" name="dtjwb_referensi" placeholder="Masukkan Referensi" data-fv-notempty="true"
-                        data-fv-notempty-message="Wajib Diisi"/>
-                    </div>
-
-            <div class="col-md-12 form-group center">
-              <h4 class="example-title">Pertanyaan</h4>
-              <input type="text" class="form-control" id="dtjwb_pertanyaan" name="dtjwb_pertanyaan" placeholder="Masukkan Pertanyaan" data-fv-notempty="true"
-                        data-fv-notempty-message="Wajib Diisi"/>
-            </div>
-            
-            <input type="hidden" name="jwb_id" value="<?=$jwb_id?>"/>
-          </div>
-        </div>
-
-        <div class="modal-footer text-right">
-          <button type="submit" class="btn btn-primary" name="submitjawaban" value="submitjawaban">
-            Kirim
-          </button>
-        </div>
-
-      </form>
-    </div>
-  </div>
-</div>
-
-<div
-    class="modal fade"
-    id="editPertanyaanModal"
-    aria-hidden="false"
-    aria-labelledby="exampleFormModalLabel"
-    role="dialog"
-    tabindex="-1">
-    <div class="modal-dialog modal-simple modal-lg">
-        <form id="formpertanyaan" class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-                <h4 class="modal-title" id="informasiLabel">Edit Pertanyaan</h4>
-            </div>
-            <div class="modal-body">
-
-                <div class="row">
-                  <div class="col-md-12 form-group center">
-                      <h4 class="example-title">Referensi</h4>
-                        <input type="text" class="form-control" id="edit_dtjwb_referensi" name="edit_dtjwb_referensi" placeholder="Masukkan Referensi" data-fv-notempty="true"
-                        data-fv-notempty-message="Wajib Diisi"/>
-                    </div>
-                    <div class="col-md-12 form-group center">
-                        <h4 class="example-title">Pertanyaan</h4>
-                        <input type="text" class="form-control" id="edit_dtjwb_pertanyaan" name="edit_dtjwb_pertanyaan" placeholder="Masukkan Pertanyaan" data-fv-notempty="true"
-                        data-fv-notempty-message="Wajib Diisi"/>
-                    </div>
-                    
-                    
-                    <input type="hidden" id="pertanyaan_dtjwb_id" name="pertanyaan_dtjwb_id" />
-                </div>
-            </div>
-
-            <div class="modal-footer">
-            <div class="text-right">
-                    <button type="submit" class="btn btn-primary" id="submitpertanyaan" name="submitpertanyaan" value="submitpertanyaan">Simpan</button>
-                </div>
-            </div>
-        </div>
-    </form>
-</div>
 
 <div
     class="modal fade"
@@ -272,8 +177,6 @@ echo $jawab['jwb_jawaban'];}?></p>
                         <input type="text" class="form-control" id="edit_dtjwb_hasil" name="edit_dtjwb_hasil" placeholder="Masukkan Hasil" data-fv-notempty="true"
                         data-fv-notempty-message="Wajib Diisi"/>
                     </div>
-                    
-                    <input type="hidden" id="hasil_dtjwb_id" name="hasil_dtjwb_id" />
                 </div>
             </div>
 
@@ -317,7 +220,6 @@ echo $jawab['jwb_jawaban'];}?></p>
                                   <option value="TS MAYOR">TS MAYOR</option>
                                 </select>
             </div>
-            <input type="hidden" id="temuan_dtjwb_id" name="temuan_dtjwb_id" />
           </div>
         </div>
 
@@ -354,8 +256,6 @@ echo $jawab['jwb_jawaban'];}?></p>
                         <input type="text" class="form-control" id="edit_dtjwb_catatan" name="edit_dtjwb_catatan" placeholder="Masukkan Catatan" data-fv-notempty="true"
                         data-fv-notempty-message="Wajib Diisi"/>
                     </div>
-                    
-                    <input type="hidden" id="catatan_dtjwb_id" name="catatan_dtjwb_id" />
                 </div>
             </div>
 

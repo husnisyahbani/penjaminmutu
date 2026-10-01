@@ -5,7 +5,7 @@ class Delik extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditor';
-        $this->load->js(base_url("assets/app/auditor/delik.js?v=1.32"));
+        $this->load->js(base_url("assets/app/auditor/delik.js?v=2.0"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
@@ -39,74 +39,6 @@ class Delik extends MY_Controller {
         }
     }
 
-    public function getjawabById($id) {
-        if(isset($id)){
-            $query = $this->dtjwb->getjawabById($id);
-            $query['status'] = true;
-            header('Access-Control-Allow-Origin: *');
-            header('Content-Type: application/json');
-            echo json_encode($query);
-        }else{
-            $query = array("status"=>false);
-            header('Access-Control-Allow-Origin: *');
-            header('Content-Type: application/json');
-            echo json_encode($query); 
-        }
-    }
-
-    public function tambahtilik() {
-        $data = array();
-        $data['jwb_id'] = $this->input->post('jwb_id');
-        $data['dtjwb_pertanyaan'] = $this->input->post('dtjwb_pertanyaan');
-        $data['dtjwb_referensi'] = $this->input->post('dtjwb_referensi');
-        $status = $this->dtjwb->add($data);
-        
-        
-        $query = array("status" => $status);
-        header('Access-Control-Allow-Origin: *');
-        header('Content-Type: application/json');
-        echo json_encode($query);
-    }
-
-
-    public function pertanyaan() {
-        
-        $data = array();
-        $data['dtjwb_pertanyaan'] = $this->input->post('edit_dtjwb_pertanyaan');
-        $data['dtjwb_id'] = $this->input->post('pertanyaan_dtjwb_id');
-        $status = $this->dtjwb->edit($data);
-        
-        $query = array("status" => $status);
-        header('Access-Control-Allow-Origin: *');
-        header('Content-Type: application/json');
-        echo json_encode($query);
-    }
-
-    public function hasil() {
-        $data = array();
-        $data['dtjwb_hasil'] = $this->input->post('edit_dtjwb_hasil');
-        $data['dtjwb_id'] = $this->input->post('hasil_dtjwb_id');
-        $status = $this->dtjwb->edit($data);
-        
-        $query = array("status" => $status);
-        header('Access-Control-Allow-Origin: *');
-        header('Content-Type: application/json');
-        echo json_encode($query);
-    }
-
-
-    public function temuan() {
-        $data = array();
-        $data['dtjwb_temuan'] = $this->input->post('edit_dtjwb_temuan');
-        $data['dtjwb_id'] = $this->input->post('temuan_dtjwb_id');
-        $status = $this->dtjwb->edit($data);
-        
-        $query = array("status" => $status);
-        header('Access-Control-Allow-Origin: *');
-        header('Content-Type: application/json');
-        echo json_encode($query);
-    }
-
     public function tujuan() {
         $data = array();
         $data['dtform_id'] = $this->input->post('dtform_id');
@@ -126,32 +58,57 @@ class Delik extends MY_Controller {
         echo json_encode($query);
     }
 
-    public function catatan() {
-        $data = array();
-        $data['dtjwb_catatan'] = $this->input->post('edit_dtjwb_catatan');
-        $data['dtjwb_id'] = $this->input->post('catatan_dtjwb_id');
-        $status = $this->dtjwb->edit($data);
-        
-        $query = array("status" => $status);
+    /**
+     * Nilai satu butir tilik (untuk modal edit) + teks butirnya.
+     */
+    public function gettilik($jwb_id = NULL, $lingkup_id = NULL) {
         header('Access-Control-Allow-Origin: *');
         header('Content-Type: application/json');
-        echo json_encode($query);
+
+        $this->load->model('LingkupModel', 'lingkup');
+        $butir = $this->lingkup->butirSatu($lingkup_id);
+
+        $nilai = $this->dtjwb->getNilaiByLingkup($jwb_id, $lingkup_id);
+        if (!$nilai) {
+            echo json_encode(array('status' => FALSE, 'pesan' => 'Butir tilik tidak ditemukan.'));
+            return;
+        }
+
+        $nilai['status']      = TRUE;
+        $nilai['lingkup_isi'] = $butir ? $butir['lingkup_isi'] : '';
+        echo json_encode($nilai);
     }
 
-
-    public function hapus() {
-        $data = array();
-        $dtjwb_id = $this->input->post('id');
-        $status = $this->dtjwb->hapus($dtjwb_id);
-        
-        $query = array("status" => $status);
+    /**
+     * Simpan Hasil / Temuan / Catatan satu butir lingkup.
+     * Data: jwb_id, lingkup_id, kolom (jwb_hasil|jwb_temuan|jwb_catatan), nilai
+     */
+    public function simpantilik() {
         header('Access-Control-Allow-Origin: *');
         header('Content-Type: application/json');
-        echo json_encode($query);
+
+        $jwb_id     = $this->input->post('jwb_id');
+        $lingkup_id = $this->input->post('lingkup_id');
+        $kolom      = $this->input->post('kolom');
+        $nilai      = $this->input->post('nilai');
+
+        $diizinkan = array('jwb_hasil', 'jwb_temuan', 'jwb_catatan');
+        if (!in_array($kolom, $diizinkan, TRUE)) {
+            echo json_encode(array('status' => FALSE, 'pesan' => 'Kolom tidak dikenal.'));
+            return;
+        }
+
+        // Temuan memakai pilihan tetap.
+        if ($kolom === 'jwb_temuan' && $nilai !== '' && !in_array($nilai, array('S', 'OB', 'TS MINOR', 'TS MAYOR'), TRUE)) {
+            echo json_encode(array('status' => FALSE, 'pesan' => 'Temuan tidak dikenal.'));
+            return;
+        }
+
+        $status = $this->dtjwb->simpanNilai($jwb_id, $lingkup_id, $kolom, $nilai);
+        echo json_encode($status
+            ? array('status' => TRUE, 'pesan' => 'Tersimpan.')
+            : array('status' => FALSE, 'pesan' => 'Gagal menyimpan.'));
     }
-
-
-    
 
     public function listdelik($id) {
         $post = array();
@@ -169,17 +126,22 @@ class Delik extends MY_Controller {
             $no++;
             $row = array();
             $row[] = $no;
-            $row[] = '<span style="font-size:16px;font-weight:bold">PERTANYAAN:</span><br/>'.$field->dtjwb_pertanyaan . '<br/><span style="font-size:16px;font-weight:bold">REFERENSI:</span><br/>'.$field->dtjwb_referensi.'<br/><button class="editpertanyaan btn btn-sm btn-icon btn-pure btn-default on-default"
-            data-toggle="tooltip" data-original-title="Pertanyaan" id=' . $field->dtjwb_id . '><i class="icon md-edit" aria-hidden="true"></i></button>';
-            $row[] = $field->dtjwb_hasil . '<button class="edithasil btn btn-sm btn-icon btn-pure btn-default on-default"
-            data-toggle="tooltip" data-original-title="Hasil" id=' . $field->dtjwb_id . '><i class="icon md-edit" aria-hidden="true"></i></button>';
-            $row[] = $field->dtjwb_temuan . '<button class="edittemuan btn btn-sm btn-icon btn-pure btn-default on-default"
-            data-toggle="tooltip" data-original-title="Temuan" id=' . $field->dtjwb_id . '><i class="icon md-edit" aria-hidden="true"></i></button>';
-            $row[] = $field->dtjwb_catatan . '<button class="editcatatan btn btn-sm btn-icon btn-pure btn-default on-default"
-            data-toggle="tooltip" data-original-title="Catatan" id=' . $field->dtjwb_id . '><i class="icon md-edit" aria-hidden="true"></i></button>';
-            $row[] = '<button class="delete btn btn-sm btn-icon btn-pure btn-default on-default remove-row"
-                      data-toggle="tooltip" data-original-title="Remove" id=' . $field->dtjwb_id . '><i class="icon md-delete" aria-hidden="true"></i></button>';
-           
+            $row[] = html_escape($field->lingkup_isi);
+            $row[] = $field->jwb_hasil;
+            $row[] = $field->jwb_temuan ? '<span class="badge badge-warning">' . html_escape($field->jwb_temuan) . '</span>' : '';
+            $row[] = $field->jwb_catatan;
+
+            // Tombol per butir: isi Hasil / Tetapkan Temuan / Isi Catatan.
+            $aksi = '<button type="button" class="edithasil btn btn-sm btn-icon btn-primary"'
+                . ' data-info="Isi hasil penilaian butir ini" lingkup_id="' . $field->lingkup_id . '">'
+                . '<i class="icon md-edit" aria-hidden="true"></i></button>'
+                . ' <button type="button" class="edittemuan btn btn-sm btn-icon btn-warning"'
+                . ' data-info="Tetapkan temuan butir ini" lingkup_id="' . $field->lingkup_id . '">'
+                . '<i class="icon md-flag" aria-hidden="true"></i></button>'
+                . ' <button type="button" class="editcatatan btn btn-sm btn-icon btn-success"'
+                . ' data-info="Isi catatan/tindak lanjut butir ini" lingkup_id="' . $field->lingkup_id . '">'
+                . '<i class="icon md-comment" aria-hidden="true"></i></button>';
+            $row[] = '<div class="tabel-aksi">' . $aksi . '</div>';
             $data[] = $row;
         }
 

@@ -5,7 +5,7 @@ class Ptk extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditee';
-        $this->load->js(base_url("assets/app/auditee/ptk.js?v=1.1"));
+        $this->load->js(base_url("assets/app/auditee/ptk.js?v=2.0"));
         $this->load->model('PtkModel', 'ptkmodel');
 
         $role = $this->session->userdata('role');
@@ -33,8 +33,11 @@ class Ptk extends MY_Controller {
         $data = array();
         $data['dtform_id'] = $this->input->post('dtform_id');
         $data['audit_id'] = $this->input->post('audit_id');
+        $data['lingkup_id'] = $this->input->post('lingkup_id');
         $data['jwb_koreksi'] = $this->input->post('ptk_koreksi');
-        $status = $this->ptk->koreksi($data);
+        $allowed_tags = '<p><br><b><i><u><strong><em><ul><ol><li>';
+        $data['jwb_koreksi'] = strip_tags((string) $data['jwb_koreksi'], $allowed_tags);
+        $status = $this->ptkmodel->koreksi($data);
         
         $query = array("status" => $status);
         header('Access-Control-Allow-Origin: *');
@@ -44,7 +47,21 @@ class Ptk extends MY_Controller {
 
     public function hapus() {
         $id = $this->input->post('id');
-        $this->mutu->hapus($id);
+        $this->ptkmodel->hapus($id);
+    }
+
+    /** Data satu butir temuan untuk modal rencana koreksi. */
+    public function getbutir($audit_id = NULL, $lingkup_id = NULL) {
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
+
+        $row = $this->ptkmodel->getButir($audit_id, $lingkup_id);
+        if (!$row) {
+            echo json_encode(array('status' => FALSE, 'pesan' => 'Data tidak ditemukan.'));
+            return;
+        }
+        $row['status'] = TRUE;
+        echo json_encode($row);
     }
 
     public function listptk() {
@@ -64,12 +81,20 @@ class Ptk extends MY_Controller {
             $row = array();
             $row[] = $no;
             $row[] = $field->form_nama;
-            $row[] = $field->dtform_lingkup;
+            $row[] = html_escape($field->lingkup_isi);
             $row[] = $field->jwb_hasil;
-            $row[] = $field->jwb_temuan;
+            $row[] = $field->jwb_temuan
+                ? '<span class="badge badge-warning">' . html_escape($field->jwb_temuan) . '</span>' : '';
             $row[] = $field->jwb_catatan;
-            if(isset($field->jwb_koreksi))
-            $row[] = $field->jwb_koreksi.' <button type="button" class="edit btn btn-warning btn-xs waves-effect waves-classic" dtform_id=' . $field->dtform_id.' audit_id=' . $field->audit_id.'><i class="icon md-edit" aria-hidden="true"></i></button>';;
+
+            $tombol = '<button type="button" class="edit btn btn-sm btn-icon btn-primary"'
+                . ' data-info="Tulis rencana koreksi butir ini"'
+                . ' dtform_id="' . $field->dtform_id . '"'
+                . ' audit_id="' . $field->audit_id . '"'
+                . ' lingkup_id="' . $field->lingkup_id . '">'
+                . '<i class="icon md-edit" aria-hidden="true"></i></button>';
+            $koreksi = isset($field->jwb_koreksi) ? (string) $field->jwb_koreksi : '';
+            $row[] = '<div class="ptk-koreksi">' . $koreksi . '</div><div class="tabel-aksi">' . $tombol . '</div>';
   
             
             $data[] = $row;

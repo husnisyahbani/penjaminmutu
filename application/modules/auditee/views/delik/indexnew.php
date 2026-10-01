@@ -41,7 +41,10 @@
                 <div class="panel">
                   <div class="panel-body">
                     <p><?php if(isset($soal['dtform_pertanyaan'])) echo $soal['dtform_pertanyaan'];?></p>
-                    <p id="pertanyaan"><?php if(isset($soal['dtform_lingkup'])) echo $soal['dtform_lingkup'];?></p>
+                    <?php if(!empty($lingkup)): ?>
+                    <p class="font-weight-600 mb-5">Butir lingkup yang dinilai:</p>
+                    <div id="pertanyaan"><?php echo $lingkup; ?></div>
+                    <?php endif; ?>
                   </div>
                 </div>
               </div>
@@ -178,7 +181,7 @@ echo $jawab['jwb_referensi'];}?></div>
                     <div class="col-md-12 center">
                         <h4 class="example-title">Pertanyaan</h4>
                         <p><?php if(isset($soal['dtform_pertanyaan'])) echo $soal['dtform_pertanyaan'];?></p>
-                        <p><?php if(isset($soal['dtform_lingkup'])) echo $soal['dtform_lingkup'];?></p>
+                        <?php if(!empty($lingkup)) echo $lingkup; ?>
                     </div>
                     <div class="col-md-12 center">
                         <h4 class="example-title">Jawaban</h4>
