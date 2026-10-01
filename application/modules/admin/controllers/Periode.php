@@ -28,7 +28,6 @@ class Periode extends MY_Controller {
         $this->data['auditmenu'] = 'active';
         $this->data['periode']  = 'active';   // penanda menu aktif (bukan daftar data)
         $this->data['terpasang'] = $this->periode->installed();
-        $this->data['periode_aktif'] = $this->periode->aktifId() ? $this->periode->getById($this->periode->aktifId()) : NULL;
         $this->data['tahun']     = $this->periode->pilihanTahun();
         $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
         $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');

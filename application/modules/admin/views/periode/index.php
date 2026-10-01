@@ -39,22 +39,12 @@
                         </div>
                     </header>
                     <div class="panel-body">
-                        <div class="info-periode d-flex align-items-center flex-wrap mb-15">
-                            <p class="text-muted mr-15" style="margin:0;">
-                                Periode yang ditandai <span class="badge badge-success">Aktif</span> dipakai sebagai
-                                filter bawaan pada halaman <a href="<?php echo base_url('admin/daftaraudit'); ?>">Daftar Audit</a>.
-                                Bila tidak ada periode aktif, Daftar Audit menampilkan seluruh data.
-                            </p>
-                            <?php if (!empty($periode_aktif)): ?>
-                                <div class="tabel-aksi ml-15">
-                                    <button type="button" class="batalkan btn btn-sm btn-warning" id="<?php echo (int) $periode_aktif['periode_id']; ?>"
-                                        data-info="Batalkan status aktif periode <?php echo html_escape($periode_aktif['periode_tahun']); ?>"
-                                        aria-label="Batalkan aktif">
-                                        <i class="icon md-close" aria-hidden="true"></i>Batalkan Aktif <?php echo html_escape($periode_aktif['periode_tahun']); ?>
-                                    </button>
-                                </div>
-                            <?php endif; ?>
-                        </div>
+                        <p class="text-muted">
+                            Periode yang ditandai <span class="badge badge-success">Aktif</span> dipakai sebagai
+                            filter bawaan pada halaman <a href="<?php echo base_url('admin/daftaraudit'); ?>">Daftar Audit</a>.
+                            Bila tidak ada periode aktif, Daftar Audit menampilkan seluruh data.
+                            Status aktif dapat dibatalkan lewat tombol pada kolom <strong>Aksi</strong> baris periode yang aktif.
+                        </p>
                         <table class="table table-hover dataTable w-full" id="periode">
                             <thead>
                                 <tr>
