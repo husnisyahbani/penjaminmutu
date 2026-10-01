@@ -83,7 +83,7 @@ if (!function_exists('ph_potong')) {
     <div class="panel">
 
       <header class="panel-heading">
-        <h3 class="panel-title"><?= $title; ?></h3>
+        <h3 class="panel-title"><?php echo htmlspecialchars($title); ?></h3>
         <div class="panel-actions panel-actions-keep">
           <a class="btn btn-sm btn-icon btn-outline btn-default" href="<?php echo base_url(); ?>" target="_blank" rel="noopener">
             <i class="icon md-open-in-new" aria-hidden="true"></i> Lihat Halaman
@@ -128,7 +128,7 @@ if (!function_exists('ph_potong')) {
                  href="#tab-<?php echo $tab['id']; ?>"
                  role="tab">
                 <i class="icon <?php echo $tab['ikon']; ?>" aria-hidden="true"></i>
-                <?php echo $tab['label']; ?>
+                <?php echo htmlspecialchars($tab['label']); ?>
               </a>
             </li>
           <?php endforeach; ?>
@@ -148,28 +148,28 @@ if (!function_exists('ph_potong')) {
 
                 <?php if (empty($bagian['rows'])) { continue; } ?>
 
-                <form class="form-pengaturan" data-grup="<?php echo $grup; ?>" data-judul="<?php echo $bagian['judul']; ?>" style="max-width:820px;">
+                <form class="form-pengaturan" data-grup="<?php echo $grup; ?>" data-judul="<?php echo htmlspecialchars($bagian['judul'], ENT_QUOTES); ?>" style="max-width:820px;">
                   <div class="mb-20">
                     <h4 class="mb-1">
                       <?php if (!empty($bagian['ikon'])): ?><i class="icon <?php echo $bagian['ikon']; ?>" aria-hidden="true"></i> <?php endif; ?>
-                      <?php echo $bagian['judul']; ?>
+                      <?php echo htmlspecialchars($bagian['judul']); ?>
                     </h4>
-                    <p class="text-muted mb-0"><?php echo $bagian['keterangan']; ?></p>
+                    <p class="text-muted mb-0"><?php echo htmlspecialchars($bagian['keterangan']); ?></p>
                   </div>
 
                   <?php foreach ($bagian['rows'] as $row): ?>
                     <div class="form-group">
-                      <label class="form-control-label"><?php echo $row['label']; ?></label>
+                      <label class="form-control-label"><?php echo htmlspecialchars($row['label']); ?></label>
                       <?php echo ph_input($row); ?>
                       <?php if (!empty($row['bantuan'])): ?>
-                        <small class="text-muted d-block mt-1"><?php echo $row['bantuan']; ?></small>
+                        <small class="text-muted d-block mt-1"><?php echo htmlspecialchars($row['bantuan']); ?></small>
                       <?php endif; ?>
                     </div>
                   <?php endforeach; ?>
 
                   <div class="form-group mb-30">
                     <button type="submit" class="btn btn-primary">
-                      <i class="icon md-check" aria-hidden="true"></i> Simpan <?php echo $bagian['judul']; ?>
+                      <i class="icon md-check" aria-hidden="true"></i> Simpan <?php echo htmlspecialchars($bagian['judul']); ?>
                     </button>
                   </div>
                 </form>
@@ -186,13 +186,13 @@ if (!function_exists('ph_potong')) {
                   <div>
                     <h4 class="mb-1">
                       <?php if (!empty($bagian['ikon'])): ?><i class="icon <?php echo $bagian['ikon']; ?>" aria-hidden="true"></i> <?php endif; ?>
-                      <?php echo $bagian['judul']; ?>
+                      <?php echo htmlspecialchars($bagian['judul']); ?>
                     </h4>
-                    <p class="text-muted mb-0"><?php echo $bagian['keterangan']; ?></p>
+                    <p class="text-muted mb-0"><?php echo htmlspecialchars($bagian['keterangan']); ?></p>
                   </div>
                   <button type="button"
                           class="btn btn-success btn-sm tambah-item"
-                          data-grup="<?php echo $grup; ?>">
+                          data-grup="<?php echo htmlspecialchars($grup, ENT_QUOTES); ?>">
                     <i class="icon md-plus" aria-hidden="true"></i> Tambah
                   </button>
                 </div>
@@ -232,7 +232,7 @@ if (!function_exists('ph_potong')) {
                             <?php if (in_array('gambar', $fields, TRUE)): ?>
                               <td>
                                 <?php if (!empty($item['item_gambar'])): ?>
-                                  <img src="<?php echo $item['item_gambar'] !== '' && !preg_match('#^(https?:)?//#i', $item['item_gambar']) ? base_url($item['item_gambar']) : $item['item_gambar']; ?>"
+                                  <img src="<?php echo htmlspecialchars($item['item_gambar'] !== '' && !preg_match('#^(https?:)?//#i', $item['item_gambar']) ? base_url($item['item_gambar']) : $item['item_gambar'], ENT_QUOTES); ?>"
                                        alt="gambar" style="width:70px;height:48px;object-fit:cover;border-radius:6px;">
                                 <?php else: ?>
                                   <span class="text-muted">-</span>
@@ -241,8 +241,8 @@ if (!function_exists('ph_potong')) {
                             <?php endif; ?>
                             <?php if (in_array('warna', $fields, TRUE)): ?>
                               <td>
-                                <?php if (!empty($item['item_warna'])): ?>
-                                  <span style="display:inline-block;width:26px;height:26px;border-radius:8px;border:1px solid #dbe2ea;background:<?php echo htmlspecialchars($item['item_warna']); ?>;"></span>
+                                <?php if (!empty($item['item_warna']) && preg_match('/^#[0-9a-f]{6}$/i', $item['item_warna'])): ?>
+                                  <span style="display:inline-block;width:26px;height:26px;border-radius:8px;border:1px solid #dbe2ea;background:<?php echo htmlspecialchars($item['item_warna'], ENT_QUOTES); ?>;"></span>
                                 <?php else: ?>
                                   <span class="text-muted">-</span>
                                 <?php endif; ?>

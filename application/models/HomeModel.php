@@ -217,7 +217,7 @@ class HomeModel extends CI_Model
                     'kontak_telepon' => array('label' => 'Telepon', 'tipe' => 'text', 'default' => '(0711) 315010'),
                     'kontak_email'   => array('label' => 'Email', 'tipe' => 'text', 'default' => 'spmi@stik-sitikhadijah.ac.id'),
                     'kontak_website' => array('label' => 'Website', 'tipe' => 'text', 'default' => 'https://stik-sitikhadijah.ac.id'),
-                    'kontak_maps'    => array('label' => 'Embed Peta (opsional)', 'tipe' => 'textarea', 'default' => '', 'bantuan' => 'Tempel kode <iframe> Google Maps, kosongkan bila tidak dipakai.'),
+                    'kontak_maps'    => array('label' => 'Embed Peta (opsional)', 'tipe' => 'textarea', 'default' => '', 'bantuan' => 'Tempel kode embed Google Maps (tag iframe), kosongkan bila tidak dipakai.'),
                     'footer_teks'    => array('label' => 'Teks Footer', 'tipe' => 'text', 'default' => 'Dikembangkan oleh STIK Siti Khadijah'),
                     'footer_kredit'  => array('label' => 'Teks Kredit', 'tipe' => 'text', 'default' => 'Pusat Penjaminan Mutu © ' . date('Y')),
                 ),
