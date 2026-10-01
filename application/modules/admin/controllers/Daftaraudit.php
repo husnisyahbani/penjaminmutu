@@ -5,13 +5,15 @@ class Daftaraudit extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'admin';
-        $this->load->js(base_url("assets/app/admin/daftaraudit.js?v=1.41"));
+        $this->load->js(base_url("assets/app/admin/daftaraudit.js?v=1.42"));
+        $this->load->js(base_url("assets/app/tabel-aksi.js?v=1.0"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('AuditJawabDetailModel', 'auditjawabdetail');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
         $this->load->model('AkunModel', 'akun');
         $this->load->model('FormulirModel', 'formulir');
+        $this->load->model('PeriodeModel', 'periode');
 
         $role = $this->session->userdata('role');
         if (!isset($role) || $role != 'PPM') {
@@ -430,10 +432,16 @@ class Daftaraudit extends MY_Controller {
             $this->data['js'] = $this->load->get_js_files();
             $this->data['auditmenu'] = 'active';
             $this->data['audit'] = 'active';
-            $this->data['totalterkirim'] = $this->mutu->totalTerkirim();
-            $this->data['totalproses'] = $this->mutu->totalProses();
-            $this->data['totalselesai'] = $this->mutu->totalSelesai();
-            $this->data['totaldraft'] = $this->mutu->totalDraft();
+            /* Filter periode: bawaan = periode aktif; bila tidak ada periode
+               aktif, seluruh data ditampilkan (periode_id = NULL). */
+            $this->data['list_periode'] = $this->periode->getAll();
+            $this->data['periode_aktif'] = $this->periode->aktifId();
+            $filter = $this->data['periode_aktif'];
+
+            $this->data['totalterkirim'] = $this->mutu->totalTerkirim($filter);
+            $this->data['totalproses'] = $this->mutu->totalProses($filter);
+            $this->data['totalselesai'] = $this->mutu->totalSelesai($filter);
+            $this->data['totaldraft'] = $this->mutu->totalDraft($filter);
             $this->data['listauditor'] = $this->akun->getAllAuditor();
             $this->data['listauditee'] = $this->akun->getAllAuditee();
             $this->data['formulir'] = $this->formulir->getAllFormulir();
@@ -458,6 +466,25 @@ class Daftaraudit extends MY_Controller {
         }
     }
 
+    /**
+     * Jumlah audit per status untuk filter periode terpilih.
+     * Dipakai kartu statistik agar ikut berubah saat filter diganti.
+     */
+    public function statistik() {
+        $this->output->set_content_type('application/json');
+
+        $periode_id = $this->input->post('periode_id');
+
+        $query = array(
+            'status' => TRUE,
+            'draft' => (int) $this->mutu->totalDraft($periode_id),
+            'terkirim' => (int) $this->mutu->totalTerkirim($periode_id),
+            'proses' => (int) $this->mutu->totalProses($periode_id),
+            'selesai' => (int) $this->mutu->totalSelesai($periode_id),
+        );
+        echo json_encode($query);
+    }
+
    public function tambah() {
         $form_id = $this->input->post('form_id');
         if($form_id){
@@ -472,6 +499,13 @@ class Daftaraudit extends MY_Controller {
 
                 $akunauditor = $this->akun->getAkunById($data['auditor_id']);
                 $data['auditor'] = $akunauditor['nama'];
+
+                // Audit baru ditempatkan pada periode yang sedang aktif (bila ada).
+                // Kolom periode_id hanya diisi bila sudah disiapkan, supaya
+                // aplikasi tetap jalan sebelum database/periode_audit.sql dijalankan.
+                if ($this->db->field_exists('periode_id', 'mutu_audit')) {
+                    $data['periode_id'] = $this->periode->aktifId();
+                }
 
                 if ($this->mutu->add($data)) {
                     $query = array("status" => true, "pesan" => "Berhasil");
@@ -539,9 +573,10 @@ class Daftaraudit extends MY_Controller {
         $post['length'] = $this->input->post('length');
         $post['start'] = $this->input->post('start');
         $post['draw'] = $this->input->post('draw');
+        // '' / 0 = semua periode
+        $post['periode_id'] = $this->input->post('periode_id');
 
-
-        $list = $this->mutu->get_datatables($post['length'], $post['start'], $post['search'], $post['order']);
+        $list = $this->mutu->get_datatables($post['length'], $post['start'], $post['search'], $post['order'], $post['periode_id']);
         $data = array();
         $no = $this->input->post('start');
         foreach ($list as $field) {
@@ -553,28 +588,32 @@ class Daftaraudit extends MY_Controller {
             $row[] = $field->auditee;
             $row[] = $field->unit;
             
-            //$row[] = $field->audit_status;
-            if($field->audit_status == "DRAFT"){
-                $row[] = '<button class="detail btn btn-sm btn-icon btn-success"
-            data-toggle="tooltip" data-original-title="DETAIL" id=' . $field->audit_id.'><i class="icon md-book" aria-hidden="true"></i></button> <button class="delete btn btn-sm btn-icon btn-danger"
-            data-toggle="tooltip" data-original-title="DELETE" id=' . $field->audit_id.'><i class="icon md-delete" aria-hidden="true"></i></button>';
-                $row[] = '<button class="btn btn-primary btn-xs waves-effect waves-classic"
-            data-toggle="tooltip" data-original-title="DRAFT">Draft</button>';
-            }else if($field->audit_status == "TERKIRIM"){           
-                $row[] = '<button class="detail btn btn-sm btn-icon btn-success"
-            data-toggle="tooltip" data-original-title="DETAIL" id=' . $field->audit_id.'><i class="icon md-book" aria-hidden="true"></i></button>';                             
-                $row[] = '<button class="btn btn-danger btn-xs waves-effect waves-classic"
-            data-toggle="tooltip" data-original-title="DRAFT">Terkirim</button>';
-            }else if($field->audit_status == "PROSES"){
-                $row[] = '<button class="detail btn btn-sm btn-icon btn-success"
-            data-toggle="tooltip" data-original-title="DETAIL" id=' . $field->audit_id.'><i class="icon md-book" aria-hidden="true"></i></button>';
-                $row[] = '<button type="button" class="btn btn-warning btn-xs waves-effect waves-classic"><i class="icon md-home" aria-hidden="true"></i>Diproses</button>';
-            }else if($field->audit_status == "SELESAI"){
-                $row[] = '<button class="detail btn btn-sm btn-icon btn-success"
-            data-toggle="tooltip" data-original-title="DETAIL" id=' . $field->audit_id.'><i class="icon md-book" aria-hidden="true"></i></button> <button class="download btn btn-sm btn-icon btn-success"
-            data-toggle="tooltip" data-original-title="DELETE" id=' . $field->audit_id.'><i class="icon md-download" aria-hidden="true"></i></button>';
-                $row[] = '<button type="button" class="selesai btn btn-success btn-xs waves-effect waves-classic"><i class="icon md-download" aria-hidden="true"></i>Selesai</button>';
+            /* ---- kolom Aksi: tombol ikon seragam, info muncul saat hover ---- */
+            $aksi = '<button type="button" class="detail btn btn-sm btn-icon btn-primary" aria-label="Detail audit"'
+                . ' data-info="Lihat rincian audit ini" id=' . $field->audit_id . '>'
+                . '<i class="icon md-book" aria-hidden="true"></i></button>';
+
+            if ($field->audit_status == "DRAFT") {
+                $aksi .= ' <button type="button" class="delete btn btn-sm btn-icon btn-danger" aria-label="Hapus audit"'
+                    . ' data-info="Hapus audit ini" id=' . $field->audit_id . '>'
+                    . '<i class="icon md-delete" aria-hidden="true"></i></button>';
+            } else if ($field->audit_status == "SELESAI") {
+                $aksi .= ' <button type="button" class="download btn btn-sm btn-icon btn-success" aria-label="Unduh hasil audit"'
+                    . ' data-info="Unduh hasil audit" id=' . $field->audit_id . '>'
+                    . '<i class="icon md-download" aria-hidden="true"></i></button>';
             }
+            $row[] = '<div class="tabel-aksi">' . $aksi . '</div>';
+
+            /* ---- kolom Status: badge, bukan tombol ---- */
+            $badge = array(
+                'DRAFT'    => 'badge-default',
+                'TERKIRIM' => 'badge-info',
+                'PROSES'   => 'badge-warning',
+                'SELESAI'  => 'badge-success',
+            );
+            $kunci = strtoupper(trim($field->audit_status));
+            $kelas = isset($badge[$kunci]) ? $badge[$kunci] : 'badge-default';
+            $row[] = '<span class="badge ' . $kelas . '">' . ucfirst(strtolower($kunci)) . '</span>';
             
             
             $data[] = $row;
@@ -583,7 +622,7 @@ class Daftaraudit extends MY_Controller {
         $output = array(
             "draw" => $post['draw'],
             "recordsTotal" => $this->mutu->count_all(),
-            "recordsFiltered" => $this->mutu->count_filtered($post['search'], $post['order']),
+            "recordsFiltered" => $this->mutu->count_filtered($post['search'], $post['order'], $post['periode_id']),
             "data" => $data,
         );
         //output dalam format JSON

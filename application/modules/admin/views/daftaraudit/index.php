@@ -1,75 +1,58 @@
 <div class="page">
     <div class="page-content container-fluid">
         
+        <?php
+        /* Kartu statistik - gaya bersama (assets/app/kartu-statistik.css).
+           Angka diperbarui lewat AJAX saat filter periode diganti, jadi tiap
+           angka diberi id. */
+        $kartu_audit = array(
+            array('id' => 'stat_draft',    'judul' => 'Audit Draft',    'nilai' => isset($totaldraft) ? $totaldraft : 0,
+                  'ikon' => 'md-edit',         'warna' => '#90a4ae', 'ket' => 'Belum diajukan'),
+            array('id' => 'stat_terkirim', 'judul' => 'Audit Terkirim', 'nilai' => isset($totalterkirim) ? $totalterkirim : 0,
+                  'ikon' => 'md-play-circle',  'warna' => '#1e88e5', 'ket' => 'Menunggu diproses'),
+            array('id' => 'stat_proses',   'judul' => 'Audit Proses',   'nilai' => isset($totalproses) ? $totalproses : 0,
+                  'ikon' => 'md-refresh',      'warna' => '#fb8c00', 'ket' => 'Sedang dinilai'),
+            array('id' => 'stat_selesai',  'judul' => 'Audit Selesai',  'nilai' => isset($totalselesai) ? $totalselesai : 0,
+                  'ikon' => 'md-check-circle', 'warna' => '#43a047', 'ket' => 'Penilaian tuntas'),
+        );
+        ?>
+
         <div class="row" data-plugin="matchHeight" data-by-row="true">
 
-        <div class="col-xl-3 col-md-6">
-                <div class="card card-block p-25 bg-blue-600">
-                    <div class="counter counter-lg counter-inverse">
-                        <div class="counter-label text-uppercase">AUDIT DRAFT</div>
-                        <div class="counter-number-group">
-                            <span class="counter-number-related"></span>
-                            <span class="counter-number">
-                            <?php if(isset($totaldraft)){echo number_format($totaldraft,0,',','.');}else{echo '0';}?>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+          <?php foreach ($kartu_audit as $k): ?>
             <div class="col-xl-3 col-md-6">
-                <div class="card card-block p-25 bg-red-600">
-                    <div class="counter counter-lg counter-inverse">
-                        <div class="counter-label text-uppercase">AUDIT TERKIRIM</div>
-                        <div class="counter-number-group">
-                            <span class="counter-number-related"></span>
-                            <span class="counter-number">
-                            <?php if(isset($totalterkirim)){echo number_format($totalterkirim,0,',','.');}else{echo '0';}?>
-                            </span>
-                        </div>
-                    </div>
+              <div class="kartu-stat" style="background-color:<?php echo $k['warna']; ?>;">
+                <i class="icon <?php echo $k['ikon']; ?> kartu-stat__ikon" aria-hidden="true"></i>
+                <div style="overflow:hidden;">
+                  <div class="kartu-stat__angka" id="<?php echo $k['id']; ?>"><?php echo number_format($k['nilai'], 0, ',', '.'); ?></div>
+                  <div class="kartu-stat__judul"><?php echo $k['judul']; ?></div>
+                  <div class="kartu-stat__ket"><?php echo $k['ket']; ?></div>
                 </div>
+              </div>
             </div>
-
-            <div class="col-xl-3 col-md-6">
-                <div class="card card-block p-25 bg-orange-600">
-                    <div class="counter counter-lg counter-inverse">
-                        <div class="counter-label text-uppercase">AUDIT PROSES</div>
-                        <div class="counter-number-group">
-                            <span class="counter-number-related"></span>
-                            <span class="counter-number">
-                            <?php if(isset($totalproses)){echo number_format($totalproses,0,',','.');}else{echo '0';}?>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-3 col-md-6">
-                <div class="card card-block p-25 bg-green-600">
-                    <div class="counter counter-lg counter-inverse">
-                        <div class="counter-label text-uppercase">AUDIT SELESAI</div>
-                        <div class="counter-number-group">
-                            <span class="counter-number-related"></span>
-                            <span class="counter-number">
-                            <?php if(isset($totalselesai)){echo number_format($totalselesai,0,',','.');}else{echo '0';}?>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            
+          <?php endforeach; ?>
 
         </div>
+
         <div class="row"  data-by-row="true">
+        
             
             <div class="col-xl-12 col-md-24">
 
                 <div class="panel">
                     <header class="panel-heading">
-                        <h3 class="panel-title">AUDIT</h3>
+                        <h3 class="panel-title">Daftar Audit</h3>
                         <div class="panel-actions panel-actions-keep">
+                            <select class="form-control" id="filter_periode" style="min-width:180px; display:inline-block;">
+                                <option value="">Semua Periode</option>
+                                <?php foreach ($list_periode as $p): ?>
+                                    <option value="<?php echo (int) $p['periode_id']; ?>" <?php echo ($periode_aktif == $p['periode_id']) ? 'selected' : ''; ?>>
+                                        <?php echo html_escape($p['periode_tahun']); ?>
+                                        (<?php echo date('d-m-Y', strtotime($p['periode_mulai'])); ?> s.d. <?php echo date('d-m-Y', strtotime($p['periode_selesai'])); ?>)
+                                        <?php echo $p['periode_aktif'] ? ' - Aktif' : ''; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
                             <button type="button" class="btn btn-sm btn-icon btn-danger" id="download">
                                 <i class="icon md-download" aria-hidden="true"></i>Download
                             </button>
@@ -87,8 +70,8 @@
                                     <th >Auditor</th>
                                     <th >Auditee</th>
                                     <th >Unit</th>
-                                    <th width="100px"> Aksi</th>
-                                    <th> Status</th>
+                                    <th width="1%" class="tabel-aksi-sel">Aksi</th>
+                                    <th width="1%" class="tabel-aksi-sel">Status</th>
                                 </tr>
                             </thead>
 

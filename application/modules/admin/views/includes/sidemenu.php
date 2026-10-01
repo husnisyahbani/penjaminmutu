@@ -88,7 +88,14 @@
                 <span class="site-menu-title">Daftar Audit</span>
               </a>
             </li>
-            
+
+            <li class="site-menu-item <?php if(isset($periode)){echo $periode;} ?>">
+              <a class="animsition-link" href="<?php echo base_url($module.'/periode');?>">
+                <i class="icon md-calendar" aria-hidden="true"></i>
+                <span class="site-menu-title">Periode</span>
+              </a>
+            </li>
+
          </ul>
         </li>
 

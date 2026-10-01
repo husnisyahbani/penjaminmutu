@@ -14,6 +14,7 @@ class Daftaraudit extends MY_Controller {
         $this->load->model('DtformModel', 'dtform');
         $this->load->model('AkunModel', 'akun');
         $this->load->model('FormulirModel', 'formulir');
+        $this->load->model('PeriodeModel', 'periode');
 
         $role = $this->session->userdata('role');
         if (!isset($role) || $role != 'AUDITOR') {
@@ -266,6 +267,11 @@ class Daftaraudit extends MY_Controller {
 
                 $akunauditor = $this->akun->getAkunById($data['auditor_id']);
                 $data['auditor'] = $akunauditor['nama'];
+
+                // Audit baru ditempatkan pada periode yang sedang aktif (bila ada).
+                if ($this->periode->siap()) {
+                    $data['periode_id'] = $this->periode->aktifId();
+                }
 
                 if ($this->mutu->add($data)) {
                     $query = array("status" => true, "pesan" => "Berhasil");

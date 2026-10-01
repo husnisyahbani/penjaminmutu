@@ -27,3 +27,31 @@ Cara pakai:
 > **Buat Tabel Pengaturan** (muncul otomatis bila tabel belum ada). Selama
 > tabel belum dibuat, halaman depan tetap tampil normal menggunakan konten
 > bawaan.
+
+## `periode_audit.sql`
+
+Membuat tabel periode audit dan menghubungkannya ke daftar audit:
+
+| Objek                          | Isi                                                                 |
+| ------------------------------ | ------------------------------------------------------------------- |
+| `mutu_periode`                 | daftar periode: `periode_tahun`, `periode_mulai`, `periode_selesai`, penanda `periode_aktif` |
+| `mutu_audit`.`periode_id`      | relasi setiap audit ke periodenya                                   |
+
+Cara pakai:
+
+1. Buka phpMyAdmin (atau menu SQL) pada database aplikasi.
+2. Impor berkas `database/periode_audit.sql`.
+3. Sesuaikan nama tabel bila prefix pada `application/config/database.php`
+   bukan `mutu_`.
+4. Kelola periode dari aplikasi melalui menu **Audit → Periode**.
+
+Catatan:
+
+- Hanya satu periode yang aktif. Periode aktif menjadi **filter bawaan** pada
+  halaman **Audit → Daftar Audit**; bila tidak ada periode aktif, halaman
+  tersebut menampilkan seluruh audit.
+- Audit yang baru dibuat (dari admin, auditor, maupun auditee) otomatis
+  ditempatkan pada periode yang sedang aktif bila ada.
+- Tabel dan kolom di atas juga dapat dibuat langsung dari aplikasi: buka menu
+  **Audit → Periode**, lalu klik tombol **Buat Tabel Periode** (muncul
+  otomatis bila tabel belum ada). Aman dijalankan berulang kali.
