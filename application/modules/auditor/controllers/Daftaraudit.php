@@ -6,6 +6,8 @@ class Daftaraudit extends MY_Controller {
         parent::__construct();
         $this->module = 'auditor';
         $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=1.60"));
+        // Informasi tombol aksi saat hover (lihat assets/app/tabel-aksi.css)
+        $this->load->js(base_url("assets/app/tabel-aksi.js?v=1.0"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('AuditJawabDetailModel', 'auditjawabdetail');
         $this->load->model('MutuauditModel', 'mutu');
@@ -352,31 +354,38 @@ class Daftaraudit extends MY_Controller {
 
             /* ================= TOMBOL AKSI =================
                Pola seragam: btn btn-sm btn-icon btn-<warna> + ikon saja
-               (tanpa teks, sesuai gaya tabel admin) dengan tooltip
-               sebagai penjelas. Tombol dibungkus .tabel-aksi supaya
-               selalu satu baris dan jaraknya konsisten. */
+               (tanpa teks, sesuai gaya tabel admin). Tombol dibungkus
+               .tabel-aksi supaya selalu satu baris dan jaraknya
+               konsisten.
+
+               Keterangan tiap tombol muncul saat kursor diarahkan (hover)
+               atau saat tombol mendapat fokus keyboard, memakai atribut
+               data-info yang diolah assets/app/tabel-aksi.js (delegasi di
+               document, jadi baris baru dari DataTables ikut terjangkau).
+               Tooltip bawaan tema tidak dipakai karena $.fn.tooltip pada
+               tema ini diambil alih jQuery UI. */
             $btn_detail = '<button type="button" class="detail btn btn-sm btn-icon btn-primary" '
-                . 'data-toggle="tooltip" data-original-title="Lihat rincian penilaian" '
+                . 'data-info="Lihat rincian penilaian" '
                 . 'aria-label="Detail" id="' . $field->audit_id . '">'
                 . '<i class="icon md-book" aria-hidden="true"></i></button>';
 
             $btn_unduh = '<button type="button" class="download btn btn-sm btn-icon btn-success" '
-                . 'data-toggle="tooltip" data-original-title="Unduh hasil audit" '
+                . 'data-info="Unduh hasil audit" '
                 . 'aria-label="Unduh" id="' . $field->audit_id . '">'
                 . '<i class="icon md-download" aria-hidden="true"></i></button>';
 
             $btn_proses = '<button type="button" class="proses btn btn-sm btn-icon btn-warning" '
-                . 'data-toggle="tooltip" data-original-title="Mulai proses penilaian" '
+                . 'data-info="Mulai proses penilaian" '
                 . 'aria-label="Proses" id="' . $field->audit_id . '">'
                 . '<i class="icon md-play" aria-hidden="true"></i></button>';
 
             $btn_kembali = '<button type="button" class="kembali btn btn-sm btn-icon btn-danger" '
-                . 'data-toggle="tooltip" data-original-title="Kembalikan ke auditor" '
+                . 'data-info="Kembalikan ke auditor" '
                 . 'aria-label="Kembalikan" id="' . $field->audit_id . '">'
                 . '<i class="icon md-undo" aria-hidden="true"></i></button>';
 
             $btn_selesai = '<button type="button" class="selesai btn btn-sm btn-icon btn-success" '
-                . 'data-toggle="tooltip" data-original-title="Selesaikan penilaian" '
+                . 'data-info="Selesaikan penilaian" '
                 . 'aria-label="Selesai" id="' . $field->audit_id . '">'
                 . '<i class="icon md-check" aria-hidden="true"></i></button>';
 
