@@ -103,7 +103,7 @@ if (ENVIRONMENT === 'development') {
         'hostname' => '116.193.191.133',
 	    'username' => 'sstiksiti_igni339',
 	    'password' => 'Q7li5aS5R5',
-        'database'  => 'stiksiti_akademik',
+        'database'  => 'mutu',
         'dbdriver'  => 'mysqli',
         'dbprefix'  => 'mutu_',
         'pconnect'  => FALSE,
