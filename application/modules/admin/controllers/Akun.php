@@ -9,9 +9,117 @@ class Akun extends MY_Controller {
         $this->load->model('AkunModel', 'akun');
 
         $role = $this->session->userdata('role');
+        $asli = $this->session->userdata('impersonator');
+        $aksi = $this->router->fetch_method();
+
+        // Saat admin sedang "login sebagai" user lain, sesi hanya boleh memakai
+        // method kembali() untuk mengembalikan sesi admin semula.
+        if ($asli && $aksi === 'kembali') {
+            return;
+        }
+
         if (!isset($role) || $role != 'PPM') {
             redirect(base_url());
         }
+    }
+
+    /**
+     * Halaman awal tiap peran (sama dengan pengalihan pada umum/Login).
+     */
+    private function halaman_peran($role)
+    {
+        $role = strtoupper(trim($role));
+
+        if ($role === 'AUDITOR') {
+            return base_url('auditor');
+        }
+
+        if ($role === 'AUDITEE') {
+            return base_url('auditee');
+        }
+
+        return base_url('admin');
+    }
+
+    /* =====================================================================
+     | LOGIN SEBAGAI USER (IMPERSONASI)
+     * ================================================================== */
+
+    /**
+     * Masuk memakai akun user terpilih tanpa perlu password.
+     * Identitas admin disimpan di session (key "impersonator") agar dapat
+     * dikembalikan melalui kembali().
+     */
+    public function loginsebagai()
+    {
+        $this->output->set_content_type('application/json');
+
+        $id = $this->input->post('id');
+        $akun = $this->akun->getAkunById($id);
+
+        if (empty($akun)) {
+            echo json_encode(array('status' => FALSE, 'pesan' => 'Akun tidak ditemukan.'));
+            return;
+        }
+
+        if ((int) $akun['users_id'] === (int) $this->session->userdata('users_id')) {
+            echo json_encode(array('status' => FALSE, 'pesan' => 'Anda sudah masuk sebagai akun ini.'));
+            return;
+        }
+
+        // simpan identitas admin asli (hanya sekali, agar tidak menumpuk)
+        if (!$this->session->userdata('impersonator')) {
+            $this->session->set_userdata('impersonator', array(
+                'users_id' => $this->session->userdata('users_id'),
+                'username' => $this->session->userdata('username'),
+                'nama'     => $this->session->userdata('nama'),
+                'role'     => $this->session->userdata('role'),
+            ));
+        }
+
+        $this->session->set_userdata(array(
+            'users_id' => $akun['users_id'],
+            'username' => $akun['username'],
+            'nama'     => $akun['nama'],
+            'role'     => $akun['role'],
+        ));
+
+        echo json_encode(array(
+            'status'   => TRUE,
+            'pesan'    => 'Berhasil masuk sebagai ' . $akun['nama'] . '.',
+            'nama'     => $akun['nama'],
+            'role'     => $akun['role'],
+            'redirect' => $this->halaman_peran($akun['role']),
+        ));
+    }
+
+    /**
+     * Kembali ke sesi admin semula setelah "login sebagai" user.
+     */
+    public function kembali()
+    {
+        $asli = $this->session->userdata('impersonator');
+
+        if (!$asli) {
+            redirect(base_url('admin/akun'));
+        }
+
+        $this->session->unset_userdata('impersonator');
+        $this->session->set_userdata(array(
+            'users_id' => $asli['users_id'],
+            'username' => $asli['username'],
+            'role'     => $asli['role'],
+        ));
+
+        // kembalikan nama admin (bila ada)
+        if (!empty($asli['nama'])) {
+            $this->session->set_userdata('nama', $asli['nama']);
+        } else {
+            $this->session->unset_userdata('nama');
+        }
+
+        $this->session->set_flashdata('pesanberhasil', 'Kembali masuk sebagai ' . $asli['username'] . '.');
+        redirect(base_url('admin/akun'));
     }
 
     public function index() {
@@ -146,7 +254,12 @@ class Akun extends MY_Controller {
             $row[] = $field->password;
             $row[] = $field->role;
 
-            $row[] = '<button class="reset btn btn-sm btn-icon btn-pure btn-default on-default reset-row"
+            $row[] = '<button class="login-as btn btn-sm btn-icon btn-pure btn-primary on-default"
+                      data-toggle="tooltip" data-original-title="Login sebagai user ini"
+                      data-nama="' . htmlspecialchars($field->nama, ENT_QUOTES) . '"
+                      data-username="' . htmlspecialchars($field->username, ENT_QUOTES) . '"
+                      data-role="' . htmlspecialchars($field->role, ENT_QUOTES) . '"
+                      id=' . $field->users_id . '><i class="icon md-account-add" aria-hidden="true"></i></button><button class="reset btn btn-sm btn-icon btn-pure btn-default on-default reset-row"
                       data-toggle="tooltip" data-original-title="Reset" id=' . $field->users_id . '><i class="icon md-refresh" aria-hidden="true"></i></button><button class="edit btn btn-sm btn-icon btn-pure btn-default on-default edit-row"
                       data-toggle="tooltip" data-original-title="Edit" id=' . $field->users_id . '><i class="icon md-edit" aria-hidden="true"></i></button>
                     <button class="delete btn btn-sm btn-icon btn-pure btn-default on-default remove-row"

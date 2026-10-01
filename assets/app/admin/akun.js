@@ -40,6 +40,51 @@ $(function () {
         //window.open(base_url+ "/akun/edit?id="+id);
         location.href = base_url+ "/akun/edit?id="+id;
     });
+
+    /* Login sebagai user terpilih (khusus admin PPM). */
+    $("#akun").on("click", ".login-as", function () {
+        var id = $(this).attr('id');
+        var nama = $(this).data('nama') || '';
+        var username = $(this).data('username') || '';
+        var role = $(this).data('role') || '';
+        masukSebagai(id, nama, username, role);
+    });
+
+    function masukSebagai(id, nama, username, role)
+    {
+        swal.fire({
+            title: "Login Sebagai",
+            html: "Masuk sebagai <b>" + nama + "</b> (" + username + " &middot; " + role + ")?"
+                + "<br><br><small>Anda akan memakai hak akses akun ini. "
+                + "Kembali ke akun admin melalui menu foto profil &rarr; <b>Kembali sebagai Admin</b>.</small>",
+            type: "warning",
+            showCancelButton: true,
+            showLoaderOnConfirm: true,
+            confirmButtonText: "Ya, Masuk!",
+            cancelButtonText: 'Batal',
+            preConfirm: function () {
+                return $.ajax({
+                    url: base_url + "/akun/loginsebagai",
+                    type: "POST",
+                    data: { id: id },
+                    dataType: 'json'
+                }).then(function (res) {
+                    return res;
+                }, function () {
+                    return { status: false, pesan: 'Tidak dapat menghubungi server.' };
+                });
+            }
+        }).then(function (hasil) {
+            var res = hasil.value;
+
+            if (!res || res.status !== true) {
+                swal.fire("Gagal", (res && res.pesan) ? res.pesan : "Login sebagai user gagal.", "error");
+                return;
+            }
+
+            location.href = res.redirect;
+        });
+    }
     
     
 

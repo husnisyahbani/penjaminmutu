@@ -50,6 +50,13 @@
                 </span>
               </a>
               <div class="dropdown-menu" role="menu">
+                <?php /* Ditampilkan hanya saat admin sedang "login sebagai" user lain */ ?>
+                <?php $nav_impersonator = $this->session->userdata('impersonator'); ?>
+                <?php if ($nav_impersonator): ?>
+                  <div class="dropdown-item-text px-15 py-5" style="font-size:12px;opacity:.75;">Masuk sebagai <b><?php $nav_nama = $this->session->userdata('nama'); echo htmlspecialchars($nav_nama ? $nav_nama : $this->session->userdata('username')); ?></b></div>
+                  <a class="dropdown-item" href="<?php echo base_url("admin/akun/kembali"); ?>" role="menuitem"><i class="icon md-key" aria-hidden="true"></i> Kembali sebagai Admin</a>
+                  <div class="dropdown-divider"></div>
+                <?php endif; ?>
                 <a class="dropdown-item" href="<?php echo base_url("admin/akun/password");?>" role="menuitem"><i class="icon md-power" aria-hidden="true"></i> Ubah Password</a>  
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="<?php echo base_url("admin/akun/logout");?>" role="menuitem"><i class="icon md-power" aria-hidden="true"></i> Logout</a>
