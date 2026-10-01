@@ -61,7 +61,7 @@
                         <h3 class="panel-title">Daftar Audit</h3>
                         <div class="panel-actions panel-actions-keep">
                             
-                            <button type="button" class="btn btn-sm btn-icon btn-success" id="tambah">
+                            <button type="button" class="btn btn-success" id="tambah">
                                 <i class="icon md-plus" aria-hidden="true"></i>Tambah
                             </button>
                         </div>
@@ -70,13 +70,13 @@
                         <table class="table table-hover dataTable w-full" id="daftaraudit">
                             <thead>
                                 <tr>
-                                    <th >No</th>
-                                    <th >Formulir</th>
-                                    <th >Auditor</th>
-                                    <th >Auditee</th>
-                                    <th >Unit</th>
-                                    <th width="24%"> Aksi</th>
-                                    <th width="12%"> Status</th>
+                                    <th width="1%">No</th>
+                                    <th>Formulir</th>
+                                    <th>Auditor</th>
+                                    <th>Auditee</th>
+                                    <th>Unit</th>
+                                    <th width="1%" class="tabel-aksi-sel">Aksi</th>
+                                    <th width="1%" class="tabel-aksi-sel">Status</th>
                                 </tr>
                             </thead>
 

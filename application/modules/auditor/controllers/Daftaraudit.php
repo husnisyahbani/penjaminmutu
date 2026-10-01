@@ -350,42 +350,50 @@ class Daftaraudit extends MY_Controller {
             $row[] = $field->auditee;
             $row[] = $field->unit; 
 
-            /* ================= TOMBOL AKSI (seragam) =================
-               Semua tombol memakai pola yang sama:
-               btn btn-sm btn-icon btn-<warna> + ikon + label.
-               Tombol yang tidak berlaku ditampilkan sebagai badge status. */
+            /* ================= TOMBOL AKSI =================
+               Pola seragam: btn btn-sm btn-icon btn-<warna> + ikon saja
+               (tanpa teks, sesuai gaya tabel admin) dengan tooltip
+               sebagai penjelas. Tombol dibungkus .tabel-aksi supaya
+               selalu satu baris dan jaraknya konsisten. */
             $btn_detail = '<button type="button" class="detail btn btn-sm btn-icon btn-primary" '
-                . 'data-toggle="tooltip" data-original-title="Lihat rincian penilaian" id="' . $field->audit_id . '">'
-                . '<i class="icon md-book" aria-hidden="true"></i>Detail</button>';
+                . 'data-toggle="tooltip" data-original-title="Lihat rincian penilaian" '
+                . 'aria-label="Detail" id="' . $field->audit_id . '">'
+                . '<i class="icon md-book" aria-hidden="true"></i></button>';
 
             $btn_unduh = '<button type="button" class="download btn btn-sm btn-icon btn-success" '
-                . 'data-toggle="tooltip" data-original-title="Unduh hasil audit" id="' . $field->audit_id . '">'
-                . '<i class="icon md-download" aria-hidden="true"></i>Unduh</button>';
+                . 'data-toggle="tooltip" data-original-title="Unduh hasil audit" '
+                . 'aria-label="Unduh" id="' . $field->audit_id . '">'
+                . '<i class="icon md-download" aria-hidden="true"></i></button>';
 
             $btn_proses = '<button type="button" class="proses btn btn-sm btn-icon btn-warning" '
-                . 'data-toggle="tooltip" data-original-title="Mulai proses penilaian" id="' . $field->audit_id . '">'
-                . '<i class="icon md-play" aria-hidden="true"></i>Proses</button>';
+                . 'data-toggle="tooltip" data-original-title="Mulai proses penilaian" '
+                . 'aria-label="Proses" id="' . $field->audit_id . '">'
+                . '<i class="icon md-play" aria-hidden="true"></i></button>';
 
-            $btn_kembali = '<button type="button" class="kembali btn btn-sm btn-icon btn-default" '
-                . 'data-toggle="tooltip" data-original-title="Kembalikan ke auditor" id="' . $field->audit_id . '">'
-                . '<i class="icon md-undo" aria-hidden="true"></i>Kembalikan</button>';
+            $btn_kembali = '<button type="button" class="kembali btn btn-sm btn-icon btn-danger" '
+                . 'data-toggle="tooltip" data-original-title="Kembalikan ke auditor" '
+                . 'aria-label="Kembalikan" id="' . $field->audit_id . '">'
+                . '<i class="icon md-undo" aria-hidden="true"></i></button>';
 
             $btn_selesai = '<button type="button" class="selesai btn btn-sm btn-icon btn-success" '
-                . 'data-toggle="tooltip" data-original-title="Selesaikan penilaian" id="' . $field->audit_id . '">'
-                . '<i class="icon md-check" aria-hidden="true"></i>Selesai</button>';
+                . 'data-toggle="tooltip" data-original-title="Selesaikan penilaian" '
+                . 'aria-label="Selesai" id="' . $field->audit_id . '">'
+                . '<i class="icon md-check" aria-hidden="true"></i></button>';
 
             $tunggu = '<span class="badge badge-default">Menunggu proses</span>';
 
             // ---- kolom Aksi: seluruh tombol, seragam, sesuai status ----
             if ($field->audit_status == "PROSES") {
-                $row[] = $btn_detail . ' ' . $btn_kembali . ' ' . $btn_selesai;
+                $aksi = $btn_detail . $btn_kembali . $btn_selesai;
             } else if ($field->audit_status == "SELESAI") {
-                $row[] = $btn_detail . ' ' . $btn_unduh;
+                $aksi = $btn_detail . $btn_unduh;
             } else if ($field->audit_status == "TERKIRIM") {
-                $row[] = $btn_proses;
+                $aksi = $btn_proses;
             } else {
-                $row[] = $tunggu; // DRAFT / status lain: belum ada aksi
+                $aksi = $tunggu; // DRAFT / status lain: belum ada aksi
             }
+
+            $row[] = '<div class="tabel-aksi">' . $aksi . '</div>';
 
             // ---- kolom Status: hanya badge (tanpa tombol) ----
             $badge = array(

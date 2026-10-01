@@ -1,0 +1,36 @@
+/* ------------------------------------------------------------------
+   Tombol aksi pada tabel (kolom "Aksi").
+
+   Tombol memakai pola btn btn-sm btn-icon btn-<warna> sehingga tampil
+   sebagai kotak kecil berukuran sama (tema hanya memberi padding
+   seragam pada .btn-icon, jadi pola ini tidak untuk tombol berteks).
+   Keterangan tiap tombol diambil dari tooltip.
+
+   Isi sel dibungkus .tabel-aksi supaya:
+     - selalu berada dalam satu baris (tidak pernah pindah baris),
+     - jarak antar tombol konsisten,
+     - tidak menyisakan celah baseline di bawah tombol.
+   Kolom Aksi & Status sendiri diratakan tengah (text-center).
+   ------------------------------------------------------------------ */
+
+.tabel-aksi {
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.tabel-aksi > .btn + .btn {
+  margin-left: 6px;
+}
+
+.tabel-aksi > .btn {
+  vertical-align: middle;
+}
+
+.tabel-aksi > .badge {
+  white-space: nowrap;
+}
+
+/* Judul kolom aksi/status: tidak pernah membungkus. */
+.tabel-aksi-sel {
+  white-space: nowrap;
+}

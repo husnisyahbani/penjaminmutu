@@ -6,7 +6,10 @@ $(function () {
         "searching": true,
         "order": [],
         "columnDefs": [
-            {"targets": [0,5,6], "orderable": false}
+            {"targets": [0,5,6], "orderable": false},
+            /* Kolom Aksi & Status: rata tengah. Lebarnya mengikuti isi
+               (th width 1%) supaya tombol tidak pernah pindah baris. */
+            {"targets": [5,6], "className": "text-center tabel-aksi-sel"}
         ],
         "ajax": {
             "url": base_url + "/daftaraudit/listmutu/",
