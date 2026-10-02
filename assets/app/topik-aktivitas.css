@@ -1,10 +1,13 @@
 /* =============================================================================
-   Gaya topik & activity (mirip halaman kursus Moodle)
+   Gaya pertanyaan & lingkup (mirip halaman kursus Moodle)
    Dipakai oleh: admin (kelola formulir), auditor & auditee (detail audit).
 
-   Satu formulir  = satu halaman kursus
-   Satu topik      = satu pertanyaan formulir
-   Satu activity   = satu butir lingkup pada pertanyaan tersebut
+   Satu formulir    = satu halaman kursus
+   Satu pertanyaan  = satu baris formulir audit
+   Satu lingkup     = satu butir pada pertanyaan tersebut (wajib dijawab
+                      auditee, lampiran opsional boleh lebih dari satu)
+
+   Nama kelas CSS lama (topik/aktivitas) dipertahankan sebagai penanda markup.
    ============================================================================= */
 
 .topik-berkas {

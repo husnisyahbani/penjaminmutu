@@ -44,7 +44,7 @@ $(function () {
         }
     }
 
-    function bangunBarisActivity(lingkup_id, isi) {
+    function bangunBarisLingkup(lingkup_id, isi) {
         var baris = $(
             '<div class="aktivitas">' +
                 '<i class="icon md-assignment aktivitas-ikon" aria-hidden="true"></i>' +
@@ -266,7 +266,7 @@ $(function () {
             lingkup_isi: isi
         }, function (hasil) {
             if (baris.hasClass('aktivitas-tambah-baris')) {
-                var baru = bangunBarisActivity(hasil.lingkup_id, hasil.lingkup_isi);
+                var baru = bangunBarisLingkup(hasil.lingkup_id, hasil.lingkup_isi);
                 baris.before(baru);
                 baris.hide().find('textarea').val('');
                 topik.find('.topik-tambah-activity').show();

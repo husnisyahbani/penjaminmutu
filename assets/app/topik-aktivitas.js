@@ -1,12 +1,13 @@
 /* =============================================================================
-   Perilaku bersama tampilan topik & activity.
+   Perilaku bersama tampilan pertanyaan & lingkup (gaya halaman kursus).
 
-   - Klik kepala topik untuk membuka/menutup (disimpan di localStorage agar
-     tidak hilang saat halaman dimuat ulang setelah menyimpan topik).
-   - Kotak pencarian menyaring topik dan activity sekaligus.
-   - Pembantu penomoran ulang topik setelah aktivitas dipindah/dihapus.
+   - Klik kepala pertanyaan untuk membuka/menutup (disimpan di localStorage
+     agar tidak hilang saat halaman dimuat ulang).
+   - Kotak pencarian menyaring pertanyaan dan lingkup sekaligus.
+   - Pembantu penomoran ulang pertanyaan setelah lingkup dipindah/dihapus.
 
-   Tanpa dependensi jQuery: status buka/tutup disimpan sebagai kelas CSS.
+   Nama kelas CSS lama (topik/aktivitas) dipertahankan agar tidak mengubah
+   markup di banyak halaman. Tanpa dependensi jQuery.
    ============================================================================= */
 (function () {
     'use strict';
