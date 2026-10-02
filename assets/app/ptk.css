@@ -212,17 +212,6 @@
     margin: 0 0 6px 10px;
 }
 
-/* Isi sel tampil penuh (tidak dibatasi jumlah baris seperti .ptk-klamp). */
-#tilik .tilik-teks {
-    word-break: break-word;
-    overflow-wrap: anywhere;
-}
-
-.tilik-teks {
-    word-break: break-word;
-    overflow-wrap: anywhere;
-}
-
 /* Daftar butir lingkup + jawaban auditee pada panel Informasi Pertanyaan. */
 .butir-lingkup-teks {
     font-weight: 600;
