@@ -37,6 +37,9 @@ class Delik extends MY_Controller {
             /* Ringkasan kartu: jumlah butir tilik per jenis penilaian.
                Sumbernya tabel yang sama dengan tabel di bawah. */
             $butir = $this->dtjwb->butirAudit($this->data['jwb_id']);
+            /* Daftar butir beserta jawaban auditee - ditampilkan pada panel
+               Informasi Pertanyaan (pengganti blok "Jawaban auditee"). */
+            $this->data['butir_lingkup'] = $butir;
             $ringkas = array('total' => count($butir), 'sesuai' => 0, 'observasi' => 0,
                              'minor' => 0, 'mayor' => 0);
             foreach ($butir as $b) {
@@ -279,7 +282,7 @@ class Delik extends MY_Controller {
                     . '<i class="icon md-edit" aria-hidden="true"></i></button>';
             };
 
-            $butir = '<div class="ptk-klamp">' . html_escape(lingkup_bersihkan($field->dtjwb_pertanyaan)) . '</div>';
+            $butir = '<div class="tilik-teks">' . html_escape(lingkup_bersihkan($field->dtjwb_pertanyaan)) . '</div>';
             if (trim((string) $field->dtjwb_referensi) !== '') {
                 $butir .= '<div class="tilik-ref"><strong>Referensi:</strong> '
                     . html_escape(lingkup_bersihkan($field->dtjwb_referensi)) . '</div>';
@@ -297,13 +300,13 @@ class Delik extends MY_Controller {
                 . ' data-referensi="' . html_escape($field->dtjwb_referensi) . '">'
                 . '<i class="icon md-edit" aria-hidden="true"></i></button>';
 
-            $row[] = '<div class="ptk-klamp">' . html_escape(lingkup_bersihkan($field->dtjwb_hasil)) . '</div>'
+            $row[] = '<div class="tilik-teks">' . html_escape(lingkup_bersihkan($field->dtjwb_hasil)) . '</div>'
                 . $tombol('editisi', 'dtjwb_hasil', $field->dtjwb_hasil, 'Ubah hasil', 'primary');
 
             $row[] = '<span class="badge ' . $kelas . '">' . html_escape($temuan) . '</span> '
                 . $tombol('editisi', 'dtjwb_temuan', $temuan, 'Ubah temuan', 'warning');
 
-            $row[] = '<div class="ptk-klamp">' . html_escape(lingkup_bersihkan($field->dtjwb_catatan)) . '</div>'
+            $row[] = '<div class="tilik-teks">' . html_escape(lingkup_bersihkan($field->dtjwb_catatan)) . '</div>'
                 . $tombol('editisi', 'dtjwb_catatan', $field->dtjwb_catatan, 'Ubah catatan', 'success');
 
             /* Aksi: tombol hapus saja. */

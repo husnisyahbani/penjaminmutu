@@ -75,7 +75,16 @@ class DtjwbModel extends CI_Model {
            jwb_hasil/jwb_temuan/jwb_catatan tetap membaca nilainya. */
         $this->db->select('dj.dtjwb_hasil AS jwb_hasil, dj.dtjwb_temuan AS jwb_temuan,'
             . ' dj.dtjwb_catatan AS jwb_catatan', FALSE);
+        /* Jawaban auditee: kolom per butir bila ada (data lama), jika tidak
+           dipakai jawaban pertanyaan (jwb_jawaban) sebagai cadangan. */
+        if ($this->db->field_exists('dtjwb_jawaban', 'auditjawabdetail')) {
+            $this->db->select("NULLIF(dj.dtjwb_jawaban, '') AS jwb_jawaban_butir", FALSE);
+        } else {
+            $this->db->select('NULL AS jwb_jawaban_butir', FALSE);
+        }
+        $this->db->select('j.jwb_jawaban AS jwb_jawaban_pertanyaan', FALSE);
         $this->db->from('auditjawabdetail dj');
+        $this->db->join('auditjawab j', 'j.jwb_id = dj.jwb_id', 'left');
         $this->db->where('dj.jwb_id', $jwb_id);
 
         if (!empty($search['value'])) {

@@ -105,13 +105,6 @@
             <div class="pertanyaan-isi"><?php echo $soal['dtform_pertanyaan']; ?></div>
             <?php endif; ?>
 
-            <?php if (isset($jawab['jwb_jawaban']) && trim((string) $jawab['jwb_jawaban']) !== ''): ?>
-            <div class="aktivitas-bukti">
-              <span class="aktivitas-label">Jawaban auditee:</span>
-              <?php echo nl2br(html_escape(lingkup_bersihkan($jawab['jwb_jawaban']))); ?>
-            </div>
-            <?php endif; ?>
-
             <!-- Input tujuan pertanyaan (langsung di atas tabel) -->
             <div class="tujuan-kotak" id="tujuan_kotak">
               <label class="tujuan-label" for="tujuan_isi">
@@ -143,6 +136,53 @@
                   <span class="tujuan-pesan text-muted"></span>
                 </div>
               </div>
+
+            <?php
+            /* Butir-butir lingkup pertanyaan ini beserta jawaban auditee.
+               Jawaban per butir dipakai bila ada (data lama); jika tidak,
+               jawaban pertanyaan yang ditampilkan. */
+            $butir_lingkup = isset($butir_lingkup) ? $butir_lingkup : array();
+            ?>
+            <?php if (!empty($butir_lingkup)): ?>
+            <div class="pertanyaan-butir">
+              <button type="button" class="btn btn-sm btn-default" data-toggle="collapse"
+                      data-target="#butir_lingkup" aria-expanded="false" aria-controls="butir_lingkup">
+                <i class="icon md-chevron-down" aria-hidden="true"></i>
+                Lihat <?php echo count($butir_lingkup); ?> butir tilik beserta jawaban auditee
+              </button>
+              <div class="collapse pertanyaan-butir__daftar" id="butir_lingkup">
+                <ol class="lingkup-daftar">
+                  <?php
+                  $warna_butir = array('S' => 'badge-success', 'OB' => 'badge-info',
+                                       'TS MINOR' => 'badge-warning', 'TS MAYOR' => 'badge-danger');
+                  foreach ($butir_lingkup as $b):
+                      $temuan_butir = strtoupper(trim((string) $b['dtjwb_temuan']));
+                      $warna = isset($warna_butir[$temuan_butir]) ? $warna_butir[$temuan_butir] : 'badge-default';
+                      $jawab_butir = trim((string) (isset($b['jwb_jawaban_butir']) ? $b['jwb_jawaban_butir'] : ''));
+                      if ($jawab_butir === '') {
+                          $jawab_butir = trim((string) (isset($b['jwb_jawaban_pertanyaan']) ? $b['jwb_jawaban_pertanyaan'] : ''));
+                      }
+                  ?>
+                  <li>
+                    <div class="butir-lingkup-teks"><?php echo html_escape(lingkup_bersihkan($b['dtjwb_pertanyaan'])); ?></div>
+                    <?php if (!empty($b['dtjwb_referensi']) && trim((string) $b['dtjwb_referensi']) !== ''): ?>
+                    <div class="tilik-ref"><strong>Referensi:</strong> <?php echo html_escape(lingkup_bersihkan($b['dtjwb_referensi'])); ?></div>
+                    <?php endif; ?>
+                    <?php if ($temuan_butir !== ''): ?>
+                    <div class="butir-lingkup-status"><span class="badge <?php echo $warna; ?>"><?php echo html_escape($temuan_butir); ?></span></div>
+                    <?php endif; ?>
+                    <div class="aktivitas-bukti">
+                      <span class="aktivitas-label">Jawaban auditee:</span>
+                      <?php echo $jawab_butir !== ''
+                          ? nl2br(html_escape(lingkup_bersihkan($jawab_butir)))
+                          : '<span class="text-muted">belum dijawab</span>'; ?>
+                    </div>
+                  </li>
+                  <?php endforeach; ?>
+                </ol>
+              </div>
+            </div>
+            <?php endif; ?>
             </div>
           </div>
         </div>

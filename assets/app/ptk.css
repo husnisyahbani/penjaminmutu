@@ -212,6 +212,31 @@
     margin: 0 0 6px 10px;
 }
 
+/* Isi sel tampil penuh (tidak dibatasi jumlah baris seperti .ptk-klamp). */
+#tilik .tilik-teks {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+.tilik-teks {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+/* Daftar butir lingkup + jawaban auditee pada panel Informasi Pertanyaan. */
+.butir-lingkup-teks {
+    font-weight: 600;
+    color: #424242;
+}
+
+.butir-lingkup-status {
+    margin: 4px 0 2px;
+}
+
+.pertanyaan-butir .aktivitas-bukti {
+    margin-top: 4px;
+}
+
 /* Referensi ditulis di bawah isian butir dengan penanda tebal. */
 .tilik-ref {
     margin-top: 4px;
