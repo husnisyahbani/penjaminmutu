@@ -57,8 +57,8 @@
                                     <td><strong><?php echo (int) $status['jml_jawaban_lama']; ?></strong></td>
                                 </tr>
                                 <tr>
-                                    <td>Kolom jawaban per butir <code>auditjawabdetail.dtjwb_jawaban</code></td>
-                                    <td><?php echo $status['jawaban_tilik'] ? '<span class="badge badge-success">sudah ada</span>' : '<span class="badge badge-default">belum ada</span>'; ?></td>
+                                    <td>Lampiran jawaban pertanyaan <code>lampiran.jwb_id</code></td>
+                                    <td><?php echo !empty($status['lampiran_jawaban']) ? '<span class="badge badge-success">sudah ada</span>' : '<span class="badge badge-default">belum ada / tabel lampiran belum dipasang</span>'; ?></td>
                                 </tr>
                                 <tr>
                                     <td>Kolom koreksi per butir <code>auditjawabdetail.dtjwb_koreksi</code></td>
@@ -76,8 +76,8 @@
                             <button type="button" class="btn btn-primary" id="jalankan">
                                 <i class="icon md-refresh" aria-hidden="true"></i>Jalankan Migrasi
                             </button>
-                            <button type="button" class="btn btn-info" id="siapkankoreksi" <?php echo ($status['koreksi_butir'] && $status['jawaban_tilik']) ? 'disabled' : ''; ?>>
-                                <i class="icon md-plus" aria-hidden="true"></i>Siapkan Kolom Tilik (jawaban &amp; koreksi)
+                            <button type="button" class="btn btn-info" id="siapkankoreksi" <?php echo ($status['koreksi_butir'] && !empty($status['lampiran_jawaban'])) ? 'disabled' : ''; ?>>
+                                <i class="icon md-plus" aria-hidden="true"></i>Siapkan Kolom Tilik (koreksi &amp; lampiran)
                             </button>
                             <button type="button" class="btn btn-danger" id="hapuskolom" <?php echo $status['kolom_lama'] ? '' : 'disabled'; ?>>
                                 <i class="icon md-delete" aria-hidden="true"></i>Hapus Kolom Lama

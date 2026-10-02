@@ -1,10 +1,11 @@
 /* =============================================================================
-   Halaman detail audit auditee: jawaban + lampiran tiap butir tilik
-   (mutu_auditjawabdetail) pada tiap pertanyaan.
+   Halaman detail audit auditee: jawaban + lampiran tiap PERTANYAAN.
 
-   - Setiap butir tilik wajib dijawab (tombol Simpan Jawaban).
-   - Lampiran opsional dan boleh lebih dari satu berkas per butir.
-   - Tombol "Kirim Hasil Evaluasi" ditolak server selama masih ada butir
+   - Butir tilik (mutu_auditjawabdetail) hanya ditampilkan sebagai penilaian
+     auditor - auditee tidak menjawabnya.
+   - Setiap pertanyaan wajib dijawab (tombol Simpan Jawaban).
+   - Lampiran opsional dan boleh lebih dari satu berkas per pertanyaan.
+   - Tombol "Kirim Hasil Evaluasi" ditolak server selama masih ada pertanyaan
      yang belum dijawab, dan pesannya ditampilkan di sini.
    ============================================================================= */
 $(function () {
@@ -22,24 +23,28 @@ $(function () {
         });
     }
 
+    function auditId() {
+        return $('#kirim_hasil').attr('audit_id') || $('.delik').first().attr('audit_id');
+    }
+
     /* ------------------- indikator jumlah jawaban & lampiran -------------------
 
-       Semua angka dihitung ulang dari tampilan setiap kali ada jawaban atau
-       lampiran yang berubah, supaya badge ringkasan ("N sudah dijawab",
-       "N belum dijawab", "N lampiran") dan badge per pertanyaan
-       ("N/M dijawab") ikut bergerak tanpa memuat ulang halaman. */
+       Angka dihitung ulang dari tampilan setiap kali ada jawaban atau lampiran
+       yang berubah, supaya badge ringkasan ("N sudah dijawab", "N belum
+       dijawab", "N lampiran") ikut bergerak tanpa memuat ulang halaman. */
 
-    function jawabTerisi(baris) {
-        return /sudah/i.test(baris.find('.status-jawab').first().text());
+    function topikSudahDijawab(topik) {
+        return topik.attr('data-sudah-dijawab') === '1';
     }
 
     function hitungRingkas() {
-        var semua = $('#topik_daftar .aktivitas');
+        var semua = $('#topik_daftar .topik');
 
         return {
-            lingkup: semua.length,
-            dijawab: semua.filter(function () { return jawabTerisi($(this)); }).length,
-            lampiran: $('#topik_daftar .lampiran[data-lampiran_id]').length
+            pertanyaan: semua.length,
+            dijawab: semua.filter(function () { return topikSudahDijawab($(this)); }).length,
+            lampiran: $('#topik_daftar .lampiran[data-lampiran_id]').length,
+            butir: $('#topik_daftar .aktivitas').length
         };
     }
 
@@ -54,31 +59,29 @@ $(function () {
 
     function perbaruiRingkas() {
         var angka = hitungRingkas();
-        var belum = angka.lingkup - angka.dijawab;
+        var belum = angka.pertanyaan - angka.dijawab;
 
-        ubahAngka('#jml_lingkup', angka.lingkup + ' butir tilik');
+        ubahAngka('#jml_lingkup', angka.butir + ' butir tilik');
         ubahAngka('#jml_dijawab', angka.dijawab + ' sudah dijawab');
         ubahAngka('#sisa_belum', belum + ' belum dijawab');
         ubahAngka('#jml_lampiran', angka.lampiran + ' lampiran');
 
-        // Badge jumlah jawaban pada tiap pertanyaan.
+        // Badge status pada tiap pertanyaan.
         $('#topik_daftar .topik').each(function () {
-            var semua = $(this).find('.aktivitas').length;
-            var sudah = $(this).find('.aktivitas').filter(function () {
-                return jawabTerisi($(this));
-            }).length;
-            var badge = $(this).find('.topik-dijawab').first();
+            var topik = $(this);
+            var badge = topik.find('.topik-dijawab').first();
             if (!badge.length) {
                 return;
             }
 
-            var teks = sudah + '/' + semua + ' dijawab';
+            var sudah = topikSudahDijawab(topik);
+            var teks = sudah ? 'sudah dijawab' : 'belum dijawab';
             if (badge.text().trim() !== teks) {
                 badge.text(teks).addClass('ringkas-berubah');
                 window.setTimeout(function () { badge.removeClass('ringkas-berubah'); }, 700);
             }
             badge.removeClass('badge-success badge-warning')
-                .addClass((semua > 0 && sudah >= semua) ? 'badge-success' : 'badge-warning');
+                .addClass(sudah ? 'badge-success' : 'badge-warning');
         });
 
         // Peringatan "wajib dijawab" hilang sendiri setelah semuanya terjawab.
@@ -89,24 +92,25 @@ $(function () {
         return belum;
     }
 
-    /* ---------------------- simpan jawaban satu lingkup ---------------------- */
+    /* ---------------------- simpan jawaban satu pertanyaan ---------------------- */
 
     $('#topik_daftar').on('click', '.jawaban-simpan', function () {
-        var baris = $(this).closest('.aktivitas');
-        var dtjwb_id = baris.attr('data-dtjwb_id');
-        var audit_id = $('#kirim_hasil').attr('audit_id') || $('.delik').first().attr('audit_id');
-        var teks = String(baris.find('.jawaban-isi').val() || '').trim();
+        var tombol = $(this);
+        var kotak = tombol.closest('.jawaban-kotak');
+        var topik = tombol.closest('.topik');
+        var dtform_id = tombol.attr('dtform_id') || topik.data('dtform_id');
+        var teks = String(kotak.find('.jawaban-isi').val() || '').trim();
 
         if (teks === '') {
-            pesan('Oops', 'Jawaban wajib diisi untuk setiap butir tilik.', 'error');
-            baris.find('.jawaban-isi').focus();
+            pesan('Oops', 'Jawaban wajib diisi untuk setiap pertanyaan.', 'error');
+            kotak.find('.jawaban-isi').focus();
             return;
         }
 
         $.ajax({
             url: base_url + "/dashboard/jawablingkup",
             type: "POST",
-            data: { audit_id: audit_id, dtjwb_id: dtjwb_id, jwb_jawaban: teks },
+            data: { audit_id: auditId(), dtform_id: dtform_id, jwb_jawaban: teks },
             dataType: "json",
             success: function (hasil) {
                 if (!hasil || !hasil.status) {
@@ -114,8 +118,8 @@ $(function () {
                     return;
                 }
 
-                baris.find('.jawaban-pesan').text('tersimpan ' + waktuSekarang());
-                baris.find('.status-jawab').removeClass('badge-danger').addClass('badge-success').text('sudah dijawab');
+                kotak.find('.jawaban-pesan').text('tersimpan ' + waktuSekarang());
+                topik.attr('data-sudah-dijawab', '1');
                 perbaruiRingkas();
                 pesan('Tersimpan', hasil.pesan, 'success');
             },
@@ -134,10 +138,11 @@ $(function () {
     /* ---------------------- unggah lampiran (boleh banyak) ---------------------- */
 
     $('#topik_daftar').on('click', '.lampiran-unggah-btn', function () {
-        var kotak = $(this).closest('.lampiran-kotak');
-        var baris = $(this).closest('.aktivitas');
+        var tombol = $(this);
+        var kotak = tombol.closest('.lampiran-kotak');
+        var topik = tombol.closest('.topik');
         var masukan = kotak.find('.lampiran-berkas');
-        var audit_id = $('#kirim_hasil').attr('audit_id') || $('.delik').first().attr('audit_id');
+        var dtform_id = tombol.attr('dtform_id') || topik.data('dtform_id');
 
         if (!masukan.length || !masukan[0].files.length) {
             pesan('Oops', 'Pilih berkas yang akan diunggah terlebih dahulu.', 'error');
@@ -145,13 +150,12 @@ $(function () {
         }
 
         var data = new FormData();
-        data.append('audit_id', audit_id);
-        data.append('dtjwb_id', baris.attr('data-dtjwb_id'));
+        data.append('audit_id', auditId());
+        data.append('dtform_id', dtform_id);
         $.each(masukan[0].files, function (i, berkas) {
             data.append('lampiran[]', berkas);
         });
 
-        var tombol = $(this);
         tombol.prop('disabled', true).text('Mengunggah...');
         muat();
 
@@ -172,7 +176,7 @@ $(function () {
                 }
 
                 $.each(hasil.lampiran, function (i, l) {
-                    kotak.find('.lampiran-daftar').append(barisLampiran(l));
+                    kotak.find('.lampiran-daftar').first().append(barisLampiran(l));
                 });
                 masukan.val('');
                 perbaruiRingkas();
@@ -199,34 +203,37 @@ $(function () {
                 .append('<i class="icon md-delete" aria-hidden="true"></i>'));
     }
 
-    /* ---------------------- hapus lampiran ---------------------- */
+    /* ------------------------------ hapus lampiran ------------------------------ */
 
     $('#topik_daftar').on('click', '.lampiran-hapus', function () {
-        var baris = $(this).closest('.lampiran');
-        var audit_id = $('#kirim_hasil').attr('audit_id') || $('.delik').first().attr('audit_id');
+        var tombol = $(this);
+        var id = tombol.attr('id');
 
         swal.fire({
             title: 'Hapus lampiran ini?',
+            text: 'Berkas akan dihapus dari server.',
             type: 'warning',
             showCancelButton: true,
-            confirmButtonText: 'Ya, hapus',
-            cancelButtonText: 'Batal'
-        }).then(function (hasil) {
-            if (!hasil.value) {
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Tidak'
+        }).then(function (konfirmasi) {
+            if (!konfirmasi.value) {
                 return;
             }
+
             $.ajax({
                 url: base_url + "/dashboard/hapuslampiran",
                 type: "POST",
-                data: { audit_id: audit_id, lampiran_id: baris.attr('data-lampiran_id') },
+                data: { audit_id: auditId(), lampiran_id: id },
                 dataType: "json",
-                success: function (jawab) {
-                    if (!jawab || !jawab.status) {
-                        pesan('Oops', jawab && jawab.pesan ? jawab.pesan : 'Lampiran gagal dihapus.', 'error');
+                success: function (hasil) {
+                    if (!hasil || !hasil.status) {
+                        pesan('Oops', hasil && hasil.pesan ? hasil.pesan : 'Lampiran gagal dihapus.', 'error');
                         return;
                     }
-                    baris.remove();
+                    tombol.closest('.lampiran').remove();
                     perbaruiRingkas();
+                    pesan('Terhapus', hasil.pesan, 'success');
                 },
                 error: function () {
                     pesan('Oops', 'Tidak dapat menghubungi server.', 'error');
@@ -235,14 +242,14 @@ $(function () {
         });
     });
 
-    /* ---------------------- kirim hasil evaluasi ---------------------- */
+    /* --------------------------- kirim hasil evaluasi --------------------------- */
 
     $('#kirim_hasil').on('click', function () {
         var id = $(this).attr('audit_id');
         var belum = perbaruiRingkas();
 
         if (belum > 0) {
-            pesan('Belum lengkap', 'Masih ada ' + belum + ' butir tilik yang belum dijawab. Setiap butir wajib dijawab sebelum hasil dikirim.', 'warning');
+            pesan('Belum lengkap', 'Masih ada ' + belum + ' pertanyaan yang belum dijawab. Setiap pertanyaan wajib dijawab sebelum hasil dikirim.', 'warning');
             return;
         }
 

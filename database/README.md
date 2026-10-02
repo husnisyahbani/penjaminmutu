@@ -178,18 +178,28 @@ Catatan:
   bernilai `NULL`).
 - Butir yang sudah dipakai jawaban audit tidak ikut terhapus saat pertanyaan
   disunting, supaya hasil audit tidak kehilangan relasinya.
-- Daftar tilik pada halaman audit (auditor/admin) terisi otomatis dari butir
-  lingkup, jadi tidak ada lagi tombol **Tambah Tilik**.
+- Daftar tilik pada halaman audit (auditor) diisi **auditor**: hasil, temuan,
+  dan catatan tiap butir tilik disimpan pada `mutu_auditjawabdetail`
+  (`dtjwb_hasil`, `dtjwb_temuan`, `dtjwb_catatan`). Baris butir dapat
+  ditambah/disunting lewat halaman **Daftar Tilik** (tombol *Tambah Butir*).
+- **Auditee tidak mengisi `mutu_auditjawabdetail`.** Auditee menjawab pada
+  tingkat **pertanyaan** (`mutu_auditjawab`.`jwb_jawaban`) di halaman
+  *Auditee → Daftar Audit → Detail*, dengan lampiran opsional pada
+  `mutu_lampiran`.`jwb_id`. Rencana koreksi tiap butir
+  (`mutu_auditjawabdetail`.`dtjwb_koreksi`) baru diisi auditee setelah audit
+  berstatus **SELESAI**.
 
 ## `lampiran_lingkup.sql`
 
 Membuat tabel lampiran jawaban audit. Pada halaman
-**Auditee → Daftar Audit → (detail)**, setiap lingkup **wajib dijawab**, dan
+**Auditee → Daftar Audit → (detail)**, setiap **pertanyaan wajib dijawab**, dan
 tiap jawaban boleh dilengkapi **lampiran opsional lebih dari satu berkas**.
+Butir tilik (`mutu_auditjawabdetail`) hanya diisi auditor, auditee tidak
+menjawabnya.
 
 | Objek             | Isi                                                                              |
 | ----------------- | -------------------------------------------------------------------------------- |
-| `mutu_lampiran`   | berkas lampiran per lingkup: `audit_id`, `lingkup_id`, `users_id`, `lampiran_nama` (nama simpan), `lampiran_asli` (nama asli), `lampiran_tipe`, `lampiran_ukuran`, `lampiran_create` |
+| `mutu_lampiran`   | berkas lampiran per jawaban pertanyaan: `audit_id`, `jwb_id` (baris `mutu_auditjawab`), `users_id`, `lampiran_nama` (nama simpan), `lampiran_asli` (nama asli), `lampiran_tipe`, `lampiran_ukuran`, `lampiran_create` |
 
 Cara pakai:
 
@@ -203,12 +213,15 @@ Cara pakai:
 Catatan:
 
 - Aman dijalankan berulang kali (`CREATE TABLE IF NOT EXISTS`).
-- Relasi memakai `ON DELETE CASCADE`: menghapus audit atau lingkup ikut
-  membersihkan lampirannya, sedangkan jawaban (`mutu_auditjawab`) tidak
-  terpengaruh.
+- Tabel lama yang belum punya `jwb_id` dapat disiapkan lewat
+  **Admin → Migrasi Lingkup** (tombol *Siapkan Kolom Tilik*). Lampiran lama
+  tetap terbaca: bila `jwb_id` kosong, lampiran dipetakan lewat
+  `lingkup_id` (= `dtform_id` pertanyaannya).
+- Relasi memakai `ON DELETE CASCADE`: menghapus audit ikut membersihkan
+  lampirannya, sedangkan jawaban (`mutu_auditjawab`) tidak terpengaruh.
 - Tanpa tabel ini aplikasi tetap berjalan: kolom jawaban wajib tetap ada, tetapi
   bagian lampiran menampilkan keterangan bahwa fitur belum disiapkan.
-- Lampiran bersifat **opsional**; satu lingkup boleh memiliki banyak berkas.
+- Lampiran bersifat **opsional**; satu pertanyaan boleh memiliki banyak berkas.
   Jenis berkas: PDF, Office (doc/docx/xls/xlsx/ppt/pptx), gambar
   (jpg/jpeg/png), dan arsip (zip/rar), maksimum 5 MB per berkas.
 - Menghapus lampiran dari halaman detail ikut menghapus berkas fisiknya.

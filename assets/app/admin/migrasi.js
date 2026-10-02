@@ -48,7 +48,7 @@ $(function () {
     $('#siapkankoreksi').on('click', function () {
         kirim('/migrasi/kolomtilik',
             'Siapkan Kolom Tilik?',
-            'Kolom jawaban (dtjwb_jawaban) dan koreksi (dtjwb_koreksi) per butir tilik ditambahkan, dan lampiran menempel pada butir tilik.',
+            'Kolom koreksi (dtjwb_koreksi) per butir tilik ditambahkan, dan lampiran jawaban menempel pada pertanyaan (lampiran.jwb_id).',
             'Ya, Siapkan!',
             'Kolom Siap');
     });

@@ -42,6 +42,22 @@ class LampiranModel extends CI_Model {
     }
 
     /**
+     * Kolom penanda jawaban AUDITEE (baris pertanyaan): `jwb_id` bila ada,
+     * jika tidak `lingkup_id` (data lama).
+     */
+    function kolomJawaban() {
+        if (!$this->siap()) {
+            return NULL;
+        }
+        return $this->db->field_exists('jwb_id', $this->tabel) ? 'jwb_id' : 'lingkup_id';
+    }
+
+    /** Lampiran sudah menempel pada jawaban pertanyaan (jwb_id)? */
+    function jawabanSiap() {
+        return $this->siap() && $this->db->field_exists('jwb_id', $this->tabel);
+    }
+
+    /**
      * Buat tabel lampiran (aman dijalankan berulang kali). Dipakai tombol
      * penyiapan di halaman migrasi admin dan saat pengujian.
      */
@@ -52,6 +68,7 @@ class LampiranModel extends CI_Model {
             $this->dbforge->add_field(array(
                 'lampiran_id'     => array('type' => 'INT', 'constraint' => 11, 'unsigned' => TRUE, 'auto_increment' => TRUE),
                 'audit_id'        => array('type' => 'INT', 'constraint' => 11),
+                'jwb_id'          => array('type' => 'INT', 'constraint' => 11, 'null' => TRUE),
                 'dtjwb_id'        => array('type' => 'INT', 'constraint' => 11, 'null' => TRUE),
                 'lingkup_id'      => array('type' => 'INT', 'constraint' => 11, 'null' => TRUE),
                 'users_id'        => array('type' => 'INT', 'constraint' => 11, 'null' => TRUE),
@@ -65,6 +82,19 @@ class LampiranModel extends CI_Model {
             $this->dbforge->add_key('audit_id');
             $this->dbforge->add_key('lingkup_id');
             $this->dbforge->create_table($this->tabel, TRUE);
+        }
+
+        /* Tabel lama: tambahkan kolom jawaban pertanyaan (jwb_id). */
+        if ($this->siap() && !$this->db->field_exists('jwb_id', $this->tabel)) {
+            if (in_array($this->db->dbdriver, array('sqlite', 'sqlite3'), TRUE)) {
+                $this->db->query('ALTER TABLE ' . $this->db->protect_identifiers($this->tabel, TRUE)
+                    . ' ADD COLUMN jwb_id INTEGER');
+            } else {
+                $this->load->dbforge();
+                $this->dbforge->add_column($this->tabel, array(
+                    'jwb_id' => array('type' => 'INT', 'constraint' => 11, 'null' => TRUE, 'after' => 'audit_id'),
+                ));
+            }
         }
 
         /* Tabel lama: tambahkan kolom butir tilik dan longgarkan lingkup_id
@@ -108,9 +138,9 @@ class LampiranModel extends CI_Model {
        Baca
        ================================================================== */
 
-    /** Lampiran satu butir pada satu audit, terlama lebih dahulu. */
-    function daftar($audit_id, $butir_id) {
-        $kolom = $this->kolomButir();
+    /** Lampiran satu butir/jawaban pada satu audit, terlama lebih dahulu. */
+    function daftar($audit_id, $butir_id, $kolom = NULL) {
+        $kolom = $kolom ? $kolom : $this->kolomButir();
         if (!$kolom) {
             return array();
         }
@@ -140,10 +170,10 @@ class LampiranModel extends CI_Model {
      * Butir = dtjwb_id (butir tilik) bila kolomnya ada, jika tidak
      * lingkup_id (data lama). Dipakai halaman detail audit.
      */
-    function peta($audit_id) {
+    function peta($audit_id, $kolom = NULL) {
         $hasil = array();
-        $kolom = $this->kolomButir();
-        if (!$kolom) {
+        $kolom = $kolom ? $kolom : $this->kolomButir();
+        if (!$kolom || !$this->db->field_exists($kolom, $this->tabel)) {
             return $hasil;
         }
 
@@ -152,14 +182,52 @@ class LampiranModel extends CI_Model {
         foreach ($this->db->get($this->tabel)->result_array() as $row) {
             $row['url']         = $this->url($row['lampiran_nama']);
             $row['ukuran_teks'] = $this->ukuranTeks($row['lampiran_ukuran']);
-            $hasil[(int) $row[$kolom]][] = $row;
+            $id = (int) $row[$kolom];
+            if ($id < 1) {
+                continue;
+            }
+            $hasil[$id][] = $row;
         }
         return $hasil;
     }
 
-    /** Jumlah lampiran satu butir (atau seluruh audit). */
-    function hitung($audit_id, $butir_id = NULL) {
-        $kolom = $this->kolomButir();
+    /** Peta lampiran jawaban pertanyaan ([jwb_id => daftar lampiran]). */
+    function petaJawaban($audit_id) {
+        $kolom = $this->kolomJawaban();
+        $hasil = $this->peta($audit_id, $kolom);
+        if ($kolom !== 'jwb_id') {
+            return $hasil;
+        }
+
+        /* Lampiran lama yang belum punya jwb_id (dulu menempel pada
+           lingkup_id = dtform_id) tetap ditampilkan. */
+        $this->db->select('l.*');
+        $this->db->select('j.jwb_id AS jwb_id_lama', FALSE);
+        $this->db->from($this->tabel . ' l');
+        $this->db->join('auditjawab j', 'j.audit_id = l.audit_id AND j.dtform_id = l.lingkup_id', 'inner');
+        $this->db->where('l.audit_id', $audit_id);
+        $this->db->where('l.jwb_id IS NULL', NULL, FALSE);
+        $this->db->where('l.lingkup_id >', 0);
+        $this->db->order_by('l.lampiran_id', 'ASC');
+
+        foreach ($this->db->get()->result_array() as $row) {
+            $jwb_id = (int) $row['jwb_id_lama'];
+            if ($jwb_id < 1) {
+                continue;
+            }
+            $row['jwb_id']      = $jwb_id;
+            $row['url']         = $this->url($row['lampiran_nama']);
+            $row['ukuran_teks'] = $this->ukuranTeks($row['lampiran_ukuran']);
+            unset($row['jwb_id_lama']);
+            $hasil[$jwb_id][] = $row;
+        }
+
+        return $hasil;
+    }
+
+    /** Jumlah lampiran satu butir/jawaban (atau seluruh audit). */
+    function hitung($audit_id, $butir_id = NULL, $kolom = NULL) {
+        $kolom = $kolom ? $kolom : $this->kolomButir();
         if (!$kolom) {
             return 0;
         }
@@ -175,8 +243,8 @@ class LampiranModel extends CI_Model {
        ================================================================== */
 
     /** Catat satu berkas yang sudah dipindahkan ke folder lampiran. */
-    function tambah($audit_id, $butir_id, $berkas) {
-        $kolom = $this->kolomButir();
+    function tambah($audit_id, $butir_id, $berkas, $kolom = NULL) {
+        $kolom = $kolom ? $kolom : $this->kolomButir();
         if (!$kolom) {
             return NULL;
         }
@@ -192,9 +260,9 @@ class LampiranModel extends CI_Model {
             'lampiran_create' => date('Y-m-d H:i:s'),
         );
 
-        /* Tabel lama punya lingkup_id NOT NULL - isi kosong bila kolom butir
-           tilik sudah dipakai supaya penyimpanan tidak gagal. */
-        if ($kolom === 'dtjwb_id' && $this->db->field_exists('lingkup_id', $this->tabel)) {
+        /* Tabel lama punya lingkup_id NOT NULL - isi kosong bila kolom lain
+           yang dipakai supaya penyimpanan tidak gagal. */
+        if ($kolom !== 'lingkup_id' && $this->db->field_exists('lingkup_id', $this->tabel)) {
             $isi['lingkup_id'] = 0;
         }
 

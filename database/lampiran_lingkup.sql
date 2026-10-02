@@ -20,6 +20,7 @@
 CREATE TABLE IF NOT EXISTS `mutu_lampiran` (
   `lampiran_id`     int(11) NOT NULL AUTO_INCREMENT,
   `audit_id`        int(11) NOT NULL,
+  `jwb_id`          int(11) DEFAULT NULL,
   `dtjwb_id`        int(11) DEFAULT NULL,
   `lingkup_id`      int(11) DEFAULT NULL,
   `users_id`        int(11) DEFAULT NULL,
@@ -31,6 +32,7 @@ CREATE TABLE IF NOT EXISTS `mutu_lampiran` (
   PRIMARY KEY (`lampiran_id`),
   PRIMARY KEY (`lampiran_id`),
   KEY `lampiran_audit_id` (`audit_id`),
+  KEY `lampiran_jwb_id` (`jwb_id`),
   KEY `lampiran_dtjwb_id` (`dtjwb_id`),
   KEY `lampiran_lingkup_id` (`lingkup_id`),
   CONSTRAINT `lampiran_audit_id` FOREIGN KEY (`audit_id`)
@@ -39,7 +41,9 @@ CREATE TABLE IF NOT EXISTS `mutu_lampiran` (
 
 -- Tabel versi lama (sebelum ada kolom dtjwb_id) dapat disesuaikan dengan:
 --   ALTER TABLE `mutu_lampiran`
---     ADD COLUMN `dtjwb_id` int(11) DEFAULT NULL AFTER `audit_id`,
+--     ADD COLUMN `jwb_id` int(11) DEFAULT NULL AFTER `audit_id`,
+--     ADD COLUMN `dtjwb_id` int(11) DEFAULT NULL AFTER `jwb_id`,
+--     ADD KEY `lampiran_jwb_id` (`jwb_id`),
 --     ADD KEY `lampiran_dtjwb_id` (`dtjwb_id`),
 --     MODIFY `lingkup_id` int(11) DEFAULT NULL;
 -- atau lewat tombol "Siapkan Kolom Tilik" pada menu PPM > Migrasi Lingkup.
@@ -49,11 +53,11 @@ CREATE TABLE IF NOT EXISTS `mutu_lampiran` (
 --   dihapus, sehingga tidak ada berkas yatim di database.
 -- - Menghapus baris di tabel ini tidak menghapus berkas fisik; aplikasi
 --   menghapus berkasnya lebih dahulu (lihat LampiranModel::hapus()).
--- - Lampiran menempel pada BUTIR TILIK (`dtjwb_id` ->
---   mutu_auditjawabdetail), pilihan yang dipakai halaman detail audit.
---   Kolom `lingkup_id` tetap ada untuk data lama (struktur lingkup).
--- - Jawaban tiap butir tilik disimpan pada
---   `mutu_auditjawabdetail`.`dtjwb_jawaban` (lihat database/jawaban_tilik.sql).
+-- - Lampiran menempel pada JAWABAN PERTANYAAN (`jwb_id` ->
+--   mutu_auditjawab baris pertanyaan). Auditee menjawab pertanyaan, bukan
+--   butir tilik - butir tilik (mutu_auditjawabdetail) hanya diisi auditor.
+--   Kolom `dtjwb_id`/`lingkup_id` tetap ada untuk data lama.
+-- - Jawaban auditee disimpan pada `mutu_auditjawab`.`jwb_jawaban`.
 
 -- ---------------------------------------------------------------------------
 -- Bila ingin membatalkan:

@@ -318,12 +318,14 @@ class AuditjawabModel extends CI_Model {
      * @return array daftar topik; tiap topik berisi 'butir' dan 'jwb'.
      */
     /**
-     * Peta pertanyaan (topik) + butir tilik beserta jawaban auditee,
-     * penilaian auditor, dan lampiran.
+     * Peta pertanyaan (topik) + butir tilik beserta penilaian auditor dan
+     * jawaban auditee.
      *
-     * Butirnya dibaca dari tabel `auditjawabdetail` (baris tilik yang
-     * diisi auditor/PPM), bukan tabel lingkup - sehingga halaman detail
-     * audit selalu sejalan dengan halaman PTK/delik auditee.
+     * - Butir tilik dibaca dari `auditjawabdetail`: hanya AUDITOR yang mengisi
+     *   hasil/temuan/catatan. Auditee tidak menjawab butir; auditee hanya
+     *   menambahkan rencana koreksi (dtjwb_koreksi) setelah audit selesai.
+     * - Jawaban auditee ada pada baris PERTANYAAN (`auditjawab.jwb_jawaban`),
+     *   begitu pula lampirannya (`mutu_lampiran.jwb_id`).
      */
     function petaTilik($audit_id) {
         /* Pembantu teks butir (lingkup_bersihkan). */
@@ -352,25 +354,19 @@ class AuditjawabModel extends CI_Model {
         $this->db->select('jwb_id, dtform_id, jwb_jawaban, jwb_tujuan, jwb_referensi');
         $this->db->where('audit_id', $audit_id);
         if ($this->db->field_exists('lingkup_id', 'auditjawab')) {
-            if ($this->_adaLingkup()) {
             $this->db->where('lingkup_id IS NULL', NULL, FALSE);
-        }
         }
         foreach ($this->db->get('auditjawab')->result_array() as $j) {
             $induk[(int) $j['dtform_id']] = $j;
         }
 
-        /* Butir tilik + nilainya. Jawaban & koreksi per butir dipakai bila
-           kolomnya sudah ada; jika belum, jatuh ke kolom lama. */
-        $kolom_jawaban = $this->db->field_exists('dtjwb_jawaban', 'auditjawabdetail')
-            ? 'd.dtjwb_jawaban' : 'NULL';
+        /* Butir tilik + penilaian auditor (read-only bagi auditee). */
         $kolom_koreksi = $this->db->field_exists('dtjwb_koreksi', 'auditjawabdetail')
             ? 'd.dtjwb_koreksi' : 'j.jwb_koreksi';
 
         $this->db->select('d.dtjwb_id, d.dtjwb_referensi, d.dtjwb_pertanyaan');
         $this->db->select('d.dtjwb_hasil, d.dtjwb_temuan, d.dtjwb_catatan');
         $this->db->select('j.jwb_id, j.dtform_id');
-        $this->db->select($kolom_jawaban . ' AS dtjwb_jawaban', FALSE);
         $this->db->select($kolom_koreksi . ' AS jwb_koreksi', FALSE);
         $this->db->from('auditjawabdetail d');
         $this->db->join('auditjawab j', 'j.jwb_id = d.jwb_id', 'inner');
@@ -383,37 +379,39 @@ class AuditjawabModel extends CI_Model {
             $peta[(int) $b['dtform_id']][] = $b;
         }
 
-        /* Lampiran jawaban (opsional, boleh lebih dari satu) per butir. */
+        /* Lampiran: menempel pada jawaban pertanyaan (jwb_id). Bila tabel
+           lampiran masih memakai lingkup_id/dtjwb_id (versi lama), ikut
+           dibaca supaya tidak ada berkas yang hilang. */
         $this->load->model('LampiranModel', 'lampiran');
-        $petaLampiran = $this->lampiran->peta($audit_id);
+        $petaJawaban = $this->lampiran->petaJawaban($audit_id);
+        $kolom_butir = $this->lampiran->kolomButir();
+        $petaButir = ($kolom_butir && $kolom_butir !== $this->lampiran->kolomJawaban())
+            ? $this->lampiran->peta($audit_id)
+            : array();
 
         foreach ($topik as $i => $t) {
             $tid = (int) $t['dtform_id'];
             $butir = isset($peta[$tid]) ? $peta[$tid] : array();
             $jawab_pertanyaan = isset($induk[$tid]) ? $induk[$tid] : NULL;
+            $sudah_dijawab = $jawab_pertanyaan
+                && trim((string) $jawab_pertanyaan['jwb_jawaban']) !== '';
 
             $dinilai = 0;
             $temuan = 0;
             $koreksi = 0;
-            $dijawab = 0;
             $jml_lampiran = 0;
 
             foreach ($butir as $k => $b) {
                 $dtjwb_id = (int) $b['dtjwb_id'];
 
-                $jawaban = trim((string) $b['dtjwb_jawaban']) !== ''
-                    ? $b['dtjwb_jawaban']
-                    : ($jawab_pertanyaan ? $jawab_pertanyaan['jwb_jawaban'] : NULL);
+                $butir[$k]['jwb_id']       = (int) $b['jwb_id'];
+                $butir[$k]['jwb_jawaban']  = $jawab_pertanyaan ? $jawab_pertanyaan['jwb_jawaban'] : NULL;
+                $butir[$k]['jwb_hasil']    = $b['dtjwb_hasil'];
+                $butir[$k]['jwb_temuan']   = $b['dtjwb_temuan'];
+                $butir[$k]['jwb_catatan']  = $b['dtjwb_catatan'];
+                $butir[$k]['jwb_koreksi']  = $b['jwb_koreksi'];
 
-                $butir[$k]['jwb_id']      = (int) $b['jwb_id'];
-                $butir[$k]['jwb_jawaban'] = $jawaban;
-                $butir[$k]['jwb_hasil']   = $b['dtjwb_hasil'];
-                $butir[$k]['jwb_temuan']  = $b['dtjwb_temuan'];
-                $butir[$k]['jwb_catatan'] = $b['dtjwb_catatan'];
-                $butir[$k]['jwb_koreksi'] = $b['jwb_koreksi'];
-
-                /* Nama kunci lama dipertahankan supaya penampil auditor/admin
-                   tidak perlu diubah. */
+                /* Nama kunci lama dipertahankan untuk penampil auditor/admin. */
                 $butir[$k]['lingkup_id']   = $dtjwb_id;
                 $butir[$k]['lingkup_isi']  = $b['dtjwb_pertanyaan'];
                 $butir[$k]['lingkup_teks'] = lingkup_bersihkan($b['dtjwb_pertanyaan']);
@@ -422,26 +420,36 @@ class AuditjawabModel extends CI_Model {
                 if (trim((string) $b['dtjwb_hasil']) !== '')  { $dinilai++; }
                 if (trim((string) $b['dtjwb_temuan']) !== '') { $temuan++; }
                 if (trim((string) $b['jwb_koreksi']) !== '')  { $koreksi++; }
-                if (trim((string) $jawaban) !== '')           { $dijawab++; }
 
-                $butir[$k]['lampiran'] = isset($petaLampiran[$dtjwb_id])
-                    ? $petaLampiran[$dtjwb_id]
+                $butir[$k]['lampiran'] = isset($petaButir[$dtjwb_id])
+                    ? $petaButir[$dtjwb_id]
                     : array();
-                $jml_lampiran += count($butir[$k]['lampiran']);
             }
 
-            $topik[$i]['butir']        = $butir;
-            $topik[$i]['jwb']          = $jawab_pertanyaan;
-            $topik[$i]['teks']         = lingkup_bersihkan($t['dtform_pertanyaan']);
-            $topik[$i]['jml_butir']    = count($butir);
-            $topik[$i]['jml_dinilai']  = $dinilai;
-            $topik[$i]['jml_temuan']   = $temuan;
-            $topik[$i]['jml_koreksi']  = $koreksi;
-            $topik[$i]['jml_dijawab']  = $dijawab;
-            $topik[$i]['jml_lampiran'] = $jml_lampiran;
+            $lampiran_topik = $jawab_pertanyaan && isset($petaJawaban[(int) $jawab_pertanyaan['jwb_id']])
+                ? $petaJawaban[(int) $jawab_pertanyaan['jwb_id']]
+                : array();
+            $jml_lampiran += count($lampiran_topik);
+            foreach ($butir as $b) {
+                $jml_lampiran += count($b['lampiran']);
+            }
+
+            $topik[$i]['butir']          = $butir;
+            $topik[$i]['jwb']            = $jawab_pertanyaan;
+            $topik[$i]['lampiran']       = $lampiran_topik;
+            $topik[$i]['sudah_dijawab']  = (bool) $sudah_dijawab;
+            $topik[$i]['teks']           = lingkup_bersihkan($t['dtform_pertanyaan']);
+            $topik[$i]['jml_butir']      = count($butir);
+            $topik[$i]['jml_dinilai']    = $dinilai;
+            $topik[$i]['jml_temuan']     = $temuan;
+            $topik[$i]['jml_koreksi']    = $koreksi;
+            /* Jumlah butir yang "terjawab" (dipakai penampil auditor). */
+            $topik[$i]['jml_dijawab']    = $sudah_dijawab ? count($butir) : 0;
+            $topik[$i]['jml_lampiran']   = $jml_lampiran;
         }
 
         return $topik;
     }
+
 
 }

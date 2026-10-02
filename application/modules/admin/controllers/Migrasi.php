@@ -82,38 +82,34 @@ class Migrasi extends MY_Controller {
      * Tambah kolom rencana koreksi per butir (auditjawabdetail.dtjwb_koreksi).
      * Aman dijalankan berulang kali: bila kolomnya sudah ada, tidak berubah.
      */
+    /** Siapkan kolom jawaban + koreksi + lampiran (dipakai tombol Migrasi). */
     public function kolomtilik() {
         $this->output->set_content_type('application/json');
 
         $this->load->model('LampiranModel', 'lampiran');
 
         $koreksi  = $this->lingkup->koreksiButirSiap();
-        $jawaban  = $this->lingkup->jawabanTilikSiap();
-        $lampiran = $this->lampiran->butirSiap();
+        $lampiran = $this->lampiran->siap() ? $this->lampiran->jawabanSiap() : FALSE;
 
         $ok_koreksi = $this->lingkup->installKoreksiButir();
-        $ok_jawaban = $this->lingkup->installJawabanTilik();
         $ok_lampiran = TRUE;
         if ($this->lampiran->siap()) {
             $this->lampiran->install();
-            $ok_lampiran = $this->lampiran->butirSiap();
+            $ok_lampiran = $this->lampiran->jawabanSiap();
         }
 
         $pesan = array();
         $pesan[] = $ok_koreksi
             ? ($koreksi ? 'Kolom koreksi per butir sudah ada.' : 'Kolom koreksi per butir ditambahkan.')
             : 'Kolom koreksi per butir gagal ditambahkan.';
-        $pesan[] = $ok_jawaban
-            ? ($jawaban ? 'Kolom jawaban per butir sudah ada.' : 'Kolom jawaban per butir ditambahkan.')
-            : 'Kolom jawaban per butir gagal ditambahkan.';
         $pesan[] = !$this->lampiran->siap()
             ? 'Tabel lampiran belum ada (impor database/lampiran_lingkup.sql bila ingin memakai lampiran).'
             : ($ok_lampiran
-                ? ($lampiran ? 'Lampiran sudah menempel pada butir tilik.' : 'Lampiran kini menempel pada butir tilik.')
-                : 'Kolom lampiran per butir gagal ditambahkan.');
+                ? ($lampiran ? 'Lampiran jawaban sudah menempel pada pertanyaan.' : 'Lampiran kini menempel pada jawaban pertanyaan.')
+                : 'Kolom lampiran jawaban gagal ditambahkan.');
 
         echo json_encode(array(
-            'status'  => ($ok_koreksi && $ok_jawaban && $ok_lampiran),
+            'status'  => ($ok_koreksi && $ok_lampiran),
             'pesan'   => implode(' ', $pesan),
             'ringkas' => $this->lingkup->status(),
         ));

@@ -30,7 +30,7 @@ foreach ($topik as $t) {
     $jml_lingkup   += $t['jml_butir'];
     $jml_dinilai   += $t['jml_dinilai'];
     $jml_temuan    += $t['jml_temuan'];
-    $jml_dijawab   += $t['jml_dijawab'];
+    $jml_dijawab   += !empty($t['sudah_dijawab']) ? 1 : 0;
     $jml_lampiran  += $t['jml_lampiran'];
 }
 ?>
@@ -59,8 +59,8 @@ foreach ($topik as $t) {
 
                         <div class="topik-ringkas mb-15">
                             <span class="badge badge-info"><?php echo (int) $jml_pertanyaan; ?> pertanyaan</span>
-                            <span class="badge badge-info"><?php echo (int) $jml_lingkup; ?> lingkup</span>
-                            <span class="badge badge-success"><?php echo (int) $jml_dijawab; ?> dijawab auditee</span>
+                            <span class="badge badge-info"><?php echo (int) $jml_lingkup; ?> butir tilik</span>
+                            <span class="badge badge-success"><?php echo (int) $jml_dijawab; ?> pertanyaan dijawab</span>
                             <span class="badge badge-info"><?php echo (int) $jml_lampiran; ?> lampiran</span>
                             <span class="badge badge-primary"><?php echo (int) $jml_dinilai; ?> dinilai</span>
                             <span class="badge badge-warning"><?php echo (int) $jml_temuan; ?> temuan</span>
@@ -68,7 +68,9 @@ foreach ($topik as $t) {
 
                         <div class="topik-berkas" id="topik_daftar">
                             <?php foreach ($topik as $i => $t):
-                                $cari = strtolower($t['teks'] . ' ' . implode(' ', array_map(function ($b) {
+                                $cari = strtolower($t['teks'] . ' '
+                                    . (isset($t['jwb']['jwb_jawaban']) ? lingkup_bersihkan($t['jwb']['jwb_jawaban']) : '') . ' '
+                                    . implode(' ', array_map(function ($b) {
                                     return $b['lingkup_teks'] . ' ' . (string) $b['jwb_temuan'] . ' '
                                         . lingkup_bersihkan($b['jwb_catatan']);
                                 }, $t['butir'])));
@@ -80,9 +82,9 @@ foreach ($topik as $t) {
                                     <h4 class="topik-judul">
                                         <?php echo html_escape($t['teks']); ?>
                                         <span class="topik-info">
-                                            <span class="badge badge-info"><?php echo (int) $t['jml_butir']; ?> lingkup</span>
-                                            <span class="badge <?php echo ($t['jml_dijawab'] >= $t['jml_butir'] && $t['jml_butir'] > 0) ? 'badge-success' : 'badge-warning'; ?>">
-                                                <?php echo (int) $t['jml_dijawab']; ?>/<?php echo (int) $t['jml_butir']; ?> dijawab
+                                            <span class="badge badge-info"><?php echo (int) $t['jml_butir']; ?> butir tilik</span>
+                                            <span class="badge <?php echo !empty($t['sudah_dijawab']) ? 'badge-success' : 'badge-warning'; ?>">
+                                                <?php echo !empty($t['sudah_dijawab']) ? 'sudah dijawab' : 'belum dijawab'; ?>
                                             </span>
                                             <?php if ($t['jml_dinilai'] > 0): ?>
                                             <span class="badge badge-success"><?php echo (int) $t['jml_dinilai']; ?> dinilai</span>
@@ -102,26 +104,44 @@ foreach ($topik as $t) {
                                     </div>
                                 </header>
                                 <div class="aktivitas-daftar">
+                                    <!-- Jawaban auditee untuk pertanyaan ini (auditee mengisi di halaman detail audit) -->
+                                    <div class="aktivitas-bukti">
+                                        <span class="aktivitas-label">Jawaban auditee:</span>
+                                        <?php
+                                        $jawab_topik = isset($t['jwb']['jwb_jawaban']) ? $t['jwb']['jwb_jawaban'] : '';
+                                        echo trim((string) $jawab_topik) !== ''
+                                            ? nl2br(html_escape($potong($jawab_topik, 500)))
+                                            : '<span class="text-muted">belum dijawab auditee</span>';
+                                        ?>
+                                    </div>
+
+                                    <?php if (!empty($t['lampiran'])): ?>
+                                    <!-- Lampiran jawaban auditee untuk pertanyaan ini -->
+                                    <div class="aktivitas-bukti">
+                                        <span class="aktivitas-label">Lampiran jawaban:</span>
+                                        <div class="lampiran-daftar">
+                                            <?php foreach ($t['lampiran'] as $l): ?>
+                                            <div class="lampiran" data-lampiran_id="<?php echo (int) $l['lampiran_id']; ?>">
+                                                <i class="icon md-file lampiran-ikon" aria-hidden="true"></i>
+                                                <a class="lampiran-nama" target="_blank" rel="noopener"
+                                                   href="<?php echo $l['url']; ?>"><?php echo html_escape($l['lampiran_asli']); ?></a>
+                                                <span class="lampiran-ukuran text-muted"><?php echo html_escape($l['ukuran_teks']); ?></span>
+                                            </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                    <?php endif; ?>
+
                                     <?php foreach ($t['butir'] as $b):
                                         $hasil  = $potong($b['jwb_hasil']);
                                         $temuan = trim((string) $b['jwb_temuan']);
                                         $catatan = $potong($b['jwb_catatan'], 180);
-                                        $jawab   = $potong($b['jwb_jawaban'], 300);
                                         $ada = ($hasil !== '' || $temuan !== '' || $catatan !== '');
                                     ?>
                                     <div class="aktivitas" data-cari="<?php echo html_escape(strtolower($b['lingkup_teks'] . ' ' . $hasil . ' ' . $temuan . ' ' . $catatan)); ?>">
                                         <i class="icon md-assignment aktivitas-ikon" aria-hidden="true"></i>
                                         <div class="aktivitas-isi">
                                             <span class="aktivitas-teks"><?php echo html_escape($b['lingkup_teks']); ?></span>
-                                            <?php if ($jawab !== ''): ?>
-                                            <div class="aktivitas-bukti">
-                                                <span class="aktivitas-label">Jawaban auditee:</span> <?php echo html_escape($jawab); ?>
-                                            </div>
-                                            <?php else: ?>
-                                            <div class="aktivitas-bukti">
-                                                <span class="text-muted">belum dijawab auditee</span>
-                                            </div>
-                                            <?php endif; ?>
 
                                             <?php if (!empty($b['lampiran'])): ?>
                                             <div class="lampiran-kotak">
@@ -168,7 +188,7 @@ foreach ($topik as $t) {
                                     <?php endforeach; ?>
 
                                     <?php if (empty($t['butir'])): ?>
-                                    <div class="aktivitas-kosong">Belum ada lingkup pada pertanyaan ini.</div>
+                                    <div class="aktivitas-kosong">Belum ada butir tilik pada pertanyaan ini (diisi lewat halaman Daftar Tilik).</div>
                                     <?php endif; ?>
                                 </div>
                             </section>
