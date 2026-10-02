@@ -26,7 +26,8 @@
 
 .topik-kepala {
     display: flex;
-    align-items: flex-start;
+    /* Nomor, judul, dan panah sejajar di tengah secara vertikal. */
+    align-items: center;
     gap: 12px;
     padding: 13px 16px;
     background: #f7f9fc;
@@ -69,7 +70,10 @@
 .topik-panah {
     flex: 0 0 auto;
     color: #8a94a6;
-    margin-top: 4px;
+    /* Sejajar tengah dengan nomor & judul (mengikuti align-items: center
+       pada .topik-kepala), jadi tidak perlu margin atas lagi. */
+    display: flex;
+    align-items: center;
     transition: transform .15s ease;
 }
 
