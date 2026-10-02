@@ -247,6 +247,14 @@ class AuditjawabModel extends CI_Model {
             $this->db->where('jwb_id', $jwb['jwb_id']);
             $this->db->where('lingkup_id IS NULL', NULL, FALSE);
             foreach ($this->db->get('auditjawabdetail')->result_array() as $d) {
+                /* Baris lama tidak punya kolom koreksi (kolom itu ada pada
+                   auditjawab.jwb_koreksi) dan boleh jadi tidak punya kolom
+                   referensi. Lengkapi kuncinya agar bentuknya sama dengan
+                   baris butir, sehingga pemakai tidak menemui "undefined
+                   index" dan koreksi lama tetap terbaca. */
+                $d['dtjwb_referensi'] = isset($d['dtjwb_referensi']) ? $d['dtjwb_referensi'] : '';
+                $d['dtjwb_koreksi']   = isset($jwb['jwb_koreksi']) ? $jwb['jwb_koreksi'] : '';
+                $d['lingkup_id']      = isset($d['lingkup_id']) ? $d['lingkup_id'] : NULL;
                 $d['baris'] = 'lama';
                 $baris[] = $d;
             }

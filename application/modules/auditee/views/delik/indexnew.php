@@ -194,11 +194,13 @@
                 </thead>
                 <tbody>
                   <?php foreach ($butir as $i => $b):
-                      $isi     = lingkup_bersihkan($b['dtjwb_pertanyaan']);
-                      $hasil   = lingkup_bersihkan($b['dtjwb_hasil']);
-                      $temuan  = strtoupper(trim((string) $b['dtjwb_temuan']));
-                      $catatan = lingkup_bersihkan($b['dtjwb_catatan']);
-                      $koreksi = lingkup_teks_baris($b['dtjwb_koreksi']);
+                      /* Akses aman: baris lama (auditjawabdetail) tidak punya
+                         kolom koreksi/referensi, nilainya dilengkapi model. */
+                      $isi     = lingkup_bersihkan(isset($b['dtjwb_pertanyaan']) ? $b['dtjwb_pertanyaan'] : '');
+                      $hasil   = lingkup_bersihkan(isset($b['dtjwb_hasil']) ? $b['dtjwb_hasil'] : '');
+                      $temuan  = strtoupper(trim((string) (isset($b['dtjwb_temuan']) ? $b['dtjwb_temuan'] : '')));
+                      $catatan = lingkup_bersihkan(isset($b['dtjwb_catatan']) ? $b['dtjwb_catatan'] : '');
+                      $koreksi = lingkup_teks_baris(isset($b['dtjwb_koreksi']) ? $b['dtjwb_koreksi'] : '');
 
                       /* Warna badge mengikuti jenis penilaian, supaya sama
                          jelasnya dengan kategori pada kartu di atas. */
