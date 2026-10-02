@@ -1,36 +1,83 @@
 /* PTK (Permintaan Tindakan Koreksi) - struktur baru.
  *
  * Satu baris = satu butir lingkup yang punya temuan (OB / TS MINOR / TS MAYOR).
- * Rencana koreksi disimpan pada baris auditjawab butir tersebut (lingkup_id).
+ * Rencana koreksi disimpan pada baris auditjawab butir tersebut (lingkup_id)
+ * sebagai teks biasa dari textarea (bukan editor kaya).
  */
 $(function () {
 
     var daftarptk = $('#ptk').DataTable({
         "responsive": true,
+        /* Lebar kolom diatur CSS (persentase + table-layout fixed pada
+           assets/app/ptk.css), bukan dihitung DataTables dari isi sel. */
+        "autoWidth": false,
         "processing": true,
         "serverSide": true,
         "searching": true,
         "order": [],
         "columnDefs": [
-            {"targets": [0, 6], "orderable": false}
+            /* Kolom No & Rencana Koreksi tidak dapat diurutkan. */
+            {"targets": [0, 6], "orderable": false},
+            /* Kelas kolom diambil dari header (lihat assets/app/ptk.css) supaya
+               lebarnya proporsional dan tidak diatur inline oleh DataTables. */
+            {"targets": 0, "className": "ptk-kolom-no"},
+            {"targets": 1, "className": "ptk-kolom-formulir"},
+            {"targets": 2, "className": "ptk-kolom-butir"},
+            {"targets": 3, "className": "ptk-kolom-hasil"},
+            {"targets": 4, "className": "ptk-kolom-temuan"},
+            {"targets": 5, "className": "ptk-kolom-catatan"},
+            {"targets": 6, "className": "ptk-koreksi-sel"}
         ],
         "ajax": {
             "url": base_url + "/ptk/listptk/",
             "type": "POST"
+        },
+        "createdRow": function (baris) {
+            $(baris).find('.ptk-klamp').each(function () {
+                var teks = $(this).text();
+                if (teks.length > 140) {
+                    $(this).attr('title', teks);
+                }
+            });
         }
+    });
+
+    /* Kotak cari pada kepala panel (menggantikan kotak bawaan DataTables,
+       lihat aturan .ptk-tabel-kotak .dataTables_filter pada ptk.css). */
+    $('#cari_ptk').on('input', function () {
+        daftarptk.search(String(this.value || '').trim()).draw();
     });
 
     var lingkup_id = 0;
     var dtform_id = 0;
     var audit_id = 0;
 
-    function isiEditor(teks) {
-        var $ed = $('#ptk_koreksi');
-        try {
-            $ed.summernote('code', teks || '');
-        } catch (e) {
-            $ed.val(teks || '');
+    /* Rencana koreksi lama mungkin tersimpan sebagai HTML (versi editor);
+       ubah menjadi teks biasa agar nyaman disunting di textarea. */
+    function keTeksBiasa(teks) {
+        if (!teks) {
+            return '';
         }
+        teks = String(teks);
+        if (teks.indexOf('<') === -1) {
+            return teks;
+        }
+
+        teks = teks.replace(/<br\s*\/?>/gi, '\n')
+                   .replace(/<li[^>]*>/gi, '- ')
+                   .replace(/<\/(p|div|li|ul|ol|h[1-6]|tr)>/gi, '\n')
+                   .replace(/<[^>]*>/g, '');
+
+        var entitas = {
+            '&nbsp;': ' ', '&amp;': '&', '&lt;': '<', '&gt;': '>',
+            '&quot;': '"', '&#39;': "'", '&apos;': "'"
+        };
+        teks = teks.replace(/&[a-z#0-9]+;/gi, function (kode) {
+            var kunci = kode.toLowerCase();
+            return entitas[kunci] !== undefined ? entitas[kunci] : kode;
+        });
+
+        return teks.replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
     }
 
     $('#ptk').on('click', '.edit', function () {
@@ -54,7 +101,7 @@ $(function () {
                 $('#ptk_butir').html(data.lingkup_isi || '');
                 $('#ptk_hasil').html(data.jwb_hasil || '-');
                 $('#ptk_catatan').html(data.jwb_catatan || '-');
-                isiEditor(data.jwb_koreksi || '');
+                $('#ptk_koreksi').val(keTeksBiasa(data.jwb_koreksi));
                 $('#editModal').modal('show');
             },
             error: function () {
@@ -80,12 +127,7 @@ $(function () {
         e.preventDefault();
 
         var $form = $(e.target);
-        var koreksi = '';
-        try {
-            koreksi = $('#ptk_koreksi').summernote('code');
-        } catch (err) {
-            koreksi = $('#ptk_koreksi').val();
-        }
+        var koreksi = $('#ptk_koreksi').val() || '';
 
         $.ajax({
             url: base_url + "/ptk/koreksi",

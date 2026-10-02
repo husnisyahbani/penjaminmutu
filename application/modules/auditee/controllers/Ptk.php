@@ -5,8 +5,12 @@ class Ptk extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditee';
-        $this->load->js(base_url("assets/app/auditee/ptk.js?v=2.0"));
+        $this->load->js(base_url("assets/app/auditee/ptk.js?v=3.0"));
+        // Informasi tombol aksi saat hover (lihat assets/app/tabel-aksi.css)
+        $this->load->js(base_url("assets/app/tabel-aksi.js?v=1.0"));
         $this->load->model('PtkModel', 'ptkmodel');
+        // Pembantu teks (lingkup_bersihkan) untuk merapikan isi kolom tabel.
+        $this->load->helper('lingkup');
 
         $role = $this->session->userdata('role');
         if (!isset($role) || $role != 'AUDITEE') {
@@ -34,9 +38,7 @@ class Ptk extends MY_Controller {
         $data['dtform_id'] = $this->input->post('dtform_id');
         $data['audit_id'] = $this->input->post('audit_id');
         $data['lingkup_id'] = $this->input->post('lingkup_id');
-        $data['jwb_koreksi'] = $this->input->post('ptk_koreksi');
-        $allowed_tags = '<p><br><b><i><u><strong><em><ul><ol><li>';
-        $data['jwb_koreksi'] = strip_tags((string) $data['jwb_koreksi'], $allowed_tags);
+        $data['jwb_koreksi'] = $this->_teksBaris($this->input->post('ptk_koreksi'));
         $status = $this->ptkmodel->koreksi($data);
         
         $query = array("status" => $status);
@@ -64,6 +66,36 @@ class Ptk extends MY_Controller {
         echo json_encode($row);
     }
 
+    /** Teks polos satu baris (untuk kolom tabel). */
+    private function _teks($nilai) {
+        return lingkup_bersihkan($nilai);
+    }
+
+    /**
+     * Teks polos yang tetap mempertahankan baris baru (rencana koreksi).
+     *
+     * Rencana koreksi lama tersimpan sebagai HTML (versi editor); tag blok
+     * diubah menjadi baris baru supaya tampil rapi di textarea dan tabel.
+     */
+    private function _teksBaris($nilai) {
+        $teks = (string) $nilai;
+
+        if (strpos($teks, '<') !== FALSE) {
+            $teks = preg_replace('/<br\s*\/?>/i', "\n", $teks);
+            $teks = preg_replace('/<li\b[^>]*>/i', '- ', $teks);
+            $teks = preg_replace('/<\/(p|div|li|ul|ol|h[1-6]|tr)>/i', "\n", $teks);
+            $teks = strip_tags($teks);
+        }
+
+        $teks = html_entity_decode($teks, ENT_QUOTES, 'UTF-8');
+        $teks = str_replace(array("\r\n", "\r"), "\n", $teks);
+        $teks = preg_replace('/[ \t]+/', ' ', $teks);
+        $teks = preg_replace('/ ?\n ?/', "\n", $teks);
+        $teks = preg_replace('/\n{3,}/', "\n\n", $teks);
+
+        return trim($teks);
+    }
+
     public function listptk() {
         $post = array();
         $post['search'] = $this->input->post('search');
@@ -80,12 +112,12 @@ class Ptk extends MY_Controller {
             $no++;
             $row = array();
             $row[] = $no;
-            $row[] = $field->form_nama;
-            $row[] = html_escape($field->lingkup_isi);
-            $row[] = $field->jwb_hasil;
+            $row[] = '<div class="ptk-klamp">' . html_escape($this->_teks($field->form_nama)) . '</div>';
+            $row[] = '<div class="ptk-klamp">' . html_escape($this->_teks($field->lingkup_isi)) . '</div>';
+            $row[] = '<div class="ptk-klamp">' . html_escape($this->_teks($field->jwb_hasil)) . '</div>';
             $row[] = $field->jwb_temuan
                 ? '<span class="badge badge-warning">' . html_escape($field->jwb_temuan) . '</span>' : '';
-            $row[] = $field->jwb_catatan;
+            $row[] = '<div class="ptk-klamp">' . html_escape($this->_teks($field->jwb_catatan)) . '</div>';
 
             $tombol = '<button type="button" class="edit btn btn-sm btn-icon btn-primary"'
                 . ' data-info="Tulis rencana koreksi butir ini"'
@@ -93,8 +125,11 @@ class Ptk extends MY_Controller {
                 . ' audit_id="' . $field->audit_id . '"'
                 . ' lingkup_id="' . $field->lingkup_id . '">'
                 . '<i class="icon md-edit" aria-hidden="true"></i></button>';
-            $koreksi = isset($field->jwb_koreksi) ? (string) $field->jwb_koreksi : '';
-            $row[] = '<div class="ptk-koreksi">' . $koreksi . '</div><div class="tabel-aksi">' . $tombol . '</div>';
+            $koreksi = $this->_teksBaris(isset($field->jwb_koreksi) ? $field->jwb_koreksi : '');
+            $isi = $koreksi === ''
+                ? '<span class="ptk-koreksi-kosong">Belum ada rencana koreksi</span>'
+                : '<div class="ptk-klamp ptk-koreksi">' . nl2br(html_escape($koreksi)) . '</div>';
+            $row[] = $isi . '<div class="tabel-aksi ptk-koreksi-aksi">' . $tombol . '</div>';
   
             
             $data[] = $row;

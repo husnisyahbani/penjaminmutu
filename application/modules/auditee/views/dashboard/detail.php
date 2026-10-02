@@ -159,7 +159,7 @@ $jml_belum = $jml_lingkup - $jml_dijawab;
                                                 <span class="badge badge-info">Catatan</span>
                                                 <?php endif; ?>
                                                 <?php if ($koreksi !== ''): ?>
-                                                <span class="badge badge-success">Sudah dikoreksi</span>
+                                                <span class="badge badge-success">Ada rencana koreksi</span>
                                                 <?php endif; ?>
                                             </div>
 
@@ -170,7 +170,7 @@ $jml_belum = $jml_lingkup - $jml_dijawab;
                                             <?php endif; ?>
                                             <?php if ($koreksi !== ''): ?>
                                             <div class="aktivitas-bukti">
-                                                <span class="aktivitas-label">Koreksi auditee:</span> <?php echo html_escape($koreksi); ?>
+                                                <span class="aktivitas-label">Rencana koreksi:</span> <?php echo nl2br(html_escape($koreksi)); ?>
                                             </div>
                                             <?php endif; ?>
 

@@ -55,34 +55,38 @@
             <div class="col-xl-12 col-md-24">
 
                 <div class="panel">
-                    <header class="panel-heading">
-                        <h3 class="panel-title"><?=$title?></h3>
-                        <div class="panel-actions panel-actions-keep">
-                            
-                            <!-- <button type="button" class="btn btn-sm btn-icon btn-success" id="tambah">
-                                <i class="icon md-plus" aria-hidden="true"></i>Tambah
-                            </button> -->
+                    <header class="panel-heading panel-heading-filter">
+                        <div class="panel-heading-isi">
+                            <h3 class="panel-title"><?=$title?></h3>
+                            <div class="panel-aksi">
+                                <div class="filter-kotak">
+                                    <label for="cari_ptk"><i class="icon md-search" aria-hidden="true"></i>Cari</label>
+                                    <input type="text" class="form-control" id="cari_ptk"
+                                           placeholder="Cari formulir, lingkup, catatan, koreksi">
+                                </div>
+                            </div>
                         </div>
                     </header>
                     <div class="panel-body">
-                        <table class="table table-hover dataTable w-full" id="ptk">
-                            <thead>
-                                <tr>
-                                    <th width="1%">No</th>
-                                    <th >Formulir</th>
-                                    <th >Butir Lingkup</th>
-                                    <th >Hasil</th>
-                                    <th >Temuan</th>
-                                    <th> Catatan</th>
-                                    <th> Rencana Koreksi</th>
-                                </tr>
-                            </thead>
+                        <div class="ptk-tabel-kotak">
+                            <table class="table table-hover dataTable ptk-tabel" id="ptk">
+                                <thead>
+                                    <tr>
+                                        <th class="ptk-kolom-no">No</th>
+                                        <th class="ptk-kolom-formulir">Formulir</th>
+                                        <th class="ptk-kolom-butir">Butir Lingkup</th>
+                                        <th class="ptk-kolom-hasil">Hasil</th>
+                                        <th class="ptk-kolom-temuan">Temuan</th>
+                                        <th class="ptk-kolom-catatan">Catatan</th>
+                                        <th class="ptk-kolom-koreksi">Rencana Koreksi</th>
+                                    </tr>
+                                </thead>
 
-                            <tbody>
-                            
+                                <tbody>
 
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
@@ -132,7 +136,9 @@
                     </div>
                     <div class="col-md-12">
                         <h4 class="example-title">Rencana Koreksi</h4>
-                        <textarea id="ptk_koreksi" class="editor" name="ptk_koreksi"></textarea>
+                        <textarea id="ptk_koreksi" class="form-control ptk-koreksi-input" name="ptk_koreksi"
+                                  rows="6" placeholder="Tulis rencana koreksi untuk butir ini..."></textarea>
+                        <div class="ptk-rencana-info">Tulis teks biasa; enter dipakai untuk memisahkan poin.</div>
                     </div>
                 </div>
 
@@ -147,8 +153,3 @@
         </div>
     </form>
 </div>
-
-<style>
-    .ptk-teks { min-height: 20px; word-break: break-word; }
-    .ptk-koreksi { margin-bottom: 6px; }
-</style>
