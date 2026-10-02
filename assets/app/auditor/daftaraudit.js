@@ -6,7 +6,10 @@ $(function () {
         "searching": true,
         "order": [],
         "columnDefs": [
-            {"targets": [0,5,6], "orderable": false}
+            {"targets": [0,5,6], "orderable": false},
+            /* Kolom Aksi & Status: rata tengah. Lebarnya mengikuti isi
+               (th width 1%) supaya tombol tidak pernah pindah baris. */
+            {"targets": [5,6], "className": "text-center tabel-aksi-sel"}
         ],
         "ajax": {
             "url": base_url + "/daftaraudit/listmutu/",
@@ -14,20 +17,9 @@ $(function () {
         }
     });
 
-    var daftarpertanyaan = $('#daftarpertanyaan').DataTable({
-        "responsive": true,
-        "processing": true,
-        "serverSide": true,
-        "searching": true,
-        "order": [],
-        "columnDefs": [
-            {"targets": [0,1,2], "orderable": false}
-        ],
-        "ajax": {
-            "url": base_url + "/daftaraudit/listpertanyaan/"+audit_id,
-            "type": "POST"
-        }
-    });
+    /* Halaman detail audit kini berbentuk topik/activity yang dirender server
+       (lihat assets/app/topik-aktivitas.js), jadi tidak ada DataTable
+       #daftarpertanyaan lagi di halaman itu. */
 
     // $('#jwb_pertanyaan').summernote('code', jwb_pertanyaan);
     // $('#jwb_referensi').summernote('code', jwb_referensi);
@@ -36,7 +28,8 @@ $(function () {
     // $('#jwb_tujuan').summernote('code', jwb_tujuan);
 
 
-    $("#daftarpertanyaan").on("click", ".delik", function () {
+    /* Tombol "Daftar Tilik" pada tiap topik (halaman detail). */
+    $(document).on("click", "#topik_daftar .delik", function () {
         var audit_id = $(this).attr('audit_id');
         var dtform_id = $(this).attr('dtform_id');
          window.location.href = base_url+"/delik?audit_id="+audit_id+"&dtform_id="+dtform_id;
@@ -127,7 +120,7 @@ $(function () {
     {
         swal.fire({
             title: "Anda Yakin?",
-            text: "Anda Yakin Ingin Mengembalikan Evaluasi Ini?",
+            text: "Anda Yakin Ingin Mengembalikan Evaluasi Ini Kepada Auditee?",
             type: "warning",
             showCancelButton: true,
             showLoaderOnConfirm: true,
@@ -142,8 +135,8 @@ $(function () {
                         .done(function (data) {
                             if(data.status){
                                     swal.fire({
-                                        title: "Hapus",
-                                        text: "Evaluasi Telah Dikembalikan!",
+                                        title: "Berhasil",
+                                        text: "Evaluasi telah dikembalikan ke auditee!",
                                         type: "success",
                                         preConfirm: function () {
                                             daftaraudit.ajax.reload();
@@ -152,7 +145,7 @@ $(function () {
                             }else{
                                 swal.fire({
                                         title: "Gagal",
-                                        text: "Evaluasi Tidak dapat dikembalikan!",
+                                        text: "Evaluasi tidak dapat dikembalikan ke auditee!",
                                         type: "danger",
                                         preConfirm: function () {
                                             daftaraudit.ajax.reload();

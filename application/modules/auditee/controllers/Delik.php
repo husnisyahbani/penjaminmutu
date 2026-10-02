@@ -5,12 +5,18 @@ class Delik extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditee';
-        $this->load->js(base_url("assets/app/auditee/delik.js?v=1.16"));
+        $this->load->js(base_url("assets/app/auditee/delik.js?v=2.4"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
         $this->load->model('AkunModel', 'akun');
         $this->load->model('FormulirModel', 'formulir');
+        $this->load->model('LingkupModel', 'lingkup');
+        /* Daftar butir memakai kueri yang sama dengan halaman PTK, supaya
+           kolom dan datanya sama (lihat PtkModel::_query_ptk). */
+        $this->load->model('PtkModel', 'ptkmodel');
+        // Pembantu teks (lingkup_bersihkan / lingkup_teks_baris) untuk daftar butir.
+        $this->load->helper('lingkup');
 
         $role = $this->session->userdata('role');
         if (!isset($role) || $role != 'AUDITEE') {
@@ -37,6 +43,44 @@ class Delik extends MY_Controller {
             $this->data['result'] = $this->mutu->getAuditById($audit_id);
             $this->data['jawab'] = $this->auditjawab->getAuditJawab($audit_id,$dtform_id);
             $this->data['soal'] = $this->formulir->getSoalFormulir($dtform_id);
+            // Butir lingkup (struktur baru) untuk tab Evaluasi.
+            $this->data['lingkup'] = $this->lingkup->daftarHtml($dtform_id);
+            /* Kolom dan data sama dengan halaman PTK (PtkModel), hanya saja
+               dibatasi pada pertanyaan yang dipilih dan butir bernilai "S"
+               ikut tampil - PTK menampilkan semua pertanyaan tanpa nilai "S". */
+            $butir = $this->ptkmodel->daftar($audit_id, $dtform_id, TRUE);
+            $this->data['butir'] = $butir;
+
+            /* Ringkasan untuk kartu: jumlah per jenis penilaian. */
+            $ringkas = array('total' => count($butir), 'sesuai' => 0, 'observasi' => 0,
+                             'minor' => 0, 'mayor' => 0);
+            foreach ($butir as $b) {
+                switch (strtoupper(trim((string) $b['jwb_temuan']))) {
+                    case 'S':        $ringkas['sesuai']++;    break;
+                    case 'OB':       $ringkas['observasi']++; break;
+                    case 'TS MINOR': $ringkas['minor']++;     break;
+                    case 'TS MAYOR': $ringkas['mayor']++;     break;
+                }
+            }
+            $this->data['ringkas'] = $ringkas;
+            /* Jumlah & daftar butir mengikuti tabel tilik; tabel lingkup
+               hanya dipakai bila strukturnya memang terisi. */
+            $jml_lingkup = $this->lingkup->hitung($dtform_id);
+            if ($jml_lingkup < 1 && !empty($butir)) {
+                $jml_lingkup = count($butir);
+            }
+            $this->data['jml_lingkup'] = $jml_lingkup;
+            if (trim((string) $this->data['lingkup']) === '' && !empty($butir)) {
+                $item = '';
+                foreach ($butir as $b) {
+                    $item .= '<li>' . html_escape(lingkup_bersihkan($b['lingkup_isi'])) . '</li>';
+                }
+                $this->data['lingkup'] = '<ol class="lingkup-daftar">' . $item . '</ol>';
+            }
+
+            /* Rencana koreksi hanya dapat diisi setelah audit selesai. */
+            $status_audit = strtoupper(trim((string) $this->data['result']['audit_status']));
+            $this->data['boleh_koreksi'] = ($status_audit === 'SELESAI');
             $this->data['js'] = $this->load->get_js_files();
             $this->data['audit'] = 'active';//auditmenu
             $this->data['auditmenu'] = 'active';
@@ -60,6 +104,37 @@ class Delik extends MY_Controller {
             header('Content-Type: application/json');
             echo json_encode($query); 
         }
+    }
+
+    /**
+     * Simpan rencana koreksi satu butir, langsung dari halaman delik.
+     *
+     * Hanya menerima butir (lingkup_id) milik pertanyaan yang dikirim, supaya
+     * satu halaman tidak bisa menulis ke pertanyaan lain. Butir "S" tidak
+     * perlu koreksi - penjagaannya ada di tampilan.
+     */
+    public function koreksi() {
+        $audit_id = (int) $this->input->post('audit_id');
+        $dtjwb_id = (int) $this->input->post('dtjwb_id');
+
+        /* Penjagaan: butir harus milik auditee ini (getButir menyaring
+           auditee_id) dan auditnya sudah selesai dinilai (status SELESAI).
+           Penyimpanan memakai model yang sama dengan halaman PTK. */
+        $butir = $this->ptkmodel->getButir($audit_id, $dtjwb_id);
+        $status = false;
+        if (!empty($butir) && strtoupper(trim((string) $butir['audit_status'])) === 'SELESAI') {
+            $status = $this->ptkmodel->koreksi(array(
+                'audit_id'    => $audit_id,
+                'jwb_id'      => (int) $butir['jwb_id'],
+                'dtjwb_id'    => $dtjwb_id,
+                'jwb_koreksi' => $this->input->post('koreksi'),
+            ));
+        }
+
+        $query = array("status" => $status);
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
+        echo json_encode($query);
     }
 
     public function jawaban() {

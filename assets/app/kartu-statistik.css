@@ -1,0 +1,111 @@
+/**
+ * Kartu statistik (dipakai bersama)
+ * ---------------------------------------------------------------------------
+ * Dipakai oleh dashboard admin dan halaman Daftar Audit (auditor) supaya
+ * tampilan kartu seragam.
+ *
+ * Struktur:
+ *   <a class="kartu-stat" style="background-color:#3949ab">
+ *     <i class="icon md-library kartu-stat__ikon"></i>
+ *     <div style="overflow:hidden;">
+ *       <div class="kartu-stat__angka">23</div>
+ *       <div class="kartu-stat__judul">Dokumen Mutu</div>
+ *       <div class="kartu-stat__ket">Seluruh dokumen standar mutu</div>
+ *     </div>
+ *   </a>
+ *
+ * Warna diberikan lewat gaya inline supaya tidak bergantung kelas utility tema.
+ */
+
+.kartu-stat {
+    display: block;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    color: #fff !important;
+    text-decoration: none !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .14);
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+a.kartu-stat:hover,
+a.kartu-stat:focus {
+    color: #fff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 7px 16px rgba(0, 0, 0, .2);
+}
+
+.kartu-stat__ikon {
+    float: left;
+    font-size: 32px;
+    line-height: 1;
+    margin: 2px 16px 22px 0;
+    opacity: .9;
+}
+
+.kartu-stat__angka {
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.kartu-stat__judul {
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    opacity: .92;
+}
+
+.kartu-stat__ket {
+    font-size: 12px;
+    opacity: .78;
+    margin-top: 2px;
+}
+
+/* Versi tanpa tautan (kartu statis) tetap memakai gaya yang sama. */
+div.kartu-stat {
+    cursor: default;
+}
+
+/* ---------------------------------------------------------------------------
+   Tambahan opsional: bilah porsi + keterangan kecil.
+
+   Dipakai halaman PTK (auditee) untuk menunjukkan porsi temuan terhadap
+   total, dan porsi temuan yang sudah punya rencana koreksi.
+   --------------------------------------------------------------------------- */
+
+.kartu-stat__isi {
+    overflow: hidden;
+}
+
+.kartu-stat__bar {
+    height: 5px;
+    margin-top: 10px;
+    border-radius: 3px;
+    background-color: rgba(255, 255, 255, .3);
+    overflow: hidden;
+}
+
+.kartu-stat__bar-isi {
+    display: block;
+    height: 100%;
+    border-radius: 3px;
+    background-color: #fff;
+    transition: width .3s ease;
+}
+
+.kartu-stat__bar-ket {
+    margin-top: 5px;
+    font-size: 11px;
+    letter-spacing: .02em;
+    opacity: .82;
+}
+
+/* Kartu yang ikonnya di atas angka (layar sempit): tetap rapi saat dibungkus. */
+@media (max-width: 575px) {
+    .kartu-stat__ikon {
+        float: none;
+        display: block;
+        margin: 0 0 10px;
+    }
+}

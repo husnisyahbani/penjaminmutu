@@ -1,0 +1,64 @@
+/* ------------------------------------------------------------------
+   Tombol aksi pada tabel (kolom "Aksi").
+
+   Tombol memakai pola btn btn-sm btn-icon btn-<warna> sehingga tampil
+   sebagai kotak kecil berukuran sama (tema hanya memberi padding
+   seragam pada .btn-icon, jadi pola ini tidak untuk tombol berteks).
+   Keterangan tiap tombol diambil dari tooltip.
+
+   Isi sel dibungkus .tabel-aksi supaya:
+     - selalu berada dalam satu baris (tidak pernah pindah baris),
+     - jarak antar tombol konsisten,
+     - tidak menyisakan celah baseline di bawah tombol.
+   Kolom Aksi & Status sendiri diratakan tengah (text-center).
+   ------------------------------------------------------------------ */
+
+.tabel-aksi {
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.tabel-aksi > .btn + .btn {
+  margin-left: 6px;
+}
+
+.tabel-aksi > .btn {
+  vertical-align: middle;
+}
+
+.tabel-aksi > .badge {
+  white-space: nowrap;
+}
+
+/* Judul kolom aksi/status: tidak pernah membungkus. */
+.tabel-aksi-sel {
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------
+   Kotak informasi tombol (dipakai assets/app/tabel-aksi.js).
+   Muncul saat kursor diarahkan ke tombol atau tombol mendapat fokus.
+   ------------------------------------------------------------------ */
+.tabel-info {
+  position: fixed;
+  z-index: 1090;
+  max-width: 280px;
+  padding: 6px 10px;
+  border-radius: 3px;
+  background-color: rgba(33, 33, 33, .95);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: nowrap;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .12s ease-in-out, visibility .12s ease-in-out;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+}
+
+.tabel-info--tampil {
+  opacity: 1;
+  visibility: visible;
+}

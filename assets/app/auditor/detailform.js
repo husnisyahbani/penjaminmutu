@@ -1,5 +1,41 @@
 $(function () {
 
+    /* ---------------- butir lingkup (boleh banyak per pertanyaan) ---------------- */
+
+    var templat = $('#lingkup_templat').html();
+
+    function tambahBaris(target, id, isi) {
+        var $baris = $(templat);
+        $baris.find('input[name="lingkup_id[]"]').val(id || 0);
+        $baris.find('textarea[name="lingkup_isi[]"]').val(isi || '');
+        $('#' + target).append($baris);
+    }
+
+    function kosongkan(target) {
+        $('#' + target).empty();
+    }
+
+    function siapkanFormTambah() {
+        kosongkan('lingkup_add_daftar');
+        tambahBaris('lingkup_add_daftar', 0, '');
+    }
+
+    $('.lingkup-tambah').on('click', function () {
+        tambahBaris($(this).data('target'), 0, '');
+    });
+
+    $(document).on('click', '.lingkup-hapus', function () {
+        $(this).closest('.lingkup-baris').remove();
+    });
+
+    function rapikan(target) {
+        $('#' + target).find('.lingkup-baris').each(function () {
+            if ($.trim($(this).find('textarea').val()) === '' && $(this).find('input').val() === '0') {
+                $(this).remove();
+            }
+        });
+    }
+
     var dtform = $('#dtform').DataTable({
         "responsive": true,
         "processing": true,
@@ -41,7 +77,15 @@ $(function () {
                     $("#edit_dtform_tujuan").val(list.dtform_tujuan);
                     $("#dtform_id").val(list.dtform_id);
                     $('#edit_dtform_pertanyaan').summernote('code',list.dtform_pertanyaan);
-                    $('#edit_dtform_lingkup').summernote('code',list.dtform_lingkup);
+
+                    kosongkan('lingkup_edit_daftar');
+                    if (list.lingkup && list.lingkup.length) {
+                        $.each(list.lingkup, function (i, b) {
+                            tambahBaris('lingkup_edit_daftar', b.lingkup_id, b.lingkup_isi);
+                        });
+                    } else {
+                        tambahBaris('lingkup_edit_daftar', 0, '');
+                    }
                     //tinymce.get('edit_dtform_pertanyaan').setContent(list.dtform_pertanyaan);
                     //tinymce.get('edit_dtform_lingkup').setContent(list.dtform_lingkup);
                     
@@ -107,6 +151,7 @@ $(function () {
     }
 
     $("#tambah").on("click", function () {
+        siapkanFormTambah();
         $("#dtformAddModal").modal('show');
     });
 
@@ -128,6 +173,7 @@ $(function () {
         e.preventDefault();
 
         var $form = $(e.target);       // ✅ perbaikan
+        rapikan('lingkup_add_daftar');
         var formData = new FormData(e.target);
 
         $.ajax({
@@ -188,6 +234,7 @@ $("#formeditdtform").formValidation({
         e.preventDefault();
 
         var $form = $(e.target);       // ✅ perbaikan
+        rapikan('lingkup_edit_daftar');
         var formData = new FormData(e.target);
 
         $.ajax({

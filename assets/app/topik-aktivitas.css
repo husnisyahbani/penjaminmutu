@@ -1,0 +1,325 @@
+/* =============================================================================
+   Gaya pertanyaan & lingkup (mirip halaman kursus Moodle)
+   Dipakai oleh: admin (kelola formulir), auditor & auditee (detail audit).
+
+   Satu formulir    = satu halaman kursus
+   Satu pertanyaan  = satu baris formulir audit
+   Satu lingkup     = satu butir pada pertanyaan tersebut (wajib dijawab
+                      auditee, lampiran opsional boleh lebih dari satu)
+
+   Nama kelas CSS lama (topik/aktivitas) dipertahankan sebagai penanda markup.
+   ============================================================================= */
+
+.topik-berkas {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.topik {
+    border: 1px solid #e3e8ef;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(32, 45, 64, .05);
+    overflow: hidden;
+}
+
+.topik-kepala {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 13px 16px;
+    background: #f7f9fc;
+    border-bottom: 1px solid #eef1f6;
+    cursor: pointer;
+}
+
+.topik-kepala:hover {
+    background: #f1f5fa;
+}
+
+.topik-nomor {
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #3f51b5;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.topik-judul {
+    flex: 1 1 auto;
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.5;
+    color: #2b3546;
+    word-break: break-word;
+}
+
+.topik-judul .topik-info {
+    margin-left: 8px;
+    white-space: nowrap;
+}
+
+.topik-panah {
+    flex: 0 0 auto;
+    color: #8a94a6;
+    margin-top: 4px;
+    transition: transform .15s ease;
+}
+
+.topik-terlipat .topik-panah {
+    transform: rotate(-90deg);
+}
+
+.topik-terlipat .aktivitas-daftar {
+    display: none;
+}
+
+.topik-aksi,
+.aktivitas-aksi {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.topik-aksi .btn,
+.aktivitas-aksi .btn {
+    margin: 0;
+}
+
+.aktivitas-daftar {
+    padding: 12px 16px 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.aktivitas {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 9px 11px;
+    border: 1px solid #eef1f6;
+    border-radius: 8px;
+    background: #fcfdff;
+}
+
+.aktivitas:hover {
+    border-color: #dbe3ee;
+    background: #f8fbff;
+}
+
+.aktivitas-ikon {
+    flex: 0 0 auto;
+    color: #7986cb;
+    margin-top: 3px;
+}
+
+.aktivitas-isi {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.aktivitas-teks {
+    display: block;
+    color: #3c4657;
+    line-height: 1.55;
+    word-break: break-word;
+}
+
+.aktivitas-kosong,
+.topik-kosong {
+    color: #9aa4b2;
+    font-size: 13px;
+    font-style: italic;
+}
+
+.topik-kosong {
+    padding: 26px 16px;
+    text-align: center;
+}
+
+.aktivitas-editor {
+    margin-top: 8px;
+}
+
+.aktivitas-editor .form-control {
+    min-height: 62px;
+}
+
+.aktivitas-editor-aksi {
+    margin-top: 6px;
+    display: flex;
+    gap: 6px;
+}
+
+.topik-tambah-activity {
+    align-self: flex-start;
+}
+
+/* Penanda status pada halaman detail audit */
+.aktivitas-status {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.aktivitas-status .badge {
+    font-weight: 500;
+}
+
+.aktivitas-bukti {
+    margin-top: 6px;
+    color: #5b6475;
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.aktivitas-bukti .aktivitas-label {
+    color: #8a94a6;
+    font-style: italic;
+}
+
+.topik-ringkas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+/* Kotak pencarian pada kepala panel (mirip select pada filter periode) */
+.panel-aksi .filter-kotak input[type="text"] {
+    width: auto;
+    min-width: 210px;
+    max-width: 100%;
+    height: 30px;
+    padding: 0 8px;
+    font-size: 13px;
+    color: #424242;
+    background-color: #fff;
+    border-color: #dcdcdc;
+}
+
+.panel-aksi .filter-kotak input[type="text"]:focus {
+    border-color: #3f51b5;
+    box-shadow: none;
+}
+
+.topik-disembunyikan {
+    display: none !important;
+}
+
+@media (max-width: 767px) {
+    .topik-kepala {
+        flex-wrap: wrap;
+    }
+
+    .aktivitas {
+        flex-wrap: wrap;
+    }
+}
+
+/* ---------------------------------------------------------------------------
+   Jawaban wajib + lampiran (halaman detail audit auditee)
+   --------------------------------------------------------------------------- */
+
+.jawaban-kotak {
+    margin-top: 10px;
+}
+
+.jawaban-isi {
+    min-height: 78px;
+    font-size: 13px;
+}
+
+.jawaban-aksi {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.jawaban-pesan {
+    font-size: 12px;
+    color: #757575;
+}
+
+.lampiran-kotak {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed #e0e0e0;
+}
+
+.lampiran-kepala {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #616161;
+}
+
+.lampiran-daftar {
+    margin-top: 6px;
+}
+
+.lampiran {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    font-size: 13px;
+}
+
+.lampiran-ikon {
+    color: #9e9e9e;
+}
+
+.lampiran-nama {
+    color: #3f51b5;
+    word-break: break-all;
+}
+
+.lampiran-ukuran,
+.lampiran-kosong {
+    font-size: 12px;
+    color: #9e9e9e;
+}
+
+.lampiran-unggah {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.lampiran-berkas {
+    max-width: 100%;
+    font-size: 13px;
+}
+
+.status-jawab.badge-danger {
+    background-color: #ef5350;
+}
+
+/* Angka indikator yang baru berubah diberi sentakan halus supaya
+   perubahan jumlah langsung terlihat. */
+@keyframes ringkasPop {
+    from { transform: scale(1.28); }
+    to   { transform: scale(1); }
+}
+
+.ringkas-berubah {
+    animation: ringkasPop 0.45s ease-out;
+    display: inline-block;
+}

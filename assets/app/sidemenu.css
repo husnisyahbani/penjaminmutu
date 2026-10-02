@@ -1,0 +1,27 @@
+/* ------------------------------------------------------------------
+   Sub menu sidebar (dipakai bersama oleh modul admin & auditor).
+
+   Tema tidak menata ikon kecil di dalam sub menu (sub menu aslinya
+   hanya berisi judul), sehingga ikon dan judul saling menempel bila
+   ditambahkan. Aturan di bawah membuat tiap baris sub menu memakai
+   flexbox: ikon berukuran tetap, judul sejajar rapi di sebelahnya,
+   dengan indentasi yang sama untuk semua modul.
+   ------------------------------------------------------------------ */
+
+.site-menu-sub .site-menu-item > a {
+  display: flex;
+  align-items: center;
+  padding: 0 25px 0 40px;
+}
+
+.site-menu-sub .site-menu-item > a .icon {
+  flex: 0 0 18px;
+  margin-right: 10px;
+  font-size: 15px;
+  text-align: center;
+  opacity: .75;
+}
+
+.site-menu-sub .site-menu-item > a .site-menu-title {
+  max-width: 145px;
+}

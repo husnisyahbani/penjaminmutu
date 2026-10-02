@@ -23,7 +23,7 @@
                             <th>Username</th>
                             <th>Password</th>
                             <th>Status</th>
-                            <th width="100px">Aksi</th>
+                            <th width="170px">Aksi</th>
                         </tr>
                     </thead>
 

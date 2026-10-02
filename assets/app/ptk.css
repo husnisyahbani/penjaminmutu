@@ -1,0 +1,288 @@
+/* =============================================================================
+   Daftar butir lingkup + form rencana koreksi.
+
+   Dipakai dua halaman:
+     - PTK auditee (/auditee/ptk) .......... tabel .ptk-tabel + form koreksi
+     - Delik auditee (/auditee/delik) ...... tabel & kolom sama persis
+       dengan PTK (kueri sama: PtkModel::daftar), hanya dibatasi pada satu
+       pertanyaan dan nilai "S" ikut tampil. Rencana koreksi disunting
+       langsung pada kolomnya (.koreksi-kotak).
+
+   - Lebar kolom dibuat proporsional: kolom sempit (No, Temuan) tetap kecil,
+     kolom teks panjang (Butir Lingkup, Catatan) diberi porsi lebih besar,
+     dan rencana koreksi mendapat kolom paling lebar.
+   - Rencana koreksi diisi lewat textarea biasa (teks polos), bukan editor.
+   ============================================================================= */
+
+/* --- tabel ---------------------------------------------------------------- */
+
+.ptk-tabel-kotak {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.ptk-tabel {
+    width: 100%;
+    margin-bottom: 0;
+    /* Lebar kolom persis seperti yang ditentukan (persentase di bawah),
+       bukan hasil hitungan isi sel, sehingga porsi antar kolom tetap. */
+    table-layout: fixed;
+    min-width: 1040px;
+}
+
+.ptk-tabel thead th {
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.ptk-tabel tbody td {
+    vertical-align: top;
+    line-height: 1.45;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+/* Lebar kolom (% dari lebar tabel). Jumlah = 100%.
+   Kolom sempit (No, Temuan) tetap kecil; kolom teks panjang (Butir Lingkup,
+   Rencana Koreksi) mendapat porsi paling besar. */
+.ptk-kolom-no {
+    width: 4%;
+    text-align: center;
+}
+
+.ptk-kolom-formulir {
+    width: 13%;
+}
+
+.ptk-kolom-butir {
+    width: 24%;
+}
+
+.ptk-kolom-hasil {
+    width: 13%;
+}
+
+.ptk-kolom-temuan {
+    width: 9%;
+    text-align: center;
+}
+
+.ptk-kolom-catatan {
+    width: 16%;
+}
+
+.ptk-kolom-koreksi {
+    width: 21%;
+}
+
+/* Kolom Aksi pada daftar tilik: hanya tombol hapus, jadi cukup sempit. */
+.ptk-kolom-aksi {
+    width: 8%;
+    text-align: center;
+}
+
+/* Isi sel yang panjang dipotong beberapa baris saja supaya tinggi baris
+   tetap rapi; teks lengkapnya muncul saat kursor diarahkan (title). */
+.ptk-klamp {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
+    line-clamp: 5;
+    overflow: hidden;
+}
+
+/* Rencana koreksi: teks di kiri, tombol tulis di kanan atas. */
+.ptk-koreksi-sel {
+    position: relative;
+}
+
+.ptk-koreksi-aksi {
+    float: right;
+    margin: 0 0 6px 10px;
+}
+
+.ptk-koreksi {
+    color: #424242;
+}
+
+.ptk-koreksi-kosong {
+    font-style: italic;
+    color: #9e9e9e;
+}
+
+/* --- modal tulis rencana koreksi ------------------------------------------ */
+
+.ptk-teks {
+    min-height: 20px;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+.ptk-koreksi-input {
+    min-height: 120px;
+    font-size: 13px;
+    line-height: 1.6;
+    resize: vertical;
+}
+
+.ptk-rencana-info {
+    margin-top: 6px;
+    font-size: 12px;
+    color: #9e9e9e;
+}
+
+/* Di layar sempit, DataTables (responsive) melipat kolom; lebar minimum
+   tabel diturunkan supaya tidak memaksa gulir mendatar terlalu jauh. */
+@media (max-width: 991px) {
+    .ptk-tabel {
+        min-width: 860px;
+    }
+}
+
+/* Kotak cari bawaan DataTables tidak dipakai: pencarian memakai kotak
+   "Cari" pada kepala panel (lihat #cari_ptk). */
+.ptk-tabel-kotak .dataTables_filter,
+.ptk-tabel-kotak .dataTables_length {
+    display: none;
+}
+/* ------------------------------------------------------------------
+   Halaman delik auditee: blok informasi pertanyaan yang dipilih.
+   ------------------------------------------------------------------ */
+.pertanyaan-isi {
+    color: #616161;
+    line-height: 1.7;
+}
+
+.pertanyaan-isi > :last-child {
+    margin-bottom: 0;
+}
+
+.pertanyaan-butir {
+    margin-top: 15px;
+}
+
+.pertanyaan-butir__daftar {
+    margin-top: 10px;
+}
+
+.pertanyaan-butir .lingkup-daftar {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.pertanyaan-butir .lingkup-daftar li {
+    margin-bottom: 4px;
+    line-height: 1.6;
+}
+
+/* Kotak isian rencana koreksi langsung pada tabel delik (bukan modal).
+   Butir "S" tidak diberi kotak ini - lihat delik/indexnew.php. */
+.koreksi-kotak .koreksi-isi {
+    min-height: 68px;
+    font-size: 13px;
+}
+
+.koreksi-kotak .koreksi-aksi {
+    margin-top: 6px;
+}
+
+/* Keterangan kecil di kolom rencana koreksi (mis. "Dapat diisi setelah
+   audit selesai") pada tabel delik & PTK. */
+.ptk-koreksi-ket {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    font-style: italic;
+    color: #9e9e9e;
+}
+
+.koreksi-kotak .koreksi-pesan {
+    margin-left: 6px;
+    font-size: 12px;
+    color: #9e9e9e;
+}
+
+/* ------------------------------------------------------------------
+   Daftar tilik auditor (/auditor/delik): tombol edit kecil di dalam
+   tiap kolom (No/Butir/Hasil/Temuan/Catatan/Aksi selalu tampil) dan
+   referensi di bawah isian butir.
+   ------------------------------------------------------------------ */
+.tilik-edit {
+    float: right;
+    margin: 0 0 6px 10px;
+}
+
+/* Daftar butir lingkup + jawaban auditee pada panel Informasi Pertanyaan. */
+.butir-lingkup-judul {
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #424242;
+}
+.butir-lingkup-teks {
+    font-weight: 600;
+    color: #424242;
+}
+
+.butir-lingkup-status {
+    margin: 4px 0 2px;
+}
+
+.pertanyaan-butir .aktivitas-bukti {
+    margin-top: 4px;
+}
+
+/* Referensi ditulis di bawah isian butir dengan penanda tebal. */
+.tilik-ref {
+    margin-top: 4px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #757575;
+}
+
+.tilik-ref strong {
+    color: #424242;
+}
+
+/* Input tujuan pertanyaan (langsung di atas tabel). */
+.tujuan-kotak {
+    margin-top: 15px;
+    padding: 12px 14px;
+    border: 1px solid #e0e0e0;
+    border-left: 3px solid #1e88e5;
+    border-radius: 4px;
+    background-color: #fafafa;
+}
+
+.tujuan-label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 13px;
+    color: #424242;
+}
+
+.tujuan-label .icon {
+    margin-right: 4px;
+}
+
+.tujuan-tampil {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.tujuan-tampil .tujuan-teks {
+    flex: 1 1 auto;
+    min-width: 0;
+    line-height: 1.7;
+    color: #616161;
+}
+
+.tujuan-aksi {
+    margin-top: 8px;
+}
+
+.tujuan-pesan {
+    margin-left: 6px;
+    font-size: 12px;
+}

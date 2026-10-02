@@ -5,13 +5,18 @@ class Daftaraudit extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditor';
-        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=1.60"));
+        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=2.0"));
+        // Informasi tombol aksi saat hover (lihat assets/app/tabel-aksi.css)
+        $this->load->js(base_url("assets/app/tabel-aksi.js?v=1.0"));
+        // Tampilan topik & activity pada halaman detail audit.
+        $this->load->js(base_url("assets/app/topik-aktivitas.js?v=1.0"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('AuditJawabDetailModel', 'auditjawabdetail');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
         $this->load->model('AkunModel', 'akun');
         $this->load->model('FormulirModel', 'formulir');
+        $this->load->model('PeriodeModel', 'periode');
 
         $role = $this->session->userdata('role');
         if (!isset($role) || $role != 'AUDITOR') {
@@ -30,7 +35,9 @@ class Daftaraudit extends MY_Controller {
             $this->data['totaldraft'] = $this->mutu->totalDraft();
             $this->data['listauditor'] = $this->akun->getAllAuditor();
             $this->data['listauditee'] = $this->akun->getAllAuditee();
-            $this->data['formulir'] = $this->formulir->getAllFormulir();
+            /* Pilihan formulir mengikuti periode aktif (formulir lama tanpa periode
+               tetap ikut tampil). */
+            $this->data['formulir'] = $this->formulir->getAllFormulir($this->periode->aktifId());
             $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
             $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
             $this->template($this->data, $this->module); 
@@ -145,8 +152,8 @@ class Daftaraudit extends MY_Controller {
                         ->getAuditJawabFix($audit['audit_id'], $row['dtform_id']);
             if (!$jwb) continue;
 
-            $detail = $this->auditjawabdetail
-                           ->getAuditJawabDetail($jwb['jwb_id']);
+            /* Struktur baru: butir lingkup + sisa baris lama. */
+            $detail = $this->auditjawab->barisTilik($audit['audit_id'], $row['dtform_id']);
 
             foreach ($detail as $dtjwb) {
 
@@ -240,6 +247,9 @@ class Daftaraudit extends MY_Controller {
             $this->data['title'] = 'Daftar Audit';
             $this->data['audit_id'] = $id;
             $this->data['result'] = $this->mutu->getAuditById($id);
+            /* Pertanyaan (topik) + lingkup (butir) beserta jawaban/lampiran
+               auditee dan hasil yang sudah tersimpan. */
+            $this->data['topik'] = $this->auditjawab->petaTilik($id);
             $this->data['js'] = $this->load->get_js_files();
             $this->data['audit'] = 'active';
             $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
@@ -264,6 +274,11 @@ class Daftaraudit extends MY_Controller {
 
                 $akunauditor = $this->akun->getAkunById($data['auditor_id']);
                 $data['auditor'] = $akunauditor['nama'];
+
+                // Audit baru ditempatkan pada periode yang sedang aktif (bila ada).
+                if ($this->periode->siap()) {
+                    $data['periode_id'] = $this->periode->aktifId();
+                }
 
                 if ($this->mutu->add($data)) {
                     $query = array("status" => true, "pesan" => "Berhasil");
@@ -350,30 +365,70 @@ class Daftaraudit extends MY_Controller {
             $row[] = $field->auditee;
             $row[] = $field->unit; 
 
-            if($field->audit_status == "PROSES"){
-                $row[] = '<button class="detail btn btn-sm btn-icon btn-success"
-            data-toggle="tooltip" data-original-title="DETAIL" id=' . $field->audit_id.'><i class="icon md-book" aria-hidden="true"></i></button>';
-            }else if($field->audit_status == "SELESAI"){
-                $row[] = '<button class="detail btn btn-sm btn-icon btn-success"
-            data-toggle="tooltip" data-original-title="DETAIL" id=' . $field->audit_id.'><i class="icon md-book" aria-hidden="true"></i></button> <button class="download btn btn-sm btn-icon btn-success"
-            data-toggle="tooltip" data-original-title="DELETE" id=' . $field->audit_id.'><i class="icon md-download" aria-hidden="true"></i></button>';
-            }else{
-                $row[] = '<button class="btn btn-warning btn-xs waves-effect waves-classic"
-            data-toggle="tooltip" data-original-title="Wait">Menunggu Proses</button>';
+            /* ================= TOMBOL AKSI =================
+               Pola seragam: btn btn-sm btn-icon btn-<warna> + ikon saja
+               (tanpa teks, sesuai gaya tabel admin). Tombol dibungkus
+               .tabel-aksi supaya selalu satu baris dan jaraknya
+               konsisten.
+
+               Keterangan tiap tombol muncul saat kursor diarahkan (hover)
+               atau saat tombol mendapat fokus keyboard, memakai atribut
+               data-info yang diolah assets/app/tabel-aksi.js (delegasi di
+               document, jadi baris baru dari DataTables ikut terjangkau).
+               Tooltip bawaan tema tidak dipakai karena $.fn.tooltip pada
+               tema ini diambil alih jQuery UI. */
+            $btn_detail = '<button type="button" class="detail btn btn-sm btn-icon btn-primary" '
+                . 'data-info="Lihat rincian penilaian" '
+                . 'aria-label="Detail" id="' . $field->audit_id . '">'
+                . '<i class="icon md-book" aria-hidden="true"></i></button>';
+
+            $btn_unduh = '<button type="button" class="download btn btn-sm btn-icon btn-success" '
+                . 'data-info="Unduh hasil audit" '
+                . 'aria-label="Unduh" id="' . $field->audit_id . '">'
+                . '<i class="icon md-download" aria-hidden="true"></i></button>';
+
+            $btn_proses = '<button type="button" class="proses btn btn-sm btn-icon btn-warning" '
+                . 'data-info="Mulai proses penilaian" '
+                . 'aria-label="Proses" id="' . $field->audit_id . '">'
+                . '<i class="icon md-play" aria-hidden="true"></i></button>';
+
+            $btn_kembali = '<button type="button" class="kembali btn btn-sm btn-icon btn-danger" '
+                . 'data-info="Kembalikan ke auditee" '
+                . 'aria-label="Kembalikan" id="' . $field->audit_id . '">'
+                . '<i class="icon md-undo" aria-hidden="true"></i></button>';
+
+            $btn_selesai = '<button type="button" class="selesai btn btn-sm btn-icon btn-success" '
+                . 'data-info="Selesaikan penilaian" '
+                . 'aria-label="Selesai" id="' . $field->audit_id . '">'
+                . '<i class="icon md-check" aria-hidden="true"></i></button>';
+
+            $tunggu = '<span class="badge badge-default">Menunggu proses</span>';
+
+            // ---- kolom Aksi: seluruh tombol, seragam, sesuai status ----
+            if ($field->audit_status == "PROSES") {
+                $aksi = $btn_detail . $btn_kembali . $btn_selesai;
+            } else if ($field->audit_status == "SELESAI") {
+                $aksi = $btn_detail . $btn_unduh;
+            } else if ($field->audit_status == "TERKIRIM") {
+                $aksi = $btn_proses;
+            } else {
+                $aksi = $tunggu; // DRAFT / status lain: belum ada aksi
             }
-            
-            if($field->audit_status == "DRAFT"){
-                $row[] = '<button class="btn btn-primary btn-xs waves-effect waves-classic"
-            data-toggle="tooltip" data-original-title="DRAFT">Draft</button>';
-            }else if($field->audit_status == "TERKIRIM"){                                        
-                $row[] = '<button type="button" class="proses btn btn-sm btn-icon btn-warning" id="'.$field->audit_id.'"><i class="icon md-play" aria-hidden="true"></i>Proses</button>';
-            }else if($field->audit_status == "PROSES"){
-                $row[] = '<button type="button" class="kembali btn btn-sm btn-icon btn-warning" id="'.$field->audit_id.'"><i class="icon md-close" aria-hidden="true"></i>Kembalikan</button> <button type="button" class="selesai btn btn-sm btn-icon btn-danger" id="'.$field->audit_id.'"><i class="icon md-play" aria-hidden="true"></i>Selesai</button>';
-            }else if($field->audit_status == "SELESAI"){
-                $row[] = '<button type="button" class="kembali btn btn-sm btn-icon btn-warning" id="'.$field->audit_id.'"><i class="icon md-close" aria-hidden="true"></i>Kembalikan</button> <button type="button" class="btn btn-success btn-xs waves-effect waves-classic" id="'.$field->audit_id.'"><i class="icon md-check" aria-hidden="true"></i>Selesai</button>';
-            }
-            
-            
+
+            $row[] = '<div class="tabel-aksi">' . $aksi . '</div>';
+
+            // ---- kolom Status: hanya badge (tanpa tombol) ----
+            $badge = array(
+                'DRAFT'    => 'badge-default',
+                'TERKIRIM' => 'badge-info',
+                'PROSES'   => 'badge-warning',
+                'SELESAI'  => 'badge-success',
+            );
+
+            $kunci = strtoupper(trim($field->audit_status));
+            $kelas = isset($badge[$kunci]) ? $badge[$kunci] : 'badge-default';
+            $row[] = '<span class="badge ' . $kelas . '">' . ucfirst(strtolower($kunci)) . '</span>';
+
             $data[] = $row;
         }
 

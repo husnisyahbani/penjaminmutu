@@ -10,26 +10,27 @@ class DtformModel extends CI_Model {
         parent::__construct();
     }
 
-    var $column_search = array('dtform_tujuan','dtform_pertanyaan','dtform_lingkup','dtform_create');
-    var $column_order = array(null,'dtform_tujuan','dtform_pertanyaan','dtform_lingkup','dtform_create',null);
+    /* 'lingkup' bukan nama kolom lagi: pencariannya lewat EXISTS ke tabel lingkup. */
+    var $column_search = array('dtform_tujuan','dtform_pertanyaan','lingkup','dtform_create');
+    var $column_order = array(null,'dtform_tujuan','dtform_pertanyaan','dtform_create','dtform_create',null);
     var $order = array('dtform_create' => 'desc');
 
     private function _get_datatables_query($search, $ordering) {
-        $i = 0;
+        /* Pencarian menyertakan butir lingkup (tabel lingkup) lewat EXISTS. */
+        if (!empty($search['value'])) {
+            $kunci = $this->db->escape_like_str($search['value']);
 
-        foreach ($this->column_search as $item) { // looping awal
-            if ($search['value']) { // jika datatable mengirimkan pencarian dengan metode POST
-                if ($i === 0) { // looping awal
-                    $this->db->group_start();
-                    $this->db->like($item, $search['value']);
-                } else {
-                    $this->db->or_like($item, $search['value']);
-                }
-
-                if (count($this->column_search) - 1 == $i)
-                    $this->db->group_end();
+            $this->db->group_start();
+            $this->db->like('df.dtform_pertanyaan', $search['value']);
+            $this->db->or_like('df.dtform_tujuan', $search['value']);
+            if ($this->db->table_exists('lingkup')) {
+                $tabel = $this->db->dbprefix('lingkup');
+                $this->db->or_where(
+                    "EXISTS (SELECT 1 FROM `" . $tabel . "` lg WHERE lg.dtform_id = df.dtform_id AND lg.lingkup_isi LIKE '%" . $kunci . "%')",
+                    NULL, FALSE
+                );
             }
-            $i++;
+            $this->db->group_end();
         }
 
         if (isset($ordering)) {
@@ -46,23 +47,23 @@ class DtformModel extends CI_Model {
             $this->db->limit($length, $start);
         }
         
-        $this->db->from('detailform');
-        $this->db->where("form_id",$id);
+        $this->db->from('detailform AS df');
+        $this->db->where('df.form_id', $id);
         $query = $this->db->get();
         return $query->result();
     }
 
     function count_filtered($search, $ordering,$id) {
         $this->_get_datatables_query($search, $ordering);
-        $this->db->from('detailform');
-        $this->db->where("form_id",$id);
+        $this->db->from('detailform AS df');
+        $this->db->where('df.form_id', $id);
         $query = $this->db->get();
         return $query->num_rows();
     }
 
     public function count_all($id) {
-        $this->db->from('detailform');
-        $this->db->where("form_id",$id);
+        $this->db->from('detailform AS df');
+        $this->db->where('df.form_id', $id);
         return $this->db->count_all_results();
     }
 

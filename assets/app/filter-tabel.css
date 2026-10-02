@@ -1,0 +1,145 @@
+/* ------------------------------------------------------------------
+   Kepala panel berisi filter + tombol (mis. Daftar Audit > Periode).
+
+   Pengganti .panel-actions bawaan tema. .panel-actions diposisikan
+   absolut dari kanan, sehingga bila isinya panjang (pilihan filter
+   ditambah beberapa tombol) isinya meluber dan tombol pindah baris.
+
+   Di sini susunannya memakai flexbox:
+     - judul panel di kiri dan boleh menyusut,
+     - kelompok filter + tombol di kanan,
+     - tombol tidak pernah berubah ukuran (tidak membungkus teksnya),
+     - satu kelompok tombol tidak pernah terpisah baris.
+
+   Cara pakai:
+
+       <header class="panel-heading panel-heading-filter">
+         <div class="panel-heading-isi">
+           <h3 class="panel-title">Judul</h3>
+           <div class="panel-aksi">
+             <div class="filter-kotak">
+               <label for="filter_x"><i class="icon md-calendar"></i>Periode</label>
+               <select class="form-control" id="filter_x">...</select>
+             </div>
+             <div class="panel-aksi__tombol">
+               <button class="btn btn-sm btn-primary">...</button>
+               <button class="btn btn-sm btn-success">...</button>
+             </div>
+           </div>
+         </div>
+       </header>
+   ------------------------------------------------------------------ */
+
+/* Kepala panel sendiri tanpa padding: padding ada di baris isinya. */
+.panel-heading-filter {
+  padding: 0;
+}
+
+.panel-heading-filter > .panel-heading-isi {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -ms-flex-align: center;
+  align-items: center;
+  padding: 20px 30px;
+}
+
+/* Judul panel: tanpa padding sendiri (padding ada di barisnya), boleh menyusut. */
+.panel-heading-filter .panel-title {
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+  min-width: 120px;
+  padding: 0;
+  margin: 0;
+}
+
+/* Kelompok filter + tombol. margin-left:auto mendorongnya ke kanan. */
+.panel-heading-filter .panel-aksi {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -ms-flex-align: center;
+  align-items: center;
+  margin-left: auto;
+}
+
+.panel-heading-filter .panel-aksi > * {
+  margin-left: 10px;
+}
+
+.panel-heading-filter .panel-aksi > *:first-child {
+  margin-left: 0;
+}
+
+/* Tombol: teksnya tidak pernah terpotong atau membungkus. */
+.panel-heading-filter .panel-aksi .btn {
+  -ms-flex: 0 0 auto;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+/* Beberapa tombol yang harus selalu tampil dalam satu baris. */
+.panel-aksi__tombol {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: nowrap;
+  flex-wrap: nowrap;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.panel-aksi__tombol > .btn + .btn {
+  margin-left: 8px;
+}
+
+/* Kotak filter: label kecil + pilihan. */
+.filter-kotak {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: nowrap;
+  flex-wrap: nowrap;
+  -ms-flex-align: center;
+  align-items: center;
+  padding: 4px 10px 4px 12px;
+  background-color: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 3px;
+}
+
+.filter-kotak > label {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  margin: 0 10px 0 0;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .3px;
+  text-transform: uppercase;
+  color: #757575;
+  white-space: nowrap;
+}
+
+.filter-kotak > label .icon {
+  margin-right: 6px;
+  font-size: 15px;
+  opacity: .75;
+}
+
+.filter-kotak > select.form-control {
+  width: auto;
+  max-width: 100%;
+  height: 30px;
+  padding: 0 8px;
+  font-size: 13px;
+  color: #424242;
+  background-color: #fff;
+  border-color: #dcdcdc;
+}
+
+.filter-kotak > select.form-control:focus {
+  border-color: #3f51b5;
+  box-shadow: none;
+}

@@ -23,9 +23,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
-$http = isset($_SERVER['HTTPS']) ? "https://" : "http://";
-$url = str_replace("index.php", "", $_SERVER['SCRIPT_NAME']);
-$config['base_url'] = $http . $_SERVER['SERVER_NAME'] . $url;
+if (ENVIRONMENT === 'development') {
+    $config['base_url'] = 'http://localhost:8080/mutu/';
+} else {
+    $http = isset($_SERVER['HTTPS']) ? "https://" : "http://";
+    $url = str_replace("index.php", "", $_SERVER['SCRIPT_NAME']);
+    $config['base_url'] = $http . $_SERVER['SERVER_NAME'] . $url;
+}
+
 
 /*
 |--------------------------------------------------------------------------
@@ -326,7 +331,7 @@ $config['cache_query_string'] = FALSE;
 | https://codeigniter.com/user_guide/libraries/encryption.html
 |
 */
-$config['encryption_key'] = 'ezyb0dah';
+$config['encryption_key'] = getenv('APP_ENCRYPTION_KEY') ?: 'REPLACE_WITH_STRONG_RANDOM_64_CHAR_STRING';
 
 /*
 |--------------------------------------------------------------------------
@@ -379,13 +384,13 @@ $config['encryption_key'] = 'ezyb0dah';
 | except for 'cookie_prefix' and 'cookie_httponly', which are ignored here.
 |
 */
-$config['sess_driver'] = 'files';
+$config['sess_driver'] = 'database';
 $config['sess_cookie_name'] = 'ci_session';
 $config['sess_expiration'] = 7200;
-$config['sess_save_path'] = NULL;
-$config['sess_match_ip'] = FALSE;
+$config['sess_save_path'] = 'ci_sessions';
+$config['sess_match_ip'] = TRUE;
 $config['sess_time_to_update'] = 300;
-$config['sess_regenerate_destroy'] = FALSE;
+$config['sess_regenerate_destroy'] = TRUE;
 
 /*
 |--------------------------------------------------------------------------

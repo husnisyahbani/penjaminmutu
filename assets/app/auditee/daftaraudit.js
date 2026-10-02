@@ -6,30 +6,55 @@ $(function () {
         "searching": true,
         "order": [],
         "columnDefs": [
-            {"targets": [0,5,6], "orderable": false}
+            {"targets": [0,5,6], "orderable": false},
+            /* Kolom Aksi & Status: rata tengah; lebarnya mengikuti isi
+               (th width 1%) supaya tombol tidak pernah pindah baris. */
+            {"targets": [5,6], "className": "text-center tabel-aksi-sel"}
         ],
         "ajax": {
             "url": base_url + "/dashboard/listmutu/",
-            "type": "POST"
+            "type": "POST",
+            /* Filter periode ikut dikirim; kosong = semua periode */
+            "data": function (d) {
+                d.periode_id = $('#filter_periode').val();
+            }
         }
     });
 
-    var daftarpertanyaan = $('#daftarpertanyaan').DataTable({
-        "responsive": true,
-        "processing": true,
-        "serverSide": true,
-        "searching": true,
-        "order": [],
-        "columnDefs": [
-            {"targets": [0,1,2], "orderable": false}
-        ],
-        "ajax": {
-            "url": base_url + "/dashboard/listpertanyaan/"+audit_id,
-            "type": "POST"
-        }
+    /* Ganti periode: muat ulang tabel + perbarui kartu statistik */
+    $('#filter_periode').on('change', function () {
+        daftaraudit.ajax.reload();
+        perbaruiKartu($(this).val());
     });
 
-    $("#daftarpertanyaan").on("click", ".delik", function () {
+    function angka(nilai) {
+        return String(nilai === null || nilai === undefined ? 0 : nilai)
+            .replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
+    function perbaruiKartu(periode_id) {
+        $.ajax({
+            url: base_url + "/dashboard/statistik",
+            type: "POST",
+            dataType: "json",
+            data: {periode_id: periode_id}
+        }).done(function (data) {
+            if (!data.status) {
+                return;
+            }
+            $('#stat_draft').text(angka(data.draft));
+            $('#stat_terkirim').text(angka(data.terkirim));
+            $('#stat_proses').text(angka(data.proses));
+            $('#stat_selesai').text(angka(data.selesai));
+        });
+    }
+
+    /* Halaman detail audit kini berbentuk topik/activity yang dirender server
+       (lihat assets/app/topik-aktivitas.js), jadi tidak ada DataTable
+       #daftarpertanyaan lagi di halaman itu. */
+
+    /* Tombol "Jawaban & Delik" pada tiap topik (halaman detail). */
+    $(document).on("click", "#topik_daftar .delik", function () {
         var audit_id = $(this).attr('audit_id');
         var dtform_id = $(this).attr('dtform_id');
          window.location.href = base_url+"/delik?audit_id="+audit_id+"&dtform_id="+dtform_id;
@@ -59,12 +84,28 @@ $(function () {
             confirmButtonText: "Ya, Kirim!",
             cancelButtonText: 'Tidak',
             preConfirm: function () {
+                /* Server menolak pengiriman bila masih ada lingkup yang belum
+                   dijawab; dalam hal itu tampilkan pesan dan buka halaman
+                   detail supaya auditee bisa melengkapi jawabannya. */
                 $.ajax({
                     url: base_url + "/dashboard/update",
                     type: "POST",
-                    data: { id: $id}
+                    data: { id: $id },
+                    dataType: "json"
                 })
-                        .done(function (data) {
+                        .done(function (jawab) {
+                            if (!jawab || !jawab.status) {
+                                swal.fire({
+                                    title: "Belum lengkap",
+                                    text: jawab && jawab.pesan
+                                            ? jawab.pesan
+                                            : "Hasil evaluasi belum dapat dikirim.",
+                                    type: "warning"
+                                }).then(function () {
+                                    window.location.href = base_url + "/dashboard/detail/" + $id;
+                                });
+                                return;
+                            }
                             swal.fire({
                                 title: "Terkirim",
                                 text: "Hasil Evaluasi Telah Terkirim!",
@@ -188,7 +229,7 @@ $("#formedit").formValidation({
                 var list = data == null ? [] : (data instanceof Array ? data : [data]);
                 $.each(list, function (index, org_types) {
                     if (org_types.status) {
-                        daftarpertanyaan.ajax.reload();
+                        window.location.reload();
                     } else {
                         swal.fire("Oops", org_types.pesan, "error");
                     }
