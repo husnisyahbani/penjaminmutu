@@ -141,3 +141,32 @@ function hitung_potong($teks) {
     }
     return strlen($teks);
 }
+
+/**
+ * Ubah isi (HTML atau teks) menjadi teks biasa yang tetap mempertahankan
+ * baris baru. Dipakai kolom "Rencana Koreksi" pada halaman PTK dan daftar
+ * butir halaman delik: rencana koreksi lama tersimpan sebagai HTML, sedangkan
+ * yang baru berupa teks polos dengan baris baru.
+ *
+ * @param  string $nilai isi HTML/teks
+ * @return string teks polos
+ */
+function lingkup_teks_baris($nilai) {
+    $teks = (string) $nilai;
+
+    if (strpos($teks, '<') !== FALSE) {
+        // Tag blok menjadi baris baru supaya daftar tetap terbaca.
+        $teks = preg_replace('/<br\s*\/?>/i', "\n", $teks);
+        $teks = preg_replace('/<li\b[^>]*>/i', '- ', $teks);
+        $teks = preg_replace('/<\/(p|div|li|ul|ol|h[1-6]|tr)>/i', "\n", $teks);
+        $teks = strip_tags($teks);
+    }
+
+    $teks = html_entity_decode($teks, ENT_QUOTES, 'UTF-8');
+    $teks = str_replace(array("\r\n", "\r"), "\n", $teks);
+    $teks = preg_replace('/[ \t]+/', ' ', $teks);
+    $teks = preg_replace('/ ?\n ?/', "\n", $teks);
+    $teks = preg_replace('/\n{3,}/', "\n\n", $teks);
+
+    return trim($teks);
+}

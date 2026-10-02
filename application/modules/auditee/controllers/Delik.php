@@ -5,13 +5,15 @@ class Delik extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditee';
-        $this->load->js(base_url("assets/app/auditee/delik.js?v=2.0"));
+        $this->load->js(base_url("assets/app/auditee/delik.js?v=2.1"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
         $this->load->model('AkunModel', 'akun');
         $this->load->model('FormulirModel', 'formulir');
         $this->load->model('LingkupModel', 'lingkup');
+        // Pembantu teks (lingkup_bersihkan / lingkup_teks_baris) untuk daftar butir.
+        $this->load->helper('lingkup');
 
         $role = $this->session->userdata('role');
         if (!isset($role) || $role != 'AUDITEE') {
@@ -40,6 +42,10 @@ class Delik extends MY_Controller {
             $this->data['soal'] = $this->formulir->getSoalFormulir($dtform_id);
             // Butir lingkup (struktur baru) untuk tab Evaluasi.
             $this->data['lingkup'] = $this->lingkup->daftarHtml($dtform_id);
+            /* Daftar butir pertanyaan ini untuk tab Temuan: seluruh butir
+               ditampilkan (tanpa filter temuan), lengkap dengan hasil,
+               temuan, catatan, dan rencana koreksi tiap butir. */
+            $this->data['butir'] = $this->auditjawab->barisTilik($audit_id, $dtform_id);
             $this->data['js'] = $this->load->get_js_files();
             $this->data['audit'] = 'active';//auditmenu
             $this->data['auditmenu'] = 'active';

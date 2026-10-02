@@ -127,13 +127,93 @@ echo $jawab['jwb_referensi'];}?></div>
 
               <div class="tab-pane" id="exampleTabsSeven" role="tabpanel">
                 <div class="panel">
-                  <header class="panel-heading">
-                    <div class="panel-actions panel-actions-keep">
-                      
-                    </div>
-                  </header>
                   <div class="panel-body">
-                    <div id="temuan"><p></p><?php if(isset($jawab['jwb_temuan'])) echo $jawab['jwb_temuan'];?></div>
+                    <?php
+                    /* Daftar butir lingkup pertanyaan ini, tampil seperti kolom
+                       pada halaman PTK namun TANPA filter temuan: seluruh butir
+                       pertanyaan yang dipilih ditampilkan, bertemuan maupun
+                       tidak. Data dari controller: $butir (AuditjawabModel::
+                       barisTilik). */
+                    $jml_butir  = count($butir);
+                    $jml_temuan = 0;
+                    foreach ($butir as $b) {
+                        if (trim((string) $b['dtjwb_temuan']) !== '') {
+                            $jml_temuan++;
+                        }
+                    }
+                    $temuan_pertanyaan = isset($jawab['jwb_temuan'])
+                        ? lingkup_bersihkan($jawab['jwb_temuan']) : '';
+                    ?>
+                    <div class="topik-ringkas mb-15">
+                      <span class="badge badge-info"><?php echo (int) $jml_butir; ?> butir lingkup</span>
+                      <span class="badge badge-warning"><?php echo (int) $jml_temuan; ?> bertemuan</span>
+                      <span class="badge badge-default">seluruh butir ditampilkan (tanpa filter temuan)</span>
+                    </div>
+
+                    <?php if ($temuan_pertanyaan !== ''): ?>
+                    <div class="aktivitas-bukti mb-15">
+                      <span class="aktivitas-label">Temuan tingkat pertanyaan:</span>
+                      <?php echo nl2br(html_escape($temuan_pertanyaan)); ?>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if (empty($butir)): ?>
+                    <div class="topik-kosong">Belum ada butir lingkup pada pertanyaan ini.</div>
+                    <?php else: ?>
+                    <div class="ptk-tabel-kotak">
+                      <table class="table table-hover ptk-tabel butir-tabel">
+                        <thead>
+                          <tr>
+                            <th class="butir-kolom-no">No</th>
+                            <th class="butir-kolom-isi">Butir Lingkup</th>
+                            <th class="butir-kolom-hasil">Hasil</th>
+                            <th class="butir-kolom-temuan">Temuan</th>
+                            <th class="butir-kolom-catatan">Catatan</th>
+                            <th class="butir-kolom-koreksi">Rencana Koreksi</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <?php foreach ($butir as $i => $b):
+                              $isi     = lingkup_bersihkan($b['dtjwb_pertanyaan']);
+                              $hasil   = lingkup_bersihkan($b['dtjwb_hasil']);
+                              $temuan  = trim((string) $b['dtjwb_temuan']);
+                              $catatan = lingkup_bersihkan($b['dtjwb_catatan']);
+                              $koreksi = lingkup_teks_baris($b['dtjwb_koreksi']);
+                          ?>
+                          <tr>
+                            <td class="butir-kolom-no"><?php echo $i + 1; ?></td>
+                            <td>
+                              <div class="butir-klamp"><?php echo html_escape($isi); ?></div>
+                              <?php if (isset($b['baris']) && $b['baris'] === 'lama'): ?>
+                              <span class="badge badge-default">data lama</span>
+                              <?php endif; ?>
+                            </td>
+                            <td><div class="butir-klamp"><?php echo html_escape($hasil); ?></div></td>
+                            <td class="text-center">
+                              <?php if ($temuan !== ''): ?>
+                              <span class="badge badge-warning"><?php echo html_escape($temuan); ?></span>
+                              <?php else: ?>
+                              <span class="text-muted">&ndash;</span>
+                              <?php endif; ?>
+                            </td>
+                            <td><div class="butir-klamp"><?php echo html_escape($catatan); ?></div></td>
+                            <td>
+                              <?php if ($koreksi === ''): ?>
+                              <span class="butir-koreksi-kosong">Belum ada rencana koreksi</span>
+                              <?php else: ?>
+                              <div class="butir-klamp"><?php echo nl2br(html_escape($koreksi)); ?></div>
+                              <?php endif; ?>
+                            </td>
+                          </tr>
+                          <?php endforeach; ?>
+                        </tbody>
+                      </table>
+                    </div>
+                    <div class="butir-tabel-info">
+                      Tulis rencana koreksi lewat tombol <i class="icon md-edit" aria-hidden="true"></i>
+                      pada halaman <strong>PTK</strong>; kolom di atas hanya menampilkan.
+                    </div>
+                    <?php endif; ?>
                   </div>
                 </div>
               </div>

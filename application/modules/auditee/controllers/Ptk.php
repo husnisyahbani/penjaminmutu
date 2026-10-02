@@ -77,29 +77,9 @@ class Ptk extends MY_Controller {
         return lingkup_bersihkan($nilai);
     }
 
-    /**
-     * Teks polos yang tetap mempertahankan baris baru (rencana koreksi).
-     *
-     * Rencana koreksi lama tersimpan sebagai HTML (versi editor); tag blok
-     * diubah menjadi baris baru supaya tampil rapi di textarea dan tabel.
-     */
+    /** Teks polos rencana koreksi (helper bersama, lihat lingkup_helper). */
     private function _teksBaris($nilai) {
-        $teks = (string) $nilai;
-
-        if (strpos($teks, '<') !== FALSE) {
-            $teks = preg_replace('/<br\s*\/?>/i', "\n", $teks);
-            $teks = preg_replace('/<li\b[^>]*>/i', '- ', $teks);
-            $teks = preg_replace('/<\/(p|div|li|ul|ol|h[1-6]|tr)>/i', "\n", $teks);
-            $teks = strip_tags($teks);
-        }
-
-        $teks = html_entity_decode($teks, ENT_QUOTES, 'UTF-8');
-        $teks = str_replace(array("\r\n", "\r"), "\n", $teks);
-        $teks = preg_replace('/[ \t]+/', ' ', $teks);
-        $teks = preg_replace('/ ?\n ?/', "\n", $teks);
-        $teks = preg_replace('/\n{3,}/', "\n\n", $teks);
-
-        return trim($teks);
+        return lingkup_teks_baris($nilai);
     }
 
     public function listptk() {

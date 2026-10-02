@@ -180,6 +180,18 @@ class AuditjawabModel extends CI_Model {
         return $this->db->trans_status();
     }
 
+    /**
+     * Jawaban tingkat pertanyaan (lingkup_id NULL) dengan kunci yang sudah
+     * dibakukan. Dipakai barisTilik() untuk mengambil sisa baris tilik lama.
+     */
+    public function getAuditJawabFix($audit_id,$dtform_id){
+        $this->db->where($this->db->dbprefix('auditjawab').'.audit_id', $audit_id);
+        $this->db->where($this->db->dbprefix('auditjawab').'.dtform_id', $dtform_id);
+        $this->db->where($this->db->dbprefix('auditjawab').'.lingkup_id IS NULL', NULL, FALSE);
+        $query = $this->db->get('auditjawab');
+        return $query->row_array();
+    }
+
     public function getAuditJawab($audit_id,$dtform_id){
         $this->db->join('detailform', 'detailform.dtform_id = auditjawab.dtform_id', 'left');
         $this->db->where($this->db->dbprefix('auditjawab').'.audit_id', $audit_id);
