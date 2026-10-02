@@ -12,6 +12,9 @@ class Delik extends MY_Controller {
         $this->load->model('AkunModel', 'akun');
         $this->load->model('FormulirModel', 'formulir');
         $this->load->model('LingkupModel', 'lingkup');
+        /* Daftar butir memakai kueri yang sama dengan halaman PTK, supaya
+           kolom dan datanya sama (lihat PtkModel::_query_ptk). */
+        $this->load->model('PtkModel', 'ptkmodel');
         // Pembantu teks (lingkup_bersihkan / lingkup_teks_baris) untuk daftar butir.
         $this->load->helper('lingkup');
 
@@ -42,17 +45,17 @@ class Delik extends MY_Controller {
             $this->data['soal'] = $this->formulir->getSoalFormulir($dtform_id);
             // Butir lingkup (struktur baru) untuk tab Evaluasi.
             $this->data['lingkup'] = $this->lingkup->daftarHtml($dtform_id);
-            /* Halaman delik kini seperti PTK: kartu ringkasan + tabel butir.
-               Daftar butir = seluruh butir pertanyaan ini yang sudah dinilai
-               auditor (termasuk nilai "S"), tanpa penyaringan temuan. */
-            $butir = $this->auditjawab->butirDinilai($audit_id, $dtform_id);
+            /* Kolom dan data sama dengan halaman PTK (PtkModel), hanya saja
+               dibatasi pada pertanyaan yang dipilih dan butir bernilai "S"
+               ikut tampil - PTK menampilkan semua pertanyaan tanpa nilai "S". */
+            $butir = $this->ptkmodel->daftar($audit_id, $dtform_id, TRUE);
             $this->data['butir'] = $butir;
 
             /* Ringkasan untuk kartu: jumlah per jenis penilaian. */
             $ringkas = array('total' => count($butir), 'sesuai' => 0, 'observasi' => 0,
                              'minor' => 0, 'mayor' => 0);
             foreach ($butir as $b) {
-                switch (strtoupper(trim((string) $b['dtjwb_temuan']))) {
+                switch (strtoupper(trim((string) $b['jwb_temuan']))) {
                     case 'S':        $ringkas['sesuai']++;    break;
                     case 'OB':       $ringkas['observasi']++; break;
                     case 'TS MINOR': $ringkas['minor']++;     break;

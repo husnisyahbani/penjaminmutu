@@ -42,7 +42,20 @@ class PtkModel extends CI_Model {
         }
     }
 
-    private function _query_ptk() {
+    /**
+     * Kueri dasar daftar butir - SATU sumber data untuk halaman PTK dan
+     * halaman delik, supaya kolom dan isinya sama.
+     *
+     * Perbedaan kedua halaman hanya pada penyaringan:
+     *   - PTK   : seluruh pertanyaan, hanya butir bertemuan
+     *             (OB / TS MINOR / TS MAYOR) - tanpa nilai "S".
+     *   - Delik : satu pertanyaan ($dtform_id) dan nilai "S" ikut tampil
+     *             ($termasuk_s = TRUE).
+     *
+     * @param int|null $dtform_id  batasi ke satu pertanyaan (delik)
+     * @param bool     $termasuk_s sertakan butir bernilai "S" (delik)
+     */
+    private function _query_ptk($dtform_id = NULL, $termasuk_s = FALSE) {
         $this->db->select('au.audit_id, au.audit_status');
         $this->db->select('dt.dtform_id, dt.dtform_pertanyaan');
         $this->db->select('f.form_nama');
@@ -53,12 +66,34 @@ class PtkModel extends CI_Model {
         $this->db->join('formulir f', 'f.form_id = au.form_id', 'left');
         $this->db->join('lingkup lg', 'lg.dtform_id = dt.dtform_id', 'inner');
         $this->db->join('auditjawab jb', 'jb.audit_id = au.audit_id AND jb.lingkup_id = lg.lingkup_id', 'inner');
-        $this->db->where("jb.jwb_temuan IN ('OB','TS MINOR','TS MAYOR')");
+        $nilai = $termasuk_s
+            ? "('S','OB','TS MINOR','TS MAYOR')"
+            : "('OB','TS MINOR','TS MAYOR')";
+        $this->db->where('jb.jwb_temuan IN ' . $nilai);
+
+        if (!empty($dtform_id)) {
+            $this->db->where('dt.dtform_id', $dtform_id);
+        }
 
         $users_id = $this->session->userdata('users_id');
         if (isset($users_id)) {
             $this->db->where('au.auditee_id', $users_id);
         }
+    }
+
+    /**
+     * Daftar butir satu audit untuk halaman delik (tanpa paging DataTables).
+     *
+     * @return array baris dengan kunci sama seperti halaman PTK
+     *               (form_nama, lingkup_isi, jwb_hasil, jwb_temuan,
+     *                jwb_catatan, jwb_koreksi, lingkup_id, dtform_id, ...)
+     */
+    public function daftar($audit_id, $dtform_id = NULL, $termasuk_s = FALSE) {
+        $this->_query_ptk($dtform_id, $termasuk_s);
+        $this->db->where('au.audit_id', $audit_id);
+        $this->db->order_by('lg.lingkup_urut', 'asc');
+        $this->db->order_by('lg.lingkup_id', 'asc');
+        return $this->db->get()->result_array();
     }
 
     function get_datatables($length, $start, $search, $ordering) {

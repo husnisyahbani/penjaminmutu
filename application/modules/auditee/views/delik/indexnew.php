@@ -8,7 +8,12 @@
        Yang ditampilkan: seluruh butir pertanyaan yang dipilih yang sudah
        dinilai auditor (S / OB / TS MINOR / TS MAYOR), tanpa penyaringan
        jenis penilaian - butir "S" (sesuai) ikut tampil. Data dari
-       controller: $butir (AuditjawabModel::butirDinilai).
+       controller: $butir (PtkModel::daftar - sama dengan halaman PTK).
+
+       Kolom tabel sama persis dengan halaman PTK (No, Formulir, Butir
+       Lingkup, Hasil, Temuan, Catatan, Rencana Koreksi) karena keduanya
+       memakai kueri PtkModel::daftar(); bedanya halaman ini dibatasi pada
+       pertanyaan yang dipilih.
 
        Kartu ringkasan: Sesuai / Observasi / Minor / Mayor (empat kartu).
        Rencana koreksi disunting langsung pada kolomnya - hanya bila audit
@@ -173,26 +178,28 @@
             <div class="topik-kosong">Belum ada butir yang dinilai pada pertanyaan ini.</div>
             <?php else: ?>
             <div class="ptk-tabel-kotak">
-              <table class="table table-hover ptk-tabel butir-tabel">
+              <table class="table table-hover ptk-tabel">
                 <thead>
                   <tr>
-                    <th class="butir-kolom-no">No</th>
-                    <th class="butir-kolom-isi">Butir Lingkup</th>
-                    <th class="butir-kolom-hasil">Hasil</th>
-                    <th class="butir-kolom-temuan">Temuan</th>
-                    <th class="butir-kolom-catatan">Catatan</th>
-                    <th class="butir-kolom-koreksi">Rencana Koreksi</th>
+                    <th class="ptk-kolom-no">No</th>
+                    <th class="ptk-kolom-formulir">Formulir</th>
+                    <th class="ptk-kolom-butir">Butir Lingkup</th>
+                    <th class="ptk-kolom-hasil">Hasil</th>
+                    <th class="ptk-kolom-temuan">Temuan</th>
+                    <th class="ptk-kolom-catatan">Catatan</th>
+                    <th class="ptk-kolom-koreksi">Rencana Koreksi</th>
                   </tr>
                 </thead>
                 <tbody>
                   <?php foreach ($butir as $i => $b):
-                      /* Akses aman: baris lama (auditjawabdetail) tidak punya
-                         kolom koreksi/referensi, nilainya dilengkapi model. */
-                      $isi     = lingkup_bersihkan(isset($b['dtjwb_pertanyaan']) ? $b['dtjwb_pertanyaan'] : '');
-                      $hasil   = lingkup_bersihkan(isset($b['dtjwb_hasil']) ? $b['dtjwb_hasil'] : '');
-                      $temuan  = strtoupper(trim((string) (isset($b['dtjwb_temuan']) ? $b['dtjwb_temuan'] : '')));
-                      $catatan = lingkup_bersihkan(isset($b['dtjwb_catatan']) ? $b['dtjwb_catatan'] : '');
-                      $koreksi = lingkup_teks_baris(isset($b['dtjwb_koreksi']) ? $b['dtjwb_koreksi'] : '');
+                      /* Kunci sama seperti baris pada halaman PTK
+                         (PtkModel::daftar), jadi kolom & isinya seragam. */
+                      $formulir = lingkup_bersihkan($b['form_nama']);
+                      $isi     = lingkup_bersihkan($b['lingkup_isi']);
+                      $hasil   = lingkup_bersihkan($b['jwb_hasil']);
+                      $temuan  = strtoupper(trim((string) $b['jwb_temuan']));
+                      $catatan = lingkup_bersihkan($b['jwb_catatan']);
+                      $koreksi = lingkup_teks_baris($b['jwb_koreksi']);
 
                       /* Warna badge mengikuti jenis penilaian, supaya sama
                          jelasnya dengan kategori pada kartu di atas. */
@@ -208,19 +215,18 @@
                       }
                   ?>
                   <tr>
-                    <td class="butir-kolom-no"><?php echo $i + 1; ?></td>
-                    <td>
-                      <div class="butir-klamp"><?php echo html_escape($isi); ?></div>
-                    </td>
-                    <td><div class="butir-klamp"><?php echo html_escape($hasil); ?></div></td>
+                    <td class="ptk-kolom-no"><?php echo $i + 1; ?></td>
+                    <td><div class="ptk-klamp"><?php echo html_escape($formulir); ?></div></td>
+                    <td><div class="ptk-klamp"><?php echo html_escape($isi); ?></div></td>
+                    <td><div class="ptk-klamp"><?php echo html_escape($hasil); ?></div></td>
                     <td class="text-center">
                       <span class="badge <?php echo $warna; ?>"><?php echo html_escape($temuan); ?></span>
                     </td>
-                    <td><div class="butir-klamp"><?php echo html_escape($catatan); ?></div></td>
+                    <td><div class="ptk-klamp"><?php echo html_escape($catatan); ?></div></td>
                     <td>
                       <?php if ($temuan === 'S'): ?>
                       <span class="text-muted">Tidak perlu koreksi</span>
-                      <?php elseif (!empty($b['lingkup_id']) && !empty($boleh_koreksi)): ?>
+                      <?php elseif (!empty($boleh_koreksi)): ?>
                       <div class="koreksi-kotak" data-lingkup_id="<?php echo (int) $b['lingkup_id']; ?>"
                            data-audit_id="<?php echo (int) $audit_id; ?>"
                            data-dtform_id="<?php echo (int) $dtform_id; ?>">
@@ -233,16 +239,13 @@
                           <span class="koreksi-pesan"></span>
                         </div>
                       </div>
-                      <?php elseif (!empty($b['lingkup_id'])): ?>
+                      <?php else: ?>
                       <?php if ($koreksi !== ''): ?>
-                      <div class="butir-klamp"><?php echo nl2br(html_escape($koreksi)); ?></div>
+                      <div class="ptk-klamp ptk-koreksi"><?php echo nl2br(html_escape($koreksi)); ?></div>
                       <?php else: ?>
-                      <span class="butir-koreksi-kosong">Belum ada rencana koreksi</span>
+                      <span class="ptk-koreksi-kosong">Belum ada rencana koreksi</span>
                       <?php endif; ?>
-                      <span class="butir-koreksi-ket">Dapat diisi setelah audit selesai</span>
-                      <?php else: ?>
-                      <div class="butir-klamp"><?php echo nl2br(html_escape($koreksi)); ?></div>
-                      <div class="butir-koreksi-ket">Data lama - tidak dapat disunting di sini</div>
+                      <span class="ptk-koreksi-ket">Dapat diisi setelah audit selesai</span>
                       <?php endif; ?>
                     </td>
                   </tr>
