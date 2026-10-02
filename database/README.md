@@ -182,24 +182,27 @@ Catatan:
   dan catatan tiap butir tilik disimpan pada `mutu_auditjawabdetail`
   (`dtjwb_hasil`, `dtjwb_temuan`, `dtjwb_catatan`). Baris butir dapat
   ditambah/disunting lewat halaman **Daftar Tilik** (tombol *Tambah Butir*).
-- **Auditee tidak mengisi `mutu_auditjawabdetail`.** Auditee menjawab pada
-  tingkat **pertanyaan** (`mutu_auditjawab`.`jwb_jawaban`) di halaman
-  *Auditee → Daftar Audit → Detail*, dengan lampiran opsional pada
-  `mutu_lampiran`.`jwb_id`. Rencana koreksi tiap butir
+- **Auditee tidak mengisi `mutu_auditjawabdetail`.** Yang dijawab auditee ada
+  pada halaman *Auditee → Daftar Audit → Detail*, yaitu **tiap butir lingkup**
+  pada tabel `mutu_lingkup`: jawaban tersimpan pada `mutu_auditjawab` dengan
+  kolom `lingkup_id` terisi. Pertanyaan yang belum punya butir lingkup tetap
+  memakai jawaban tingkat pertanyaan (`lingkup_id` bernilai `NULL`), supaya
+  formulir lama tidak terkunci. Lampiran mengikuti butirnya
+  (`mutu_lampiran`.`jwb_id` + `lingkup_id`). Rencana koreksi tiap butir
   (`mutu_auditjawabdetail`.`dtjwb_koreksi`) baru diisi auditee setelah audit
   berstatus **SELESAI**.
 
 ## `lampiran_lingkup.sql`
 
 Membuat tabel lampiran jawaban audit. Pada halaman
-**Auditee → Daftar Audit → (detail)**, setiap **pertanyaan wajib dijawab**, dan
-tiap jawaban boleh dilengkapi **lampiran opsional lebih dari satu berkas**.
-Butir tilik (`mutu_auditjawabdetail`) hanya diisi auditor, auditee tidak
-menjawabnya.
+**Auditee → Daftar Audit → (detail)**, daftar pertanyaan yang dijawab berasal
+dari `mutu_lingkup` dan **setiap butir lingkup wajib dijawab**; tiap jawaban
+boleh dilengkapi **lampiran opsional lebih dari satu berkas**. Butir tilik
+(`mutu_auditjawabdetail`) hanya diisi auditor, auditee tidak menjawabnya.
 
 | Objek             | Isi                                                                              |
 | ----------------- | -------------------------------------------------------------------------------- |
-| `mutu_lampiran`   | berkas lampiran per jawaban pertanyaan: `audit_id`, `jwb_id` (baris `mutu_auditjawab`), `users_id`, `lampiran_nama` (nama simpan), `lampiran_asli` (nama asli), `lampiran_tipe`, `lampiran_ukuran`, `lampiran_create` |
+| `mutu_lampiran`   | berkas lampiran per jawaban: `audit_id`, `jwb_id` (baris `mutu_auditjawab` — baris butir lingkup bila ada), `lingkup_id` (butir lingkup), `dtjwb_id` (baris tilik lama), `users_id`, `lampiran_nama` (nama simpan), `lampiran_asli` (nama asli), `lampiran_tipe`, `lampiran_ukuran`, `lampiran_create` |
 
 Cara pakai:
 

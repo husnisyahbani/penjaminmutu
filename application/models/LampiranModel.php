@@ -242,8 +242,16 @@ class LampiranModel extends CI_Model {
        Tulis
        ================================================================== */
 
-    /** Catat satu berkas yang sudah dipindahkan ke folder lampiran. */
-    function tambah($audit_id, $butir_id, $berkas, $kolom = NULL) {
+    /**
+     * Catat satu berkas yang sudah dipindahkan ke folder lampiran.
+     *
+     * @param int   $audit_id
+     * @param int   $butir_id   nilai untuk kolom $kolom
+     * @param array $berkas     hasil $this->upload->data()
+     * @param string $kolom     kolom penanda (jwb_id / lingkup_id / dtjwb_id)
+     * @param array $ekstra     kolom tambahan, mis. array('lingkup_id' => 12)
+     */
+    function tambah($audit_id, $butir_id, $berkas, $kolom = NULL, $ekstra = array()) {
         $kolom = $kolom ? $kolom : $this->kolomButir();
         if (!$kolom) {
             return NULL;
@@ -264,6 +272,15 @@ class LampiranModel extends CI_Model {
            yang dipakai supaya penyimpanan tidak gagal. */
         if ($kolom !== 'lingkup_id' && $this->db->field_exists('lingkup_id', $this->tabel)) {
             $isi['lingkup_id'] = 0;
+        }
+
+        /* Kolom tambahan (mis. penanda butir lingkup) menimpa nilai bawaan. */
+        if (is_array($ekstra)) {
+            foreach ($ekstra as $kolom_ekstra => $nilai) {
+                if ($this->db->field_exists($kolom_ekstra, $this->tabel)) {
+                    $isi[$kolom_ekstra] = $nilai;
+                }
+            }
         }
 
         $this->db->insert($this->tabel, $isi);

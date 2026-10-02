@@ -20,8 +20,8 @@ class Dashboard extends MY_Controller {
         // Pembantu teks butir (lingkup_bersihkan) untuk pesan validasi.
         $this->load->helper('lingkup');
 
-        // Jawaban wajib + lampiran opsional per lingkup (halaman detail audit).
-        $this->load->js(base_url("assets/app/auditee/jawaban-lingkup.js?v=2.0"));
+        // Jawaban wajib + lampiran opsional per butir lingkup (halaman detail audit).
+        $this->load->js(base_url("assets/app/auditee/jawaban-lingkup.js?v=3.0"));
 
         $role = $this->session->userdata('role');
         if (!isset($role) || $role != 'AUDITEE') {
@@ -81,9 +81,13 @@ class Dashboard extends MY_Controller {
             $this->data['audit_id'] = $id;
             $this->data['dashboard'] = 'active';
             $this->data['result'] = $this->mutu->getAuditById($id);
-            /* Pertanyaan (topik) + lingkup (butir) beserta jawaban, lampiran,
-               dan koreksi auditee untuk halaman detail audit. */
-            $this->data['topik'] = $this->auditjawab->petaTilik($id);
+            /* Daftar pertanyaan yang dijawab auditee = butir lingkup pada
+               tabel mutu_lingkup, lengkap dengan jawaban, lampiran,
+               penilaian auditor, dan koreksi auditee. */
+            $this->data['topik'] = $this->auditjawab->petaLingkup($id);
+            /* Tabel mutu_lingkup belum diimpor -> bukan salah data, tampilkan
+               petunjuk pada halaman. */
+            $this->data['lingkup_siap'] = $this->auditjawab->lingkupSiap();
 
             /* Jawaban hanya dapat diisi/diubah selama audit masih DRAFT.
                Status lain (TERKIRIM / PROSES / SELESAI) dikunci. */
@@ -196,14 +200,21 @@ class Dashboard extends MY_Controller {
             return;
         }
 
-        // Seluruh pertanyaan wajib dijawab sebelum hasil dikirim ke auditor.
+        // Seluruh butir lingkup wajib dijawab sebelum hasil dikirim ke auditor.
         $kurang = $this->auditjawab->lingkupBelumDijawab($id);
         if (!empty($kurang)) {
             $contoh = array();
             foreach (array_slice($kurang, 0, 3) as $k) {
                 $contoh[] = lingkup_bersihkan($k['lingkup_isi']);
             }
-            $pesan = 'Masih ada ' . count($kurang) . ' pertanyaan yang belum dijawab.';
+            $satuan = 'pertanyaan';
+            foreach ($kurang as $k) {
+                if ((int) $k['lingkup_id'] > 0) {
+                    $satuan = 'butir lingkup';
+                    break;
+                }
+            }
+            $pesan = 'Masih ada ' . count($kurang) . ' ' . $satuan . ' yang belum dijawab.';
             if (!empty($contoh)) {
                 $pesan .= ' Misalnya: ' . implode('; ', $contoh) . '.';
             }
@@ -249,15 +260,21 @@ class Dashboard extends MY_Controller {
     }
 
     /**
-     * Simpan jawaban auditee untuk satu PERTANYAAN (halaman detail audit).
-     * Butir tilik tidak dijawab auditee - itu penilaian auditor.
+     * Simpan jawaban auditee untuk satu BUTIR LINGKUP (halaman detail audit).
+     *
+     * Daftar pertanyaan pada halaman detail berasal dari mutu_lingkup, jadi
+     * tiap butir lingkup dijawab sendiri-sendiri. Bila butir lingkup tidak
+     * dikirim (pertanyaan tanpa butir lingkup / data lama), jawaban disimpan
+     * pada baris pertanyaan seperti sebelumnya.
      */
     public function jawablingkup() {
-        $audit_id  = (int) $this->input->post('audit_id');
-        $dtform_id = $this->_dtformId();
+        $audit_id   = (int) $this->input->post('audit_id');
+        $lingkup_id = (int) $this->input->post('lingkup_id');
+        $dtform_id  = $this->_dtformId();
+        $teks       = $this->input->post('jwb_jawaban');
 
-        if (empty($audit_id) || empty($dtform_id)) {
-            $this->_json(array('status' => false, 'pesan' => 'Pertanyaan tidak diketahui.'));
+        if (empty($audit_id)) {
+            $this->_json(array('status' => false, 'pesan' => 'Audit tidak diketahui.'));
             return;
         }
 
@@ -267,7 +284,20 @@ class Dashboard extends MY_Controller {
             return;
         }
 
-        $hasil = $this->auditjawab->simpanJawabanPertanyaan($audit_id, $dtform_id, $this->input->post('jwb_jawaban'));
+        // Butir lingkup: jawaban tersimpan per butir (auditjawab.lingkup_id).
+        if ($lingkup_id > 0) {
+            $hasil = $this->auditjawab->simpanJawabanButir($audit_id, $lingkup_id, $teks);
+            $this->_json($hasil);
+            return;
+        }
+
+        // Cadangan: pertanyaan yang belum punya butir lingkup.
+        if (empty($dtform_id)) {
+            $this->_json(array('status' => false, 'pesan' => 'Pertanyaan tidak diketahui.'));
+            return;
+        }
+
+        $hasil = $this->auditjawab->simpanJawabanPertanyaan($audit_id, $dtform_id, $teks);
         $this->_json($hasil);
     }
 
@@ -276,11 +306,12 @@ class Dashboard extends MY_Controller {
      * (input name="lampiran[]").
      */
     public function unggahlampiran() {
-        $audit_id  = (int) $this->input->post('audit_id');
-        $dtform_id = $this->_dtformId();
+        $audit_id   = (int) $this->input->post('audit_id');
+        $lingkup_id = (int) $this->input->post('lingkup_id');
+        $dtform_id  = $this->_dtformId();
 
-        if (empty($audit_id) || empty($dtform_id)) {
-            $this->_json(array('status' => false, 'pesan' => 'Pertanyaan tidak diketahui.'));
+        if (empty($audit_id)) {
+            $this->_json(array('status' => false, 'pesan' => 'Audit tidak diketahui.'));
             return;
         }
 
@@ -298,15 +329,37 @@ class Dashboard extends MY_Controller {
             return;
         }
 
-        /* Lampiran menempel pada jawaban pertanyaan (jwb_id). Bila kolom itu
-           belum ada, dipakai kolom lama (lingkup_id/dtjwb_id). */
-        $jwb_id = $this->auditjawab->pastikanPertanyaan($audit_id, $dtform_id);
-        if (!$jwb_id) {
-            $this->_json(array('status' => false, 'pesan' => 'Pertanyaan tidak ditemukan pada audit ini.'));
-            return;
+        /* Lampiran menempel pada jawaban: baris butir lingkup bila ada,
+           kalau tidak baris pertanyaan (data lama). Kolom yang dipakai
+           mengikuti struktur tabel lampiran (jwb_id atau lingkup_id). */
+        $ekstra = array();
+
+        if ($lingkup_id > 0) {
+            $jwb_id = $this->auditjawab->pastikanButir($audit_id, $lingkup_id);
+            if (!$jwb_id) {
+                $this->_json(array('status' => false, 'pesan' => 'Butir lingkup tidak ditemukan pada audit ini.'));
+                return;
+            }
+            $kolom_lampiran = $this->lampiran->kolomJawaban();
+            $id_lampiran    = ($kolom_lampiran === 'jwb_id') ? $jwb_id : $lingkup_id;
+            if ($kolom_lampiran === 'jwb_id') {
+                // Penanda butir ikut tersimpan supaya lampiran mudah dibaca
+                // kembali per butir lingkup.
+                $ekstra['lingkup_id'] = $lingkup_id;
+            }
+        } else {
+            if (empty($dtform_id)) {
+                $this->_json(array('status' => false, 'pesan' => 'Pertanyaan tidak diketahui.'));
+                return;
+            }
+            $jwb_id = $this->auditjawab->pastikanPertanyaan($audit_id, $dtform_id);
+            if (!$jwb_id) {
+                $this->_json(array('status' => false, 'pesan' => 'Pertanyaan tidak ditemukan pada audit ini.'));
+                return;
+            }
+            $kolom_lampiran = $this->lampiran->kolomJawaban();
+            $id_lampiran    = ($kolom_lampiran === 'jwb_id') ? $jwb_id : $dtform_id;
         }
-        $kolom_lampiran = $this->lampiran->kolomJawaban();
-        $id_lampiran    = ($kolom_lampiran === 'jwb_id') ? $jwb_id : $dtform_id;
 
         if (!isset($_FILES['lampiran']) || empty($_FILES['lampiran']['name'])) {
             $this->_json(array('status' => false, 'pesan' => 'Belum ada berkas yang dipilih.'));
@@ -350,7 +403,7 @@ class Dashboard extends MY_Controller {
 
             if ($this->upload->do_upload('lampiran_berkas')) {
                 $info = $this->upload->data();
-                $id   = $this->lampiran->tambah($audit_id, $id_lampiran, $info, $kolom_lampiran);
+                $id   = $this->lampiran->tambah($audit_id, $id_lampiran, $info, $kolom_lampiran, $ekstra);
 
                 $tersimpan[] = array(
                     'lampiran_id' => $id,

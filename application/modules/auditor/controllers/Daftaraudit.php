@@ -247,9 +247,9 @@ class Daftaraudit extends MY_Controller {
             $this->data['title'] = 'Daftar Audit';
             $this->data['audit_id'] = $id;
             $this->data['result'] = $this->mutu->getAuditById($id);
-            /* Pertanyaan (topik) + lingkup (butir) beserta jawaban/lampiran
-               auditee dan hasil yang sudah tersimpan. */
-            $this->data['topik'] = $this->auditjawab->petaTilik($id);
+            /* Butir lingkup (mutu_lingkup) beserta jawaban auditee per butir,
+               lampiran, dan hasil penilaian yang sudah tersimpan. */
+            $this->data['topik'] = $this->auditjawab->petaLingkup($id);
             $this->data['js'] = $this->load->get_js_files();
             $this->data['audit'] = 'active';
             $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
