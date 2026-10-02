@@ -256,24 +256,24 @@ class AuditjawabModel extends CI_Model {
     }
 
     /**
-     * Temuan satu pertanyaan (untuk tab Temuan halaman delik).
+     * Butir yang sudah dinilai pada satu pertanyaan (untuk tab Temuan halaman
+     * delik).
      *
-     * Mengembalikan baris temuan saja - sama seperti daftar pada halaman PTK
-     * (hanya butir dengan temuan OB / TS MINOR / TS MAYOR) - tetapi dibatasi
-     * pada pertanyaan (dtform_id) yang sedang dibuka. Baris tilik lama yang
-     * belum dipetakan ke butir ikut bila bertemuan.
+     * Berbeda dengan daftar PTK yang menyaring butir bertemuan saja
+     * (OB / TS MINOR / TS MAYOR), di sini TIDAK ada penyaringan jenis
+     * penilaian: butir dengan nilai "S" (sesuai) ikut ditampilkan. Yang tidak
+     * ikut hanyalah butir yang belum dinilai auditor (nilai temuan kosong).
      */
-    public function temuanPertanyaan($audit_id, $dtform_id) {
-        $temuan = array();
+    public function butirDinilai($audit_id, $dtform_id) {
+        $dinilai = array();
 
         foreach ($this->barisTilik($audit_id, $dtform_id) as $b) {
-            $nilai = strtoupper(trim((string) $b['dtjwb_temuan']));
-            if ($nilai === 'OB' || $nilai === 'TS MINOR' || $nilai === 'TS MAYOR') {
-                $temuan[] = $b;
+            if (trim((string) $b['dtjwb_temuan']) !== '') {
+                $dinilai[] = $b;
             }
         }
 
-        return $temuan;
+        return $dinilai;
     }
 
     /**

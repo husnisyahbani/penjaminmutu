@@ -42,9 +42,10 @@ class Delik extends MY_Controller {
             $this->data['soal'] = $this->formulir->getSoalFormulir($dtform_id);
             // Butir lingkup (struktur baru) untuk tab Evaluasi.
             $this->data['lingkup'] = $this->lingkup->daftarHtml($dtform_id);
-            /* Tab Temuan: daftar temuan pertanyaan ini, sama seperti tabel
-               PTK namun dibatasi pada pertanyaan (dtform_id) yang dipilih. */
-            $this->data['butir'] = $this->auditjawab->temuanPertanyaan($audit_id, $dtform_id);
+            /* Tab Temuan: butir yang sudah dinilai pada pertanyaan ini
+               (termasuk nilai "S"), ditampilkan seperti tabel PTK namun
+               dibatasi pada pertanyaan (dtform_id) yang dipilih. */
+            $this->data['butir'] = $this->auditjawab->butirDinilai($audit_id, $dtform_id);
             $this->data['js'] = $this->load->get_js_files();
             $this->data['audit'] = 'active';//auditmenu
             $this->data['auditmenu'] = 'active';

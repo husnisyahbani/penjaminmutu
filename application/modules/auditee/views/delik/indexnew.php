@@ -129,13 +129,14 @@ echo $jawab['jwb_referensi'];}?></div>
                 <div class="panel">
                   <div class="panel-body">
                     <?php
-                    /* Daftar temuan pertanyaan ini - tabel yang sama seperti
-                       halaman PTK, hanya ditampilkan temuan (OB / TS MINOR /
-                       TS MAYOR) milik pertanyaan yang dipilih. Data dari
-                       controller: $butir (AuditjawabModel::temuanPertanyaan). */
+                    /* Butir yang sudah dinilai pada pertanyaan ini - tabel
+                       yang sama seperti halaman PTK, TANPA filter jenis
+                       penilaian: butir "S" (sesuai) ikut tampil, hanya butir
+                       yang belum dinilai auditor yang tidak ikut. Data dari
+                       controller: $butir (AuditjawabModel::butirDinilai). */
                     ?>
                     <?php if (empty($butir)): ?>
-                    <div class="topik-kosong">Belum ada temuan pada pertanyaan ini.</div>
+                    <div class="topik-kosong">Belum ada butir yang dinilai pada pertanyaan ini.</div>
                     <?php else: ?>
                     <div class="ptk-tabel-kotak">
                       <table class="table table-hover ptk-tabel butir-tabel">
