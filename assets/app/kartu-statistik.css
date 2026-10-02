@@ -66,3 +66,46 @@ a.kartu-stat:focus {
 div.kartu-stat {
     cursor: default;
 }
+
+/* ---------------------------------------------------------------------------
+   Tambahan opsional: bilah porsi + keterangan kecil.
+
+   Dipakai halaman PTK (auditee) untuk menunjukkan porsi temuan terhadap
+   total, dan porsi temuan yang sudah punya rencana koreksi.
+   --------------------------------------------------------------------------- */
+
+.kartu-stat__isi {
+    overflow: hidden;
+}
+
+.kartu-stat__bar {
+    height: 5px;
+    margin-top: 10px;
+    border-radius: 3px;
+    background-color: rgba(255, 255, 255, .3);
+    overflow: hidden;
+}
+
+.kartu-stat__bar-isi {
+    display: block;
+    height: 100%;
+    border-radius: 3px;
+    background-color: #fff;
+    transition: width .3s ease;
+}
+
+.kartu-stat__bar-ket {
+    margin-top: 5px;
+    font-size: 11px;
+    letter-spacing: .02em;
+    opacity: .82;
+}
+
+/* Kartu yang ikonnya di atas angka (layar sempit): tetap rapi saat dibungkus. */
+@media (max-width: 575px) {
+    .kartu-stat__ikon {
+        float: none;
+        display: block;
+        margin: 0 0 10px;
+    }
+}

@@ -130,6 +130,37 @@ class PtkModel extends CI_Model {
         }
     }
 
+    /**
+     * Ringkasan temuan unit auditee ini dalam satu kueri:
+     * total, jumlah per kategori temuan, dan jumlah yang belum punya
+     * rencana koreksi (dipakai kartu statistik halaman PTK).
+     */
+    public function ringkasan() {
+        $this->db->select('COUNT(*) AS total', FALSE);
+        $this->db->select("SUM(CASE WHEN jwb_temuan = 'OB' THEN 1 ELSE 0 END) AS observasi", FALSE);
+        $this->db->select("SUM(CASE WHEN jwb_temuan = 'TS MINOR' THEN 1 ELSE 0 END) AS minor", FALSE);
+        $this->db->select("SUM(CASE WHEN jwb_temuan = 'TS MAYOR' THEN 1 ELSE 0 END) AS mayor", FALSE);
+        $this->db->select("SUM(CASE WHEN (jwb_koreksi IS NULL OR TRIM(jwb_koreksi) = '') THEN 1 ELSE 0 END) AS tanpa_koreksi", FALSE);
+        $this->db->from('auditjawab');
+        $this->db->join('audit ma', 'ma.audit_id = auditjawab.audit_id', 'left');
+        $users_id = $this->session->userdata('users_id');
+        if (isset($users_id)) {
+            $this->db->where('ma.auditee_id', $users_id);
+        }
+        $this->db->where('lingkup_id IS NOT NULL', NULL, FALSE);
+        $this->db->where("jwb_temuan IN ('OB','TS MINOR','TS MAYOR')");
+
+        $row = $this->db->get()->row_array();
+
+        return array(
+            'total'         => isset($row['total']) ? (int) $row['total'] : 0,
+            'observasi'     => isset($row['observasi']) ? (int) $row['observasi'] : 0,
+            'minor'         => isset($row['minor']) ? (int) $row['minor'] : 0,
+            'mayor'         => isset($row['mayor']) ? (int) $row['mayor'] : 0,
+            'tanpa_koreksi' => isset($row['tanpa_koreksi']) ? (int) $row['tanpa_koreksi'] : 0,
+        );
+    }
+
     public function totalObservasi(){
         $this->db->from('mutu_auditjawab');
         $this->db->join('mutu_audit ma', 'ma.audit_id = mutu_auditjawab.audit_id', 'left');

@@ -1,53 +1,85 @@
 <div class="page">
     <div class="page-content container-fluid">
         
+        <?php
+        /* Kartu statistik temuan - memakai komponen bersama
+           assets/app/kartu-statistik.css (seragam dengan dashboard auditee,
+           admin, dan daftar audit auditor). Tiap kartu kategori menampilkan
+           porsi temuan terhadap total, dan kartu total menampilkan berapa
+           temuan yang belum punya rencana koreksi. */
+        $total = isset($total_temuan) ? (int) $total_temuan : 0;
+        $siap  = isset($sudah_koreksi) ? (int) $sudah_koreksi : 0;
+        $sisa  = isset($tanpa_koreksi) ? (int) $tanpa_koreksi : 0;
+
+        $persen = function ($nilai) use ($total) {
+            if ($total < 1) {
+                return 0;
+            }
+            return (int) round($nilai * 100 / $total);
+        };
+
+        $kartu_temuan = array(
+            array(
+                'judul'  => 'Total Temuan',
+                'nilai'  => $total,
+                'ikon'   => 'md-assignment',
+                'warna'  => '#3949ab',
+                'ket'    => $total > 0
+                    ? $siap . ' sudah ditindaklanjuti, ' . $sisa . ' belum'
+                    : 'Belum ada temuan pada unit Anda',
+                'bar'    => $total > 0 ? $persen($siap) : 0,
+                'bar_ket' => $total > 0 ? $persen($siap) . '% sudah ada rencana koreksi' : '',
+            ),
+            array(
+                'judul'  => 'Observasi',
+                'nilai'  => isset($observasi) ? (int) $observasi : 0,
+                'ikon'   => 'md-info-outline',
+                'warna'  => '#1e88e5',
+                'ket'    => 'Catatan perbaikan (OB)',
+                'bar'    => $persen(isset($observasi) ? (int) $observasi : 0),
+                'bar_ket' => $persen(isset($observasi) ? (int) $observasi : 0) . '% dari total temuan',
+            ),
+            array(
+                'judul'  => 'Minor',
+                'nilai'  => isset($minor) ? (int) $minor : 0,
+                'ikon'   => 'md-alert-triangle',
+                'warna'  => '#fb8c00',
+                'ket'    => 'Ketidaksesuaian minor (TS MINOR)',
+                'bar'    => $persen(isset($minor) ? (int) $minor : 0),
+                'bar_ket' => $persen(isset($minor) ? (int) $minor : 0) . '% dari total temuan',
+            ),
+            array(
+                'judul'  => 'Mayor',
+                'nilai'  => isset($mayor) ? (int) $mayor : 0,
+                'ikon'   => 'md-alert-octagon',
+                'warna'  => '#e53935',
+                'ket'    => 'Ketidaksesuaian mayor (TS MAYOR)',
+                'bar'    => $persen(isset($mayor) ? (int) $mayor : 0),
+                'bar_ket' => $persen(isset($mayor) ? (int) $mayor : 0) . '% dari total temuan',
+            ),
+        );
+        ?>
+
         <div class="row" data-plugin="matchHeight" data-by-row="true">
 
-            <div class="col-xl-4 col-md-8">
-                <div class="card card-block p-25 bg-green-600">
-                    <div class="counter counter-lg counter-inverse">
-                        <div class="counter-label text-uppercase">OBSERVASI</div>
-                        <div class="counter-number-group">
-                            <span class="counter-number-related"></span>
-                            <span class="counter-number">
-                            <?php if(isset($observasi)){echo number_format($observasi,0,',','.');}else{echo '0';}?>
-                            </span>
-                        </div>
-                    </div>
+          <?php foreach ($kartu_temuan as $k): ?>
+            <div class="col-xl-3 col-md-6">
+              <div class="kartu-stat" style="background-color:<?php echo $k['warna']; ?>;">
+                <i class="icon <?php echo $k['ikon']; ?> kartu-stat__ikon" aria-hidden="true"></i>
+                <div class="kartu-stat__isi">
+                  <div class="kartu-stat__angka"><?php echo number_format($k['nilai'], 0, ',', '.'); ?></div>
+                  <div class="kartu-stat__judul"><?php echo $k['judul']; ?></div>
+                  <div class="kartu-stat__ket"><?php echo $k['ket']; ?></div>
+                  <?php if ($k['bar_ket'] !== ''): ?>
+                  <div class="kartu-stat__bar" role="img" aria-label="<?php echo html_escape($k['bar_ket']); ?>">
+                    <span class="kartu-stat__bar-isi" style="width:<?php echo (int) $k['bar']; ?>%;"></span>
+                  </div>
+                  <div class="kartu-stat__bar-ket"><?php echo $k['bar_ket']; ?></div>
+                  <?php endif; ?>
                 </div>
+              </div>
             </div>
-
-            <div class="col-xl-4 col-md-8">
-                <div class="card card-block p-25 bg-orange-600">
-                    <div class="counter counter-lg counter-inverse">
-                        <div class="counter-label text-uppercase">MINOR</div>
-                        <div class="counter-number-group">
-                            <span class="counter-number-related"></span>
-                            <span class="counter-number">
-                            <?php if(isset($minor)){echo number_format($minor,0,',','.');}else{echo '0';}?>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-4 col-md-8">
-                <div class="card card-block p-25 bg-red-600">
-                    <div class="counter counter-lg counter-inverse">
-                        <div class="counter-label text-uppercase">MAYOR</div>
-                        <div class="counter-number-group">
-                            <span class="counter-number-related"></span>
-                            <span class="counter-number">
-                            <?php if(isset($mayor)){echo number_format($mayor,0,',','.');}else{echo '0';}?>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            
-
-            
+          <?php endforeach; ?>
 
         </div>
         <div class="row"  data-by-row="true">

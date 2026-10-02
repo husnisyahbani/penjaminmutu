@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", function(){
     <!-- Kartu statistik & tombol aksi tabel (dipakai bersama admin/auditor/auditee) -->
     <link rel="stylesheet" href="<?php echo asset_url();?>app/topik-aktivitas.css?v=1.2">
     <link rel="stylesheet" href="<?php echo asset_url();?>app/filter-tabel.css">
-    <link rel="stylesheet" href="<?php echo asset_url();?>app/kartu-statistik.css">
+    <link rel="stylesheet" href="<?php echo asset_url();?>app/kartu-statistik.css?v=1.1">
     <link rel="stylesheet" href="<?php echo asset_url();?>app/tabel-aksi.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>app/ptk.css?v=1.0">
     <link rel="stylesheet" href="<?php echo asset_url();?>global/fonts/material-design/material-design.min.css">

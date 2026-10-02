@@ -23,9 +23,15 @@ class Ptk extends MY_Controller {
             $this->data['title'] = 'PERMINTAAN TINDAKAN KOREKSI';
             $this->data['js'] = $this->load->get_js_files();
             $this->data['ptk'] = 'active';
-            $this->data['observasi'] = $this->ptkmodel->totalObservasi();
-            $this->data['minor'] = $this->ptkmodel->totalMinor();
-            $this->data['mayor'] = $this->ptkmodel->totalMayor();
+            /* Angka kartu statistik: satu kueri untuk total, per kategori,
+               dan yang belum punya rencana koreksi. */
+            $ringkasan = $this->ptkmodel->ringkasan();
+            $this->data['observasi'] = $ringkasan['observasi'];
+            $this->data['minor'] = $ringkasan['minor'];
+            $this->data['mayor'] = $ringkasan['mayor'];
+            $this->data['total_temuan'] = $ringkasan['total'];
+            $this->data['tanpa_koreksi'] = $ringkasan['tanpa_koreksi'];
+            $this->data['sudah_koreksi'] = $ringkasan['total'] - $ringkasan['tanpa_koreksi'];
             $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
             $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
             $this->template($this->data, $this->module); 
