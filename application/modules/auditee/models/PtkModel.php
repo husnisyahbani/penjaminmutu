@@ -231,6 +231,16 @@ class PtkModel extends CI_Model {
      * seperti versi lama. $data: audit_id, jwb_id, dtjwb_id, jwb_koreksi.
      */
     public function koreksi($data) {
+        /* Auditee hanya mengisi kolom dtjwb_koreksi, dan hanya setelah audit
+           berstatus SELESAI. Penjagaan di model ini melindungi semua
+           pemanggil (halaman PTK maupun halaman delik). */
+        $audit = $this->db->select('audit_status')
+            ->where('audit_id', $data['audit_id'])
+            ->get('audit')->row_array();
+        if (empty($audit) || strtoupper(trim((string) $audit['audit_status'])) !== 'SELESAI') {
+            return FALSE;
+        }
+
         $this->db->trans_start();
 
         if ($this->koreksiSiap()) {

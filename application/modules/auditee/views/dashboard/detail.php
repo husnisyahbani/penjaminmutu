@@ -16,7 +16,8 @@
 $pesan_kunci = array(
     'TERKIRIM' => 'Hasil evaluasi sudah dikirim ke auditor, sehingga jawaban dan lampiran tidak dapat diubah lagi.',
     'PROSES'   => 'Audit sedang dinilai auditor, sehingga jawaban dan lampiran tidak dapat diubah lagi.',
-    'SELESAI'  => 'Audit sudah selesai, sehingga jawaban dan lampiran tidak dapat diubah lagi.',
+    'SELESAI'  => 'Audit sudah selesai, sehingga jawaban dan lampiran tidak dapat diubah lagi. '
+        . 'Rencana koreksi tiap butir dapat Anda lengkapi melalui tombol Daftar Tilik & Koreksi.',
 );
 $pesan_kunci = isset($pesan_kunci[$status_audit])
     ? $pesan_kunci[$status_audit]
@@ -205,6 +206,10 @@ $jml_belum = $jml_topik - $jml_dijawab;
                                             <?php if ($koreksi !== ''): ?>
                                             <div class="aktivitas-bukti">
                                                 <span class="aktivitas-label">Rencana koreksi:</span> <?php echo nl2br(html_escape($koreksi)); ?>
+                                            </div>
+                                            <?php elseif ($status_audit !== 'SELESAI'): ?>
+                                            <div class="aktivitas-bukti">
+                                                <span class="text-muted">Rencana koreksi dapat Anda isi setelah audit selesai.</span>
                                             </div>
                                             <?php endif; ?>
 
