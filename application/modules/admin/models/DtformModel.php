@@ -93,9 +93,123 @@ class DtformModel extends CI_Model {
         return $query->result_array();
     }
 
+    /* ==================================================================
+       Urutan pertanyaan (topik)
+       ================================================================== */
+
+    /** Kolom urutan sudah ada? (database/urut_pertanyaan.sql) */
+    public function urutSiap() {
+        return $this->db->field_exists('dtform_urut', 'detailform');
+    }
+
+    /**
+     * Siapkan kolom urutan + isi nilainya mengikuti urutan id saat ini.
+     * Dipakai tombol "Aktifkan Urutan Topik" (aman dijalankan berulang kali).
+     */
+    public function installUrut() {
+        if (!$this->db->table_exists('detailform')) {
+            return FALSE;
+        }
+
+        if (!$this->db->field_exists('dtform_urut', 'detailform')) {
+            $this->load->dbforge();
+            // DBForge::add_column() menambahkan dbprefix sendiri.
+            $this->dbforge->add_column('detailform', array(
+                'dtform_urut' => array('type' => 'INT', 'constraint' => 11, 'default' => 0),
+            ));
+        }
+
+        // Isi urutan awal per formulir mengikuti id.
+        foreach ($this->db->select('form_id')->group_by('form_id')
+                     ->get('detailform')->result_array() as $f) {
+            $this->normalisasi($f['form_id']);
+        }
+
+        return $this->urutSiap();
+    }
+
+    /** Rapikan dtform_urut menjadi 1..N mengikuti urutan id. */
+    public function normalisasi($form_id) {
+        if (!$this->urutSiap()) {
+            return;
+        }
+
+        $this->db->where('form_id', $form_id);
+        $this->db->order_by('dtform_urut', 'ASC');
+        $this->db->order_by('dtform_id', 'ASC');
+        $daftar = $this->db->get('detailform')->result_array();
+
+        $urut = 1;
+        foreach ($daftar as $d) {
+            if ((int) $d['dtform_urut'] !== $urut) {
+                $this->db->where('dtform_id', $d['dtform_id']);
+                $this->db->update('detailform', array('dtform_urut' => $urut));
+            }
+            $urut++;
+        }
+    }
+
+    /** Nomor urut berikutnya untuk formulir ini. */
+    public function urutBerikut($form_id) {
+        if (!$this->urutSiap()) {
+            return 0;
+        }
+        $max = $this->db->select_max('dtform_urut')
+            ->where('form_id', $form_id)
+            ->get('detailform')->row_array();
+        return (int) (isset($max['dtform_urut']) ? $max['dtform_urut'] : 0) + 1;
+    }
+
+    /** Geser satu pertanyaan satu langkah (naik/turun) di dalam formulirnya. */
+    public function pindah($dtform_id, $arah = 'naik') {
+        if (!$this->urutSiap()) {
+            return FALSE;
+        }
+
+        $this->db->where('dtform_id', $dtform_id);
+        $row = $this->db->get('detailform')->row_array();
+        if (!$row) {
+            return FALSE;
+        }
+
+        $this->normalisasi($row['form_id']);
+
+        $this->db->where('form_id', $row['form_id']);
+        $this->db->order_by('dtform_urut', 'ASC');
+        $this->db->order_by('dtform_id', 'ASC');
+        $daftar = $this->db->get('detailform')->result_array();
+
+        $ids = array();
+        $posisi = NULL;
+        foreach ($daftar as $i => $d) {
+            $ids[] = (int) $d['dtform_id'];
+            if ((int) $d['dtform_id'] === (int) $dtform_id) {
+                $posisi = $i;
+            }
+        }
+        if ($posisi === NULL) {
+            return FALSE;
+        }
+
+        $tujuan = ($arah === 'naik') ? $posisi - 1 : $posisi + 1;
+        if ($tujuan < 0 || $tujuan >= count($ids)) {
+            return FALSE;
+        }
+
+        $this->db->where('dtform_id', $ids[$posisi]);
+        $this->db->update('detailform', array('dtform_urut' => $tujuan + 1));
+        $this->db->where('dtform_id', $ids[$tujuan]);
+        $this->db->update('detailform', array('dtform_urut' => $posisi + 1));
+        return TRUE;
+    }
+
     /** Daftar pertanyaan satu formulir (dipakai di luar tabel). */
     function getByFormId($form_id) {
         $this->db->where('form_id', $form_id);
+        // Pertanyaan terbaru yang belum punya urut diletakkan di belakang.
+        if ($this->urutSiap()) {
+            $this->db->order_by('dtform_urut', 'ASC');
+        }
         $this->db->order_by('dtform_id', 'ASC');
         return $this->db->get('detailform')->result_array();
     }

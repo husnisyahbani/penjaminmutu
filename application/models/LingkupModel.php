@@ -274,6 +274,129 @@ class LingkupModel extends CI_Model {
     }
 
     /**
+     * Simpan satu butir (tambah bila $lingkup_id = 0, ubah bila terisi).
+     * Dipakai tampilan gaya topik/activity yang mengedit satu baris sekaligus.
+     */
+    function simpanSatu($dtform_id, $lingkup_id = 0, $isi = '') {
+        if (!$this->siap()) {
+            return array('status' => FALSE, 'pesan' => 'Tabel lingkup belum disiapkan.');
+        }
+
+        $isi = trim((string) $isi);
+        if ($isi === '') {
+            return array('status' => FALSE, 'pesan' => 'Isi butir tidak boleh kosong.');
+        }
+
+        if ((int) $lingkup_id > 0) {
+            $butir = $this->butirSatu($lingkup_id);
+            if (!$butir || (int) $butir['dtform_id'] !== (int) $dtform_id) {
+                return array('status' => FALSE, 'pesan' => 'Butir tidak ditemukan pada pertanyaan ini.');
+            }
+
+            $this->db->where('lingkup_id', $lingkup_id);
+            $this->db->update($this->tabel, array(
+                'lingkup_isi'    => $isi,
+                'lingkup_update' => date('Y-m-d H:i:s'),
+            ));
+
+            return array(
+                'status'     => TRUE,
+                'pesan'      => 'Butir diperbarui.',
+                'lingkup_id' => (int) $lingkup_id,
+                'lingkup_isi' => $isi,
+                'lingkup_urut' => (int) $butir['lingkup_urut'],
+            );
+        }
+
+        $max = $this->db->select_max('lingkup_urut')
+            ->where('dtform_id', $dtform_id)
+            ->get($this->tabel)->row_array();
+        $urut = (int) (isset($max['lingkup_urut']) ? $max['lingkup_urut'] : 0) + 1;
+
+        $this->db->insert($this->tabel, array(
+            'dtform_id'      => $dtform_id,
+            'lingkup_isi'    => $isi,
+            'lingkup_urut'   => $urut,
+            'lingkup_create' => date('Y-m-d H:i:s'),
+        ));
+
+        return array(
+            'status'      => TRUE,
+            'pesan'       => 'Butir ditambahkan.',
+            'lingkup_id'  => $this->db->insert_id(),
+            'lingkup_isi' => $isi,
+            'lingkup_urut' => $urut,
+        );
+    }
+
+    /**
+     * Geser satu butir satu langkah (naik/turun) di dalam pertanyaannya.
+     * Urutan dinormalkan lebih dahulu supaya nilai urut yang sama tidak
+     * membuat perpindahan tidak berefek.
+     */
+    function pindah($lingkup_id, $arah = 'naik') {
+        if (!$this->siap()) {
+            return FALSE;
+        }
+
+        $butir = $this->butirSatu($lingkup_id);
+        if (!$butir) {
+            return FALSE;
+        }
+
+        $this->normalisasi($butir['dtform_id']);
+
+        $daftar = $this->butir($butir['dtform_id']);
+        $ids = array();
+        $posisi = NULL;
+        foreach ($daftar as $i => $b) {
+            $ids[] = (int) $b['lingkup_id'];
+            if ((int) $b['lingkup_id'] === (int) $lingkup_id) {
+                $posisi = $i;
+            }
+        }
+        if ($posisi === NULL) {
+            return FALSE;
+        }
+
+        $tujuan = ($arah === 'naik') ? $posisi - 1 : $posisi + 1;
+        if ($tujuan < 0 || $tujuan >= count($ids)) {
+            return FALSE;
+        }
+
+        $this->db->where('lingkup_id', $ids[$posisi]);
+        $this->db->update($this->tabel, array('lingkup_urut' => $tujuan + 1));
+        $this->db->where('lingkup_id', $ids[$tujuan]);
+        $this->db->update($this->tabel, array('lingkup_urut' => $posisi + 1));
+        return TRUE;
+    }
+
+    /** Rapikan nilai urut menjadi 1..N mengikuti urutan yang tampil. */
+    function normalisasi($dtform_id) {
+        if (!$this->siap()) {
+            return;
+        }
+
+        $daftar = $this->butir($dtform_id);
+        $urut = 1;
+        foreach ($daftar as $b) {
+            if ((int) $b['lingkup_urut'] !== $urut) {
+                break;
+            }
+            $urut++;
+        }
+        if ($urut > count($daftar)) {
+            return;   // sudah rapi
+        }
+
+        $urut = 1;
+        foreach ($daftar as $b) {
+            $this->db->where('lingkup_id', $b['lingkup_id']);
+            $this->db->update($this->tabel, array('lingkup_urut' => $urut++));
+        }
+    }
+
+    /**
      * Hapus satu butir. Butir yang sudah dipakai jawaban audit tidak dihapus
      * supaya hasil audit tidak kehilangan relasinya.
      */

@@ -17,20 +17,9 @@ $(function () {
         }
     });
 
-    var daftarpertanyaan = $('#daftarpertanyaan').DataTable({
-        "responsive": true,
-        "processing": true,
-        "serverSide": true,
-        "searching": true,
-        "order": [],
-        "columnDefs": [
-            {"targets": [0,1,2], "orderable": false}
-        ],
-        "ajax": {
-            "url": base_url + "/daftaraudit/listpertanyaan/"+audit_id,
-            "type": "POST"
-        }
-    });
+    /* Halaman detail audit kini berbentuk topik/activity yang dirender server
+       (lihat assets/app/topik-aktivitas.js), jadi tidak ada DataTable
+       #daftarpertanyaan lagi di halaman itu. */
 
     // $('#jwb_pertanyaan').summernote('code', jwb_pertanyaan);
     // $('#jwb_referensi').summernote('code', jwb_referensi);
@@ -39,7 +28,8 @@ $(function () {
     // $('#jwb_tujuan').summernote('code', jwb_tujuan);
 
 
-    $("#daftarpertanyaan").on("click", ".delik", function () {
+    /* Tombol "Daftar Tilik" pada tiap topik (halaman detail). */
+    $(document).on("click", "#topik_daftar .delik", function () {
         var audit_id = $(this).attr('audit_id');
         var dtform_id = $(this).attr('dtform_id');
          window.location.href = base_url+"/delik?audit_id="+audit_id+"&dtform_id="+dtform_id;

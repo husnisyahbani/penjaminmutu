@@ -118,6 +118,34 @@ Catatan:
 - Berkas ini tidak idempoten (`ADD COLUMN` gagal bila kolom sudah ada) —
   lewati bila kolom `periode_id` sudah terpasang.
 
+## `urut_pertanyaan.sql`
+
+Menambah kolom urutan topik pada formulir audit. Halaman **Audit → Formulir Audit**
+(lihat detail satu formulir) kini berbentuk kursus: **topik** = pertanyaan dan
+**activity** = butir lingkup, keduanya dapat digeser naik/turun.
+
+| Objek                        | Isi                                                   |
+| ---------------------------- | ----------------------------------------------------- |
+| `mutu_detailform`.`dtform_urut` | nomor urut topik di dalam satu formulir (1, 2, 3, …) |
+
+```sql
+ALTER TABLE `mutu_detailform`
+  ADD COLUMN `dtform_urut` int(11) NOT NULL DEFAULT 0 AFTER `dtform_lingkup`;
+```
+
+Catatan:
+
+- Isi awal disusun mengikuti urutan `dtform_id` (lihat berkas SQL), jadi tampilan
+  tidak berubah sebelum ada topik yang digeser.
+- Urutan **activity** memakai kolom `mutu_lingkup`.`lingkup_urut` yang sudah ada
+  (dibuat oleh `migrasi_lingkup.sql`), tidak perlu kolom baru.
+- Bisa juga dipasang dari aplikasi tanpa impor SQL: buka detail formulir, klik
+  tombol **Aktifkan Urutan Topik** pada pemberitahuan di atas daftar topik.
+- Tidak idempoten (`ADD COLUMN` gagal bila kolom sudah ada) — lewati bila kolom
+  `dtform_urut` sudah terpasang.
+- Tanpa kolom ini aplikasi tetap berjalan; tombol naik/turun topik dinonaktifkan
+  dan urutan memakai `dtform_id`.
+
 ## `migrasi_lingkup.sql`
 
 Memindahkan lingkup pertanyaan dari satu kolom teks menjadi **banyak butir**

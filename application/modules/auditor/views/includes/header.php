@@ -95,6 +95,7 @@ div[role="log"][aria-live="assertive"] {
     
     <!-- Fonts -->
     <!-- Kartu statistik (dipakai bersama dashboard admin & daftar audit) -->
+    <link rel="stylesheet" href="<?php echo asset_url();?>app/topik-aktivitas.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>app/filter-tabel.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>app/kartu-statistik.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>app/tabel-aksi.css">

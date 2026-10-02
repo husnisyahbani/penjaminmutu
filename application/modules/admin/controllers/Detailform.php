@@ -5,7 +5,9 @@ class Detailform extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'admin';
-        $this->load->js(base_url("assets/app/admin/detailform.js?v=1.6"));
+        $this->load->js(base_url("assets/app/admin/detailform.js?v=3.0"));
+        // Tampilan topik & activity (buka-tutup + pencarian).
+        $this->load->js(base_url("assets/app/topik-aktivitas.js?v=1.0"));
         $this->load->model('DtformModel', 'dtform');
         $this->load->model('FormulirModel', 'formulir');
         $this->load->model('LingkupModel', 'lingkup');
@@ -26,6 +28,17 @@ class Detailform extends MY_Controller {
             $this->data['formaudit'] = 'active';
             $this->data['formulir'] = $this->formulir->getFormulir($form_id);
             $this->data['form_id'] = $form_id;
+
+            /* Tampilan gaya topik/activity: topik = pertanyaan, activity = butir
+               lingkup. Seluruhnya dirender sekaligus (bukan tabel). */
+            $topik = $this->dtform->getByFormId($form_id);
+            $ids = array();
+            foreach ($topik as $t) {
+                $ids[] = $t['dtform_id'];
+            }
+            $this->data['topik'] = $topik;
+            $this->data['peta_lingkup'] = $this->lingkup->peta($ids);
+            $this->data['urut_siap'] = $this->dtform->urutSiap();
             /* Kolom lama masih ada dan belum semua pertanyaan punya butir ->
                tawarkan halaman migrasi. */
             $this->data['perlu_migrasi'] = $this->lingkup->kolomLamaAda()
@@ -51,17 +64,28 @@ class Detailform extends MY_Controller {
                 }
                 $data['form_id']   = $this->input->post('form_id');
 
+                // Topik baru diletakkan di urutan paling belakang.
+                $data['dtform_urut'] = $this->dtform->urutBerikut($data['form_id']);
+
                 if ($this->dtform->add($data)) {
-                    // Butir lingkup disimpan di tabel lingkup.
                     $dtform_id = $this->db->insert_id();
-                    $simpan = $this->lingkup->simpan(
-                        $dtform_id,
-                        $this->input->post('lingkup_id'),
-                        $this->input->post('lingkup_isi')
-                    );
+
+                    // Butir lingkup hanya disentuh bila daftarnya memang dikirim
+                    // (tampilan topik/activity menyimpan butir satu per satu).
+                    if ($this->input->post('lingkup_isi') !== NULL) {
+                        $simpan = $this->lingkup->simpan(
+                            $dtform_id,
+                            $this->input->post('lingkup_id'),
+                            $this->input->post('lingkup_isi')
+                        );
+                        $pesan = "Berhasil, " . $simpan['tersimpan'] . " butir lingkup disimpan.";
+                    } else {
+                        $pesan = "Topik berhasil ditambahkan.";
+                    }
+
                     $query = array(
                         "status" => true,
-                        "pesan"  => "Berhasil, " . $simpan['tersimpan'] . " butir lingkup disimpan.",
+                        "pesan"  => $pesan,
                         "dtform_id" => $dtform_id,
                     );
                 } else {
@@ -92,19 +116,23 @@ class Detailform extends MY_Controller {
                 $data['dtform_id'] = $dtform_id;
 
                 if ($this->dtform->edit($data)) {
-                    $simpan = $this->lingkup->simpan(
-                        $dtform_id,
-                        $this->input->post('lingkup_id'),
-                        $this->input->post('lingkup_isi')
-                    );
+                    if ($this->input->post('lingkup_isi') !== NULL) {
+                        $simpan = $this->lingkup->simpan(
+                            $dtform_id,
+                            $this->input->post('lingkup_id'),
+                            $this->input->post('lingkup_isi')
+                        );
 
-                    $pesan = "Berhasil, " . $simpan['tersimpan'] . " butir lingkup disimpan.";
-                    if ($simpan['dihapus'] > 0) {
-                        $pesan .= " " . $simpan['dihapus'] . " butir dihapus.";
-                    }
-                    if (!empty($simpan['ditahan'])) {
-                        $pesan .= " " . count($simpan['ditahan'])
-                                . " butir tidak dihapus karena sudah dipakai jawaban audit.";
+                        $pesan = "Berhasil, " . $simpan['tersimpan'] . " butir lingkup disimpan.";
+                        if ($simpan['dihapus'] > 0) {
+                            $pesan .= " " . $simpan['dihapus'] . " butir dihapus.";
+                        }
+                        if (!empty($simpan['ditahan'])) {
+                            $pesan .= " " . count($simpan['ditahan'])
+                                    . " butir tidak dihapus karena sudah dipakai jawaban audit.";
+                        }
+                    } else {
+                        $pesan = "Topik berhasil diperbarui.";
                     }
                     $query = array("status" => true, "pesan" => $pesan);
                 } else {
@@ -141,9 +169,99 @@ class Detailform extends MY_Controller {
 
     public function hapus() {
         $id = $this->input->post('id');
+        if (empty($id)) {
+            $this->_json(array('status' => false, 'pesan' => 'Topik tidak diketahui.'));
+            return;
+        }
+
         // Butir lingkup dihapus lebih dahulu (relasi jawaban dilepas).
         $this->lingkup->hapusByDtform($id);
         $this->dtform->hapus($id);
+
+        $this->_json(array('status' => true, 'pesan' => 'Topik berhasil dihapus.'));
+    }
+
+    /* =====================================================================
+     | GAYA TOPIK / ACTIVITY
+     | Satu pertanyaan = satu topik, satu butir lingkup = satu activity.
+     * ================================================================== */
+
+    /** Siapkan kolom urutan pertanyaan (dipakai tombol "Aktifkan Urutan Topik"). */
+    public function pasangurut() {
+        try {
+            $siap = $this->dtform->installUrut();
+            $this->_json(array(
+                'status' => (bool) $siap,
+                'pesan'  => $siap ? 'Urutan topik berhasil disiapkan.' : 'Kolom urutan gagal disiapkan.',
+            ));
+        } catch (Exception $e) {
+            $this->_json(array('status' => false, 'pesan' => 'Gagal menyiapkan urutan: ' . $e->getMessage()));
+        }
+    }
+
+    /** Geser topik (pertanyaan) naik/turun. */
+    public function pindah() {
+        $dtform_id = $this->input->post('dtform_id');
+        $arah      = $this->input->post('arah');
+
+        if ($this->dtform->pindah($dtform_id, $arah === 'turun' ? 'turun' : 'naik')) {
+            $this->_json(array('status' => true, 'pesan' => 'Urutan topik diperbarui.'));
+        } else {
+            $this->_json(array('status' => false, 'pesan' => 'Topik sudah berada di ujung urutan.'));
+        }
+    }
+
+    /** Geser butir lingkup (activity) naik/turun di dalam topiknya. */
+    public function pindahbutir() {
+        $lingkup_id = $this->input->post('lingkup_id');
+        $arah       = $this->input->post('arah');
+
+        if ($this->lingkup->pindah($lingkup_id, $arah === 'turun' ? 'turun' : 'naik')) {
+            $this->_json(array('status' => true, 'pesan' => 'Urutan activity diperbarui.'));
+        } else {
+            $this->_json(array('status' => false, 'pesan' => 'Activity sudah berada di ujung urutan.'));
+        }
+    }
+
+    /** Simpan satu activity (butir lingkup): tambah baru atau ubah. */
+    public function simpanbutir() {
+        $dtform_id  = (int) $this->input->post('dtform_id');
+        $lingkup_id = (int) $this->input->post('lingkup_id');
+        $isi        = $this->input->post('lingkup_isi');
+
+        if (empty($dtform_id)) {
+            $this->_json(array('status' => false, 'pesan' => 'Topik tidak diketahui.'));
+            return;
+        }
+
+        $hasil = $this->lingkup->simpanSatu($dtform_id, $lingkup_id, $isi);
+        $this->_json($hasil);
+    }
+
+    /** Hapus satu activity (butir lingkup). */
+    public function hapusbutir() {
+        $lingkup_id = (int) $this->input->post('lingkup_id');
+        if (empty($lingkup_id)) {
+            $this->_json(array('status' => false, 'pesan' => 'Activity tidak diketahui.'));
+            return;
+        }
+
+        $ditahan = array();
+        if ($this->lingkup->hapusButir($lingkup_id, $ditahan)) {
+            $this->_json(array('status' => true, 'pesan' => 'Activity berhasil dihapus.'));
+        } else {
+            $this->_json(array(
+                'status' => false,
+                'pesan'  => 'Activity tidak dihapus karena sudah dipakai pada jawaban audit.',
+            ));
+        }
+    }
+
+    /** Balas JSON (dipakai endpoint gaya topik/activity). */
+    private function _json($data) {
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
+        echo json_encode($data);
     }
 
     public function listdtform($id) {

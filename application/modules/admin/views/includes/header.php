@@ -80,6 +80,7 @@ document.addEventListener("DOMContentLoaded", function(){
     
     <!-- Fonts -->
     <!-- Kartu statistik (dipakai bersama dashboard admin & daftar audit) -->
+    <link rel="stylesheet" href="<?php echo asset_url();?>app/topik-aktivitas.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>app/kartu-statistik.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>app/sidemenu.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>app/tabel-aksi.css">

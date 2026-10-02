@@ -1,65 +1,137 @@
+/* =============================================================================
+   Kelola formulir gaya kursus: topik (pertanyaan) + activity (butir lingkup).
+
+   - Topik: tambah/edit/hapus/naik-turun. Setelah berubah halaman dimuat ulang
+     supaya nomor topik dan ringkasan di panel kiri selalu sinkron.
+   - Activity: tambah/edit/hapus/naik-turun langsung di tempat (tanpa muat ulang).
+   ============================================================================= */
 $(function () {
 
-    /* ---------------- butir lingkup (boleh banyak per pertanyaan) ---------------- */
+    /* ------------------------- pembantu ------------------------- */
 
-    var templat = $('#lingkup_templat').html();
-
-    function tambahBaris(target, id, isi) {
-        var $baris = $(templat);
-        $baris.find('input[name="lingkup_id[]"]').val(id || 0);
-        $baris.find('textarea[name="lingkup_isi[]"]').val(isi || '');
-        $('#' + target).append($baris);
+    function pesanGagal(teks) {
+        swal.fire("Oops", teks || "Gagal menyimpan data.", "error");
     }
 
-    function kosongkan(target) {
-        $('#' + target).empty();
-    }
-
-    /* Satu baris kosong siap diisi saat modal dibuka. */
-    function siapkanFormTambah() {
-        kosongkan('lingkup_add_daftar');
-        tambahBaris('lingkup_add_daftar', 0, '');
-    }
-
-    $('.lingkup-tambah').on('click', function () {
-        tambahBaris($(this).data('target'), 0, '');
-    });
-
-    $(document).on('click', '.lingkup-hapus', function () {
-        $(this).closest('.lingkup-baris').remove();
-    });
-
-    /* Buang baris yang benar-benar kosong sebelum dikirim. */
-    function rapikan(target) {
-        $('#' + target).find('.lingkup-baris').each(function () {
-            if ($.trim($(this).find('textarea').val()) === '' && $(this).find('input').val() === '0') {
-                $(this).remove();
+    function kirim(url, data, sukses, gagal) {
+        $.ajax({
+            url: base_url + url,
+            type: "POST",
+            data: data,
+            dataType: "json",
+            success: function (hasil) {
+                if (hasil && hasil.status) {
+                    sukses(hasil);
+                } else {
+                    (gagal || pesanGagal)(hasil ? hasil.pesan : null);
+                }
+            },
+            error: function () {
+                (gagal || pesanGagal)("Tidak dapat menghubungi server.");
             }
         });
     }
 
-    var dtform = $('#dtform').DataTable({
-        "responsive": true,
-        "processing": true,
-        "serverSide": true,
-        "searching": true,
-        "order": [],
-        "columnDefs": [
-            {"targets": [0,3], "orderable": false}
-        ],
-        "ajax": {
-            "url": base_url + "/detailform/listdtform/"+form_id,
-            "type": "POST"
+    function segarkanAngka(topik) {
+        if (!topik) {
+            return;
         }
+        var jumlah = topik.find('.aktivitas').not('.aktivitas-tambah-baris').length;
+        topik.find('.badge-activity').text(jumlah + ' activity');
+        topik.find('.aktivitas-kosong').toggle(jumlah === 0);
+        if (window.TopikAktivitas) {
+            window.TopikAktivitas.aturTombolActivity(topik);
+        }
+    }
+
+    function bangunBarisActivity(lingkup_id, isi) {
+        var baris = $(
+            '<div class="aktivitas">' +
+                '<i class="icon md-assignment aktivitas-ikon" aria-hidden="true"></i>' +
+                '<div class="aktivitas-isi">' +
+                    '<span class="aktivitas-teks"></span>' +
+                    '<div class="aktivitas-editor" style="display:none;">' +
+                        '<textarea class="form-control" rows="2" placeholder="Tulis activity, mis. dokumen/bukti yang diminta"></textarea>' +
+                        '<div class="aktivitas-editor-aksi">' +
+                            '<button type="button" class="btn btn-sm btn-primary aktivitas-simpan">Simpan</button>' +
+                            '<button type="button" class="btn btn-sm btn-default aktivitas-batal">Batal</button>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="aktivitas-aksi">' +
+                    '<button type="button" class="btn btn-sm btn-icon btn-default aktivitas-naik" data-info="Naikkan activity">' +
+                        '<i class="icon md-chevron-up" aria-hidden="true"></i></button>' +
+                    '<button type="button" class="btn btn-sm btn-icon btn-default aktivitas-turun" data-info="Turunkan activity">' +
+                        '<i class="icon md-chevron-down" aria-hidden="true"></i></button>' +
+                    '<button type="button" class="btn btn-sm btn-icon btn-success aktivitas-edit" data-info="Ubah isi activity">' +
+                        '<i class="icon md-edit" aria-hidden="true"></i></button>' +
+                    '<button type="button" class="btn btn-sm btn-icon btn-danger aktivitas-hapus" data-info="Hapus activity ini">' +
+                        '<i class="icon md-delete" aria-hidden="true"></i></button>' +
+                '</div>' +
+            '</div>'
+        );
+        baris.attr('data-lingkup_id', lingkup_id);
+        baris.attr('data-cari', (isi || '').toLowerCase());
+        baris.find('.aktivitas-teks').text(isi);
+        baris.find('.aktivitas-editor textarea').val(isi);
+        return baris;
+    }
+
+    /* ------------------------- topik ------------------------- */
+
+    $('#tambah_topik').on('click', function () {
+        $('#formaddtopik')[0].reset();
+        $('#topikAddModal').modal('show');
     });
 
-   
-
-    $("#dtform").on("click", ".edit", function () {
-        var id = $(this).attr('id');
+    $("#formaddtopik").formValidation({
+        framework: "bootstrap4",
+        excluded: [':disabled'],
+        err: { clazz: 'invalid-feedback' },
+        control: { valid: 'is-valid', invalid: 'is-invalid' },
+        row: { invalid: 'has-danger' }
+    }).on('success.form.fv', function (e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var formData = new FormData(e.target);
 
         $.ajax({
-            url: base_url + "/detailform/getdtformById/"+id,
+            url: base_url + "/detailform/tambah",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            beforeSend: function () {
+                $("#topikAddModal").modal('hide');
+                swal.fire({
+                    title: 'Loading',
+                    allowEscapeKey: false,
+                    allowOutsideClick: false,
+                    didOpen: function () { swal.showLoading(); }
+                });
+            },
+            success: function (data) {
+                swal.close();
+                if (data && data.status) {
+                    window.location.reload();
+                    return;
+                }
+                pesanGagal(data ? data.pesan : null);
+                $form.formValidation('disableSubmitButtons', false).formValidation('resetForm', true);
+            },
+            error: function () {
+                swal.close();
+                pesanGagal("Tidak dapat menghubungi server.");
+                $form.formValidation('disableSubmitButtons', false).formValidation('resetForm', true);
+            }
+        });
+        return false;
+    });
+
+    $('#topik_daftar').on('click', '.topik-edit', function () {
+        var id = $(this).attr('id');
+        $.ajax({
+            url: base_url + "/detailform/getdtformById/" + id,
             type: "GET",
             dataType: "json",
             beforeSend: function () {
@@ -67,219 +139,203 @@ $(function () {
                     title: 'Loading',
                     allowEscapeKey: false,
                     allowOutsideClick: false,
-                    onOpen: () => {
-                        swal.showLoading();
-                    }
+                    didOpen: function () { swal.showLoading(); }
                 });
             },
             success: function (list) {
                 swal.close();
-                if (list.status) {
-                    $('#dtformEditModal').modal('show');
-                    $("#edit_dtform_tujuan").val(list.dtform_tujuan);
-                    $("#dtform_id").val(list.dtform_id);
-                    $('#edit_dtform_pertanyaan').summernote('code',list.dtform_pertanyaan);
-
-                    /* Butir lingkup: satu baris per butir (boleh ditambah/dihapus). */
-                    kosongkan('lingkup_edit_daftar');
-                    if (list.lingkup && list.lingkup.length) {
-                        $.each(list.lingkup, function (i, b) {
-                            tambahBaris('lingkup_edit_daftar', b.lingkup_id, b.lingkup_isi);
-                        });
-                    } else {
-                        tambahBaris('lingkup_edit_daftar', 0, '');
-                    }
-                    // tinymce.get('edit_dtform_pertanyaan').setContent(list.dtform_pertanyaan);
-                    // tinymce.get('edit_dtform_lingkup').setContent(list.dtform_lingkup);
-                    
+                if (list && list.status) {
+                    $('#dtform_id').val(list.dtform_id);
+                    $('#edit_dtform_pertanyaan').val(list.dtform_pertanyaan);
+                    $('#formbedittopik').formValidation('resetForm', true);
+                    $('#topikEditModal').modal('show');
                 } else {
-                    swal.fire("Oops", "Gagal!", "error");
-                        $("#formeditdtform")
-                    .formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-                }   
+                    pesanGagal();
+                }
             },
             error: function () {
-                swal.fire("Oops", "No connection!", "error");
-                
-                 $("#formeditdtform")
-                .formValidation('disableSubmitButtons', false)
-                .formValidation('resetForm', true);
-            }
-        });
-    });
-
-
-    $("#dtform").on("click", ".delete", function () {
-        var id = $(this).attr('id');
-        hapus(id);
-    });
-
-    $("#dtform").on("click", ".detail", function () {
-        var id = $(this).attr('id');
-        location.href = base_url + "/detailform?id="+id;
-    });
-
-    function hapus($id)
-    {
-        swal.fire({
-            title: "Anda Yakin?",
-            text: "Anda Yakin Ingin Hapus dtform Ini?",
-            type: "warning",
-            showCancelButton: true,
-            showLoaderOnConfirm: true,
-            confirmButtonText: "Ya, Hapus!",
-            cancelButtonText: 'Tidak',
-            preConfirm: function () {
-                $.ajax({
-                    url: base_url + "/detailform/hapus",
-                    type: "POST",
-                    data: { id: $id}
-                })
-                        .done(function (data) {
-                            swal.fire({
-                                title: "Hapus",
-                                text: "dtform Telah Terhapus!",
-                                type: "success",
-                                preConfirm: function () {
-                                    dtform.ajax.reload();
-                                }
-                            });
-                        })
-                        .error(function (data) {
-                            swal.fire("Oops", "No connection!", "error");
-                        });
-            }
-        });
-    }
-
-    $("#tambah").on("click", function () {
-        siapkanFormTambah();
-        $("#dtformAddModal").modal('show');
-    });
-
-
-    $("#formadddtform").formValidation({
-        framework: "bootstrap4",
-        excluded: [':disabled'],
-        err: {
-            clazz: 'invalid-feedback'
-        },
-        control: {
-            valid: 'is-valid',
-            invalid: 'is-invalid'
-        },
-        row: {
-            invalid: 'has-danger'
-        }
-    }).on('success.form.fv', function(e) {
-        e.preventDefault();
-
-        var $form = $(e.target);       // ✅ perbaikan
-        rapikan('lingkup_add_daftar');
-        var formData = new FormData(e.target);
-
-        $.ajax({
-            url: base_url + "/detailform/tambah",
-            type: "POST",
-            data: formData,
-            processData: false,        // ✅ wajib
-            contentType: false,        // ✅ wajib
-            beforeSend: function () {
-                $("#dtformAddModal").modal('hide');
-                swal.fire({
-                    title: 'Loading',
-                    allowEscapeKey: false,
-                    allowOutsideClick: false,
-                    onOpen: () => {
-                        swal.showLoading();
-                    }
-                });
-            },
-            success: function (data) {
                 swal.close();
-                var list = data == null ? [] : (data instanceof Array ? data : [data]);
-                $.each(list, function (index, org_types) {
-                    if (org_types.status) {
-                        dtform.ajax.reload();
-                    } else {
-                        swal.fire("Oops", org_types.pesan, "error");
-                    }
-                });
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
-            },
-            error: function () {
-                swal.fire("Oops", "No connection!", "error");
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
+                pesanGagal("Tidak dapat menghubungi server.");
             }
         });
+    });
 
-    return false;
-});
-
-
-$("#formeditdtform").formValidation({
+    $("#formbedittopik").formValidation({
         framework: "bootstrap4",
         excluded: [':disabled'],
-        err: {
-            clazz: 'invalid-feedback'
-        },
-        control: {
-            valid: 'is-valid',
-            invalid: 'is-invalid'
-        },
-        row: {
-            invalid: 'has-danger'
-        }
-    }).on('success.form.fv', function(e) {
+        err: { clazz: 'invalid-feedback' },
+        control: { valid: 'is-valid', invalid: 'is-invalid' },
+        row: { invalid: 'has-danger' }
+    }).on('success.form.fv', function (e) {
         e.preventDefault();
-
-        var $form = $(e.target);       // ✅ perbaikan
-        rapikan('lingkup_edit_daftar');
+        var $form = $(e.target);
         var formData = new FormData(e.target);
 
         $.ajax({
             url: base_url + "/detailform/edit",
             type: "POST",
             data: formData,
-            processData: false,        // ✅ wajib
-            contentType: false,        // ✅ wajib
+            processData: false,
+            contentType: false,
             beforeSend: function () {
-                $("#dtformEditModal").modal('hide');
+                $("#topikEditModal").modal('hide');
                 swal.fire({
                     title: 'Loading',
                     allowEscapeKey: false,
                     allowOutsideClick: false,
-                    onOpen: () => {
-                        swal.showLoading();
-                    }
+                    didOpen: function () { swal.showLoading(); }
                 });
             },
             success: function (data) {
                 swal.close();
-                var list = data == null ? [] : (data instanceof Array ? data : [data]);
-                $.each(list, function (index, org_types) {
-                    if (org_types.status) {
-                        dtform.ajax.reload();
-                    } else {
-                        swal.fire("Oops", org_types.pesan, "error");
-                    }
-                });
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
+                if (data && data.status) {
+                    window.location.reload();
+                    return;
+                }
+                pesanGagal(data ? data.pesan : null);
+                $form.formValidation('disableSubmitButtons', false).formValidation('resetForm', true);
             },
             error: function () {
-                swal.fire("Oops", "No connection!", "error");
-                $form.formValidation('disableSubmitButtons', false)
-                    .formValidation('resetForm', true);
+                swal.close();
+                pesanGagal("Tidak dapat menghubungi server.");
+                $form.formValidation('disableSubmitButtons', false).formValidation('resetForm', true);
             }
         });
+        return false;
+    });
 
-    return false;
+    $('#topik_daftar').on('click', '.topik-hapus', function () {
+        var id = $(this).attr('id');
+        swal.fire({
+            title: "Hapus topik ini?",
+            text: "Seluruh activity pada topik ini ikut terhapus.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Ya, hapus",
+            cancelButtonText: "Batal"
+        }).then(function (hasil) {
+            if (!hasil.value) {
+                return;
+            }
+            kirim("/detailform/hapus", { id: id }, function () {
+                window.location.reload();
+            });
+        });
+    });
+
+    $('#topik_daftar').on('click', '.topik-naik, .topik-turun', function () {
+        var topik = $(this).closest('.topik');
+        var arah = $(this).hasClass('topik-naik') ? 'naik' : 'turun';
+        kirim("/detailform/pindah", { dtform_id: topik.attr('data-dtform_id'), arah: arah }, function () {
+            window.location.reload();
+        });
+    });
+
+    /* ------------------------- activity ------------------------- */
+
+    $('#topik_daftar').on('click', '.topik-tambah-activity', function () {
+        var topik = $(this).closest('.topik');
+        topik.find('.aktivitas-tambah-baris').show().find('textarea').val('').focus();
+        $(this).hide();
+    });
+
+    $('#topik_daftar').on('click', '.aktivitas-batal', function () {
+        var baris = $(this).closest('.aktivitas');
+        if (baris.hasClass('aktivitas-tambah-baris')) {
+            baris.hide();
+            baris.closest('.topik').find('.topik-tambah-activity').show();
+            return;
+        }
+        baris.find('.aktivitas-editor').hide();
+        baris.find('.aktivitas-teks').show();
+    });
+
+    $('#topik_daftar').on('click', '.aktivitas-simpan', function () {
+        var baris = $(this).closest('.aktivitas');
+        var topik = baris.closest('.topik');
+        var isi = String(baris.find('textarea').val() || '').trim();
+
+        if (isi === '') {
+            pesanGagal("Isi activity tidak boleh kosong.");
+            return;
+        }
+
+        kirim("/detailform/simpanbutir", {
+            dtform_id: topik.attr('data-dtform_id'),
+            lingkup_id: baris.attr('data-lingkup_id') || 0,
+            lingkup_isi: isi
+        }, function (hasil) {
+            if (baris.hasClass('aktivitas-tambah-baris')) {
+                var baru = bangunBarisActivity(hasil.lingkup_id, hasil.lingkup_isi);
+                baris.before(baru);
+                baris.hide().find('textarea').val('');
+                topik.find('.topik-tambah-activity').show();
+                $('#topik_kosong').hide();
+            } else {
+                baris.attr('data-lingkup_id', hasil.lingkup_id);
+                baris.attr('data-cari', (hasil.lingkup_isi || '').toLowerCase());
+                baris.find('.aktivitas-teks').text(hasil.lingkup_isi);
+                baris.find('.aktivitas-editor').hide();
+                baris.find('.aktivitas-teks').show();
+            }
+            segarkanAngka(topik);
+        });
+    });
+
+    $('#topik_daftar').on('click', '.aktivitas-edit', function () {
+        var baris = $(this).closest('.aktivitas');
+        baris.find('.aktivitas-teks').hide();
+        baris.find('.aktivitas-editor').show();
+        baris.find('.aktivitas-editor textarea').focus();
+    });
+
+    $('#topik_daftar').on('click', '.aktivitas-hapus', function () {
+        var baris = $(this).closest('.aktivitas');
+        var topik = baris.closest('.topik');
+
+        swal.fire({
+            title: "Hapus activity ini?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Ya, hapus",
+            cancelButtonText: "Batal"
+        }).then(function (hasil) {
+            if (!hasil.value) {
+                return;
+            }
+            kirim("/detailform/hapusbutir", { lingkup_id: baris.attr('data-lingkup_id') }, function () {
+                baris.remove();
+                segarkanAngka(topik);
+            });
+        });
+    });
+
+    $('#topik_daftar').on('click', '.aktivitas-naik, .aktivitas-turun', function () {
+        var baris = $(this).closest('.aktivitas');
+        var topik = baris.closest('.topik');
+        var arah = $(this).hasClass('aktivitas-naik') ? 'naik' : 'turun';
+
+        kirim("/detailform/pindahbutir", { lingkup_id: baris.attr('data-lingkup_id'), arah: arah }, function () {
+            if (arah === 'naik') {
+                baris.prevAll('.aktivitas').not('.aktivitas-tambah-baris').first().before(baris);
+            } else {
+                baris.nextAll('.aktivitas').not('.aktivitas-tambah-baris').first().after(baris);
+            }
+            segarkanAngka(topik);
+        });
+    });
+
+    /* ------------------------- urutan topik ------------------------- */
+
+    $('#pasang_urut').on('click', function () {
+        var tombol = $(this);
+        tombol.prop('disabled', true).text('Menyiapkan...');
+        kirim("/detailform/pasangurut", {}, function () {
+            window.location.reload();
+        }, function (pesan) {
+            tombol.prop('disabled', false).text('Aktifkan Urutan Topik');
+            pesanGagal(pesan);
+        });
+    });
+
 });
-
-
-  
-})

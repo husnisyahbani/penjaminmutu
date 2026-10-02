@@ -256,4 +256,98 @@ class AuditjawabModel extends CI_Model {
         return $baris;
     }
 
+    /**
+     * Susunan topik & activity satu audit (gaya halaman kursus).
+     *
+     * Topik    = pertanyaan formulir (urut dtform_urut bila kolomnya ada)
+     * Activity = butir lingkup pertanyaan tersebut, dilengkapi jawaban yang
+     *            sudah tersimpan (hasil/temuan/catatan/koreksi).
+     *
+     * @return array daftar topik; tiap topik berisi 'butir' dan 'jwb'.
+     */
+    function petaTilik($audit_id) {
+        $this->load->model('LingkupModel', 'lingkup');
+
+        $audit = $this->db->select('audit_id, form_id')
+            ->where('audit_id', $audit_id)
+            ->get('audit')->row_array();
+        if (!$audit) {
+            return array();
+        }
+
+        $this->db->where('form_id', $audit['form_id']);
+        if ($this->db->field_exists('dtform_urut', 'detailform')) {
+            $this->db->order_by('dtform_urut', 'ASC');
+        }
+        $this->db->order_by('dtform_id', 'ASC');
+        $topik = $this->db->get('detailform')->result_array();
+        if (!$topik) {
+            return array();
+        }
+
+        $ids = array();
+        foreach ($topik as $t) {
+            $ids[] = $t['dtform_id'];
+        }
+        $peta = $this->lingkup->peta($ids);
+
+        // Jawaban per butir (lingkup_id terisi).
+        $this->db->select('jwb_id, dtform_id, lingkup_id, jwb_hasil, jwb_temuan, jwb_catatan, jwb_koreksi');
+        $this->db->where('audit_id', $audit_id);
+        $this->db->where('lingkup_id IS NOT NULL', NULL, FALSE);
+        $jawab = array();
+        foreach ($this->db->get('auditjawab')->result_array() as $j) {
+            $jawab[(int) $j['lingkup_id']] = $j;
+        }
+
+        // Jawaban tingkat pertanyaan (lingkup_id NULL): jawaban auditee + tujuan.
+        $this->db->select('jwb_id, dtform_id, jwb_jawaban, jwb_tujuan, jwb_referensi');
+        $this->db->where('audit_id', $audit_id);
+        $this->db->where('lingkup_id IS NULL', NULL, FALSE);
+        $induk = array();
+        foreach ($this->db->get('auditjawab')->result_array() as $j) {
+            $induk[(int) $j['dtform_id']] = $j;
+        }
+
+        foreach ($topik as $i => $t) {
+            $tid = (int) $t['dtform_id'];
+
+            $butir = isset($peta[$tid]) ? $peta[$tid] : array();
+            $dinilai = 0;
+            $temuan = 0;
+            $koreksi = 0;
+
+            foreach ($butir as $k => $b) {
+                $lj = isset($jawab[(int) $b['lingkup_id']]) ? $jawab[(int) $b['lingkup_id']] : NULL;
+
+                $butir[$k]['jwb_id']      = $lj ? $lj['jwb_id'] : NULL;
+                $butir[$k]['jwb_hasil']   = $lj ? $lj['jwb_hasil'] : NULL;
+                $butir[$k]['jwb_temuan']  = $lj ? $lj['jwb_temuan'] : NULL;
+                $butir[$k]['jwb_catatan'] = $lj ? $lj['jwb_catatan'] : NULL;
+                $butir[$k]['jwb_koreksi'] = $lj ? $lj['jwb_koreksi'] : NULL;
+                $butir[$k]['lingkup_teks'] = lingkup_bersihkan($b['lingkup_isi']);
+
+                if ($lj && trim((string) $lj['jwb_hasil']) !== '') {
+                    $dinilai++;
+                }
+                if ($lj && trim((string) $lj['jwb_temuan']) !== '') {
+                    $temuan++;
+                }
+                if ($lj && trim((string) $lj['jwb_koreksi']) !== '') {
+                    $koreksi++;
+                }
+            }
+
+            $topik[$i]['butir']        = $butir;
+            $topik[$i]['jwb']          = isset($induk[$tid]) ? $induk[$tid] : NULL;
+            $topik[$i]['teks']         = lingkup_bersihkan($t['dtform_pertanyaan']);
+            $topik[$i]['jml_butir']    = count($butir);
+            $topik[$i]['jml_dinilai']  = $dinilai;
+            $topik[$i]['jml_temuan']   = $temuan;
+            $topik[$i]['jml_koreksi']  = $koreksi;
+        }
+
+        return $topik;
+    }
+
 }

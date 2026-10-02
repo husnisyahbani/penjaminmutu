@@ -5,9 +5,11 @@ class Dashboard extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditee';
-        $this->load->js(base_url("assets/app/auditee/daftaraudit.js?v=1.35"));
+        $this->load->js(base_url("assets/app/auditee/daftaraudit.js?v=2.0"));
         // Informasi tombol aksi saat hover (lihat assets/app/tabel-aksi.css)
         $this->load->js(base_url("assets/app/tabel-aksi.js?v=1.0"));
+        // Tampilan topik & activity pada halaman detail audit.
+        $this->load->js(base_url("assets/app/topik-aktivitas.js?v=1.0"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
@@ -47,6 +49,9 @@ class Dashboard extends MY_Controller {
             $this->data['audit_id'] = $id;
             $this->data['dashboard'] = 'active';
             $this->data['result'] = $this->mutu->getAuditById($id);
+            /* Topik (pertanyaan) + activity (butir lingkup) beserta jawaban dan
+               koreksi, untuk tampilan gaya halaman kursus. */
+            $this->data['topik'] = $this->auditjawab->petaTilik($id);
             $this->data['js'] = $this->load->get_js_files();
             $this->data['audit'] = 'active';
             $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
