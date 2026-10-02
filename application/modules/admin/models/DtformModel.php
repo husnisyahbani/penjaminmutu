@@ -160,7 +160,7 @@ class DtformModel extends CI_Model {
         return (int) (isset($max['dtform_urut']) ? $max['dtform_urut'] : 0) + 1;
     }
 
-    /** Geser satu pertanyaan satu langkah (naik/turun) di dalam formulirnya. */
+    /** Geser satu pertanyaan (topik) satu langkah (naik/turun) di dalam formulirnya. */
     public function pindah($dtform_id, $arah = 'naik') {
         if (!$this->urutSiap()) {
             return FALSE;

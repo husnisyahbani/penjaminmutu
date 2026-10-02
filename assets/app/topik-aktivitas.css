@@ -222,3 +222,89 @@
         flex-wrap: wrap;
     }
 }
+
+/* ---------------------------------------------------------------------------
+   Jawaban wajib + lampiran (halaman detail audit auditee)
+   --------------------------------------------------------------------------- */
+
+.jawaban-kotak {
+    margin-top: 10px;
+}
+
+.jawaban-isi {
+    min-height: 78px;
+    font-size: 13px;
+}
+
+.jawaban-aksi {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.jawaban-pesan {
+    font-size: 12px;
+    color: #757575;
+}
+
+.lampiran-kotak {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed #e0e0e0;
+}
+
+.lampiran-kepala {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #616161;
+}
+
+.lampiran-daftar {
+    margin-top: 6px;
+}
+
+.lampiran {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    font-size: 13px;
+}
+
+.lampiran-ikon {
+    color: #9e9e9e;
+}
+
+.lampiran-nama {
+    color: #3f51b5;
+    word-break: break-all;
+}
+
+.lampiran-ukuran,
+.lampiran-kosong {
+    font-size: 12px;
+    color: #9e9e9e;
+}
+
+.lampiran-unggah {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.lampiran-berkas {
+    max-width: 100%;
+    font-size: 13px;
+}
+
+.status-jawab.badge-danger {
+    background-color: #ef5350;
+}

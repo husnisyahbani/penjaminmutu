@@ -120,13 +120,13 @@ Catatan:
 
 ## `urut_pertanyaan.sql`
 
-Menambah kolom urutan topik pada formulir audit. Halaman **Audit → Formulir Audit**
-(lihat detail satu formulir) kini berbentuk kursus: **topik** = pertanyaan dan
-**activity** = butir lingkup, keduanya dapat digeser naik/turun.
+Menambah kolom urutan pertanyaan pada formulir audit. Halaman **Audit → Formulir Audit**
+(lihat detail satu formulir) kini berbentuk kursus: **pertanyaan** dan
+**lingkup**, keduanya dapat digeser naik/turun.
 
 | Objek                        | Isi                                                   |
 | ---------------------------- | ----------------------------------------------------- |
-| `mutu_detailform`.`dtform_urut` | nomor urut topik di dalam satu formulir (1, 2, 3, …) |
+| `mutu_detailform`.`dtform_urut` | nomor urut pertanyaan di dalam satu formulir (1, 2, 3, …) |
 
 ```sql
 ALTER TABLE `mutu_detailform`
@@ -137,14 +137,14 @@ Catatan:
 
 - Isi awal disusun mengikuti urutan `dtform_id` (lihat berkas SQL), jadi tampilan
   tidak berubah sebelum ada topik yang digeser.
-- Urutan **activity** memakai kolom `mutu_lingkup`.`lingkup_urut` yang sudah ada
+- Urutan **lingkup** memakai kolom `mutu_lingkup`.`lingkup_urut` yang sudah ada
   (dibuat oleh `migrasi_lingkup.sql`), tidak perlu kolom baru.
 - Bisa juga dipasang dari aplikasi tanpa impor SQL: buka detail formulir, klik
-  tombol **Aktifkan Urutan Topik** pada pemberitahuan di atas daftar topik.
+  tombol **Aktifkan Urutan Pertanyaan** pada pemberitahuan di atas daftar pertanyaan.
 - Tidak idempoten (`ADD COLUMN` gagal bila kolom sudah ada) — lewati bila kolom
   `dtform_urut` sudah terpasang.
-- Tanpa kolom ini aplikasi tetap berjalan; tombol naik/turun topik dinonaktifkan
-  dan urutan memakai `dtform_id`.
+- Tanpa kolom ini aplikasi tetap berjalan; tombol naik/turun pertanyaan
+  dinonaktifkan dan urutan memakai `dtform_id`.
 
 ## `migrasi_lingkup.sql`
 
@@ -180,3 +180,37 @@ Catatan:
   disunting, supaya hasil audit tidak kehilangan relasinya.
 - Daftar tilik pada halaman audit (auditor/admin) terisi otomatis dari butir
   lingkup, jadi tidak ada lagi tombol **Tambah Tilik**.
+
+## `lampiran_lingkup.sql`
+
+Membuat tabel lampiran jawaban audit. Pada halaman
+**Auditee → Daftar Audit → (detail)**, setiap lingkup **wajib dijawab**, dan
+tiap jawaban boleh dilengkapi **lampiran opsional lebih dari satu berkas**.
+
+| Objek             | Isi                                                                              |
+| ----------------- | -------------------------------------------------------------------------------- |
+| `mutu_lampiran`   | berkas lampiran per lingkup: `audit_id`, `lingkup_id`, `users_id`, `lampiran_nama` (nama simpan), `lampiran_asli` (nama asli), `lampiran_tipe`, `lampiran_ukuran`, `lampiran_create` |
+
+Cara pakai:
+
+1. Buka phpMyAdmin (atau menu SQL) pada database aplikasi.
+2. Impor berkas `database/lampiran_lingkup.sql`.
+3. Sesuaikan nama tabel bila prefix pada `application/config/database.php`
+   bukan `mutu_`.
+4. Pastikan folder penyimpanan `filedata/lampiran/` dapat ditulis oleh web server
+   (dibuat otomatis oleh aplikasi saat unggahan pertama).
+
+Catatan:
+
+- Aman dijalankan berulang kali (`CREATE TABLE IF NOT EXISTS`).
+- Relasi memakai `ON DELETE CASCADE`: menghapus audit atau lingkup ikut
+  membersihkan lampirannya, sedangkan jawaban (`mutu_auditjawab`) tidak
+  terpengaruh.
+- Tanpa tabel ini aplikasi tetap berjalan: kolom jawaban wajib tetap ada, tetapi
+  bagian lampiran menampilkan keterangan bahwa fitur belum disiapkan.
+- Lampiran bersifat **opsional**; satu lingkup boleh memiliki banyak berkas.
+  Jenis berkas: PDF, Office (doc/docx/xls/xlsx/ppt/pptx), gambar
+  (jpg/jpeg/png), dan arsip (zip/rar), maksimum 5 MB per berkas.
+- Menghapus lampiran dari halaman detail ikut menghapus berkas fisiknya.
+- Rollback: `DROP TABLE mutu_lampiran;` (berkas fisik di `filedata/lampiran/`
+  dihapus manual bila perlu).

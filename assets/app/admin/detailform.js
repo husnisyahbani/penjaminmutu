@@ -1,9 +1,9 @@
 /* =============================================================================
-   Kelola formulir gaya kursus: topik (pertanyaan) + activity (butir lingkup).
+   Kelola formulir: pertanyaan (topik) + lingkup (butir).
 
-   - Topik: tambah/edit/hapus/naik-turun. Setelah berubah halaman dimuat ulang
+   - Pertanyaan: tambah/edit/hapus/naik-turun. Setelah berubah halaman dimuat ulang
      supaya nomor topik dan ringkasan di panel kiri selalu sinkron.
-   - Activity: tambah/edit/hapus/naik-turun langsung di tempat (tanpa muat ulang).
+   - Lingkup: tambah/edit/hapus/naik-turun langsung di tempat (tanpa muat ulang).
    ============================================================================= */
 $(function () {
 
@@ -333,7 +333,7 @@ $(function () {
         kirim("/detailform/pasangurut", {}, function () {
             window.location.reload();
         }, function (pesan) {
-            tombol.prop('disabled', false).text('Aktifkan Urutan Topik');
+            tombol.prop('disabled', false).text('Aktifkan Urutan Pertanyaan');
             pesanGagal(pesan);
         });
     });

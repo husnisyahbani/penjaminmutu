@@ -247,8 +247,8 @@ class Daftaraudit extends MY_Controller {
             $this->data['title'] = 'Daftar Audit';
             $this->data['audit_id'] = $id;
             $this->data['result'] = $this->mutu->getAuditById($id);
-            /* Topik (pertanyaan) + activity (butir lingkup) beserta hasil yang
-               sudah tersimpan, untuk tampilan gaya halaman kursus. */
+            /* Pertanyaan (topik) + lingkup (butir) beserta jawaban/lampiran
+               auditee dan hasil yang sudah tersimpan. */
             $this->data['topik'] = $this->auditjawab->petaTilik($id);
             $this->data['js'] = $this->load->get_js_files();
             $this->data['audit'] = 'active';

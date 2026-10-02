@@ -52,12 +52,28 @@ $(function () {
             confirmButtonText: "Ya, Kirim!",
             cancelButtonText: 'Tidak',
             preConfirm: function () {
+                /* Server menolak pengiriman bila masih ada lingkup yang belum
+                   dijawab; dalam hal itu tampilkan pesan dan buka halaman
+                   detail supaya auditee bisa melengkapi jawabannya. */
                 $.ajax({
                     url: base_url + "/dashboard/update",
                     type: "POST",
-                    data: { id: $id}
+                    data: { id: $id },
+                    dataType: "json"
                 })
-                        .done(function (data) {
+                        .done(function (jawab) {
+                            if (!jawab || !jawab.status) {
+                                swal.fire({
+                                    title: "Belum lengkap",
+                                    text: jawab && jawab.pesan
+                                            ? jawab.pesan
+                                            : "Hasil evaluasi belum dapat dikirim.",
+                                    type: "warning"
+                                }).then(function () {
+                                    window.location.href = base_url + "/dashboard/detail/" + $id;
+                                });
+                                return;
+                            }
                             swal.fire({
                                 title: "Terkirim",
                                 text: "Hasil Evaluasi Telah Terkirim!",

@@ -1,7 +1,7 @@
 <?php
 /**
  * Kelola formulir audit dengan gaya kursus: topik = pertanyaan, activity = butir
- * lingkup. Seluruh topik/activity dirender sekaligus supaya bisa dibuka-tutup,
+ * Seluruh pertanyaan/lingkup dirender sekaligus supaya bisa dibuka-tutup,
  * dicari, dan dipindahkan urutannya tanpa memuat halaman.
  *
  * Data dari controller: $formulir, $form_id, $topik, $peta_lingkup, $urut_siap,
@@ -14,10 +14,10 @@ if (empty($periode_form) && !empty($formulir['periode_id'])) {
     $periode_form = $formulir['periode_id'];
 }
 
-$jumlah_topik = count($topik);
-$jumlah_butir = 0;
+$jumlah_pertanyaan = count($topik);
+$jumlah_lingkup = 0;
 foreach ($peta_lingkup as $daftar) {
-    $jumlah_butir += count($daftar);
+    $jumlah_lingkup += count($daftar);
 }
 ?>
     <!-- Page -->
@@ -35,8 +35,8 @@ foreach ($peta_lingkup as $daftar) {
         <?php if (empty($urut_siap)): ?>
         <div class="alert alert-info alert-dismissible" role="alert" id="kotak_urut">
             <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            Urutan topik belum aktif pada database ini, sehingga tombol naik/turun topik dinonaktifkan.
-            <button type="button" class="btn btn-sm btn-info ml-10" id="pasang_urut">Aktifkan Urutan Topik</button>
+            Urutan pertanyaan belum aktif pada database ini, sehingga tombol naik/turun pertanyaan dinonaktifkan.
+            <button type="button" class="btn btn-sm btn-info ml-10" id="pasang_urut">Aktifkan Urutan Pertanyaan</button>
         </div>
         <?php endif; ?>
 
@@ -70,12 +70,12 @@ foreach ($peta_lingkup as $daftar) {
                     </td>
                   </tr>
                   <tr>
-                    <th>Topik</th>
-                    <td><?php echo (int) $jumlah_topik; ?> topik</td>
+                    <th>Pertanyaan</th>
+                    <td><?php echo (int) $jumlah_pertanyaan; ?> pertanyaan</td>
                   </tr>
                   <tr>
-                    <th>Activity</th>
-                    <td><?php echo (int) $jumlah_butir; ?> activity</td>
+                    <th>Lingkup</th>
+                    <td><?php echo (int) $jumlah_lingkup; ?> lingkup</td>
                   </tr>
                 </table>
                 <a href="<?php echo base_url('admin/formaudit'); ?>" class="btn btn-sm btn-default mt-15">
@@ -89,7 +89,7 @@ foreach ($peta_lingkup as $daftar) {
             <div class="panel">
               <header class="panel-heading panel-heading-filter">
                 <div class="panel-heading-isi">
-                  <h3 class="panel-title">Topik &amp; Activity</h3>
+                  <h3 class="panel-title">Pertanyaan &amp; Lingkup</h3>
                   <div class="panel-aksi">
                     <div class="filter-kotak">
                       <label for="cari_topik"><i class="icon md-search" aria-hidden="true"></i>Cari</label>
@@ -97,7 +97,7 @@ foreach ($peta_lingkup as $daftar) {
                     </div>
                     <div class="panel-aksi__tombol">
                       <button type="button" class="btn btn-sm btn-success" id="tambah_topik">
-                        <i class="icon md-plus" aria-hidden="true"></i>Tambah Topik
+                        <i class="icon md-plus" aria-hidden="true"></i>Tambah Pertanyaan
                       </button>
                     </div>
                   </div>
@@ -111,34 +111,34 @@ foreach ($peta_lingkup as $daftar) {
                       if ($judul === '') {
                           $judul = '(topik tanpa pertanyaan)';
                       }
-                      $cari_topik = strtolower($judul);
+                      $cari_pertanyaan = strtolower($judul);
                   ?>
                   <section class="topik" data-dtform_id="<?php echo (int) $t['dtform_id']; ?>"
-                           data-cari="<?php echo html_escape($cari_topik); ?>">
+                           data-cari="<?php echo html_escape($cari_pertanyaan); ?>">
                     <header class="topik-kepala">
                       <span class="topik-nomor"><?php echo $i + 1; ?></span>
                       <h4 class="topik-judul">
                         <?php echo html_escape($judul); ?>
                         <span class="topik-info">
-                          <span class="badge badge-info badge-activity"><?php echo count($butir); ?> activity</span>
+                          <span class="badge badge-info badge-activity"><?php echo count($butir); ?> lingkup</span>
                         </span>
                       </h4>
                       <i class="icon md-chevron-down topik-panah" aria-hidden="true"></i>
                       <div class="topik-aksi">
                         <button type="button" class="btn btn-sm btn-icon btn-default topik-naik"
-                                data-info="Naikkan topik" <?php echo $i === 0 ? 'disabled' : ''; ?>>
+                                data-info="Naikkan pertanyaan" <?php echo $i === 0 ? 'disabled' : ''; ?>>
                           <i class="icon md-chevron-up" aria-hidden="true"></i>
                         </button>
                         <button type="button" class="btn btn-sm btn-icon btn-default topik-turun"
-                                data-info="Turunkan topik">
+                                data-info="Turunkan pertanyaan">
                           <i class="icon md-chevron-down" aria-hidden="true"></i>
                         </button>
                         <button type="button" class="btn btn-sm btn-icon btn-success topik-edit"
-                                data-info="Ubah pertanyaan topik ini" id="<?php echo (int) $t['dtform_id']; ?>">
+                                data-info="Ubah pertanyaan ini" id="<?php echo (int) $t['dtform_id']; ?>">
                           <i class="icon md-edit" aria-hidden="true"></i>
                         </button>
                         <button type="button" class="btn btn-sm btn-icon btn-danger topik-hapus"
-                                data-info="Hapus topik beserta seluruh activity-nya" id="<?php echo (int) $t['dtform_id']; ?>">
+                                data-info="Hapus pertanyaan beserta seluruh lingkupnya" id="<?php echo (int) $t['dtform_id']; ?>">
                           <i class="icon md-delete" aria-hidden="true"></i>
                         </button>
                       </div>
@@ -154,7 +154,7 @@ foreach ($peta_lingkup as $daftar) {
                         <div class="aktivitas-isi">
                           <span class="aktivitas-teks"><?php echo html_escape($teks); ?></span>
                           <div class="aktivitas-editor" style="display:none;">
-                            <textarea class="form-control" rows="2" placeholder="Tulis activity, mis. dokumen/bukti yang diminta"><?php echo html_escape($teks); ?></textarea>
+                            <textarea class="form-control" rows="2" placeholder="Tulis lingkup, mis. dokumen/bukti yang diminta"><?php echo html_escape($teks); ?></textarea>
                             <div class="aktivitas-editor-aksi">
                               <button type="button" class="btn btn-sm btn-primary aktivitas-simpan">Simpan</button>
                               <button type="button" class="btn btn-sm btn-default aktivitas-batal">Batal</button>
@@ -163,19 +163,19 @@ foreach ($peta_lingkup as $daftar) {
                         </div>
                         <div class="aktivitas-aksi">
                           <button type="button" class="btn btn-sm btn-icon btn-default aktivitas-naik"
-                                  data-info="Naikkan activity">
+                                  data-info="Naikkan lingkup">
                             <i class="icon md-chevron-up" aria-hidden="true"></i>
                           </button>
                           <button type="button" class="btn btn-sm btn-icon btn-default aktivitas-turun"
-                                  data-info="Turunkan activity">
+                                  data-info="Turunkan lingkup">
                             <i class="icon md-chevron-down" aria-hidden="true"></i>
                           </button>
                           <button type="button" class="btn btn-sm btn-icon btn-success aktivitas-edit"
-                                  data-info="Ubah isi activity">
+                                  data-info="Ubah isi lingkup">
                             <i class="icon md-edit" aria-hidden="true"></i>
                           </button>
                           <button type="button" class="btn btn-sm btn-icon btn-danger aktivitas-hapus"
-                                  data-info="Hapus activity ini" id="<?php echo (int) $b['lingkup_id']; ?>">
+                                  data-info="Hapus lingkup ini" id="<?php echo (int) $b['lingkup_id']; ?>">
                             <i class="icon md-delete" aria-hidden="true"></i>
                           </button>
                         </div>
@@ -183,13 +183,13 @@ foreach ($peta_lingkup as $daftar) {
                       <?php endforeach; ?>
 
                       <div class="aktivitas-kosong" style="display:<?php echo empty($butir) ? '' : 'none'; ?>">
-                        Belum ada activity pada topik ini.
+                        Belum ada lingkup pada pertanyaan ini.
                       </div>
 
                       <div class="aktivitas aktivitas-tambah-baris" style="display:none;">
                         <i class="icon md-assignment aktivitas-ikon" aria-hidden="true"></i>
                         <div class="aktivitas-isi">
-                          <textarea class="form-control" rows="2" placeholder="Tulis activity, mis. dokumen/bukti yang diminta"></textarea>
+                          <textarea class="form-control" rows="2" placeholder="Tulis lingkup, mis. dokumen/bukti yang diminta"></textarea>
                           <div class="aktivitas-editor-aksi">
                             <button type="button" class="btn btn-sm btn-primary aktivitas-simpan">Tambah</button>
                             <button type="button" class="btn btn-sm btn-default aktivitas-batal">Batal</button>
@@ -198,7 +198,7 @@ foreach ($peta_lingkup as $daftar) {
                       </div>
 
                       <button type="button" class="btn btn-sm btn-primary topik-tambah-activity">
-                        <i class="icon md-plus" aria-hidden="true"></i>Tambah Activity
+                        <i class="icon md-plus" aria-hidden="true"></i>Tambah Lingkup
                       </button>
                     </div>
                   </section>
@@ -206,10 +206,10 @@ foreach ($peta_lingkup as $daftar) {
                 </div>
 
                 <div class="topik-kosong" id="topik_kosong" style="display:<?php echo empty($topik) ? '' : 'none'; ?>">
-                  Belum ada topik pada formulir ini. Klik <strong>Tambah Topik</strong> untuk membuat pertanyaan pertama.
+                  Belum ada pertanyaan pada formulir ini. Klik <strong>Tambah Pertanyaan</strong> untuk membuat pertanyaan pertama.
                 </div>
                 <div class="topik-kosong" id="topik_cari_kosong" style="display:none;">
-                  Tidak ada topik atau activity yang cocok dengan pencarian.
+                  Tidak ada pertanyaan atau lingkup yang cocok dengan pencarian.
                 </div>
               </div>
             </div>
@@ -233,12 +233,12 @@ foreach ($peta_lingkup as $daftar) {
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h4 class="modal-title">Tambah Topik</h4>
+                <h4 class="modal-title">Tambah Pertanyaan</h4>
             </div>
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-12 center">
-                      <h4 class="example-title">Pertanyaan Topik</h4>
+                      <h4 class="example-title">Pertanyaan</h4>
                         <textarea class="form-control" id="dtform_pertanyaan" name="dtform_pertanyaan" rows="4"
                         data-fv-notempty="true" data-fv-notempty-message="Wajib Diisi"
                         placeholder="Tulis pertanyaan/topik audit"></textarea>
@@ -268,12 +268,12 @@ foreach ($peta_lingkup as $daftar) {
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h4 class="modal-title">Edit Topik</h4>
+                <h4 class="modal-title">Edit Pertanyaan</h4>
             </div>
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-12 center">
-                      <h4 class="example-title">Pertanyaan Topik</h4>
+                      <h4 class="example-title">Pertanyaan</h4>
                         <textarea class="form-control" id="edit_dtform_pertanyaan" name="dtform_pertanyaan" rows="4"
                         data-fv-notempty="true" data-fv-notempty-message="Wajib Diisi"></textarea>
                     </div>

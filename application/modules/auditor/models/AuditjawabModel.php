@@ -291,8 +291,12 @@ class AuditjawabModel extends CI_Model {
         }
         $peta = $this->lingkup->peta($ids);
 
+        // Lampiran jawaban auditee (opsional, boleh lebih dari satu).
+        $this->load->model('LampiranModel', 'lampiran');
+        $petaLampiran = $this->lampiran->peta($audit_id);
+
         // Jawaban per butir (lingkup_id terisi).
-        $this->db->select('jwb_id, dtform_id, lingkup_id, jwb_hasil, jwb_temuan, jwb_catatan, jwb_koreksi');
+        $this->db->select('jwb_id, dtform_id, lingkup_id, jwb_jawaban, jwb_hasil, jwb_temuan, jwb_catatan, jwb_koreksi');
         $this->db->where('audit_id', $audit_id);
         $this->db->where('lingkup_id IS NOT NULL', NULL, FALSE);
         $jawab = array();
@@ -316,11 +320,14 @@ class AuditjawabModel extends CI_Model {
             $dinilai = 0;
             $temuan = 0;
             $koreksi = 0;
+            $dijawab = 0;
+            $jml_lampiran = 0;
 
             foreach ($butir as $k => $b) {
                 $lj = isset($jawab[(int) $b['lingkup_id']]) ? $jawab[(int) $b['lingkup_id']] : NULL;
 
                 $butir[$k]['jwb_id']      = $lj ? $lj['jwb_id'] : NULL;
+                $butir[$k]['jwb_jawaban'] = $lj ? $lj['jwb_jawaban'] : NULL;
                 $butir[$k]['jwb_hasil']   = $lj ? $lj['jwb_hasil'] : NULL;
                 $butir[$k]['jwb_temuan']  = $lj ? $lj['jwb_temuan'] : NULL;
                 $butir[$k]['jwb_catatan'] = $lj ? $lj['jwb_catatan'] : NULL;
@@ -336,15 +343,25 @@ class AuditjawabModel extends CI_Model {
                 if ($lj && trim((string) $lj['jwb_koreksi']) !== '') {
                     $koreksi++;
                 }
+                if ($lj && trim((string) $lj['jwb_jawaban']) !== '') {
+                    $dijawab++;
+                }
+
+                $butir[$k]['lampiran'] = isset($petaLampiran[(int) $b['lingkup_id']])
+                    ? $petaLampiran[(int) $b['lingkup_id']]
+                    : array();
+                $jml_lampiran += count($butir[$k]['lampiran']);
             }
 
             $topik[$i]['butir']        = $butir;
             $topik[$i]['jwb']          = isset($induk[$tid]) ? $induk[$tid] : NULL;
             $topik[$i]['teks']         = lingkup_bersihkan($t['dtform_pertanyaan']);
             $topik[$i]['jml_butir']    = count($butir);
-            $topik[$i]['jml_dinilai']  = $dinilai;
-            $topik[$i]['jml_temuan']   = $temuan;
-            $topik[$i]['jml_koreksi']  = $koreksi;
+            $topik[$i]['jml_dinilai']   = $dinilai;
+            $topik[$i]['jml_temuan']    = $temuan;
+            $topik[$i]['jml_koreksi']   = $koreksi;
+            $topik[$i]['jml_dijawab']   = $dijawab;
+            $topik[$i]['jml_lampiran']  = $jml_lampiran;
         }
 
         return $topik;
