@@ -85,6 +85,39 @@ Catatan:
   **Audit → Periode**, lalu klik tombol **Buat Tabel Periode** (muncul
   otomatis bila tabel belum ada). Aman dijalankan berulang kali.
 
+## `formulir_periode.sql`
+
+Menghubungkan formulir audit (**Audit → Formulir Audit**) dengan periode.
+
+| Objek                    | Isi                                                              |
+| ------------------------ | ---------------------------------------------------------------- |
+| `mutu_formulir`.`periode_id` | relasi formulir ke `mutu_periode`; `NULL` = belum berperiode |
+
+Cara pakai:
+
+1. Pastikan `database/periode_audit.sql` sudah diimpor (tabel `mutu_periode`).
+2. Impor berkas `database/formulir_periode.sql` melalui phpMyAdmin.
+3. Sesuaikan prefix tabel bila bukan `mutu_`.
+
+Catatan:
+
+- Kolom ini juga dapat dibuat langsung dari aplikasi: menu **Audit → Periode**,
+  tombol **Buat Tabel Periode** (muncul otomatis bila belum siap). Aman
+  dijalankan berulang kali.
+- Halaman **Formulir Audit** dan daftar formulir pada halaman auditor memiliki
+  **filter periode** dengan bawaan **periode aktif**; bila tidak ada periode
+  aktif, seluruh formulir ditampilkan.
+- Formulir yang belum berperiode (`periode_id NULL`) selalu ikut tampil.
+- Formulir baru otomatis ditempatkan pada periode yang sedang aktif, dan
+  periodenya dapat diubah dari form tambah/edit (termasuk dilepas kembali ke
+  **Tanpa Periode**).
+- Periode yang masih dipakai formulir tidak dapat dihapus dari halaman
+  **Periode**; pindahkan formulirnya lebih dahulu. Pada tingkat database
+  relasinya memakai `ON DELETE SET NULL`, jadi formulir tidak pernah ikut
+  terhapus.
+- Berkas ini tidak idempoten (`ADD COLUMN` gagal bila kolom sudah ada) —
+  lewati bila kolom `periode_id` sudah terpasang.
+
 ## `migrasi_lingkup.sql`
 
 Memindahkan lingkup pertanyaan dari satu kolom teks menjadi **banyak butir**

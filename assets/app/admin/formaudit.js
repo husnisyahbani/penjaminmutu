@@ -7,12 +7,24 @@ $(function () {
         "searching": true,
         "order": [],
         "columnDefs": [
-            {"targets": [0,5], "orderable": false}
+            /* No, Periode, dan Aksi tidak dapat diurutkan. */
+            {"targets": [0,4,6], "orderable": false}
         ],
         "ajax": {
             "url": base_url + "/formaudit/listformulir",
-            "type": "POST"
+            "type": "POST",
+            "data": function (d) {
+                /* Filter periode (bawaan: periode aktif, sudah dipilih di halaman). */
+                if ($('#filter_periode').length) {
+                    d.periode_id = $('#filter_periode').val();
+                }
+            }
         }
+    });
+
+    /* Ganti periode: muat ulang daftar formulir. */
+    $('#filter_periode').on('change', function () {
+        formulir.ajax.reload();
     });
 
    
@@ -41,6 +53,9 @@ $(function () {
                     $("#edit_form_nama").val(list.form_nama);
                     $("#edit_form_kode").val(list.form_kode);
                     $("#form_id").val(list.form_id);
+                    if ($('#edit_form_periode').length) {
+                        $('#edit_form_periode').val(list.periode_id ? String(list.periode_id) : '');
+                    }
                     $('#edit_isi_artikel').summernote('code',list.form_deskripsi);
                     //tinymce.get('edit_isi_artikel').setContent(list.form_deskripsi);
                     

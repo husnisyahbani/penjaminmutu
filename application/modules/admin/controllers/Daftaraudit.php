@@ -444,7 +444,9 @@ class Daftaraudit extends MY_Controller {
             $this->data['totaldraft'] = $this->mutu->totalDraft($filter);
             $this->data['listauditor'] = $this->akun->getAllAuditor();
             $this->data['listauditee'] = $this->akun->getAllAuditee();
-            $this->data['formulir'] = $this->formulir->getAllFormulir();
+            /* Pilihan formulir mengikuti periode aktif (formulir lama tanpa periode
+               tetap ikut tampil). */
+            $this->data['formulir'] = $this->formulir->getAllFormulir($this->periode->aktifId());
             $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
             $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
             $this->template($this->data, $this->module); 

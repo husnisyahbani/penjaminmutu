@@ -9,7 +9,8 @@ if (!defined('BASEPATH')) {
  *
  * Tabel : mutu_periode (daftar periode: tahun, tanggal mulai, tanggal berakhir,
  *         penanda periode aktif)
- * Relasi: mutu_audit.periode_id -> mutu_periode.periode_id
+ * Relasi: mutu_audit.periode_id    -> mutu_periode.periode_id
+ *         mutu_formulir.periode_id -> mutu_periode.periode_id
  *
  * Satu periode saja yang boleh aktif; bila tidak ada periode aktif maka
  * Daftar Audit menampilkan seluruh data.
@@ -19,6 +20,8 @@ class PeriodeModel extends CI_Model {
     var $tabel       = 'mutu_periode';
     var $t_audit     = 'mutu_audit';
     var $kol_audit   = 'periode_id';
+    var $t_formulir  = 'mutu_formulir';
+    var $kol_formulir = 'periode_id';
 
     var $column_search = array('periode_tahun', 'periode_mulai', 'periode_selesai');
     var $column_order  = array(null, 'periode_tahun', 'periode_mulai', 'periode_selesai', null, null);
@@ -37,7 +40,14 @@ class PeriodeModel extends CI_Model {
      */
     public function installed() {
         return $this->db->table_exists($this->tabel)
-            && $this->db->field_exists($this->kol_audit, $this->t_audit);
+            && $this->db->field_exists($this->kol_audit, $this->t_audit)
+            && $this->formulirSiap();
+    }
+
+    /** Kolom relasi periode pada mutu_formulir sudah ada? */
+    public function formulirSiap() {
+        return $this->db->table_exists($this->t_formulir)
+            && $this->db->field_exists($this->kol_formulir, $this->t_formulir);
     }
 
     /**
@@ -61,9 +71,19 @@ class PeriodeModel extends CI_Model {
             $this->dbforge->create_table($this->tabel, TRUE);
         }
 
+        // Catatan: DBForge::add_column() menambahkan dbprefix sendiri, jadi
+        // nama tabel di sini harus tanpa prefix (lihat LingkupModel).
         if (!$this->db->field_exists($this->kol_audit, $this->t_audit)) {
-            $this->dbforge->add_column($this->t_audit, array(
+            $this->dbforge->add_column('audit', array(
                 $this->kol_audit => array('type' => 'INT', 'constraint' => 11, 'null' => TRUE),
+            ));
+        }
+
+        // Formulir audit juga berelasi ke periode (daftar formulir dapat
+        // disaring per periode).
+        if (!$this->formulirSiap()) {
+            $this->dbforge->add_column('formulir', array(
+                $this->kol_formulir => array('type' => 'INT', 'constraint' => 11, 'null' => TRUE),
             ));
         }
 
@@ -156,6 +176,14 @@ class PeriodeModel extends CI_Model {
             return 0;
         }
         return $this->db->where($this->kol_audit, $id)->count_all_results($this->t_audit);
+    }
+
+    /** Jumlah formulir yang memakai periode ini. */
+    function jumlahFormulir($id) {
+        if (!$this->formulirSiap()) {
+            return 0;
+        }
+        return $this->db->where($this->kol_formulir, $id)->count_all_results($this->t_formulir);
     }
 
     /* =====================================================================

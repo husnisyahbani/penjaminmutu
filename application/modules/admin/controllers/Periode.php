@@ -258,6 +258,20 @@ class Periode extends MY_Controller {
             return;
         }
 
+        // Begitu pula formulir: formulir tidak dihapus dan tidak dilepas
+        // diam-diam dari periodenya, jadi periode ini ditahan sampai
+        // formulir dipindahkan ke periode lain.
+        if ($this->periode->formulirSiap()) {
+            $formulir = $this->periode->jumlahFormulir($id);
+            if ($formulir > 0) {
+                echo json_encode(array(
+                    'status' => FALSE,
+                    'pesan'  => 'Periode tidak dapat dihapus karena masih dipakai oleh ' . $formulir . ' formulir. Pindahkan formulir tersebut ke periode lain terlebih dahulu.',
+                ));
+                return;
+            }
+        }
+
         if ($this->periode->hapus($id)) {
             echo json_encode(array('status' => TRUE, 'pesan' => 'Periode berhasil dihapus.'));
         } else {
