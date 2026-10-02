@@ -145,12 +145,11 @@
             ?>
             <?php if (!empty($butir_lingkup)): ?>
             <div class="pertanyaan-butir">
-              <button type="button" class="btn btn-sm btn-default" data-toggle="collapse"
-                      data-target="#butir_lingkup" aria-expanded="false" aria-controls="butir_lingkup">
-                <i class="icon md-chevron-down" aria-hidden="true"></i>
-                Lihat <?php echo count($butir_lingkup); ?> butir tilik beserta jawaban auditee
-              </button>
-              <div class="collapse pertanyaan-butir__daftar" id="butir_lingkup">
+              <div class="butir-lingkup-judul">
+                Butir lingkup beserta jawaban auditee
+                <span class="badge badge-default"><?php echo count($butir_lingkup); ?> butir</span>
+              </div>
+              <div class="pertanyaan-butir__daftar" id="butir_lingkup">
                 <ol class="lingkup-daftar">
                   <?php
                   $warna_butir = array('S' => 'badge-success', 'OB' => 'badge-info',

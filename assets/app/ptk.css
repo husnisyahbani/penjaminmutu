@@ -213,6 +213,11 @@
 }
 
 /* Daftar butir lingkup + jawaban auditee pada panel Informasi Pertanyaan. */
+.butir-lingkup-judul {
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #424242;
+}
 .butir-lingkup-teks {
     font-weight: 600;
     color: #424242;
