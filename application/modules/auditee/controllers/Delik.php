@@ -5,7 +5,7 @@ class Delik extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditee';
-        $this->load->js(base_url("assets/app/auditee/delik.js?v=2.2"));
+        $this->load->js(base_url("assets/app/auditee/delik.js?v=2.3"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
@@ -84,6 +84,34 @@ class Delik extends MY_Controller {
             header('Content-Type: application/json');
             echo json_encode($query); 
         }
+    }
+
+    /**
+     * Simpan rencana koreksi satu butir, langsung dari halaman delik.
+     *
+     * Hanya menerima butir (lingkup_id) milik pertanyaan yang dikirim, supaya
+     * satu halaman tidak bisa menulis ke pertanyaan lain. Butir "S" tidak
+     * perlu koreksi - penjagaannya ada di tampilan.
+     */
+    public function koreksi() {
+        $audit_id   = (int) $this->input->post('audit_id');
+        $lingkup_id = (int) $this->input->post('lingkup_id');
+        $dtform_id  = (int) $this->input->post('dtform_id');
+
+        $butir = $this->lingkup->butirSatu($lingkup_id);
+        $status = false;
+        if ($audit_id > 0 && !empty($butir) && (int) $butir['dtform_id'] === $dtform_id) {
+            $status = $this->auditjawab->koreksi(array(
+                'audit_id'    => $audit_id,
+                'lingkup_id'  => $lingkup_id,
+                'jwb_koreksi' => $this->input->post('koreksi'),
+            ));
+        }
+
+        $query = array("status" => $status);
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
+        echo json_encode($query);
     }
 
     public function jawaban() {

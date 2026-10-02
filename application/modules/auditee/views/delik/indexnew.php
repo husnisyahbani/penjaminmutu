@@ -8,7 +8,11 @@
        Yang ditampilkan: seluruh butir pertanyaan yang dipilih yang sudah
        dinilai auditor (S / OB / TS MINOR / TS MAYOR), tanpa penyaringan
        jenis penilaian - butir "S" (sesuai) ikut tampil. Data dari
-       controller: $butir (AuditjawabModel::butirDinilai). */
+       controller: $butir (AuditjawabModel::butirDinilai).
+
+       Kartu ringkasan: Sesuai / Observasi / Minor / Mayor (empat kartu).
+       Rencana koreksi disunting langsung pada kolomnya (kecuali butir "S",
+       yang tidak perlu koreksi); pengirimannya lewat delik/koreksi. */
     $ringkas = isset($ringkas) ? $ringkas : array(
         'total' => count($butir), 'sesuai' => 0, 'observasi' => 0, 'minor' => 0, 'mayor' => 0,
     );
@@ -25,19 +29,6 @@
     };
 
     $kartu = array(
-        array(
-            'judul'   => 'Butir Dinilai',
-            'nilai'   => $jml_dinilai,
-            'ikon'    => 'md-assignment',
-            'warna'   => '#3949ab',
-            'ket'     => $jml_lingkup > 0
-                ? 'dari ' . $jml_lingkup . ' butir lingkup pertanyaan ini'
-                : 'Belum ada butir lingkup pada pertanyaan ini',
-            'bar'     => $jml_lingkup > 0 ? (int) round($jml_dinilai * 100 / $jml_lingkup) : 0,
-            'bar_ket' => $jml_lingkup > 0
-                ? (int) round($jml_dinilai * 100 / $jml_lingkup) . '% butir sudah dinilai auditor'
-                : '',
-        ),
         array(
             'judul'   => 'Sesuai',
             'nilai'   => (int) $ringkas['sesuai'],
@@ -142,7 +133,7 @@
     <!-- Kartu ringkasan penilaian pertanyaan ini -->
     <div class="row" data-plugin="matchHeight" data-by-row="true">
       <?php foreach ($kartu as $k): ?>
-      <div class="col-12 col-md-6 col-xl-4 col-xxl">
+      <div class="col-xl-3 col-md-6">
         <div class="kartu-stat" style="background-color:<?php echo $k['warna']; ?>;">
           <i class="icon <?php echo $k['ikon']; ?> kartu-stat__ikon" aria-hidden="true"></i>
           <div class="kartu-stat__isi">
@@ -226,12 +217,24 @@
                     </td>
                     <td><div class="butir-klamp"><?php echo html_escape($catatan); ?></div></td>
                     <td>
-                      <?php if ($koreksi !== ''): ?>
-                      <div class="butir-klamp"><?php echo nl2br(html_escape($koreksi)); ?></div>
-                      <?php elseif ($temuan === 'S'): ?>
+                      <?php if ($temuan === 'S'): ?>
                       <span class="text-muted">Tidak perlu koreksi</span>
+                      <?php elseif (!empty($b['lingkup_id'])): ?>
+                      <div class="koreksi-kotak" data-lingkup_id="<?php echo (int) $b['lingkup_id']; ?>"
+                           data-audit_id="<?php echo (int) $audit_id; ?>"
+                           data-dtform_id="<?php echo (int) $dtform_id; ?>">
+                        <textarea class="form-control koreksi-isi" rows="3"
+                                  placeholder="Tulis rencana koreksi untuk butir ini..."><?php echo html_escape($koreksi); ?></textarea>
+                        <div class="koreksi-aksi">
+                          <button type="button" class="btn btn-sm btn-primary koreksi-simpan">
+                            <i class="icon md-check" aria-hidden="true"></i>Simpan
+                          </button>
+                          <span class="koreksi-pesan"></span>
+                        </div>
+                      </div>
                       <?php else: ?>
-                      <span class="butir-koreksi-kosong">Belum ada rencana koreksi</span>
+                      <div class="butir-klamp"><?php echo nl2br(html_escape($koreksi)); ?></div>
+                      <div class="butir-koreksi-kosong">Data lama - tidak dapat disunting di sini</div>
                       <?php endif; ?>
                     </td>
                   </tr>

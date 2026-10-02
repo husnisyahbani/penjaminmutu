@@ -159,6 +159,19 @@ class AuditjawabModel extends CI_Model {
         return $this->db->trans_status();
     }
 
+    /**
+     * Simpan rencana koreksi satu butir lingkup (halaman delik).
+     * Hanya baris butir (lingkup_id) yang disunting dari halaman itu.
+     */
+    public function koreksi($data) {
+        $this->db->trans_start();
+        $this->db->where("audit_id", $data['audit_id']);
+        $this->db->where("lingkup_id", $data['lingkup_id']);
+        $this->db->update('auditjawab', $data);
+        $this->db->trans_complete();
+        return $this->db->trans_status();
+    }
+
     public function is_exist($data) {
         
         $this->db->where("audit_id",$data['audit_id']);
