@@ -232,6 +232,17 @@
     margin-top: 6px;
 }
 
+/* Keterangan kecil di kolom rencana koreksi (mis. "Dapat diisi setelah
+   audit selesai") pada tabel delik & PTK. */
+.butir-koreksi-ket,
+.ptk-koreksi-ket {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    font-style: italic;
+    color: #9e9e9e;
+}
+
 .koreksi-kotak .koreksi-pesan {
     margin-left: 6px;
     font-size: 12px;

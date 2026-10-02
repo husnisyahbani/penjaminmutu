@@ -11,8 +11,9 @@
        controller: $butir (AuditjawabModel::butirDinilai).
 
        Kartu ringkasan: Sesuai / Observasi / Minor / Mayor (empat kartu).
-       Rencana koreksi disunting langsung pada kolomnya (kecuali butir "S",
-       yang tidak perlu koreksi); pengirimannya lewat delik/koreksi. */
+       Rencana koreksi disunting langsung pada kolomnya - hanya bila audit
+       sudah SELESAI ($boleh_koreksi) dan bukan butir "S"; pengirimannya lewat
+       delik/koreksi. */
     $ringkas = isset($ringkas) ? $ringkas : array(
         'total' => count($butir), 'sesuai' => 0, 'observasi' => 0, 'minor' => 0, 'mayor' => 0,
     );
@@ -158,7 +159,7 @@
         <div class="panel">
           <header class="panel-heading panel-heading-filter">
             <div class="panel-heading-isi">
-              <h3 class="panel-title">Daftar Butir Dinilai</h3>
+              <h3 class="panel-title">Daftar Butir</h3>
               <div class="panel-aksi">
                 <div class="topik-ringkas">
                   <span class="badge badge-info"><?php echo $jml_dinilai; ?> butir ditampilkan</span>
@@ -219,7 +220,7 @@
                     <td>
                       <?php if ($temuan === 'S'): ?>
                       <span class="text-muted">Tidak perlu koreksi</span>
-                      <?php elseif (!empty($b['lingkup_id'])): ?>
+                      <?php elseif (!empty($b['lingkup_id']) && !empty($boleh_koreksi)): ?>
                       <div class="koreksi-kotak" data-lingkup_id="<?php echo (int) $b['lingkup_id']; ?>"
                            data-audit_id="<?php echo (int) $audit_id; ?>"
                            data-dtform_id="<?php echo (int) $dtform_id; ?>">
@@ -232,9 +233,16 @@
                           <span class="koreksi-pesan"></span>
                         </div>
                       </div>
+                      <?php elseif (!empty($b['lingkup_id'])): ?>
+                      <?php if ($koreksi !== ''): ?>
+                      <div class="butir-klamp"><?php echo nl2br(html_escape($koreksi)); ?></div>
+                      <?php else: ?>
+                      <span class="butir-koreksi-kosong">Belum ada rencana koreksi</span>
+                      <?php endif; ?>
+                      <span class="butir-koreksi-ket">Dapat diisi setelah audit selesai</span>
                       <?php else: ?>
                       <div class="butir-klamp"><?php echo nl2br(html_escape($koreksi)); ?></div>
-                      <div class="butir-koreksi-kosong">Data lama - tidak dapat disunting di sini</div>
+                      <div class="butir-koreksi-ket">Data lama - tidak dapat disunting di sini</div>
                       <?php endif; ?>
                     </td>
                   </tr>

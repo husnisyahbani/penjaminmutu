@@ -5,7 +5,7 @@ class Dashboard extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditee';
-        $this->load->js(base_url("assets/app/auditee/daftaraudit.js?v=2.1"));
+        $this->load->js(base_url("assets/app/auditee/daftaraudit.js?v=2.2"));
         // Informasi tombol aksi saat hover (lihat assets/app/tabel-aksi.css)
         $this->load->js(base_url("assets/app/tabel-aksi.js?v=1.0"));
         // Tampilan topik & activity pada halaman detail audit.
@@ -31,10 +31,17 @@ class Dashboard extends MY_Controller {
             $this->data['title'] = 'Daftar Audit';
             $this->data['js'] = $this->load->get_js_files();
             $this->data['dashboard'] = 'active';
-            $this->data['totalterkirim'] = $this->mutu->totalTerkirim();
-            $this->data['totalproses'] = $this->mutu->totalProses();
-            $this->data['totalselesai'] = $this->mutu->totalSelesai();
-            $this->data['totaldraft'] = $this->mutu->totalDraft();
+            /* Filter periode: bawaan = periode aktif. Bila tidak ada periode
+               aktif, seluruh data ditampilkan (periode_id = NULL). Tabel dan
+               kartu statistik mengikuti periode yang dipilih. */
+            $this->data['list_periode'] = $this->periode->getAll();
+            $this->data['periode_aktif'] = $this->periode->aktifId();
+            $filter = $this->data['periode_aktif'];
+
+            $this->data['totalterkirim'] = $this->mutu->totalTerkirim($filter);
+            $this->data['totalproses'] = $this->mutu->totalProses($filter);
+            $this->data['totalselesai'] = $this->mutu->totalSelesai($filter);
+            $this->data['totaldraft'] = $this->mutu->totalDraft($filter);
             $this->data['listauditor'] = $this->akun->getAllAuditor();
             $this->data['listauditee'] = $this->akun->getAllAuditee();
             /* Pilihan formulir mengikuti periode aktif (formulir lama tanpa periode
@@ -43,6 +50,25 @@ class Dashboard extends MY_Controller {
             $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
             $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
             $this->template($this->data, $this->module); 
+    }
+
+    /**
+     * Jumlah audit per status untuk periode terpilih - dipakai kartu
+     * statistik agar ikut berubah saat filter periode diganti.
+     */
+    public function statistik() {
+        $this->output->set_content_type('application/json');
+
+        $periode_id = $this->input->post('periode_id');
+
+        $query = array(
+            'status' => TRUE,
+            'draft' => (int) $this->mutu->totalDraft($periode_id),
+            'terkirim' => (int) $this->mutu->totalTerkirim($periode_id),
+            'proses' => (int) $this->mutu->totalProses($periode_id),
+            'selesai' => (int) $this->mutu->totalSelesai($periode_id),
+        );
+        echo json_encode($query);
     }
 
     public function detail($id) {
@@ -56,8 +82,11 @@ class Dashboard extends MY_Controller {
                dan koreksi auditee untuk halaman detail audit. */
             $this->data['topik'] = $this->auditjawab->petaTilik($id);
 
+            /* Jawaban hanya dapat diisi/diubah selama audit masih DRAFT.
+               Status lain (TERKIRIM / PROSES / SELESAI) dikunci. */
             $status = strtoupper(trim((string) $this->data['result']['audit_status']));
-            $this->data['sudah_terkirim'] = in_array($status, array('TERKIRIM', 'SELESAI'), TRUE);
+            $this->data['status_audit'] = $status;
+            $this->data['sudah_terkirim'] = ($status !== 'DRAFT');
             $this->data['lampiran_siap']  = $this->lampiran->siap();
             $this->data['js'] = $this->load->get_js_files();
             $this->data['audit'] = 'active';
@@ -125,6 +154,14 @@ class Dashboard extends MY_Controller {
         $data['dtform_id'] = $this->input->post('dtform_id');
         $data['audit_id'] = $this->input->post('audit_id');
         $data['jwb_jawaban'] = $this->input->post('jwb_jawaban');
+
+        // Jawaban hanya boleh ditulis selama audit masih draft.
+        $kunci = $this->_kunci($data['audit_id']);
+        if ($kunci !== TRUE) {
+            $this->_json($kunci);
+            return;
+        }
+
         if($this->auditjawab->is_exist($data)){
             $status = $this->auditjawab->jawab($data);
         }else{
@@ -143,6 +180,16 @@ class Dashboard extends MY_Controller {
 
         if (!$audit) {
             $this->_json(array('status' => false, 'pesan' => 'Audit tidak ditemukan.'));
+            return;
+        }
+
+        // Hanya audit berstatus draft yang boleh dikirim.
+        $status = strtoupper(trim((string) $audit['audit_status']));
+        if ($status !== 'DRAFT') {
+            $this->_json(array(
+                'status' => false,
+                'pesan'  => 'Hasil evaluasi hanya dapat dikirim saat audit masih berstatus draft.',
+            ));
             return;
         }
 
@@ -367,11 +414,20 @@ class Dashboard extends MY_Controller {
             return array('status' => false, 'pesan' => 'Audit ini bukan milik unit Anda.');
         }
 
+        /* Jawaban & lampiran hanya dapat diubah selama audit masih DRAFT.
+           Setelah dikirim, dikunci sampai penilaian auditor selesai. */
         $status = strtoupper(trim((string) $audit['audit_status']));
-        if ($status === 'TERKIRIM' || $status === 'SELESAI') {
+        if ($status !== 'DRAFT') {
+            $pesan = array(
+                'TERKIRIM' => 'Hasil evaluasi sudah dikirim ke auditor, jawaban dan lampiran tidak dapat diubah lagi.',
+                'PROSES'   => 'Audit sedang dinilai auditor, jawaban dan lampiran tidak dapat diubah lagi.',
+                'SELESAI'  => 'Audit sudah selesai, jawaban dan lampiran tidak dapat diubah lagi.',
+            );
             return array(
                 'status' => false,
-                'pesan'  => 'Hasil evaluasi sudah dikirim, jawaban dan lampiran tidak dapat diubah lagi.',
+                'pesan'  => isset($pesan[$status])
+                    ? $pesan[$status]
+                    : 'Jawaban dan lampiran hanya dapat diubah saat audit masih berstatus draft.',
             );
         }
 
@@ -399,7 +455,11 @@ class Dashboard extends MY_Controller {
         $post['draw'] = $this->input->post('draw');
 
 
-        $list = $this->mutu->get_datatables($post['length'], $post['start'], $post['search'], $post['order']);
+        /* Filter periode (bawaan periode aktif dikirim oleh daftaraudit.js;
+           kosong = semua periode). */
+        $periode_id = $this->input->post('periode_id');
+
+        $list = $this->mutu->get_datatables($post['length'], $post['start'], $post['search'], $post['order'], $periode_id);
         $data = array();
         $no = $this->input->post('start');
         foreach ($list as $field) {
@@ -452,8 +512,8 @@ class Dashboard extends MY_Controller {
 
         $output = array(
             "draw" => $post['draw'],
-            "recordsTotal" => $this->mutu->count_all(),
-            "recordsFiltered" => $this->mutu->count_filtered($post['search'], $post['order']),
+            "recordsTotal" => $this->mutu->count_all($periode_id),
+            "recordsFiltered" => $this->mutu->count_filtered($post['search'], $post['order'], $periode_id),
             "data" => $data,
         );
         //output dalam format JSON

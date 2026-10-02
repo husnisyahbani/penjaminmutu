@@ -6,6 +6,7 @@
            dan daftar audit auditor (assets/app/kartu-statistik.css). */
         $kartu_audit = array(
             array(
+                'id'    => 'stat_draft',
                 'judul' => 'Audit Draft',
                 'nilai' => isset($totaldraft) ? $totaldraft : 0,
                 'ikon'  => 'md-edit',
@@ -13,6 +14,7 @@
                 'ket'   => 'Belum diajukan',
             ),
             array(
+                'id'    => 'stat_terkirim',
                 'judul' => 'Audit Terkirim',
                 'nilai' => isset($totalterkirim) ? $totalterkirim : 0,
                 'ikon'  => 'md-play-circle',
@@ -20,6 +22,7 @@
                 'ket'   => 'Menunggu diproses',
             ),
             array(
+                'id'    => 'stat_proses',
                 'judul' => 'Audit Proses',
                 'nilai' => isset($totalproses) ? $totalproses : 0,
                 'ikon'  => 'md-refresh',
@@ -27,6 +30,7 @@
                 'ket'   => 'Sedang dinilai',
             ),
             array(
+                'id'    => 'stat_selesai',
                 'judul' => 'Audit Selesai',
                 'nilai' => isset($totalselesai) ? $totalselesai : 0,
                 'ikon'  => 'md-check-circle',
@@ -43,7 +47,7 @@
               <div class="kartu-stat" style="background-color:<?php echo $k['warna']; ?>;">
                 <i class="icon <?php echo $k['ikon']; ?> kartu-stat__ikon" aria-hidden="true"></i>
                 <div style="overflow:hidden;">
-                  <div class="kartu-stat__angka"><?php echo number_format($k['nilai'], 0, ',', '.'); ?></div>
+                  <div class="kartu-stat__angka" id="<?php echo $k['id']; ?>"><?php echo number_format($k['nilai'], 0, ',', '.'); ?></div>
                   <div class="kartu-stat__judul"><?php echo $k['judul']; ?></div>
                   <div class="kartu-stat__ket"><?php echo $k['ket']; ?></div>
                 </div>
@@ -58,13 +62,23 @@
             <div class="col-xl-12 col-md-24">
 
                 <div class="panel">
-                    <header class="panel-heading">
-                        <h3 class="panel-title">Daftar Audit</h3>
-                        <div class="panel-actions panel-actions-keep">
-                            
-                            <!-- <button type="button" class="btn btn-sm btn-icon btn-success" id="tambah">
-                                <i class="icon md-plus" aria-hidden="true"></i>Tambah
-                            </button> -->
+                    <header class="panel-heading panel-heading-filter">
+                        <div class="panel-heading-isi">
+                            <h3 class="panel-title">Daftar Audit</h3>
+                            <div class="panel-aksi">
+                                <div class="filter-kotak">
+                                    <label for="filter_periode"><i class="icon md-calendar" aria-hidden="true"></i>Periode</label>
+                                    <select class="form-control" id="filter_periode">
+                                        <option value="">Semua Periode</option>
+                                        <?php foreach ($list_periode as $p):
+                                            $label = html_escape($p['periode_tahun'])
+                                                . ' &middot; ' . date('d-m-Y', strtotime($p['periode_mulai']))
+                                                . ' s.d. ' . date('d-m-Y', strtotime($p['periode_selesai']))
+                                                . ($p['periode_aktif'] ? ' &middot; Aktif' : '');
+                                        ?><option value="<?php echo (int) $p['periode_id']; ?>" <?php echo ($periode_aktif == $p['periode_id']) ? 'selected' : ''; ?>><?php echo $label; ?></option><?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </header>
                     <div class="panel-body">

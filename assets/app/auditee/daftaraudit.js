@@ -13,9 +13,41 @@ $(function () {
         ],
         "ajax": {
             "url": base_url + "/dashboard/listmutu/",
-            "type": "POST"
+            "type": "POST",
+            /* Filter periode ikut dikirim; kosong = semua periode */
+            "data": function (d) {
+                d.periode_id = $('#filter_periode').val();
+            }
         }
     });
+
+    /* Ganti periode: muat ulang tabel + perbarui kartu statistik */
+    $('#filter_periode').on('change', function () {
+        daftaraudit.ajax.reload();
+        perbaruiKartu($(this).val());
+    });
+
+    function angka(nilai) {
+        return String(nilai === null || nilai === undefined ? 0 : nilai)
+            .replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
+    function perbaruiKartu(periode_id) {
+        $.ajax({
+            url: base_url + "/dashboard/statistik",
+            type: "POST",
+            dataType: "json",
+            data: {periode_id: periode_id}
+        }).done(function (data) {
+            if (!data.status) {
+                return;
+            }
+            $('#stat_draft').text(angka(data.draft));
+            $('#stat_terkirim').text(angka(data.terkirim));
+            $('#stat_proses').text(angka(data.proses));
+            $('#stat_selesai').text(angka(data.selesai));
+        });
+    }
 
     /* Halaman detail audit kini berbentuk topik/activity yang dirender server
        (lihat assets/app/topik-aktivitas.js), jadi tidak ada DataTable

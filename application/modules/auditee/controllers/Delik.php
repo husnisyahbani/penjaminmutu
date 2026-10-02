@@ -61,6 +61,10 @@ class Delik extends MY_Controller {
             }
             $this->data['ringkas'] = $ringkas;
             $this->data['jml_lingkup'] = $this->lingkup->hitung($dtform_id);
+
+            /* Rencana koreksi hanya dapat diisi setelah audit selesai. */
+            $status_audit = strtoupper(trim((string) $this->data['result']['audit_status']));
+            $this->data['boleh_koreksi'] = ($status_audit === 'SELESAI');
             $this->data['js'] = $this->load->get_js_files();
             $this->data['audit'] = 'active';//auditmenu
             $this->data['auditmenu'] = 'active';
@@ -98,9 +102,17 @@ class Delik extends MY_Controller {
         $lingkup_id = (int) $this->input->post('lingkup_id');
         $dtform_id  = (int) $this->input->post('dtform_id');
 
+        /* Rencana koreksi hanya untuk audit milik auditee ini yang sudah
+           selesai dinilai (status SELESAI). */
+        $audit = $this->mutu->getAuditById($audit_id);
+        $users_id = $this->session->userdata('users_id');
+        $selesai = !empty($audit)
+            && (int) $audit['auditee_id'] === (int) $users_id
+            && strtoupper(trim((string) $audit['audit_status'])) === 'SELESAI';
+
         $butir = $this->lingkup->butirSatu($lingkup_id);
         $status = false;
-        if ($audit_id > 0 && !empty($butir) && (int) $butir['dtform_id'] === $dtform_id) {
+        if ($selesai && !empty($butir) && (int) $butir['dtform_id'] === $dtform_id) {
             $status = $this->auditjawab->koreksi(array(
                 'audit_id'    => $audit_id,
                 'lingkup_id'  => $lingkup_id,

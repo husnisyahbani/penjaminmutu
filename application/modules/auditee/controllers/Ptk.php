@@ -45,7 +45,14 @@ class Ptk extends MY_Controller {
         $data['audit_id'] = $this->input->post('audit_id');
         $data['lingkup_id'] = $this->input->post('lingkup_id');
         $data['jwb_koreksi'] = $this->_teksBaris($this->input->post('ptk_koreksi'));
-        $status = $this->ptkmodel->koreksi($data);
+
+        /* Penjagaan: butir harus milik auditee ini (getButir menyaringnya) dan
+           auditnya sudah berstatus SELESAI. */
+        $butir = $this->ptkmodel->getButir($data['audit_id'], $data['lingkup_id']);
+        $status = false;
+        if (!empty($butir) && strtoupper(trim((string) $butir['audit_status'])) === 'SELESAI') {
+            $status = $this->ptkmodel->koreksi($data);
+        }
         
         $query = array("status" => $status);
         header('Access-Control-Allow-Origin: *');
@@ -115,7 +122,14 @@ class Ptk extends MY_Controller {
             $isi = $koreksi === ''
                 ? '<span class="ptk-koreksi-kosong">Belum ada rencana koreksi</span>'
                 : '<div class="ptk-klamp ptk-koreksi">' . nl2br(html_escape($koreksi)) . '</div>';
-            $row[] = $isi . '<div class="tabel-aksi ptk-koreksi-aksi">' . $tombol . '</div>';
+
+            /* Rencana koreksi hanya dapat ditulis setelah audit selesai. */
+            if (strtoupper(trim((string) $field->audit_status)) === 'SELESAI') {
+                $aksi = '<div class="tabel-aksi ptk-koreksi-aksi">' . $tombol . '</div>';
+            } else {
+                $aksi = '<div class="ptk-koreksi-ket">Dapat diisi setelah audit selesai</div>';
+            }
+            $row[] = $isi . $aksi;
   
             
             $data[] = $row;

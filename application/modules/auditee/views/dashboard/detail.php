@@ -6,8 +6,18 @@
  * dijawab dan boleh dilengkapi lampiran (boleh lebih dari satu berkas).
  *
  * Data dari controller: $result, $audit_id, $topik, $lampiran_siap,
- * $sudah_terkirim.
+ * $sudah_terkirim (jawaban dikunci bila status bukan DRAFT), $status_audit.
  */
+/* Pesan pengunci: jawaban & lampiran hanya dapat diubah saat audit DRAFT. */
+$pesan_kunci = array(
+    'TERKIRIM' => 'Hasil evaluasi sudah dikirim ke auditor, sehingga jawaban dan lampiran tidak dapat diubah lagi.',
+    'PROSES'   => 'Audit sedang dinilai auditor, sehingga jawaban dan lampiran tidak dapat diubah lagi.',
+    'SELESAI'  => 'Audit sudah selesai, sehingga jawaban dan lampiran tidak dapat diubah lagi.',
+);
+$pesan_kunci = isset($pesan_kunci[$status_audit])
+    ? $pesan_kunci[$status_audit]
+    : 'Jawaban dan lampiran hanya dapat diubah saat audit masih berstatus draft.';
+
 $potong = function ($teks, $maks = 140) {
     $t = lingkup_bersihkan($teks);
     if ($t === '') {
@@ -74,8 +84,7 @@ $jml_belum = $jml_lingkup - $jml_dijawab;
 
                         <?php if ($sudah_terkirim): ?>
                         <div class="alert alert-info" role="alert">
-                            Hasil evaluasi sudah dikirim ke auditor, sehingga jawaban dan lampiran tidak dapat
-                            diubah lagi.
+                            <?php echo $pesan_kunci; ?>
                         </div>
                         <?php elseif ($jml_belum > 0): ?>
                         <div class="alert alert-warning" role="alert" id="peringatan_belum">
