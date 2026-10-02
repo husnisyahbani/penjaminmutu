@@ -21,11 +21,70 @@ $(function () {
         });
     }
 
-    function perbaruiSisa() {
-        var belum = $('#topik_daftar .status-jawab').filter(function () {
-            return /wajib/i.test($(this).text());
-        }).length;
-        $('#sisa_belum').text(belum + ' belum dijawab');
+    /* ------------------- indikator jumlah jawaban & lampiran -------------------
+
+       Semua angka dihitung ulang dari tampilan setiap kali ada jawaban atau
+       lampiran yang berubah, supaya badge ringkasan ("N sudah dijawab",
+       "N belum dijawab", "N lampiran") dan badge per pertanyaan
+       ("N/M dijawab") ikut bergerak tanpa memuat ulang halaman. */
+
+    function jawabTerisi(baris) {
+        return /sudah/i.test(baris.find('.status-jawab').first().text());
+    }
+
+    function hitungRingkas() {
+        var semua = $('#topik_daftar .aktivitas');
+
+        return {
+            lingkup: semua.length,
+            dijawab: semua.filter(function () { return jawabTerisi($(this)); }).length,
+            lampiran: $('#topik_daftar .lampiran[data-lampiran_id]').length
+        };
+    }
+
+    function ubahAngka(pemilih, teks) {
+        var el = $(pemilih).first();
+        if (!el.length || el.text().trim() === teks) {
+            return;
+        }
+        el.text(teks).addClass('ringkas-berubah');
+        window.setTimeout(function () { el.removeClass('ringkas-berubah'); }, 700);
+    }
+
+    function perbaruiRingkas() {
+        var angka = hitungRingkas();
+        var belum = angka.lingkup - angka.dijawab;
+
+        ubahAngka('#jml_lingkup', angka.lingkup + ' lingkup');
+        ubahAngka('#jml_dijawab', angka.dijawab + ' sudah dijawab');
+        ubahAngka('#sisa_belum', belum + ' belum dijawab');
+        ubahAngka('#jml_lampiran', angka.lampiran + ' lampiran');
+
+        // Badge jumlah jawaban pada tiap pertanyaan.
+        $('#topik_daftar .topik').each(function () {
+            var semua = $(this).find('.aktivitas').length;
+            var sudah = $(this).find('.aktivitas').filter(function () {
+                return jawabTerisi($(this));
+            }).length;
+            var badge = $(this).find('.topik-dijawab').first();
+            if (!badge.length) {
+                return;
+            }
+
+            var teks = sudah + '/' + semua + ' dijawab';
+            if (badge.text().trim() !== teks) {
+                badge.text(teks).addClass('ringkas-berubah');
+                window.setTimeout(function () { badge.removeClass('ringkas-berubah'); }, 700);
+            }
+            badge.removeClass('badge-success badge-warning')
+                .addClass((semua > 0 && sudah >= semua) ? 'badge-success' : 'badge-warning');
+        });
+
+        // Peringatan "wajib dijawab" hilang sendiri setelah semuanya terjawab.
+        if (belum === 0) {
+            $('#peringatan_belum').hide();
+        }
+
         return belum;
     }
 
@@ -56,7 +115,7 @@ $(function () {
 
                 baris.find('.jawaban-pesan').text('tersimpan ' + waktuSekarang());
                 baris.find('.status-jawab').removeClass('badge-danger').addClass('badge-success').text('sudah dijawab');
-                perbaruiSisa();
+                perbaruiRingkas();
                 pesan('Tersimpan', hasil.pesan, 'success');
             },
             error: function () {
@@ -115,6 +174,7 @@ $(function () {
                     kotak.find('.lampiran-daftar').append(barisLampiran(l));
                 });
                 masukan.val('');
+                perbaruiRingkas();
                 pesan('Tersimpan', hasil.pesan, hasil.gagal && hasil.gagal.length ? 'warning' : 'success');
             },
             error: function () {
@@ -165,6 +225,7 @@ $(function () {
                         return;
                     }
                     baris.remove();
+                    perbaruiRingkas();
                 },
                 error: function () {
                     pesan('Oops', 'Tidak dapat menghubungi server.', 'error');
@@ -177,7 +238,7 @@ $(function () {
 
     $('#kirim_hasil').on('click', function () {
         var id = $(this).attr('audit_id');
-        var belum = perbaruiSisa();
+        var belum = perbaruiRingkas();
 
         if (belum > 0) {
             pesan('Belum lengkap', 'Masih ada ' + belum + ' lingkup yang belum dijawab. Setiap lingkup wajib dijawab sebelum hasil dikirim.', 'warning');

@@ -311,3 +311,15 @@
 .status-jawab.badge-danger {
     background-color: #ef5350;
 }
+
+/* Angka indikator yang baru berubah diberi sentakan halus supaya
+   perubahan jumlah langsung terlihat. */
+@keyframes ringkasPop {
+    from { transform: scale(1.28); }
+    to   { transform: scale(1); }
+}
+
+.ringkas-berubah {
+    animation: ringkasPop 0.45s ease-out;
+    display: inline-block;
+}

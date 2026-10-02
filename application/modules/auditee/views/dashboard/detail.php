@@ -63,10 +63,10 @@ $jml_belum = $jml_lingkup - $jml_dijawab;
 
                         <div class="topik-ringkas mb-15">
                             <span class="badge badge-info"><?php echo (int) $jml_topik; ?> pertanyaan</span>
-                            <span class="badge badge-info"><?php echo (int) $jml_lingkup; ?> lingkup</span>
-                            <span class="badge badge-success"><?php echo (int) $jml_dijawab; ?> sudah dijawab</span>
+                            <span class="badge badge-info" id="jml_lingkup"><?php echo (int) $jml_lingkup; ?> lingkup</span>
+                            <span class="badge badge-success" id="jml_dijawab"><?php echo (int) $jml_dijawab; ?> sudah dijawab</span>
                             <span class="badge badge-warning" id="sisa_belum"><?php echo (int) $jml_belum; ?> belum dijawab</span>
-                            <span class="badge badge-default"><?php echo (int) $jml_lampiran; ?> lampiran</span>
+                            <span class="badge badge-default" id="jml_lampiran"><?php echo (int) $jml_lampiran; ?> lampiran</span>
                             <?php if ($jml_temuan > 0): ?>
                             <span class="badge badge-warning"><?php echo (int) $jml_temuan; ?> temuan</span>
                             <?php endif; ?>
@@ -78,7 +78,7 @@ $jml_belum = $jml_lingkup - $jml_dijawab;
                             diubah lagi.
                         </div>
                         <?php elseif ($jml_belum > 0): ?>
-                        <div class="alert alert-warning" role="alert">
+                        <div class="alert alert-warning" role="alert" id="peringatan_belum">
                             Setiap lingkup <strong>wajib dijawab</strong>. Masih ada
                             <strong><?php echo (int) $jml_belum; ?> lingkup</strong> yang belum dijawab; hasil
                             evaluasi baru dapat dikirim setelah semuanya terjawab. Lampiran bersifat opsional dan
@@ -107,7 +107,7 @@ $jml_belum = $jml_lingkup - $jml_dijawab;
                                         <?php echo html_escape($t['teks']); ?>
                                         <span class="topik-info">
                                             <span class="badge badge-info"><?php echo (int) $t['jml_butir']; ?> lingkup</span>
-                                            <span class="badge <?php echo ($t['jml_dijawab'] >= $t['jml_butir'] && $t['jml_butir'] > 0) ? 'badge-success' : 'badge-warning'; ?>">
+                                            <span class="badge topik-dijawab <?php echo ($t['jml_dijawab'] >= $t['jml_butir'] && $t['jml_butir'] > 0) ? 'badge-success' : 'badge-warning'; ?>">
                                                 <?php echo (int) $t['jml_dijawab']; ?>/<?php echo (int) $t['jml_butir']; ?> dijawab
                                             </span>
                                             <?php if ($t['jml_temuan'] > 0): ?>

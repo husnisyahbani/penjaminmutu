@@ -18,7 +18,7 @@ class Dashboard extends MY_Controller {
         $this->load->model('PeriodeModel', 'periode');
         $this->load->model('LampiranModel', 'lampiran');
         // Jawaban wajib + lampiran opsional per lingkup (halaman detail audit).
-        $this->load->js(base_url("assets/app/auditee/jawaban-lingkup.js?v=1.0"));
+        $this->load->js(base_url("assets/app/auditee/jawaban-lingkup.js?v=1.1"));
 
         $role = $this->session->userdata('role');
         if (!isset($role) || $role != 'AUDITEE') {
