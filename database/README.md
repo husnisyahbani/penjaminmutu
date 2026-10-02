@@ -28,6 +28,33 @@ Cara pakai:
 > tabel belum dibuat, halaman depan tetap tampil normal menggunakan konten
 > bawaan.
 
+## `ci_sessions.sql`
+
+Membuat tabel penyimpanan sesi login. Aplikasi memakai session driver
+`database`, jadi **tanpa tabel ini halaman login akan gagal** (*Database Error*).
+
+| Objek              | Isi                                                            |
+| ------------------ | -------------------------------------------------------------- |
+| `mutu_ci_sessions` | sesi login: `id`, `ip_address`, `timestamp`, `data`             |
+
+Cara pakai:
+
+1. Buka phpMyAdmin (atau menu SQL) pada database aplikasi.
+2. Impor berkas `database/ci_sessions.sql`.
+3. Sesuaikan nama tabel bila prefix pada `application/config/database.php`
+   bukan `mutu_` (contoh tanpa prefix disediakan di bagian bawah berkas).
+4. Tidak ada data awal yang perlu diisi: baris sesi dibuat otomatis saat
+   pengguna login.
+
+Catatan:
+
+- Konfigurasi memakai `$config['sess_driver'] = 'database'` dan
+  `$config['sess_save_path'] = 'ci_sessions'`; prefix `mutu_` ditambahkan
+  otomatis oleh CodeIgniter, sehingga nama tabel sesungguhnya
+  `mutu_ci_sessions`.
+- Sesi kedaluwarsa dibersihkan otomatis (masa berlaku bawaan 7200 detik).
+  Untuk memaksa semua pengguna login ulang: `TRUNCATE TABLE mutu_ci_sessions;`.
+
 ## `periode_audit.sql`
 
 Membuat tabel periode audit dan menghubungkannya ke daftar audit:
