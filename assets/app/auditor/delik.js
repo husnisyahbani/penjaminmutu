@@ -1,14 +1,34 @@
-/* Daftar tilik (delik).
+/* Daftar tilik auditor.
  *
- * Baris daftar tilik dibaca dari tabel mutu_auditjawabdetail (lewat jwb_id
- * pertanyaan), dan nilai yang diisi auditor disimpan kembali ke tabel yang
- * sama - sehingga langsung tampil pada halaman PTK/delik auditee.
+ * Susunannya mengikuti halaman auditee/delik: kartu ringkasan di atas, tabel
+ * butir di bawah - tanpa tab.
  *
- * Butir dapat ditambah / diubah / dihapus dari halaman ini:
- *   POST /delik/tambahtilik, /delik/pertanyaan, /delik/hapus
- * Simpan nilai: POST /delik/simpantilik {jwb_id, dtjwb_id, kolom, nilai}
+ * - Tabel: server-side DataTables (POST /delik/listdelik/<jwb_id>).
+ *   Kolom Butir Lingkup memuat pertanyaan + referensi (tebal) dan ikon ubah;
+ *   kolom Hasil / Temuan / Catatan masing-masing punya ikon ubah; kolom Aksi
+ *   hanya berisi tombol hapus.
+ * - Tambah butir  : POST /delik/tambahtilik  {jwb_id, dtjwb_pertanyaan, dtjwb_referensi}
+ * - Ubah butir    : POST /delik/pertanyaan   {pertanyaan_dtjwb_id, edit_dtjwb_*}
+ * - Ubah isian    : POST /delik/simpanbutir  {jwb_id, dtjwb_id, kolom, nilai}
+ * - Hapus butir   : POST /delik/hapus        {dtjwb_id}
+ * - Tujuan        : POST /delik/tujuan       {audit_id, dtform_id, jwb_tujuan}
  */
 $(function () {
+
+    function pesan(judul, teks, tipe) {
+        swal.fire(judul, teks, tipe || 'info');
+    }
+
+    function muat() {
+        swal.fire({
+            title: 'Menyimpan...',
+            allowEscapeKey: false,
+            allowOutsideClick: false,
+            onOpen: function () { swal.showLoading(); }
+        });
+    }
+
+    /* ------------------------------ tabel ------------------------------ */
 
     var tiliklist = $('#tilik').DataTable({
         "responsive": true,
@@ -26,108 +46,52 @@ $(function () {
         }
     });
 
-    /* Butir yang sedang dibuka pada modal. */
-    var dtjwb_id = 0;
-
-    /* ---------------- buka modal edit ---------------- */
-
-    function buka(modal, tombol) {
-        dtjwb_id = tombol.attr('dtjwb_id');
-
+    function segarkanKartu() {
         $.ajax({
-            url: base_url + "/delik/gettilik/" + jwb_id + "/" + dtjwb_id,
+            url: base_url + "/delik/ringkasan/" + jwb_id,
             type: "GET",
             dataType: "json",
             success: function (data) {
-                if (!data.status) {
-                    swal.fire("Oops", data.pesan || "Gagal!", "error");
+                if (!data || !data.status) {
                     return;
                 }
-                $('#nilai_lingkup').text(data.lingkup_isi || '');
-                $('#edit_dtjwb_hasil').val(data.jwb_hasil);
-                $('#edit_dtjwb_temuan').val(data.jwb_temuan);
-                $('#edit_dtjwb_catatan').val(data.jwb_catatan);
-                $(modal).modal('show');
-            },
-            error: function () {
-                swal.fire("Oops", "No connection!", "error");
+                $.each(data.kartu, function (i, k) {
+                    $('.kartu-stat').eq(i).find('.kartu-stat__angka').text(k.nilai);
+                    var bar = $('.kartu-stat').eq(i).find('.kartu-stat__bar-isi');
+                    if (bar.length) {
+                        bar.css('width', k.bar + '%');
+                        $('.kartu-stat').eq(i).find('.kartu-stat__bar-ket').text(k.bar + '% dari butir dinilai');
+                    }
+                });
+                $('#jml_butir').text(data.total + ' butir tilik');
             }
         });
     }
 
-    $('#tilik').on('click', '.edithasil', function () {
-        buka('#editHasilModal', $(this));
-    });
-
-    $('#tilik').on('click', '.edittemuan', function () {
-        buka('#editTemuanModal', $(this));
-    });
-
-    $('#tilik').on('click', '.editcatatan', function () {
-        buka('#editCatatanModal', $(this));
-    });
-
-    $('#tilik').on('click', '.editpertanyaan', function () {
-        dtjwb_id = $(this).attr('dtjwb_id');
-
-        $.ajax({
-            url: base_url + "/delik/gettilik/" + jwb_id + "/" + dtjwb_id,
-            type: "GET",
-            dataType: "json",
-            success: function (data) {
-                if (!data.status) {
-                    swal.fire("Oops", data.pesan || "Gagal!", "error");
-                    return;
-                }
-                $('#pertanyaan_dtjwb_id').val(data.dtjwb_id);
-                $('#edit_dtjwb_referensi').val(data.dtjwb_referensi || '');
-                $('#edit_dtjwb_pertanyaan').val(data.dtjwb_pertanyaan || '');
-                $('#editPertanyaanModal').modal('show');
-            },
-            error: function () {
-                swal.fire("Oops", "No connection!", "error");
-            }
-        });
-    });
-
-    /* ---------------- tambah butir tilik ---------------- */
-
-    $('#tambahtilik').on('click', function () {
-        $('#dtjwb_referensi').val('');
-        $('#dtjwb_pertanyaan').val('');
-        $('#tambahTilikModal').modal('show');
-    });
-
-    function simpanButir(url, formData, modal, $form) {
+    function simpan(url, data, modal, $form) {
         $.ajax({
             url: base_url + url,
             type: "POST",
-            data: formData,
+            data: data,
             dataType: "json",
             beforeSend: function () {
                 $(modal).modal('hide');
-                swal.fire({
-                    title: 'Menyimpan...',
-                    allowEscapeKey: false,
-                    allowOutsideClick: false,
-                    onOpen: function () {
-                        swal.showLoading();
-                    }
-                });
+                muat();
             },
-            success: function (data) {
+            success: function (hasil) {
                 swal.close();
-                if (data.status) {
-                    tiliklist.ajax.reload();
+                if (hasil && hasil.status) {
+                    tiliklist.ajax.reload(null, false);
+                    segarkanKartu();
                     swal.fire({
                         icon: 'success',
                         title: 'Berhasil!',
-                        text: data.pesan || 'Data telah tersimpan.',
+                        text: hasil.pesan || 'Data telah tersimpan.',
                         showConfirmButton: false,
                         timer: 1200
                     });
                 } else {
-                    swal.fire("Oops", data.pesan || "Gagal!", "error");
+                    pesan('Oops', (hasil && hasil.pesan) || 'Gagal menyimpan.', 'error');
                 }
                 if ($form) {
                     $form.formValidation('disableSubmitButtons', false).formValidation('resetForm', true);
@@ -135,7 +99,7 @@ $(function () {
             },
             error: function () {
                 swal.close();
-                swal.fire("Oops", "No connection!", "error");
+                pesan('Oops', 'Tidak dapat menghubungi server.', 'error');
                 if ($form) {
                     $form.formValidation('disableSubmitButtons', false).formValidation('resetForm', true);
                 }
@@ -143,39 +107,101 @@ $(function () {
         });
     }
 
-    $("#formtilik").formValidation({
-        framework: "bootstrap4",
-        excluded: [':disabled'],
-        err: {clazz: 'invalid-feedback'},
-        control: {valid: 'is-valid', invalid: 'is-invalid'},
-        row: {invalid: 'has-danger'}
-    }).on('success.form.fv', function (e) {
+    function pasangValidasi(pemilih) {
+        return $(pemilih).formValidation({
+            framework: "bootstrap4",
+            excluded: [':disabled'],
+            err: {clazz: 'invalid-feedback'},
+            control: {valid: 'is-valid', invalid: 'is-invalid'},
+            row: {invalid: 'has-danger'}
+        });
+    }
+
+    /* --------------------- tambah butir tilik --------------------- */
+
+    $('#tambahtilik').on('click', function () {
+        $('#dtjwb_pertanyaan').val('');
+        $('#dtjwb_referensi').val('');
+        $('#tambahTilikModal').modal('show');
+    });
+
+    pasangValidasi('#formtilik').on('success.form.fv', function (e) {
         e.preventDefault();
-        simpanButir('/delik/tambahtilik', {
+        simpan('/delik/tambahtilik', {
             jwb_id: jwb_id,
-            dtjwb_referensi: $('#dtjwb_referensi').val(),
-            dtjwb_pertanyaan: $('#dtjwb_pertanyaan').val()
+            dtjwb_pertanyaan: $('#dtjwb_pertanyaan').val(),
+            dtjwb_referensi: $('#dtjwb_referensi').val()
         }, '#tambahTilikModal', $(e.target));
         return false;
     });
 
-    $("#formpertanyaan").formValidation({
-        framework: "bootstrap4",
-        excluded: [':disabled'],
-        err: {clazz: 'invalid-feedback'},
-        control: {valid: 'is-valid', invalid: 'is-invalid'},
-        row: {invalid: 'has-danger'}
-    }).on('success.form.fv', function (e) {
+    /* ------------- ubah butir (pertanyaan + referensi) ------------- */
+
+    $('#tilik').on('click', '.editbutir', function () {
+        var tombol = $(this);
+        $('#pertanyaan_dtjwb_id').val(tombol.attr('dtjwb_id'));
+        $('#edit_dtjwb_pertanyaan').val(tombol.attr('data-pertanyaan'));
+        $('#edit_dtjwb_referensi').val(tombol.attr('data-referensi'));
+        $('#editButirModal').modal('show');
+    });
+
+    pasangValidasi('#formbutir').on('success.form.fv', function (e) {
         e.preventDefault();
-        simpanButir('/delik/pertanyaan', {
+        simpan('/delik/pertanyaan', {
             pertanyaan_dtjwb_id: $('#pertanyaan_dtjwb_id').val(),
-            edit_dtjwb_referensi: $('#edit_dtjwb_referensi').val(),
-            edit_dtjwb_pertanyaan: $('#edit_dtjwb_pertanyaan').val()
-        }, '#editPertanyaanModal', $(e.target));
+            edit_dtjwb_pertanyaan: $('#edit_dtjwb_pertanyaan').val(),
+            edit_dtjwb_referensi: $('#edit_dtjwb_referensi').val()
+        }, '#editButirModal', $(e.target));
         return false;
     });
 
-    /* ---------------- hapus butir tilik ---------------- */
+    /* ------- ubah satu isian (hasil / temuan / catatan) ------- */
+
+    var judulIsi = {
+        dtjwb_hasil: 'Ubah Hasil',
+        dtjwb_temuan: 'Ubah Temuan',
+        dtjwb_catatan: 'Ubah Catatan'
+    };
+
+    $('#tilik').on('click', '.editisi', function () {
+        var tombol = $(this);
+        var kolom = tombol.attr('data-kolom');
+        var nilai = tombol.attr('data-nilai') || '';
+
+        $('#edit_isi_dtjwb_id').val(tombol.attr('dtjwb_id'));
+        $('#edit_isi_kolom').val(kolom);
+        $('#editIsiJudul').text(judulIsi[kolom] || 'Ubah Isian');
+
+        if (kolom === 'dtjwb_temuan') {
+            $('#editIsiTeks').hide();
+            $('#editIsiTemuan').show();
+            $('#edit_isi_temuan').val(nilai);
+        } else {
+            $('#editIsiTemuan').hide();
+            $('#editIsiTeks').show();
+            $('#edit_isi_nilai').val(nilai);
+        }
+
+        $('#editIsiModal').modal('show');
+    });
+
+    $('#formisi').on('submit', function (e) {
+        e.preventDefault();
+        var kolom = $('#edit_isi_kolom').val();
+        var nilai = (kolom === 'dtjwb_temuan')
+            ? $('#edit_isi_temuan').val()
+            : $('#edit_isi_nilai').val();
+
+        simpan('/delik/simpanbutir', {
+            jwb_id: jwb_id,
+            dtjwb_id: $('#edit_isi_dtjwb_id').val(),
+            kolom: kolom,
+            nilai: nilai
+        }, '#editIsiModal', null);
+        return false;
+    });
+
+    /* ------------------------- hapus butir ------------------------- */
 
     $('#tilik').on('click', '.hapustilik', function () {
         var id = $(this).attr('dtjwb_id');
@@ -191,169 +217,64 @@ $(function () {
             if (!hasil.value) {
                 return;
             }
-            $.ajax({
-                url: base_url + "/delik/hapus",
-                type: "POST",
-                dataType: "json",
-                data: {dtjwb_id: id},
-                success: function (data) {
-                    if (data.status) {
-                        tiliklist.ajax.reload();
-                        swal.fire({
-                            icon: 'success',
-                            title: 'Terhapus!',
-                            text: 'Butir tilik telah dihapus.',
-                            showConfirmButton: false,
-                            timer: 1200
-                        });
-                    } else {
-                        swal.fire("Oops", "Gagal menghapus.", "error");
-                    }
-                },
-                error: function () {
-                    swal.fire("Oops", "No connection!", "error");
-                }
-            });
+            simpan('/delik/hapus', {dtjwb_id: id}, null, null);
         });
     });
 
-    /* ---------------- simpan satu kolom ---------------- */
+    /* --------------------------- tujuan --------------------------- */
 
-    function simpan(kolom, nilai, modal, $form) {
-        $.ajax({
-            url: base_url + "/delik/simpantilik",
-            type: "POST",
-            dataType: "json",
-            data: {
-                jwb_id: jwb_id,
-                dtjwb_id: dtjwb_id,
-                kolom: kolom,
-                nilai: nilai
-            },
-            beforeSend: function () {
-                $(modal).modal('hide');
-                swal.fire({
-                    title: 'Menyimpan...',
-                    allowEscapeKey: false,
-                    allowOutsideClick: false,
-                    onOpen: function () {
-                        swal.showLoading();
-                    }
-                });
-            },
-            success: function (data) {
-                swal.close();
-                if (data.status) {
-                    tiliklist.ajax.reload();
-                    swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil!',
-                        text: 'Data telah tersimpan.',
-                        showConfirmButton: false,
-                        timer: 1200
-                    });
-                } else {
-                    swal.fire("Oops", data.pesan || "Gagal!", "error");
-                }
-                if ($form) {
-                    $form.formValidation('disableSubmitButtons', false).formValidation('resetForm', true);
-                }
-            },
-            error: function () {
-                swal.close();
-                swal.fire("Oops", "No connection!", "error");
-                if ($form) {
-                    $form.formValidation('disableSubmitButtons', false).formValidation('resetForm', true);
-                }
-            }
-        });
-    }
-
-    function pasangForm(id, kolom, modal, input) {
-        $(id).formValidation({
-            framework: "bootstrap4",
-            excluded: [':disabled'],
-            err: {clazz: 'invalid-feedback'},
-            control: {valid: 'is-valid', invalid: 'is-invalid'},
-            row: {invalid: 'has-danger'}
-        }).on('success.form.fv', function (e) {
-            e.preventDefault();
-            var $form = $(e.target);
-            simpan(kolom, $(input).val(), modal, $form);
-            return false;
-        });
-    }
-
-    pasangForm('#formhasil', 'jwb_hasil', '#editHasilModal', '#edit_dtjwb_hasil');
-    pasangForm('#formtemuan', 'jwb_temuan', '#editTemuanModal', '#edit_dtjwb_temuan');
-    pasangForm('#formcatatan', 'jwb_catatan', '#editCatatanModal', '#edit_dtjwb_catatan');
-
-    /* ---------------- tujuan (tingkat pertanyaan) ---------------- */
-
-    $('#edittujuan').on('click', function () {
-        $('#tujuanModal').modal('show');
+    $('#tujuan_edit').on('click', function () {
+        $('#tujuan_tampil').hide();
+        $('#tujuan_ubah').show();
+        $('#tujuan_isi').focus();
     });
 
-    $("#formtujuan").formValidation({
-        framework: "bootstrap4",
-        excluded: [':disabled'],
-        err: {clazz: 'invalid-feedback'},
-        control: {valid: 'is-valid', invalid: 'is-invalid'},
-        row: {invalid: 'has-danger'}
-    }).on('success.form.fv', function (e) {
-        e.preventDefault();
+    $('#tujuan_batal').on('click', function () {
+        $('#tujuan_ubah').hide();
+        $('#tujuan_tampil').show();
+    });
 
-        var $form = $(e.target);
-        var formData = new FormData(e.target);
+    $('#tujuan_simpan').on('click', function () {
+        var tombol = $(this);
+        var teks = String($('#tujuan_isi').val() || '').trim();
 
         $.ajax({
             url: base_url + "/delik/tujuan",
             type: "POST",
-            data: formData,
-            processData: false,
-            contentType: false,
-            beforeSend: function () {
-                $("#tujuanModal").modal('hide');
-                swal.fire({
-                    title: 'Menyimpan...',
-                    allowEscapeKey: false,
-                    allowOutsideClick: false,
-                    onOpen: function () {
-                        swal.showLoading();
-                    }
-                });
+            dataType: "json",
+            data: {
+                audit_id: tombol.attr('audit_id'),
+                dtform_id: tombol.attr('dtform_id'),
+                jwb_tujuan: teks
             },
-            success: function (data) {
+            beforeSend: function () { muat(); },
+            success: function (hasil) {
                 swal.close();
-                var list = data == null ? [] : (data instanceof Array ? data : [data]);
-                $.each(list, function (index, res) {
-                    if (res.status) {
-                        swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil!',
-                            text: 'Tujuan telah tersimpan.',
-                            showConfirmButton: false,
-                            timer: 1500
-                        }).then(function () {
-                            window.location.reload();
-                        });
-                    } else {
-                        swal.fire("Oops", res.pesan, "error");
-                    }
+                if (!hasil || !hasil.status) {
+                    pesan('Oops', (hasil && hasil.pesan) || 'Gagal menyimpan tujuan.', 'error');
+                    return;
+                }
+                $('#tujuan_teks').html(teks === ''
+                    ? '<span class="text-muted">Belum ada tujuan untuk pertanyaan ini.</span>'
+                    : $('<div/>').text(teks).html().replace(/\n/g, '<br>'));
+                $('#tujuan_ubah').hide();
+                $('#tujuan_tampil').show();
+                swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Tujuan telah tersimpan.',
+                    showConfirmButton: false,
+                    timer: 1200
                 });
-                $form.formValidation('disableSubmitButtons', false).formValidation('resetForm', true);
             },
             error: function () {
                 swal.close();
-                swal.fire("Oops", "No connection!", "error");
-                $form.formValidation('disableSubmitButtons', false).formValidation('resetForm', true);
+                pesan('Oops', 'Tidak dapat menghubungi server.', 'error');
             }
         });
-
-        return false;
     });
 
-    /* ---------------- kembali ---------------- */
+    /* --------------------------- kembali --------------------------- */
 
     $('#kembali').on('click', function () {
         var id = $(this).attr('audit_id');

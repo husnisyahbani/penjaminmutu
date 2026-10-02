@@ -145,6 +145,13 @@ class FormulirModel extends CI_Model {
         return($this->db->affected_rows() != 1) ? false : true;
     }
 
+    /** Satu pertanyaan (detailform) - dipakai halaman daftar tilik. */
+    function getSoalFormulir($dtform_id) {
+        $this->db->from('detailform');
+        $this->db->where('dtform_id', $dtform_id);
+        return $this->db->get()->row_array();
+    }
+
     function getFormulir($id) {
         $this->db->where('form_id',$id);
         $this->db->from('formulir');

@@ -5,13 +5,15 @@ class Delik extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditor';
-        $this->load->js(base_url("assets/app/auditor/delik.js?v=3.0"));
+        $this->load->js(base_url("assets/app/auditor/delik.js?v=4.0"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
         $this->load->model('DtjwbModel', 'dtjwb');
         $this->load->model('AkunModel', 'akun');
         $this->load->model('FormulirModel', 'formulir');
+        // Pembantu teks butir (lingkup_bersihkan) untuk daftar tilik.
+        $this->load->helper('lingkup');
 
         $role = $this->session->userdata('role');
         if (!isset($role) || $role != 'AUDITOR') {
@@ -30,6 +32,23 @@ class Delik extends MY_Controller {
             $this->data['jwb_id'] = $this->dtjwb->getJwbid($audit_id,$dtform_id);
             $this->data['result'] = $this->mutu->getAuditById($audit_id);
             $this->data['jawab'] = $this->auditjawab->getAuditJawab($audit_id,$dtform_id);
+            $this->data['soal'] = $this->formulir->getSoalFormulir($dtform_id);
+
+            /* Ringkasan kartu: jumlah butir tilik per jenis penilaian.
+               Sumbernya tabel yang sama dengan tabel di bawah. */
+            $butir = $this->dtjwb->butirAudit($this->data['jwb_id']);
+            $ringkas = array('total' => count($butir), 'sesuai' => 0, 'observasi' => 0,
+                             'minor' => 0, 'mayor' => 0);
+            foreach ($butir as $b) {
+                switch (strtoupper(trim((string) $b['dtjwb_temuan']))) {
+                    case 'S':        $ringkas['sesuai']++;    break;
+                    case 'OB':       $ringkas['observasi']++; break;
+                    case 'TS MINOR': $ringkas['minor']++;     break;
+                    case 'TS MAYOR': $ringkas['mayor']++;     break;
+                }
+            }
+            $this->data['ringkas'] = $ringkas;
+
             $this->data['js'] = $this->load->get_js_files();
             $this->data['audit'] = 'active';
             $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
@@ -160,6 +179,77 @@ class Delik extends MY_Controller {
             : array('status' => FALSE, 'pesan' => 'Gagal menyimpan.'));
     }
 
+    /**
+     * Ringkasan kartu (Sesuai / Observasi / Minor / Mayor) untuk satu
+     * pertanyaan - dipakai setelah tambah/ubah/hapus butir.
+     */
+    public function ringkasan($jwb_id = NULL) {
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
+
+        $butir = $this->dtjwb->butirAudit($jwb_id);
+        $total = count($butir);
+        $hitung = array('S' => 0, 'OB' => 0, 'TS MINOR' => 0, 'TS MAYOR' => 0);
+        foreach ($butir as $b) {
+            $kunci = strtoupper(trim((string) $b['dtjwb_temuan']));
+            if (isset($hitung[$kunci])) {
+                $hitung[$kunci]++;
+            }
+        }
+
+        $persen = function ($nilai) use ($total) {
+            return $total < 1 ? 0 : (int) round($nilai * 100 / $total);
+        };
+
+        $kartu = array();
+        foreach (array('S' => 'sesuai', 'OB' => 'observasi', 'TS MINOR' => 'minor', 'TS MAYOR' => 'mayor') as $kode => $nama) {
+            $kartu[] = array('nama' => $nama, 'nilai' => $hitung[$kode], 'bar' => $persen($hitung[$kode]));
+        }
+
+        echo json_encode(array(
+            'status' => TRUE,
+            'total'  => $total,
+            'kartu'  => $kartu,
+        ));
+    }
+
+    /**
+     * Simpan satu kolom isian butir tilik (dtjwb_hasil | dtjwb_temuan |
+     * dtjwb_catatan). Dipakai ikon edit pada masing-masing kolom tabel.
+     */
+    public function simpanbutir() {
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
+
+        $jwb_id   = $this->input->post('jwb_id');
+        $dtjwb_id = $this->input->post('dtjwb_id');
+        $kolom    = $this->input->post('kolom');
+        $nilai    = $this->input->post('nilai');
+
+        $diizinkan = array('dtjwb_hasil', 'dtjwb_temuan', 'dtjwb_catatan');
+        if (!in_array($kolom, $diizinkan, TRUE)) {
+            echo json_encode(array('status' => FALSE, 'pesan' => 'Kolom tidak dikenal.'));
+            return;
+        }
+
+        if ($kolom === 'dtjwb_temuan' && $nilai !== ''
+                && !in_array($nilai, array('S', 'OB', 'TS MINOR', 'TS MAYOR'), TRUE)) {
+            echo json_encode(array('status' => FALSE, 'pesan' => 'Temuan tidak dikenal.'));
+            return;
+        }
+
+        $baris = $this->dtjwb->getNilai($jwb_id, $dtjwb_id);
+        if (!$baris) {
+            echo json_encode(array('status' => FALSE, 'pesan' => 'Butir tilik tidak ditemukan.'));
+            return;
+        }
+
+        $status = $this->dtjwb->edit(array('dtjwb_id' => $dtjwb_id, $kolom => $nilai));
+        echo json_encode($status
+            ? array('status' => TRUE, 'pesan' => 'Tersimpan.')
+            : array('status' => FALSE, 'pesan' => 'Gagal menyimpan.'));
+    }
+
     public function listdelik($id) {
         $post = array();
         $post['search'] = $this->input->post('search');
@@ -172,32 +262,57 @@ class Delik extends MY_Controller {
         $list = $this->dtjwb->get_datatables($post['length'], $post['start'], $post['search'], $post['order'],$id);
         $data = array();
         $no = $this->input->post('start');
+        $warna = array('S' => 'badge-success', 'OB' => 'badge-info',
+                       'TS MINOR' => 'badge-warning', 'TS MAYOR' => 'badge-danger');
         foreach ($list as $field) {
             $no++;
+            $temuan = strtoupper(trim((string) $field->dtjwb_temuan));
+            $kelas  = isset($warna[$temuan]) ? $warna[$temuan] : 'badge-default';
+
+            /* Referensi dituliskan di bawah isian pada kolom Butir Lingkup. */
+            $butir = '<div class="tilik-butir">' . html_escape(lingkup_bersihkan($field->dtjwb_pertanyaan));
+            if (trim((string) $field->dtjwb_referensi) !== '') {
+                $butir .= '<div class="tilik-ref"><strong>Referensi:</strong> '
+                    . html_escape(lingkup_bersihkan($field->dtjwb_referensi)) . '</div>';
+            }
+            $butir .= '</div>';
+
             $row = array();
             $row[] = $no;
-            $row[] = html_escape($field->dtjwb_pertanyaan);
-            $row[] = $field->jwb_hasil;
-            $row[] = $field->jwb_temuan ? '<span class="badge badge-warning">' . html_escape($field->jwb_temuan) . '</span>' : '';
-            $row[] = $field->jwb_catatan;
+            $row[] = $butir;
+            $row[] = '<div class="tilik-nilai">'
+                . '<span class="tilik-teks">' . html_escape(lingkup_bersihkan($field->dtjwb_hasil)) . '</span>'
+                . ' <button type="button" class="editisi btn btn-xs btn-icon btn-primary"'
+                . ' data-info="Ubah hasil" dtjwb_id="' . (int) $field->dtjwb_id . '"'
+                . ' data-kolom="dtjwb_hasil" data-nilai="' . html_escape($field->dtjwb_hasil) . '">'
+                . '<i class="icon md-edit" aria-hidden="true"></i></button></div>';
+            $row[] = '<div class="tilik-nilai">'
+                . '<span class="badge ' . $kelas . '">' . html_escape($temuan) . '</span>'
+                . ' <button type="button" class="editisi btn btn-xs btn-icon btn-warning"'
+                . ' data-info="Ubah temuan" dtjwb_id="' . (int) $field->dtjwb_id . '"'
+                . ' data-kolom="dtjwb_temuan" data-nilai="' . html_escape($temuan) . '">'
+                . '<i class="icon md-edit" aria-hidden="true"></i></button></div>';
+            $row[] = '<div class="tilik-nilai">'
+                . '<span class="tilik-teks">' . html_escape(lingkup_bersihkan($field->dtjwb_catatan)) . '</span>'
+                . ' <button type="button" class="editisi btn btn-xs btn-icon btn-success"'
+                . ' data-info="Ubah catatan" dtjwb_id="' . (int) $field->dtjwb_id . '"'
+                . ' data-kolom="dtjwb_catatan" data-nilai="' . html_escape($field->dtjwb_catatan) . '">'
+                . '<i class="icon md-edit" aria-hidden="true"></i></button></div>';
 
-            // Tombol per butir: ubah pertanyaan, isi Hasil / Temuan / Catatan, hapus.
-            $aksi = '<button type="button" class="editpertanyaan btn btn-sm btn-icon btn-default"'
-                . ' data-info="Ubah butir tilik ini" dtjwb_id="' . (int) $field->dtjwb_id . '">'
-                . '<i class="icon md-edit" aria-hidden="true"></i></button>'
-                . ' <button type="button" class="edithasil btn btn-sm btn-icon btn-primary"'
-                . ' data-info="Isi hasil penilaian butir ini" dtjwb_id="' . (int) $field->dtjwb_id . '">'
-                . '<i class="icon md-plus" aria-hidden="true"></i></button>'
-                . ' <button type="button" class="edittemuan btn btn-sm btn-icon btn-warning"'
-                . ' data-info="Tetapkan temuan butir ini" dtjwb_id="' . (int) $field->dtjwb_id . '">'
-                . '<i class="icon md-flag" aria-hidden="true"></i></button>'
-                . ' <button type="button" class="editcatatan btn btn-sm btn-icon btn-success"'
-                . ' data-info="Isi catatan/tindak lanjut butir ini" dtjwb_id="' . (int) $field->dtjwb_id . '">'
-                . '<i class="icon md-comment" aria-hidden="true"></i></button>'
-                . ' <button type="button" class="hapustilik btn btn-sm btn-icon btn-danger"'
+            /* Kolom Butir Lingkup disunting lewat ikon di dalam selnya: satu
+               formulir mengubah pertanyaan sekaligus referensinya. */
+            $row[1] = '<div class="tilik-butir-kotak">' . $butir
+                . ' <button type="button" class="editbutir btn btn-xs btn-icon btn-primary"'
+                . ' data-info="Ubah pertanyaan & referensi" dtjwb_id="' . (int) $field->dtjwb_id . '"'
+                . ' data-pertanyaan="' . html_escape($field->dtjwb_pertanyaan) . '"'
+                . ' data-referensi="' . html_escape($field->dtjwb_referensi) . '">'
+                . '<i class="icon md-edit" aria-hidden="true"></i></button></div>';
+
+            /* Aksi: tombol hapus saja. */
+            $row[] = '<div class="tabel-aksi">'
+                . '<button type="button" class="hapustilik btn btn-sm btn-icon btn-danger"'
                 . ' data-info="Hapus butir tilik ini" dtjwb_id="' . (int) $field->dtjwb_id . '">'
-                . '<i class="icon md-delete" aria-hidden="true"></i></button>';
-            $row[] = '<div class="tabel-aksi">' . $aksi . '</div>';
+                . '<i class="icon md-delete" aria-hidden="true"></i></button></div>';
             $data[] = $row;
         }
 
