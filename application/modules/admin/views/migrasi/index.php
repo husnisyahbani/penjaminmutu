@@ -57,6 +57,10 @@
                                     <td><strong><?php echo (int) $status['jml_jawaban_lama']; ?></strong></td>
                                 </tr>
                                 <tr>
+                                    <td>Kolom jawaban per butir <code>auditjawabdetail.dtjwb_jawaban</code></td>
+                                    <td><?php echo $status['jawaban_tilik'] ? '<span class="badge badge-success">sudah ada</span>' : '<span class="badge badge-default">belum ada</span>'; ?></td>
+                                </tr>
+                                <tr>
                                     <td>Kolom koreksi per butir <code>auditjawabdetail.dtjwb_koreksi</code></td>
                                     <td><?php echo $status['koreksi_butir'] ? '<span class="badge badge-success">sudah ada</span>' : '<span class="badge badge-default">belum ada</span>'; ?></td>
                                 </tr>
@@ -72,8 +76,8 @@
                             <button type="button" class="btn btn-primary" id="jalankan">
                                 <i class="icon md-refresh" aria-hidden="true"></i>Jalankan Migrasi
                             </button>
-                            <button type="button" class="btn btn-info" id="siapkankoreksi" <?php echo $status['koreksi_butir'] ? 'disabled' : ''; ?>>
-                                <i class="icon md-plus" aria-hidden="true"></i>Siapkan Kolom Koreksi Butir
+                            <button type="button" class="btn btn-info" id="siapkankoreksi" <?php echo ($status['koreksi_butir'] && $status['jawaban_tilik']) ? 'disabled' : ''; ?>>
+                                <i class="icon md-plus" aria-hidden="true"></i>Siapkan Kolom Tilik (jawaban &amp; koreksi)
                             </button>
                             <button type="button" class="btn btn-danger" id="hapuskolom" <?php echo $status['kolom_lama'] ? '' : 'disabled'; ?>>
                                 <i class="icon md-delete" aria-hidden="true"></i>Hapus Kolom Lama

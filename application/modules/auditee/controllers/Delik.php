@@ -63,7 +63,20 @@ class Delik extends MY_Controller {
                 }
             }
             $this->data['ringkas'] = $ringkas;
-            $this->data['jml_lingkup'] = $this->lingkup->hitung($dtform_id);
+            /* Jumlah & daftar butir mengikuti tabel tilik; tabel lingkup
+               hanya dipakai bila strukturnya memang terisi. */
+            $jml_lingkup = $this->lingkup->hitung($dtform_id);
+            if ($jml_lingkup < 1 && !empty($butir)) {
+                $jml_lingkup = count($butir);
+            }
+            $this->data['jml_lingkup'] = $jml_lingkup;
+            if (trim((string) $this->data['lingkup']) === '' && !empty($butir)) {
+                $item = '';
+                foreach ($butir as $b) {
+                    $item .= '<li>' . html_escape(lingkup_bersihkan($b['lingkup_isi'])) . '</li>';
+                }
+                $this->data['lingkup'] = '<ol class="lingkup-daftar">' . $item . '</ol>';
+            }
 
             /* Rencana koreksi hanya dapat diisi setelah audit selesai. */
             $status_audit = strtoupper(trim((string) $this->data['result']['audit_status']));

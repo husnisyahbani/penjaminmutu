@@ -46,9 +46,9 @@ $(function () {
     });
 
     $('#siapkankoreksi').on('click', function () {
-        kirim('/migrasi/kolomkoreksi',
-            'Siapkan Kolom Koreksi Butir?',
-            'Kolom auditjawabdetail.dtjwb_koreksi ditambahkan supaya rencana koreksi tersimpan per butir, bukan satu teks untuk satu pertanyaan.',
+        kirim('/migrasi/kolomtilik',
+            'Siapkan Kolom Tilik?',
+            'Kolom jawaban (dtjwb_jawaban) dan koreksi (dtjwb_koreksi) per butir tilik ditambahkan, dan lampiran menempel pada butir tilik.',
             'Ya, Siapkan!',
             'Kolom Siap');
     });

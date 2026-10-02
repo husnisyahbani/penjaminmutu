@@ -2,8 +2,9 @@
 /**
  * Detail audit (auditee).
  *
- * Setiap pertanyaan = satu topik (gaya kursus), setiap butir lingkup wajib
- * dijawab dan boleh dilengkapi lampiran (boleh lebih dari satu berkas).
+ * Setiap pertanyaan = satu topik (gaya kursus), setiap butir tilik
+ * (mutu_auditjawabdetail) wajib dijawab dan boleh dilengkapi lampiran
+ * (boleh lebih dari satu berkas).
  *
  * Data dari controller: $result, $audit_id, $topik, $lampiran_siap,
  * $sudah_terkirim (jawaban dikunci bila status bukan DRAFT), $status_audit.
@@ -53,7 +54,7 @@ $jml_belum = $jml_lingkup - $jml_dijawab;
                             <div class="panel-aksi">
                                 <div class="filter-kotak">
                                     <label for="cari_topik"><i class="icon md-search" aria-hidden="true"></i>Cari</label>
-                                    <input type="text" class="form-control" id="cari_topik" placeholder="Cari pertanyaan atau lingkup">
+                                    <input type="text" class="form-control" id="cari_topik" placeholder="Cari pertanyaan atau butir tilik">
                                 </div>
                                 <div class="panel-aksi__tombol">
                                     <a href="<?php echo base_url('auditee/dashboard'); ?>" class="btn btn-sm btn-default">
@@ -73,7 +74,7 @@ $jml_belum = $jml_lingkup - $jml_dijawab;
 
                         <div class="topik-ringkas mb-15">
                             <span class="badge badge-info"><?php echo (int) $jml_topik; ?> pertanyaan</span>
-                            <span class="badge badge-info" id="jml_lingkup"><?php echo (int) $jml_lingkup; ?> lingkup</span>
+                            <span class="badge badge-info" id="jml_lingkup"><?php echo (int) $jml_lingkup; ?> butir tilik</span>
                             <span class="badge badge-success" id="jml_dijawab"><?php echo (int) $jml_dijawab; ?> sudah dijawab</span>
                             <span class="badge badge-warning" id="sisa_belum"><?php echo (int) $jml_belum; ?> belum dijawab</span>
                             <span class="badge badge-default" id="jml_lampiran"><?php echo (int) $jml_lampiran; ?> lampiran</span>
@@ -88,14 +89,14 @@ $jml_belum = $jml_lingkup - $jml_dijawab;
                         </div>
                         <?php elseif ($jml_belum > 0): ?>
                         <div class="alert alert-warning" role="alert" id="peringatan_belum">
-                            Setiap lingkup <strong>wajib dijawab</strong>. Masih ada
-                            <strong><?php echo (int) $jml_belum; ?> lingkup</strong> yang belum dijawab; hasil
+                            Setiap butir tilik <strong>wajib dijawab</strong>. Masih ada
+                            <strong><?php echo (int) $jml_belum; ?> butir tilik</strong> yang belum dijawab; hasil
                             evaluasi baru dapat dikirim setelah semuanya terjawab. Lampiran bersifat opsional dan
                             boleh lebih dari satu berkas.
                         </div>
                         <?php elseif (!$lampiran_siap): ?>
                         <div class="alert alert-info" role="alert">
-                            Seluruh lingkup sudah dijawab. Fitur lampiran belum disiapkan pada database ini
+                            Seluruh butir tilik sudah dijawab. Fitur lampiran belum disiapkan pada database ini
                             (impor <code>database/lampiran_lingkup.sql</code>).
                         </div>
                         <?php endif; ?>
@@ -115,7 +116,7 @@ $jml_belum = $jml_lingkup - $jml_dijawab;
                                     <h4 class="topik-judul">
                                         <?php echo html_escape($t['teks']); ?>
                                         <span class="topik-info">
-                                            <span class="badge badge-info"><?php echo (int) $t['jml_butir']; ?> lingkup</span>
+                                            <span class="badge badge-info"><?php echo (int) $t['jml_butir']; ?> butir tilik</span>
                                             <span class="badge topik-dijawab <?php echo ($t['jml_dijawab'] >= $t['jml_butir'] && $t['jml_butir'] > 0) ? 'badge-success' : 'badge-warning'; ?>">
                                                 <?php echo (int) $t['jml_dijawab']; ?>/<?php echo (int) $t['jml_butir']; ?> dijawab
                                             </span>
@@ -148,11 +149,14 @@ $jml_belum = $jml_lingkup - $jml_dijawab;
                                         $koreksi = $potong($b['jwb_koreksi'], 180);
                                         $ada = ($hasil !== '' || $temuan !== '' || $catatan !== '' || $koreksi !== '');
                                     ?>
-                                    <div class="aktivitas" data-lingkup_id="<?php echo (int) $b['lingkup_id']; ?>"
-                                         data-cari="<?php echo html_escape(strtolower($b['lingkup_teks'] . ' ' . $hasil . ' ' . $temuan . ' ' . $catatan . ' ' . $koreksi)); ?>">
+                                    <div class="aktivitas" data-dtjwb_id="<?php echo (int) $b['dtjwb_id']; ?>"
+                                         data-cari="<?php echo html_escape(strtolower($b['dtjwb_teks'] . ' ' . $b['dtjwb_referensi'] . ' ' . $hasil . ' ' . $temuan . ' ' . $catatan . ' ' . $koreksi)); ?>">
                                         <i class="icon md-assignment aktivitas-ikon" aria-hidden="true"></i>
                                         <div class="aktivitas-isi">
-                                            <span class="aktivitas-teks"><?php echo html_escape($b['lingkup_teks']); ?></span>
+                                            <span class="aktivitas-teks"><?php echo html_escape($b['dtjwb_teks']); ?></span>
+                                            <?php if (trim((string) $b['dtjwb_referensi']) !== ''): ?>
+                                            <span class="aktivitas-referensi text-muted"><?php echo html_escape($b['dtjwb_referensi']); ?></span>
+                                            <?php endif; ?>
 
                                             <div class="aktivitas-status">
                                                 <span class="badge <?php echo $terjawab ? 'badge-success' : 'badge-danger'; ?> status-jawab">
@@ -193,12 +197,12 @@ $jml_belum = $jml_lingkup - $jml_dijawab;
                                                         <?php endif; ?>
                                                     </div>
                                                 <?php else: ?>
-                                                    <label class="jawaban-label" for="jawab_<?php echo (int) $b['lingkup_id']; ?>">
-                                                        Jawaban <span class="text-danger">*</span>
+                                                    <label class="jawaban-label" for="jawab_<?php echo (int) $b['dtjwb_id']; ?>">
+                                                        Jawaban butir tilik <span class="text-danger">*</span>
                                                     </label>
                                                     <textarea class="form-control jawaban-isi" rows="2"
-                                                        id="jawab_<?php echo (int) $b['lingkup_id']; ?>"
-                                                        placeholder="Tulis jawaban untuk lingkup ini (wajib diisi)"><?php echo html_escape(lingkup_bersihkan($b['jwb_jawaban'])); ?></textarea>
+                                                        id="jawab_<?php echo (int) $b['dtjwb_id']; ?>"
+                                                        placeholder="Tulis jawaban untuk butir tilik ini (wajib diisi)"><?php echo html_escape(lingkup_bersihkan($b['jwb_jawaban'])); ?></textarea>
                                                     <div class="jawaban-aksi">
                                                         <button type="button" class="btn btn-sm btn-primary jawaban-simpan">
                                                             <i class="icon md-check" aria-hidden="true"></i>Simpan Jawaban
@@ -248,7 +252,7 @@ $jml_belum = $jml_lingkup - $jml_dijawab;
                                     <?php endforeach; ?>
 
                                     <?php if (empty($t['butir'])): ?>
-                                    <div class="aktivitas-kosong">Belum ada lingkup pada pertanyaan ini.</div>
+                                    <div class="aktivitas-kosong">Belum ada butir tilik pada pertanyaan ini. Butir dibuat dari halaman auditor (Daftar Tilik) atau admin.</div>
                                     <?php endif; ?>
                                 </div>
                             </section>

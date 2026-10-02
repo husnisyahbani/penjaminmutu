@@ -20,7 +20,8 @@
 CREATE TABLE IF NOT EXISTS `mutu_lampiran` (
   `lampiran_id`     int(11) NOT NULL AUTO_INCREMENT,
   `audit_id`        int(11) NOT NULL,
-  `lingkup_id`      int(11) NOT NULL,
+  `dtjwb_id`        int(11) DEFAULT NULL,
+  `lingkup_id`      int(11) DEFAULT NULL,
   `users_id`        int(11) DEFAULT NULL,
   `lampiran_nama`   varchar(255) NOT NULL,
   `lampiran_asli`   varchar(255) NOT NULL,
@@ -28,21 +29,31 @@ CREATE TABLE IF NOT EXISTS `mutu_lampiran` (
   `lampiran_ukuran` int(11) NOT NULL DEFAULT 0,
   `lampiran_create` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`lampiran_id`),
+  PRIMARY KEY (`lampiran_id`),
   KEY `lampiran_audit_id` (`audit_id`),
+  KEY `lampiran_dtjwb_id` (`dtjwb_id`),
   KEY `lampiran_lingkup_id` (`lingkup_id`),
   CONSTRAINT `lampiran_audit_id` FOREIGN KEY (`audit_id`)
-      REFERENCES `mutu_audit` (`audit_id`) ON DELETE CASCADE,
-  CONSTRAINT `lampiran_lingkup_id` FOREIGN KEY (`lingkup_id`)
-      REFERENCES `mutu_lingkup` (`lingkup_id`) ON DELETE CASCADE
+      REFERENCES `mutu_audit` (`audit_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Tabel versi lama (sebelum ada kolom dtjwb_id) dapat disesuaikan dengan:
+--   ALTER TABLE `mutu_lampiran`
+--     ADD COLUMN `dtjwb_id` int(11) DEFAULT NULL AFTER `audit_id`,
+--     ADD KEY `lampiran_dtjwb_id` (`dtjwb_id`),
+--     MODIFY `lingkup_id` int(11) DEFAULT NULL;
+-- atau lewat tombol "Siapkan Kolom Tilik" pada menu PPM > Migrasi Lingkup.
 
 -- Catatan:
 -- - ON DELETE CASCADE: lampiran ikut terhapus bila audit atau lingkupnya
 --   dihapus, sehingga tidak ada berkas yatim di database.
 -- - Menghapus baris di tabel ini tidak menghapus berkas fisik; aplikasi
 --   menghapus berkasnya lebih dahulu (lihat LampiranModel::hapus()).
--- - Jawaban tiap lingkup disimpan pada `mutu_auditjawab`.`jwb_jawaban`
---   (baris dengan `lingkup_id` terisi), jadi tidak perlu kolom baru.
+-- - Lampiran menempel pada BUTIR TILIK (`dtjwb_id` ->
+--   mutu_auditjawabdetail), pilihan yang dipakai halaman detail audit.
+--   Kolom `lingkup_id` tetap ada untuk data lama (struktur lingkup).
+-- - Jawaban tiap butir tilik disimpan pada
+--   `mutu_auditjawabdetail`.`dtjwb_jawaban` (lihat database/jawaban_tilik.sql).
 
 -- ---------------------------------------------------------------------------
 -- Bila ingin membatalkan:

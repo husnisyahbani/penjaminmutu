@@ -102,6 +102,29 @@ class LingkupModel extends CI_Model {
         return $this->db->field_exists('dtjwb_koreksi', $this->t_jawab_det);
     }
 
+    /** Kolom jawaban auditee per butir tilik sudah ada? */
+    function jawabanTilikSiap() {
+        return $this->db->field_exists('dtjwb_jawaban', $this->t_jawab_det);
+    }
+
+    /** Tambah kolom jawaban auditee per butir tilik (dtjwb_jawaban). */
+    function installJawabanTilik() {
+        if ($this->jawabanTilikSiap()) {
+            return TRUE;
+        }
+        if (in_array($this->db->dbdriver, array('sqlite', 'sqlite3'), TRUE)) {
+            $this->db->query('ALTER TABLE ' . $this->db->protect_identifiers($this->t_jawab_det, TRUE)
+                . ' ADD COLUMN dtjwb_jawaban TEXT');
+            return $this->jawabanTilikSiap();
+        }
+
+        $this->load->dbforge();
+        $this->dbforge->add_column($this->t_jawab_det, array(
+            'dtjwb_jawaban' => array('type' => 'TEXT', 'null' => TRUE, 'after' => 'dtjwb_pertanyaan'),
+        ));
+        return $this->jawabanTilikSiap();
+    }
+
     /**
      * Tambah kolom rencana koreksi per butir pada tabel tilik lama
      * (auditjawabdetail.dtjwb_koreksi). Halaman PTK dan delik memakai kolom
@@ -620,6 +643,7 @@ class LingkupModel extends CI_Model {
             'kolom_jawab'     => $this->kolomJawabSiap(),
             'kolom_lama'      => $this->kolomLamaAda(),
             'koreksi_butir'   => $this->koreksiButirSiap(),
+            'jawaban_tilik'   => $this->jawabanTilikSiap(),
             'jml_dtform'      => 0,
             'jml_butir'       => 0,
             'jml_jawaban_butir' => 0,

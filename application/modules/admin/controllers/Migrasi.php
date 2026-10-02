@@ -14,7 +14,7 @@ class Migrasi extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'admin';
-        $this->load->js(base_url("assets/app/admin/migrasi.js?v=1.1"));
+        $this->load->js(base_url("assets/app/admin/migrasi.js?v=1.2"));
         $this->load->model('LingkupModel', 'lingkup');
 
         $role = $this->session->userdata('role');
@@ -82,6 +82,44 @@ class Migrasi extends MY_Controller {
      * Tambah kolom rencana koreksi per butir (auditjawabdetail.dtjwb_koreksi).
      * Aman dijalankan berulang kali: bila kolomnya sudah ada, tidak berubah.
      */
+    public function kolomtilik() {
+        $this->output->set_content_type('application/json');
+
+        $this->load->model('LampiranModel', 'lampiran');
+
+        $koreksi  = $this->lingkup->koreksiButirSiap();
+        $jawaban  = $this->lingkup->jawabanTilikSiap();
+        $lampiran = $this->lampiran->butirSiap();
+
+        $ok_koreksi = $this->lingkup->installKoreksiButir();
+        $ok_jawaban = $this->lingkup->installJawabanTilik();
+        $ok_lampiran = TRUE;
+        if ($this->lampiran->siap()) {
+            $this->lampiran->install();
+            $ok_lampiran = $this->lampiran->butirSiap();
+        }
+
+        $pesan = array();
+        $pesan[] = $ok_koreksi
+            ? ($koreksi ? 'Kolom koreksi per butir sudah ada.' : 'Kolom koreksi per butir ditambahkan.')
+            : 'Kolom koreksi per butir gagal ditambahkan.';
+        $pesan[] = $ok_jawaban
+            ? ($jawaban ? 'Kolom jawaban per butir sudah ada.' : 'Kolom jawaban per butir ditambahkan.')
+            : 'Kolom jawaban per butir gagal ditambahkan.';
+        $pesan[] = !$this->lampiran->siap()
+            ? 'Tabel lampiran belum ada (impor database/lampiran_lingkup.sql bila ingin memakai lampiran).'
+            : ($ok_lampiran
+                ? ($lampiran ? 'Lampiran sudah menempel pada butir tilik.' : 'Lampiran kini menempel pada butir tilik.')
+                : 'Kolom lampiran per butir gagal ditambahkan.');
+
+        echo json_encode(array(
+            'status'  => ($ok_koreksi && $ok_jawaban && $ok_lampiran),
+            'pesan'   => implode(' ', $pesan),
+            'ringkas' => $this->lingkup->status(),
+        ));
+    }
+
+    /** Nama lama (menu Migrasi sebelum kolom jawaban & lampiran ditambahkan). */
     public function kolomkoreksi() {
         $this->output->set_content_type('application/json');
 

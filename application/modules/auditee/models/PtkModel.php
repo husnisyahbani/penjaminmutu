@@ -71,7 +71,9 @@ class PtkModel extends CI_Model {
         if (isset($ordering[0]['column']) && isset($this->column_order[$ordering[0]['column']])) {
             $this->db->order_by($this->column_order[$ordering[0]['column']], $ordering[0]['dir']);
         } else {
-            $this->db->order_by('dt.dtform_urut', 'asc');
+            if ($this->db->field_exists('dtform_urut', 'detailform')) {
+                $this->db->order_by('dt.dtform_urut', 'asc');
+            }
             $this->db->order_by('dj.dtjwb_id', 'asc');
         }
     }
@@ -86,7 +88,10 @@ class PtkModel extends CI_Model {
     private function _query_ptk($dtform_id = NULL, $termasuk_s = FALSE) {
         $this->db->select('au.audit_id, au.audit_status, au.form_id');
         $this->db->select('f.form_nama');
-        $this->db->select('dt.dtform_id, dt.dtform_urut, dt.dtform_pertanyaan');
+        $this->db->select('dt.dtform_id, dt.dtform_pertanyaan');
+        if ($this->db->field_exists('dtform_urut', 'detailform')) {
+            $this->db->select('dt.dtform_urut');
+        }
         $this->db->select('dj.dtjwb_id, dj.dtjwb_pertanyaan, dj.dtjwb_hasil, dj.dtjwb_temuan, dj.dtjwb_catatan');
         $this->db->select('jb.jwb_id');
         /* Nama kunci disamakan dengan kolom tabel (lingkup_isi, jwb_*) supaya
@@ -131,7 +136,9 @@ class PtkModel extends CI_Model {
     public function daftar($audit_id, $dtform_id = NULL, $termasuk_s = FALSE) {
         $this->_query_ptk($dtform_id, $termasuk_s);
         $this->db->where('au.audit_id', $audit_id);
-        $this->db->order_by('dt.dtform_urut', 'asc');
+        if ($this->db->field_exists('dtform_urut', 'detailform')) {
+            $this->db->order_by('dt.dtform_urut', 'asc');
+        }
         $this->db->order_by('dj.dtjwb_id', 'asc');
         return $this->db->get()->result_array();
     }

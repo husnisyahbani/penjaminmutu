@@ -100,7 +100,7 @@
               <?php if (isset($soal['dtform_urut']) && (int) $soal['dtform_urut'] > 0): ?>
               <span class="badge badge-info">Pertanyaan ke-<?php echo (int) $soal['dtform_urut']; ?></span>
               <?php endif; ?>
-              <span class="badge badge-default"><?php echo $jml_lingkup; ?> butir lingkup</span>
+              <span class="badge badge-default"><?php echo $jml_lingkup; ?> butir tilik</span>
               <?php if (!empty($result['unit'])): ?>
               <span class="badge badge-default"><?php echo html_escape($result['unit']); ?></span>
               <?php endif; ?>
@@ -125,7 +125,7 @@
               <button type="button" class="btn btn-sm btn-default" data-toggle="collapse"
                       data-target="#butir_lingkup" aria-expanded="false" aria-controls="butir_lingkup">
                 <i class="icon md-chevron-down" aria-hidden="true"></i>
-                Lihat <?php echo $jml_lingkup; ?> butir lingkup pertanyaan ini
+                Lihat <?php echo $jml_lingkup; ?> butir tilik pertanyaan ini
               </button>
               <div class="collapse pertanyaan-butir__daftar" id="butir_lingkup">
                 <?php echo $lingkup; ?>

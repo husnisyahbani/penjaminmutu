@@ -1,9 +1,10 @@
 /* =============================================================================
-   Halaman detail audit auditee: jawaban + lampiran tiap lingkup.
+   Halaman detail audit auditee: jawaban + lampiran tiap butir tilik
+   (mutu_auditjawabdetail) pada tiap pertanyaan.
 
-   - Setiap lingkup wajib dijawab (tombol Simpan Jawaban).
-   - Lampiran opsional dan boleh lebih dari satu berkas per lingkup.
-   - Tombol "Kirim Hasil Evaluasi" ditolak server selama masih ada lingkup
+   - Setiap butir tilik wajib dijawab (tombol Simpan Jawaban).
+   - Lampiran opsional dan boleh lebih dari satu berkas per butir.
+   - Tombol "Kirim Hasil Evaluasi" ditolak server selama masih ada butir
      yang belum dijawab, dan pesannya ditampilkan di sini.
    ============================================================================= */
 $(function () {
@@ -55,7 +56,7 @@ $(function () {
         var angka = hitungRingkas();
         var belum = angka.lingkup - angka.dijawab;
 
-        ubahAngka('#jml_lingkup', angka.lingkup + ' lingkup');
+        ubahAngka('#jml_lingkup', angka.lingkup + ' butir tilik');
         ubahAngka('#jml_dijawab', angka.dijawab + ' sudah dijawab');
         ubahAngka('#sisa_belum', belum + ' belum dijawab');
         ubahAngka('#jml_lampiran', angka.lampiran + ' lampiran');
@@ -92,12 +93,12 @@ $(function () {
 
     $('#topik_daftar').on('click', '.jawaban-simpan', function () {
         var baris = $(this).closest('.aktivitas');
-        var lingkup_id = baris.attr('data-lingkup_id');
+        var dtjwb_id = baris.attr('data-dtjwb_id');
         var audit_id = $('#kirim_hasil').attr('audit_id') || $('.delik').first().attr('audit_id');
         var teks = String(baris.find('.jawaban-isi').val() || '').trim();
 
         if (teks === '') {
-            pesan('Oops', 'Jawaban wajib diisi untuk setiap lingkup.', 'error');
+            pesan('Oops', 'Jawaban wajib diisi untuk setiap butir tilik.', 'error');
             baris.find('.jawaban-isi').focus();
             return;
         }
@@ -105,7 +106,7 @@ $(function () {
         $.ajax({
             url: base_url + "/dashboard/jawablingkup",
             type: "POST",
-            data: { audit_id: audit_id, lingkup_id: lingkup_id, jwb_jawaban: teks },
+            data: { audit_id: audit_id, dtjwb_id: dtjwb_id, jwb_jawaban: teks },
             dataType: "json",
             success: function (hasil) {
                 if (!hasil || !hasil.status) {
@@ -145,7 +146,7 @@ $(function () {
 
         var data = new FormData();
         data.append('audit_id', audit_id);
-        data.append('lingkup_id', baris.attr('data-lingkup_id'));
+        data.append('dtjwb_id', baris.attr('data-dtjwb_id'));
         $.each(masukan[0].files, function (i, berkas) {
             data.append('lampiran[]', berkas);
         });
@@ -241,7 +242,7 @@ $(function () {
         var belum = perbaruiRingkas();
 
         if (belum > 0) {
-            pesan('Belum lengkap', 'Masih ada ' + belum + ' lingkup yang belum dijawab. Setiap lingkup wajib dijawab sebelum hasil dikirim.', 'warning');
+            pesan('Belum lengkap', 'Masih ada ' + belum + ' butir tilik yang belum dijawab. Setiap butir wajib dijawab sebelum hasil dikirim.', 'warning');
             return;
         }
 

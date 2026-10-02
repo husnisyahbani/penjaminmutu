@@ -31,6 +31,17 @@ class DtjwbModel extends CI_Model {
      * Dibuat bila belum ada supaya butir tilik selalu punya tempat berpijak.
      */
     function pastikanInduk($audit_id, $dtform_id) {
+        /* Pertanyaan harus benar-benar milik formulir audit ini, supaya tidak
+           membuat baris pertanyaan asing (mis. saat dtform_id diketik manual). */
+        $this->db->select('dt.dtform_id');
+        $this->db->from('detailform dt');
+        $this->db->join('audit au', 'au.form_id = dt.form_id', 'inner');
+        $this->db->where('au.audit_id', $audit_id);
+        $this->db->where('dt.dtform_id', $dtform_id);
+        if (!$this->db->get()->row_array()) {
+            return 0;
+        }
+
         $this->db->where('audit_id', $audit_id);
         $this->db->where('dtform_id', $dtform_id);
         /* Baris pertanyaan = baris tanpa butir lingkup. Kolomnya hanya ada
