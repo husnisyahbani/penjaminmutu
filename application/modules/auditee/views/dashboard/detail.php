@@ -10,8 +10,9 @@
  *
  * Penilaian auditor (hasil/temuan/catatan), rencana koreksi, dan referensi
  * TIDAK ditampilkan di sini - itu urutan kerja auditor dan halaman PTK.
- * Tombol "Daftar Tilik & Koreksi" tetap tersedia untuk membuka halaman Delik
- * (auditee/delik?audit_id=..&dtform_id=..) bila butir tilik perlu dilihat.
+ * Tombol "Daftar Tilik & Koreksi" membuka halaman Delik
+ * (auditee/delik?audit_id=..&dtform_id=..) dan hanya tampil bila audit sudah
+ * berstatus SELESAI (penilaian auditor baru ada setelah itu).
  * Jawaban lama tingkat pertanyaan juga tidak ditampilkan lagi (datanya tetap
  * tersimpan dan masih terbaca di halaman auditor). Pertanyaan yang belum punya
  * butir lingkup tetap memakai kotak jawaban tingkat pertanyaan supaya audit
@@ -37,6 +38,10 @@ $pesan_kunci = isset($pesan_kunci[$status_audit])
 $teks_jawaban = function ($nilai) {
     return lingkup_bersihkan($nilai);
 };
+
+/* Tombol "Daftar Tilik & Koreksi" hanya berguna setelah auditor selesai
+   menilai, jadi hanya ditampilkan pada audit berstatus SELESAI. */
+$boleh_delik = ($status_audit === 'SELESAI');
 
 $jml_topik = count($topik);
 $jml_lingkup = 0;    // butir lingkup (pertanyaan yang dijawab)
@@ -158,13 +163,16 @@ $jml_belum = $jml_wajib - $jml_dijawab;
                                         </span>
                                     </h4>
                                     <i class="icon md-chevron-down topik-panah" aria-hidden="true"></i>
+                                    <?php if ($boleh_delik): ?>
                                     <div class="topik-aksi">
                                         <button type="button" class="delik btn btn-sm btn-primary"
                                                 dtform_id="<?php echo (int) $t['dtform_id']; ?>"
-                                                audit_id="<?php echo (int) $audit_id; ?>">
+                                                audit_id="<?php echo (int) $audit_id; ?>"
+                                                title="Lihat daftar tilik &amp; koreksi pertanyaan ini">
                                             <i class="icon md-edit" aria-hidden="true"></i>Daftar Tilik &amp; Koreksi
                                         </button>
                                     </div>
+                                    <?php endif; ?>
                                 </header>
                                 <div class="aktivitas-daftar">
 
