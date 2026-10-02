@@ -94,7 +94,7 @@
                                 <div class="filter-kotak">
                                     <label for="cari_ptk"><i class="icon md-search" aria-hidden="true"></i>Cari</label>
                                     <input type="text" class="form-control" id="cari_ptk"
-                                           placeholder="Cari formulir, lingkup, catatan, koreksi">
+                                           placeholder="Cari formulir, butir, catatan, koreksi">
                                 </div>
                             </div>
                         </div>
@@ -150,8 +150,8 @@
             </div>
             <div class="modal-body">
 
-                <input type="hidden" id="ptk_lingkup_id" name="lingkup_id"/>
-                <input type="hidden" id="ptk_dtform_id" name="dtform_id"/>
+                <input type="hidden" id="ptk_dtjwb_id" name="dtjwb_id"/>
+                <input type="hidden" id="ptk_audit_id" name="audit_id"/>
 
                 <div class="row">
                     <div class="col-md-12">

@@ -97,6 +97,36 @@ class LingkupModel extends CI_Model {
         return TRUE;
     }
 
+    /** Kolom rencana koreksi per butir (auditjawabdetail) sudah ada? */
+    function koreksiButirSiap() {
+        return $this->db->field_exists('dtjwb_koreksi', $this->t_jawab_det);
+    }
+
+    /**
+     * Tambah kolom rencana koreksi per butir pada tabel tilik lama
+     * (auditjawabdetail.dtjwb_koreksi). Halaman PTK dan delik memakai kolom
+     * ini bila ada, sehingga rencana koreksi tersimpan per butir - bukan satu
+     * teks untuk satu pertanyaan.
+     */
+    function installKoreksiButir() {
+        if ($this->koreksiButirSiap()) {
+            return TRUE;
+        }
+        /* Driver uji lokal (sqlite) tidak punya Forge untuk ALTER TABLE,
+           jadi pernyataannya dijalankan langsung. */
+        if (in_array($this->db->dbdriver, array('sqlite', 'sqlite3'), TRUE)) {
+            $this->db->query('ALTER TABLE ' . $this->db->protect_identifiers($this->t_jawab_det, TRUE)
+                . ' ADD COLUMN dtjwb_koreksi TEXT');
+            return $this->koreksiButirSiap();
+        }
+
+        $this->load->dbforge();
+        $this->dbforge->add_column($this->t_jawab_det, array(
+            'dtjwb_koreksi' => array('type' => 'TEXT', 'null' => TRUE),
+        ));
+        return $this->koreksiButirSiap();
+    }
+
     /** Buang kolom lama setelah migrasi berhasil. */
     function hapusKolomLama() {
         $this->load->dbforge();
@@ -589,6 +619,7 @@ class LingkupModel extends CI_Model {
             'tabel_lingkup'   => $this->siap(),
             'kolom_jawab'     => $this->kolomJawabSiap(),
             'kolom_lama'      => $this->kolomLamaAda(),
+            'koreksi_butir'   => $this->koreksiButirSiap(),
             'jml_dtform'      => 0,
             'jml_butir'       => 0,
             'jml_jawaban_butir' => 0,

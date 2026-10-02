@@ -7,8 +7,9 @@
 
        Yang ditampilkan: seluruh butir pertanyaan yang dipilih yang sudah
        dinilai auditor (S / OB / TS MINOR / TS MAYOR), tanpa penyaringan
-       jenis penilaian - butir "S" (sesuai) ikut tampil. Data dari
-       controller: $butir (PtkModel::daftar - sama dengan halaman PTK).
+       jenis penilaian - butir "S" (sesuai) ikut tampil. Sumbernya sama
+       dengan halaman PTK: baris mutu_auditjawabdetail (data dari controller:
+       $butir = PtkModel::daftar).
 
        Kolom tabel sama persis dengan halaman PTK (No, Formulir, Butir
        Lingkup, Hasil, Temuan, Catatan, Rencana Koreksi) karena keduanya
@@ -227,9 +228,8 @@
                       <?php if ($temuan === 'S'): ?>
                       <span class="text-muted">Tidak perlu koreksi</span>
                       <?php elseif (!empty($boleh_koreksi)): ?>
-                      <div class="koreksi-kotak" data-lingkup_id="<?php echo (int) $b['lingkup_id']; ?>"
-                           data-audit_id="<?php echo (int) $audit_id; ?>"
-                           data-dtform_id="<?php echo (int) $dtform_id; ?>">
+                      <div class="koreksi-kotak" data-dtjwb_id="<?php echo (int) $b['dtjwb_id']; ?>"
+                           data-audit_id="<?php echo (int) $audit_id; ?>">
                         <textarea class="form-control koreksi-isi" rows="3"
                                   placeholder="Tulis rencana koreksi untuk butir ini..."><?php echo html_escape($koreksi); ?></textarea>
                         <div class="koreksi-aksi">

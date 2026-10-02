@@ -14,7 +14,7 @@ class Migrasi extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'admin';
-        $this->load->js(base_url("assets/app/admin/migrasi.js?v=1.0"));
+        $this->load->js(base_url("assets/app/admin/migrasi.js?v=1.1"));
         $this->load->model('LingkupModel', 'lingkup');
 
         $role = $this->session->userdata('role');
@@ -74,6 +74,27 @@ class Migrasi extends MY_Controller {
                        . ' pertanyaan, ' . $jawaban['dipindah'] . ' jawaban tilik dipindahkan.',
             'parse'   => $parse,
             'jawaban' => $jawaban,
+            'ringkas' => $this->lingkup->status(),
+        ));
+    }
+
+    /**
+     * Tambah kolom rencana koreksi per butir (auditjawabdetail.dtjwb_koreksi).
+     * Aman dijalankan berulang kali: bila kolomnya sudah ada, tidak berubah.
+     */
+    public function kolomkoreksi() {
+        $this->output->set_content_type('application/json');
+
+        $sudah = $this->lingkup->koreksiButirSiap();
+        $ok    = $this->lingkup->installKoreksiButir();
+
+        echo json_encode(array(
+            'status'  => $ok,
+            'pesan'   => $ok
+                ? ($sudah
+                    ? 'Kolom auditjawabdetail.dtjwb_koreksi sudah ada. Rencana koreksi tersimpan per butir.'
+                    : 'Kolom auditjawabdetail.dtjwb_koreksi ditambahkan. Rencana koreksi kini tersimpan per butir.')
+                : 'Gagal menambahkan kolom. Tambahkan manual lewat berkas database/koreksi_butir.sql.',
             'ringkas' => $this->lingkup->status(),
         ));
     }

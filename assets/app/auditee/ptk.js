@@ -48,8 +48,7 @@ $(function () {
         daftarptk.search(String(this.value || '').trim()).draw();
     });
 
-    var lingkup_id = 0;
-    var dtform_id = 0;
+    var dtjwb_id = 0;
     var audit_id = 0;
 
     /* Rencana koreksi lama mungkin tersimpan sebagai HTML (versi editor);
@@ -82,12 +81,11 @@ $(function () {
 
     $('#ptk').on('click', '.edit', function () {
         var $btn = $(this);
-        lingkup_id = $btn.attr('lingkup_id');
-        dtform_id = $btn.attr('dtform_id');
+        dtjwb_id = $btn.attr('dtjwb_id');
         audit_id = $btn.attr('audit_id');
 
         $.ajax({
-            url: base_url + "/ptk/getbutir/" + $btn.attr('audit_id') + "/" + lingkup_id,
+            url: base_url + "/ptk/getbutir/" + audit_id + "/" + dtjwb_id,
             type: "GET",
             dataType: "json",
             success: function (data) {
@@ -96,8 +94,8 @@ $(function () {
                     return;
                 }
 
-                $('#ptk_lingkup_id').val(lingkup_id);
-                $('#ptk_dtform_id').val(dtform_id);
+                $('#ptk_dtjwb_id').val(dtjwb_id);
+                $('#ptk_audit_id').val(audit_id);
                 $('#ptk_butir').html(data.lingkup_isi || '');
                 $('#ptk_hasil').html(data.jwb_hasil || '-');
                 $('#ptk_catatan').html(data.jwb_catatan || '-');
@@ -135,8 +133,7 @@ $(function () {
             dataType: "json",
             data: {
                 audit_id: audit_id,
-                dtform_id: $('#ptk_dtform_id').val(),
-                lingkup_id: $('#ptk_lingkup_id').val(),
+                dtjwb_id: $('#ptk_dtjwb_id').val(),
                 ptk_koreksi: koreksi
             },
             beforeSend: function () {

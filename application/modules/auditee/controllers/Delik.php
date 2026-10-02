@@ -5,7 +5,7 @@ class Delik extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditee';
-        $this->load->js(base_url("assets/app/auditee/delik.js?v=2.3"));
+        $this->load->js(base_url("assets/app/auditee/delik.js?v=2.4"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
@@ -101,24 +101,19 @@ class Delik extends MY_Controller {
      * perlu koreksi - penjagaannya ada di tampilan.
      */
     public function koreksi() {
-        $audit_id   = (int) $this->input->post('audit_id');
-        $lingkup_id = (int) $this->input->post('lingkup_id');
-        $dtform_id  = (int) $this->input->post('dtform_id');
+        $audit_id = (int) $this->input->post('audit_id');
+        $dtjwb_id = (int) $this->input->post('dtjwb_id');
 
-        /* Rencana koreksi hanya untuk audit milik auditee ini yang sudah
-           selesai dinilai (status SELESAI). */
-        $audit = $this->mutu->getAuditById($audit_id);
-        $users_id = $this->session->userdata('users_id');
-        $selesai = !empty($audit)
-            && (int) $audit['auditee_id'] === (int) $users_id
-            && strtoupper(trim((string) $audit['audit_status'])) === 'SELESAI';
-
-        $butir = $this->lingkup->butirSatu($lingkup_id);
+        /* Penjagaan: butir harus milik auditee ini (getButir menyaring
+           auditee_id) dan auditnya sudah selesai dinilai (status SELESAI).
+           Penyimpanan memakai model yang sama dengan halaman PTK. */
+        $butir = $this->ptkmodel->getButir($audit_id, $dtjwb_id);
         $status = false;
-        if ($selesai && !empty($butir) && (int) $butir['dtform_id'] === $dtform_id) {
-            $status = $this->auditjawab->koreksi(array(
+        if (!empty($butir) && strtoupper(trim((string) $butir['audit_status'])) === 'SELESAI') {
+            $status = $this->ptkmodel->koreksi(array(
                 'audit_id'    => $audit_id,
-                'lingkup_id'  => $lingkup_id,
+                'jwb_id'      => (int) $butir['jwb_id'],
+                'dtjwb_id'    => $dtjwb_id,
                 'jwb_koreksi' => $this->input->post('koreksi'),
             ));
         }

@@ -45,6 +45,14 @@ $(function () {
             'Migrasi Selesai');
     });
 
+    $('#siapkankoreksi').on('click', function () {
+        kirim('/migrasi/kolomkoreksi',
+            'Siapkan Kolom Koreksi Butir?',
+            'Kolom auditjawabdetail.dtjwb_koreksi ditambahkan supaya rencana koreksi tersimpan per butir, bukan satu teks untuk satu pertanyaan.',
+            'Ya, Siapkan!',
+            'Kolom Siap');
+    });
+
     $('#hapuskolom').on('click', function () {
         kirim('/migrasi/hapuskolom',
             'Hapus Kolom Lama?',

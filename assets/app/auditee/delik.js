@@ -29,10 +29,9 @@ $(function () {
             type: 'POST',
             dataType: 'json',
             data: {
-                audit_id:   kotak.attr('data-audit_id'),
-                dtform_id:  kotak.attr('data-dtform_id'),
-                lingkup_id: kotak.attr('data-lingkup_id'),
-                koreksi:    kotak.find('.koreksi-isi').val()
+                audit_id:  kotak.attr('data-audit_id'),
+                dtjwb_id:  kotak.attr('data-dtjwb_id'),
+                koreksi:   kotak.find('.koreksi-isi').val()
             }
         }).done(function (data) {
             if (data && data.status) {
