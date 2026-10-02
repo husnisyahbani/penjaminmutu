@@ -27,7 +27,9 @@ $(function () {
     }
 
     function auditId() {
-        return $('#kirim_hasil').attr('audit_id') || $('.delik').first().attr('audit_id');
+        return $('#kirim_hasil').attr('audit_id')
+            || $('#topik_daftar').data('audit_id')
+            || $('.delik').first().attr('audit_id');
     }
 
     /* ------------------- indikator jumlah jawaban & lampiran -------------------

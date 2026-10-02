@@ -21,7 +21,7 @@ class Dashboard extends MY_Controller {
         $this->load->helper('lingkup');
 
         // Jawaban wajib + lampiran opsional per butir lingkup (halaman detail audit).
-        $this->load->js(base_url("assets/app/auditee/jawaban-lingkup.js?v=3.0"));
+        $this->load->js(base_url("assets/app/auditee/jawaban-lingkup.js?v=3.1"));
 
         $role = $this->session->userdata('role');
         if (!isset($role) || $role != 'AUDITEE') {

@@ -1,21 +1,17 @@
 <?php
 /**
- * Detail audit (auditee).
+ * Detail audit (auditee) - daftar butir lingkup + jawaban auditee.
  *
- * Daftar pertanyaan yang dijawab auditee berasal dari tabel mutu_lingkup:
- * satu pertanyaan formulir (mutu_detailform) dapat memiliki banyak butir
- * lingkup, dan TIAP butir lingkup dijawab sendiri-sendiri oleh auditee
- * (tersimpan pada mutu_auditjawab dengan kolom lingkup_id terisi).
+ * Halaman ini hanya menampilkan:
+ *   1. pertanyaan formulir (mutu_detailform) sebagai pengelompok;
+ *   2. butir lingkup dari mutu_lingkup - inilah pertanyaan yang dijawab;
+ *   3. kotak jawaban untuk TIAP butir lingkup (wajib, hanya saat DRAFT);
+ *   4. lampiran jawaban per butir (opsional, boleh lebih dari satu berkas).
  *
- * Yang ditampilkan pada tiap butir lingkup:
- *   1. teks butir lingkup (pertanyaan yang dijawab);
- *   2. kotak jawaban auditee untuk butir itu (wajib diisi, hanya saat audit
- *      masih DRAFT);
- *   3. lampiran jawaban butir (opsional, boleh lebih dari satu berkas);
- *   4. penilaian auditor (hasil/temuan/catatan) + rencana koreksi - READ ONLY.
- *
- * Pertanyaan yang belum punya butir lingkup (data lama) tetap memakai kotak
- * jawaban tingkat pertanyaan supaya audit tidak terkunci.
+ * Penilaian auditor (hasil/temuan/catatan), rencana koreksi, referensi, dan
+ * daftar tilik TIDAK ditampilkan di sini - itu urutan kerja auditor dan halaman
+ * PTK. Pertanyaan yang belum punya butir lingkup tetap memakai kotak jawaban
+ * tingkat pertanyaan (data lama) supaya audit tidak terkunci.
  *
  * Data dari controller: $result, $audit_id, $topik, $lampiran_siap,
  * $lingkup_siap, $sudah_terkirim (jawaban dikunci bila status bukan DRAFT),
@@ -26,53 +22,30 @@ $pesan_kunci = array(
     'TERKIRIM' => 'Hasil evaluasi sudah dikirim ke auditor, sehingga jawaban dan lampiran tidak dapat diubah lagi.',
     'PROSES'   => 'Audit sedang dinilai auditor, sehingga jawaban dan lampiran tidak dapat diubah lagi.',
     'SELESAI'  => 'Audit sudah selesai, sehingga jawaban dan lampiran tidak dapat diubah lagi. '
-        . 'Rencana koreksi tiap butir dapat Anda lengkapi melalui tombol Daftar Tilik & Koreksi.',
+        . 'Rencana koreksi tiap butir dapat Anda lengkapi melalui menu PTK.',
 );
 $pesan_kunci = isset($pesan_kunci[$status_audit])
     ? $pesan_kunci[$status_audit]
     : 'Jawaban dan lampiran hanya dapat diubah saat audit masih berstatus draft.';
 
-$potong = function ($teks, $maks = 140) {
-    $t = lingkup_bersihkan($teks);
-    if ($t === '') {
-        return '';
-    }
-    if (hitung_potong($t) > $maks) {
-        return mb_substr_potong($t, 0, $maks) . '…';
-    }
-    return $t;
+/* Teks polos untuk kotak jawaban (jawaban tersimpan boleh berupa HTML
+   sederhana, sedangkan kotak isian memakai teks polos). */
+$teks_jawaban = function ($nilai) {
+    return lingkup_bersihkan($nilai);
 };
-
-/* Warna badge mengikuti jenis penilaian auditor. */
-$warna_temuan = array(
-    'S'        => 'badge-success',
-    'OB'       => 'badge-info',
-    'TS MINOR' => 'badge-warning',
-    'TS MAYOR' => 'badge-danger',
-);
 
 $jml_topik = count($topik);
 $jml_lingkup = 0;    // butir lingkup (pertanyaan yang dijawab)
 $jml_dijawab = 0;
 $jml_wajib = 0;
-$jml_temuan = 0;
-$jml_koreksi = 0;
 $jml_lampiran = 0;
 foreach ($topik as $t) {
     $jml_lingkup  += (int) $t['jml_butir'];
     $jml_dijawab  += (int) $t['jml_dijawab'];
     $jml_wajib    += (int) $t['jml_wajib'];
-    $jml_temuan   += (int) $t['jml_temuan'];
-    $jml_koreksi  += (int) $t['jml_koreksi'];
     $jml_lampiran += (int) $t['jml_lampiran'];
 }
 $jml_belum = $jml_wajib - $jml_dijawab;
-
-/* Teks ringkas untuk kotak jawaban (jawaban tersimpan boleh berupa HTML
-   sederhana, tetapi kotak isian memakai teks polos). */
-$teks_jawaban = function ($nilai) {
-    return lingkup_bersihkan($nilai);
-};
 ?>
 <div class="page">
     <div class="page-content container-fluid">
@@ -109,12 +82,6 @@ $teks_jawaban = function ($nilai) {
                             <span class="badge badge-success" id="jml_dijawab"><?php echo (int) $jml_dijawab; ?> sudah dijawab</span>
                             <span class="badge badge-warning" id="sisa_belum"><?php echo (int) $jml_belum; ?> belum dijawab</span>
                             <span class="badge badge-default" id="jml_lampiran"><?php echo (int) $jml_lampiran; ?> lampiran</span>
-                            <?php if ($jml_temuan > 0): ?>
-                            <span class="badge badge-warning"><?php echo (int) $jml_temuan; ?> temuan</span>
-                            <?php endif; ?>
-                            <?php if ($jml_koreksi > 0): ?>
-                            <span class="badge badge-success"><?php echo (int) $jml_koreksi; ?> rencana koreksi</span>
-                            <?php endif; ?>
                         </div>
 
                         <?php if ($sudah_terkirim): ?>
@@ -133,10 +100,9 @@ $teks_jawaban = function ($nilai) {
                             <?php if ($jml_belum > 0): ?>
                             <div class="alert alert-warning" role="alert" id="peringatan_belum">
                                 Setiap <strong>butir lingkup wajib dijawab</strong>. Masih ada
-                                <strong><?php echo (int) $jml_belum; ?> butir lingkup</strong> yang belum dijawab; hasil
-                                evaluasi baru dapat dikirim setelah semuanya terjawab. Penilaian auditor (hasil, temuan,
-                                catatan) diisi auditor, auditee tidak mengisinya. Lampiran bersifat opsional dan boleh
-                                lebih dari satu berkas.
+                                <strong><?php echo (int) $jml_belum; ?> butir lingkup</strong> yang belum dijawab;
+                                hasil evaluasi baru dapat dikirim setelah semuanya terjawab. Lampiran bersifat
+                                opsional dan boleh lebih dari satu berkas.
                             </div>
                             <?php elseif (!$lampiran_siap): ?>
                             <div class="alert alert-info" role="alert">
@@ -146,13 +112,13 @@ $teks_jawaban = function ($nilai) {
                             <?php endif; ?>
                         <?php endif; ?>
 
-                        <div class="topik-berkas" id="topik_daftar">
+                        <div class="topik-berkas" id="topik_daftar" data-audit_id="<?php echo (int) $audit_id; ?>">
                             <?php foreach ($topik as $i => $t):
                                 $punya_lingkup = !empty($t['punya_lingkup']);
                                 $sudah = !empty($t['sudah_dijawab']);
 
                                 /* Kata kunci pencarian: pertanyaan, butir
-                                   lingkup, jawaban, dan penilaian auditor. */
+                                   lingkup, dan jawaban auditee. */
                                 $kata = array($t['teks']);
                                 if (isset($t['jwb']['jwb_jawaban'])) {
                                     $kata[] = $teks_jawaban($t['jwb']['jwb_jawaban']);
@@ -160,9 +126,6 @@ $teks_jawaban = function ($nilai) {
                                 foreach ($t['butir'] as $b) {
                                     $kata[] = $b['lingkup_teks'];
                                     $kata[] = $teks_jawaban($b['jwb_jawaban']);
-                                    $kata[] = (string) $b['jwb_temuan'];
-                                    $kata[] = $potong($b['jwb_catatan'], 60);
-                                    $kata[] = $potong($b['jwb_koreksi'], 60);
                                 }
                                 $cari = strtolower(implode(' ', $kata));
                             ?>
@@ -186,31 +149,11 @@ $teks_jawaban = function ($nilai) {
                                                 <?php echo $sudah ? 'sudah dijawab' : 'belum dijawab'; ?>
                                             </span>
                                             <?php endif; ?>
-                                            <?php if ($t['jml_temuan'] > 0): ?>
-                                            <span class="badge badge-warning"><?php echo (int) $t['jml_temuan']; ?> temuan</span>
-                                            <?php endif; ?>
-                                            <?php if (!empty($t['jml_koreksi'])): ?>
-                                            <span class="badge badge-success"><?php echo (int) $t['jml_koreksi']; ?> rencana koreksi</span>
-                                            <?php endif; ?>
                                         </span>
                                     </h4>
                                     <i class="icon md-chevron-down topik-panah" aria-hidden="true"></i>
-                                    <div class="topik-aksi">
-                                        <button type="button" class="delik btn btn-sm btn-primary"
-                                                dtform_id="<?php echo (int) $t['dtform_id']; ?>"
-                                                audit_id="<?php echo (int) $audit_id; ?>">
-                                            <i class="icon md-edit" aria-hidden="true"></i>Daftar Tilik &amp; Koreksi
-                                        </button>
-                                    </div>
                                 </header>
                                 <div class="aktivitas-daftar">
-
-                                    <?php if (isset($t['jwb']['jwb_tujuan']) && trim((string) $t['jwb']['jwb_tujuan']) !== ''): ?>
-                                    <div class="aktivitas-bukti">
-                                        <span class="aktivitas-label">Tujuan:</span>
-                                        <?php echo nl2br(html_escape(lingkup_bersihkan($t['jwb']['jwb_tujuan']))); ?>
-                                    </div>
-                                    <?php endif; ?>
 
                                     <?php /* Jawaban lama (tingkat pertanyaan): ditampilkan selama masih ada
                                             butir lingkup yang belum dijawab, supaya tidak hilang setelah
@@ -230,70 +173,26 @@ $teks_jawaban = function ($nilai) {
 
                                     <?php $nomor = 0; ?>
                                     <?php foreach ($t['butir'] as $b):
-                                        $bisa_dijawab = !empty($b['bisa_dijawab']) && (int) $b['lingkup_id'] > 0;
-                                        if ($bisa_dijawab) {
-                                            $nomor++;
-                                        }
+                                        $nomor++;
                                         $jawaban = $teks_jawaban($b['jwb_jawaban']);
                                         $sudah_butir = !empty($b['sudah_dijawab']);
-                                        $hasil   = $potong($b['jwb_hasil']);
-                                        $temuan  = strtoupper(trim((string) $b['jwb_temuan']));
-                                        $catatan = $potong($b['jwb_catatan'], 180);
-                                        $koreksi = $potong($b['jwb_koreksi'], 180);
-                                        $ada_penilaian = ($hasil !== '' || $temuan !== '' || $catatan !== '');
-                                        $warna = isset($warna_temuan[$temuan]) ? $warna_temuan[$temuan] : 'badge-default';
                                     ?>
-                                    <div class="aktivitas lingkup-item<?php echo $bisa_dijawab ? '' : ' lingkup-item--lama'; ?>"
+                                    <div class="aktivitas lingkup-item"
                                          data-lingkup_id="<?php echo (int) $b['lingkup_id']; ?>"
                                          data-dtform_id="<?php echo (int) $t['dtform_id']; ?>"
                                          data-sudah-dijawab="<?php echo $sudah_butir ? '1' : '0'; ?>"
-                                         data-wajib="<?php echo $bisa_dijawab ? '1' : '0'; ?>"
-                                         data-cari="<?php echo html_escape(strtolower($b['lingkup_teks'] . ' ' . $jawaban . ' ' . $temuan . ' ' . $catatan . ' ' . $koreksi)); ?>">
-                                        <i class="icon <?php echo $bisa_dijawab ? 'md-comment-text' : 'md-assignment'; ?> aktivitas-ikon" aria-hidden="true"></i>
+                                         data-wajib="1"
+                                         data-cari="<?php echo html_escape(strtolower($b['lingkup_teks'] . ' ' . $jawaban)); ?>">
+                                        <i class="icon md-comment-text aktivitas-ikon" aria-hidden="true"></i>
                                         <div class="aktivitas-isi">
                                             <span class="aktivitas-teks">
-                                                <?php if ($bisa_dijawab): ?>
                                                 <span class="lingkup-nomor"><?php echo $nomor; ?>.</span>
-                                                <?php endif; ?>
                                                 <?php echo html_escape($b['lingkup_teks']); ?>
-                                                <?php if ($bisa_dijawab): ?>
                                                 <span class="badge lingkup-status <?php echo $sudah_butir ? 'badge-success' : 'badge-warning'; ?>">
                                                     <?php echo $sudah_butir ? 'sudah dijawab' : 'belum dijawab'; ?>
                                                 </span>
-                                                <?php endif; ?>
                                             </span>
 
-                                            <?php if (trim((string) $b['dtjwb_referensi']) !== ''): ?>
-                                            <div class="aktivitas-bukti">
-                                                <span class="aktivitas-label">Referensi:</span>
-                                                <?php echo html_escape(lingkup_bersihkan($b['dtjwb_referensi'])); ?>
-                                            </div>
-                                            <?php endif; ?>
-
-                                            <!-- Penilaian auditor (read-only bagi auditee) -->
-                                            <div class="aktivitas-status">
-                                                <?php if (!$ada_penilaian): ?>
-                                                <span class="text-muted">belum dinilai auditor</span>
-                                                <?php else: ?>
-                                                <?php if ($temuan !== ''): ?>
-                                                <span class="badge <?php echo $warna; ?>"><?php echo html_escape($temuan); ?></span>
-                                                <?php endif; ?>
-                                                <?php if ($hasil !== ''): ?>
-                                                <span class="badge badge-primary">Hasil: <?php echo html_escape($hasil); ?></span>
-                                                <?php endif; ?>
-                                                <?php if ($catatan !== ''): ?>
-                                                <span class="badge badge-info">Catatan</span>
-                                                <?php endif; ?>
-                                                <?php endif; ?>
-                                            </div>
-
-                                            <?php if ($catatan !== ''): ?>
-                                            <div class="aktivitas-bukti">
-                                                <span class="aktivitas-label">Catatan auditor:</span> <?php echo html_escape($catatan); ?>
-                                            </div>
-                                            <?php endif; ?>
-
-                                            <?php if ($bisa_dijawab): ?>
                                             <!-- Jawaban auditee untuk butir lingkup ini -->
                                             <div class="jawaban-kotak">
                                                 <?php if ($sudah_terkirim): ?>
@@ -319,10 +218,9 @@ $teks_jawaban = function ($nilai) {
                                                     </div>
                                                 <?php endif; ?>
                                             </div>
-                                            <?php endif; ?>
 
-                                            <!-- Lampiran butir lingkup -->
-                                            <?php if (!empty($b['lampiran']) || ($bisa_dijawab && !$sudah_terkirim)): ?>
+                                            <!-- Lampiran jawaban butir lingkup -->
+                                            <?php if (!empty($b['lampiran']) || !$sudah_terkirim): ?>
                                             <div class="lampiran-kotak">
                                                 <span class="lampiran-judul">
                                                     <i class="icon md-attachment" aria-hidden="true"></i>Lampiran
@@ -344,7 +242,7 @@ $teks_jawaban = function ($nilai) {
                                                     </div>
                                                     <?php endforeach; ?>
                                                 </div>
-                                                <?php if ($bisa_dijawab && !$sudah_terkirim): ?>
+                                                <?php if (!$sudah_terkirim): ?>
                                                 <div class="lampiran-unggah">
                                                     <?php if ($lampiran_siap): ?>
                                                     <input type="file" class="lampiran-berkas" name="lampiran[]" multiple>
@@ -359,16 +257,6 @@ $teks_jawaban = function ($nilai) {
                                                     <?php endif; ?>
                                                 </div>
                                                 <?php endif; ?>
-                                            </div>
-                                            <?php endif; ?>
-
-                                            <?php if ($koreksi !== ''): ?>
-                                            <div class="aktivitas-bukti">
-                                                <span class="aktivitas-label">Rencana koreksi:</span> <?php echo nl2br(html_escape($koreksi)); ?>
-                                            </div>
-                                            <?php elseif (!$bisa_dijawab && $status_audit !== 'SELESAI'): ?>
-                                            <div class="aktivitas-bukti">
-                                                <span class="text-muted">Rencana koreksi dapat Anda isi setelah audit selesai.</span>
                                             </div>
                                             <?php endif; ?>
                                         </div>
