@@ -75,6 +75,12 @@
     width: 21%;
 }
 
+/* Kolom Aksi pada daftar tilik: hanya tombol hapus, jadi cukup sempit. */
+.ptk-kolom-aksi {
+    width: 8%;
+    text-align: center;
+}
+
 /* Isi sel yang panjang dipotong beberapa baris saja supaya tinggi baris
    tetap rapi; teks lengkapnya muncul saat kursor diarahkan (title). */
 .ptk-klamp {
@@ -197,44 +203,13 @@
 }
 
 /* ------------------------------------------------------------------
-   Daftar tilik auditor (/auditor/delik): ikon ubah pada tiap kolom,
-   referensi tebal di bawah isian butir, dan input tujuan di atas tabel.
-   Semua kolom selalu tampil (tanpa pelipatan DataTables responsive).
+   Daftar tilik auditor (/auditor/delik): tombol edit kecil di dalam
+   tiap kolom (No/Butir/Hasil/Temuan/Catatan/Aksi selalu tampil) dan
+   referensi di bawah isian butir.
    ------------------------------------------------------------------ */
-#tilik .ptk-kolom-no {
-    width: 4%;
-}
-
-#tilik .ptk-kolom-butir {
-    width: 30%;
-}
-
-#tilik .ptk-kolom-hasil {
-    width: 20%;
-}
-
-#tilik .ptk-kolom-temuan {
-    width: 10%;
-}
-
-#tilik .ptk-kolom-catatan {
-    width: 28%;
-}
-
-/* Kolom aksi hanya berisi tombol hapus, jadi cukup sempit. */
-#tilik .ptk-kolom-aksi {
-    width: 8%;
-    text-align: center;
-}
-.tilik-butir-kotak {
-    position: relative;
-    padding-right: 26px;
-}
-
-.tilik-butir-kotak .editbutir {
-    position: absolute;
-    top: 0;
-    right: 0;
+.tilik-edit {
+    float: right;
+    margin: 0 0 6px 10px;
 }
 
 /* Referensi ditulis di bawah isian butir dengan penanda tebal. */
@@ -247,22 +222,6 @@
 
 .tilik-ref strong {
     color: #424242;
-}
-
-.tilik-nilai {
-    display: flex;
-    align-items: flex-start;
-    gap: 6px;
-}
-
-.tilik-nilai .tilik-teks {
-    flex: 1 1 auto;
-    min-width: 0;
-    word-break: break-word;
-}
-
-.tilik-nilai .editisi {
-    flex: 0 0 auto;
 }
 
 /* Input tujuan pertanyaan (langsung di atas tabel). */

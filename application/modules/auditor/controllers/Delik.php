@@ -269,44 +269,42 @@ class Delik extends MY_Controller {
             $temuan = strtoupper(trim((string) $field->dtjwb_temuan));
             $kelas  = isset($warna[$temuan]) ? $warna[$temuan] : 'badge-default';
 
-            /* Referensi dituliskan di bawah isian pada kolom Butir Lingkup. */
-            $butir = '<div class="tilik-butir">' . html_escape(lingkup_bersihkan($field->dtjwb_pertanyaan));
+            /* Sel disusun dengan gaya yang sama seperti tabel lain (.ptk-klamp),
+               ditambah tombol edit kecil di tiap kolom. Referensi dituliskan
+               di bawah isian pada kolom Butir Lingkup. */
+            $tombol = function ($aksi, $kolom, $nilai, $judul, $warna) use ($field) {
+                return '<button type="button" class="' . $aksi . ' tilik-edit btn btn-sm btn-icon btn-' . $warna . '"'
+                    . ' data-info="' . $judul . '" dtjwb_id="' . (int) $field->dtjwb_id . '"'
+                    . ' data-kolom="' . $kolom . '" data-nilai="' . html_escape($nilai) . '">'
+                    . '<i class="icon md-edit" aria-hidden="true"></i></button>';
+            };
+
+            $butir = '<div class="ptk-klamp">' . html_escape(lingkup_bersihkan($field->dtjwb_pertanyaan)) . '</div>';
             if (trim((string) $field->dtjwb_referensi) !== '') {
                 $butir .= '<div class="tilik-ref"><strong>Referensi:</strong> '
                     . html_escape(lingkup_bersihkan($field->dtjwb_referensi)) . '</div>';
             }
-            $butir .= '</div>';
 
             $row = array();
             $row[] = $no;
-            $row[] = $butir;
-            $row[] = '<div class="tilik-nilai">'
-                . '<span class="tilik-teks">' . html_escape(lingkup_bersihkan($field->dtjwb_hasil)) . '</span>'
-                . ' <button type="button" class="editisi btn btn-xs btn-icon btn-primary"'
-                . ' data-info="Ubah hasil" dtjwb_id="' . (int) $field->dtjwb_id . '"'
-                . ' data-kolom="dtjwb_hasil" data-nilai="' . html_escape($field->dtjwb_hasil) . '">'
-                . '<i class="icon md-edit" aria-hidden="true"></i></button></div>';
-            $row[] = '<div class="tilik-nilai">'
-                . '<span class="badge ' . $kelas . '">' . html_escape($temuan) . '</span>'
-                . ' <button type="button" class="editisi btn btn-xs btn-icon btn-warning"'
-                . ' data-info="Ubah temuan" dtjwb_id="' . (int) $field->dtjwb_id . '"'
-                . ' data-kolom="dtjwb_temuan" data-nilai="' . html_escape($temuan) . '">'
-                . '<i class="icon md-edit" aria-hidden="true"></i></button></div>';
-            $row[] = '<div class="tilik-nilai">'
-                . '<span class="tilik-teks">' . html_escape(lingkup_bersihkan($field->dtjwb_catatan)) . '</span>'
-                . ' <button type="button" class="editisi btn btn-xs btn-icon btn-success"'
-                . ' data-info="Ubah catatan" dtjwb_id="' . (int) $field->dtjwb_id . '"'
-                . ' data-kolom="dtjwb_catatan" data-nilai="' . html_escape($field->dtjwb_catatan) . '">'
-                . '<i class="icon md-edit" aria-hidden="true"></i></button></div>';
 
-            /* Kolom Butir Lingkup disunting lewat ikon di dalam selnya: satu
-               formulir mengubah pertanyaan sekaligus referensinya. */
-            $row[1] = '<div class="tilik-butir-kotak">' . $butir
-                . ' <button type="button" class="editbutir btn btn-xs btn-icon btn-primary"'
-                . ' data-info="Ubah pertanyaan & referensi" dtjwb_id="' . (int) $field->dtjwb_id . '"'
+            /* Butir Lingkup: satu formulir mengubah pertanyaan sekaligus
+               referensinya. */
+            $row[] = $butir
+                . '<button type="button" class="editbutir tilik-edit btn btn-sm btn-icon btn-primary"'
+                . ' data-info="Ubah pertanyaan &amp; referensi" dtjwb_id="' . (int) $field->dtjwb_id . '"'
                 . ' data-pertanyaan="' . html_escape($field->dtjwb_pertanyaan) . '"'
                 . ' data-referensi="' . html_escape($field->dtjwb_referensi) . '">'
-                . '<i class="icon md-edit" aria-hidden="true"></i></button></div>';
+                . '<i class="icon md-edit" aria-hidden="true"></i></button>';
+
+            $row[] = '<div class="ptk-klamp">' . html_escape(lingkup_bersihkan($field->dtjwb_hasil)) . '</div>'
+                . $tombol('editisi', 'dtjwb_hasil', $field->dtjwb_hasil, 'Ubah hasil', 'primary');
+
+            $row[] = '<span class="badge ' . $kelas . '">' . html_escape($temuan) . '</span> '
+                . $tombol('editisi', 'dtjwb_temuan', $temuan, 'Ubah temuan', 'warning');
+
+            $row[] = '<div class="ptk-klamp">' . html_escape(lingkup_bersihkan($field->dtjwb_catatan)) . '</div>'
+                . $tombol('editisi', 'dtjwb_catatan', $field->dtjwb_catatan, 'Ubah catatan', 'success');
 
             /* Aksi: tombol hapus saja. */
             $row[] = '<div class="tabel-aksi">'
