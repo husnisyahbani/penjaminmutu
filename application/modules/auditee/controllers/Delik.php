@@ -5,7 +5,7 @@ class Delik extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditee';
-        $this->load->js(base_url("assets/app/auditee/delik.js?v=2.1"));
+        $this->load->js(base_url("assets/app/auditee/delik.js?v=2.2"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
@@ -42,10 +42,25 @@ class Delik extends MY_Controller {
             $this->data['soal'] = $this->formulir->getSoalFormulir($dtform_id);
             // Butir lingkup (struktur baru) untuk tab Evaluasi.
             $this->data['lingkup'] = $this->lingkup->daftarHtml($dtform_id);
-            /* Tab Temuan: butir yang sudah dinilai pada pertanyaan ini
-               (termasuk nilai "S"), ditampilkan seperti tabel PTK namun
-               dibatasi pada pertanyaan (dtform_id) yang dipilih. */
-            $this->data['butir'] = $this->auditjawab->butirDinilai($audit_id, $dtform_id);
+            /* Halaman delik kini seperti PTK: kartu ringkasan + tabel butir.
+               Daftar butir = seluruh butir pertanyaan ini yang sudah dinilai
+               auditor (termasuk nilai "S"), tanpa penyaringan temuan. */
+            $butir = $this->auditjawab->butirDinilai($audit_id, $dtform_id);
+            $this->data['butir'] = $butir;
+
+            /* Ringkasan untuk kartu: jumlah per jenis penilaian. */
+            $ringkas = array('total' => count($butir), 'sesuai' => 0, 'observasi' => 0,
+                             'minor' => 0, 'mayor' => 0);
+            foreach ($butir as $b) {
+                switch (strtoupper(trim((string) $b['dtjwb_temuan']))) {
+                    case 'S':        $ringkas['sesuai']++;    break;
+                    case 'OB':       $ringkas['observasi']++; break;
+                    case 'TS MINOR': $ringkas['minor']++;     break;
+                    case 'TS MAYOR': $ringkas['mayor']++;     break;
+                }
+            }
+            $this->data['ringkas'] = $ringkas;
+            $this->data['jml_lingkup'] = $this->lingkup->hitung($dtform_id);
             $this->data['js'] = $this->load->get_js_files();
             $this->data['audit'] = 'active';//auditmenu
             $this->data['auditmenu'] = 'active';
