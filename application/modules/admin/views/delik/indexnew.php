@@ -79,7 +79,8 @@ echo $jawab['jwb_jawaban'];}?></p>
                 <div class="panel">
                   <header class="panel-heading">
                     <h3 class="panel-title" style="font-size:14px;padding:15px 0;">
-                      Butir daftar tilik diambil dari lingkup pertanyaan (menu Formulir Audit).
+                      Butir daftar tilik dibaca dari tabel tilik (auditjawabdetail) - sama dengan yang
+                      diisi auditor dan yang tampil pada halaman PTK/delik auditee.
                     </h3>
                   </header>
                   <div class="panel-body">

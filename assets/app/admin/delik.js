@@ -1,7 +1,7 @@
 /* Daftar tilik (halaman admin) - struktur baru.
  *
- * Baris daftar tilik berasal dari butir lingkup pertanyaan (tabel lingkup)
- * dan jawabannya tersimpan pada auditjawab (kolom lingkup_id). Halaman admin
+ * Baris daftar tilik dibaca dari tabel mutu_auditjawabdetail (sama dengan
+ * yang diisi auditor dan yang tampil pada halaman PTK/delik auditee). Halaman admin
  * bersifat baca saja untuk daftar tilik; yang dapat diubah hanya Tujuan.
  */
 $(function () {

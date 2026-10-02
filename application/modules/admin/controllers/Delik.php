@@ -5,7 +5,7 @@ class Delik extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'admin';
-        $this->load->js(base_url("assets/app/admin/delik.js?v=2.0"));
+        $this->load->js(base_url("assets/app/admin/delik.js?v=2.1"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
@@ -71,7 +71,7 @@ class Delik extends MY_Controller {
             $no++;
             $row = array();
             $row[] = $no;
-            $row[] = html_escape($field->lingkup_isi);
+            $row[] = html_escape($field->dtjwb_pertanyaan);
             $row[] = $field->jwb_hasil;
             $row[] = $field->jwb_temuan;
             $row[] = $field->jwb_catatan;
