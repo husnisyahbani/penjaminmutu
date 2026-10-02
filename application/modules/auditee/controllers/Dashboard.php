@@ -283,7 +283,7 @@ class Dashboard extends MY_Controller {
                     'tipe'        => ltrim($info['file_ext'], '.'),
                 );
             } else {
-                $gagal[] = $nama_berkas . ': ' . trim(preg_replace('/\s+/', ' ', strip_tags($this->upload->display_errors('', ''))));
+                $gagal[] = $nama_berkas . ': ' . $this->_pesanGagalUnggah();
             }
         }
 
@@ -306,6 +306,29 @@ class Dashboard extends MY_Controller {
             'lampiran'  => $tersimpan,
             'gagal'     => $gagal,
         ));
+    }
+
+    /**
+     * Pesan kesalahan unggah berbahasa Indonesia (perpustakaan upload bawaan
+     * CodeIgniter memakai pesan bahasa Inggris).
+     */
+    private function _pesanGagalUnggah() {
+        $asli = strtolower(trim(preg_replace('/\s+/', ' ', strip_tags($this->upload->display_errors('', '')))));
+
+        if (strpos($asli, 'not allowed') !== FALSE || strpos($asli, 'filetype') !== FALSE) {
+            return 'jenis berkas tidak diizinkan (PDF, Office, gambar, atau arsip)';
+        }
+        if (strpos($asli, 'too large') !== FALSE || strpos($asli, 'exceeds') !== FALSE
+                || strpos($asli, 'max_size') !== FALSE || strpos($asli, 'size') !== FALSE) {
+            return 'ukuran berkas melebihi 5 MB';
+        }
+        if (strpos($asli, 'upload path') !== FALSE || strpos($asli, 'not writable') !== FALSE) {
+            return 'folder penyimpanan lampiran tidak dapat ditulis';
+        }
+        if ($asli === '') {
+            return 'berkas gagal diunggah';
+        }
+        return 'berkas gagal diunggah (' . $asli . ')';
     }
 
     /** Hapus satu lampiran milik audit auditee yang sedang dibuka. */
