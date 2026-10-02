@@ -7,6 +7,11 @@
  * Tombol "Daftar Tilik" pada tiap topik membuka halaman pengisian seperti
  * semula (delik), sehingga alur pengisian tidak berubah.
  *
+ * Jawaban lama tingkat pertanyaan tidak ditampilkan lagi, sama seperti
+ * halaman auditee: yang dinilai auditor adalah jawaban tiap butir lingkup.
+ * Pertanyaan yang belum punya butir lingkup tetap menampilkan jawaban
+ * tingkat pertanyaan supaya data lama masih terbaca.
+ *
  * Data dari controller: $result, $audit_id, $topik.
  */
 $potong = function ($teks, $maks = 140) {
@@ -73,7 +78,10 @@ foreach ($topik as $t) {
                             <?php foreach ($topik as $i => $t):
                                 $punya_lingkup = !empty($t['punya_lingkup']);
                                 $cari = strtolower($t['teks'] . ' '
-                                    . (isset($t['jwb']['jwb_jawaban']) ? lingkup_bersihkan($t['jwb']['jwb_jawaban']) : '') . ' '
+                                    /* Jawaban tingkat pertanyaan hanya diindeks bila memang
+                                       ditampilkan, yaitu pada pertanyaan tanpa butir lingkup. */
+                                    . (!$punya_lingkup && isset($t['jwb']['jwb_jawaban'])
+                                        ? lingkup_bersihkan($t['jwb']['jwb_jawaban']) : '') . ' '
                                     . implode(' ', array_map(function ($b) {
                                     return $b['lingkup_teks'] . ' ' . $b['jwb_jawaban'] . ' '
                                         . (string) $b['jwb_temuan'] . ' ' . lingkup_bersihkan($b['jwb_catatan']);
@@ -115,16 +123,10 @@ foreach ($topik as $t) {
                                     </div>
                                 </header>
                                 <div class="aktivitas-daftar">
-                                    <?php if ($punya_lingkup && (int) $t['jml_belum'] > 0
-                                            && isset($t['jwb']['jwb_jawaban'])
-                                            && trim((string) $t['jwb']['jwb_jawaban']) !== ''): ?>
-                                    <!-- Jawaban lama (tingkat pertanyaan) - tersimpan sebelum
-                                         pertanyaan dipecah menjadi butir-butir lingkup -->
-                                    <div class="aktivitas-bukti jawaban-lama">
-                                        <span class="aktivitas-label">Jawaban lama (tingkat pertanyaan):</span>
-                                        <?php echo nl2br(html_escape(lingkup_bersihkan($t['jwb']['jwb_jawaban']))); ?>
-                                    </div>
-                                    <?php endif; ?>
+                                    <?php /* Jawaban lama tingkat pertanyaan tidak ditampilkan lagi, sama
+                                            seperti halaman auditee: yang dinilai auditor adalah jawaban
+                                            tiap butir lingkup. Datanya tetap tersimpan di
+                                            mutu_auditjawab. */ ?>
 
                                     <?php if (!$punya_lingkup): ?>
                                     <!-- Pertanyaan tanpa butir lingkup: jawaban tingkat pertanyaan
