@@ -462,6 +462,10 @@ class AuditjawabModel extends CI_Model {
      | Jawaban per butir tersimpan pada mutu_auditjawab dengan kolom
      | lingkup_id terisi; baris pertanyaan (lingkup_id NULL) tetap dipakai
      | sebagai cadangan untuk pertanyaan yang belum punya butir lingkup.
+     |
+     | Beda dengan modul auditee: mutu_auditjawabdetail (daftar tilik auditor)
+     | TIDAK ditampilkan sebagai butir di sini - hanya nilainya yang
+     | dilampirkan ke butir lingkup yang cocok.
      * ================================================================== */
 
     /** Tabel butir lingkup (mutu_lingkup) sudah siap dipakai? */
@@ -569,9 +573,11 @@ class AuditjawabModel extends CI_Model {
      * jawaban, tiap butir memuat penilaian auditor (hasil/temuan/catatan) dan
      * rencana koreksi - keduanya hanya ditampilkan, tidak diisi auditee.
      *
-     * Baris tilik lama (auditjawabdetail) yang tidak berpasangan dengan butir
-     * lingkup mana pun tetap ditampilkan (tanpa kotak jawaban) supaya
-     * penilaian auditor tidak hilang.
+     * Halaman ini HANYA menampilkan butir dari mutu_lingkup. Baris tilik lama
+     * (auditjawabdetail) bukan daftar pertanyaan di sini: nilainya (hasil,
+     * temuan, catatan, koreksi) cukup dilampirkan ke butir lingkup yang
+     * cocok, sedangkan baris yang tidak berpasangan tidak ditampilkan -
+     * daftar tilik lengkapnya ada pada halaman Daftar Tilik.
      *
      * @return array daftar topik; tiap topik berisi 'butir', 'punya_lingkup'.
      */
@@ -695,15 +701,11 @@ class AuditjawabModel extends CI_Model {
                 }
             }
 
-            /* Sisa baris tilik lama tetap ditampilkan (tanpa kotak jawaban). */
-            foreach ($berdasar_id as $kumpulan) {
-                foreach ($kumpulan as $b) {
-                    $butir[] = $this->_susunButirLama($b, $lampiran_tilik);
-                }
-            }
-            foreach ($sisa as $b) {
-                $butir[] = $this->_susunButirLama($b, $lampiran_tilik);
-            }
+            /* Baris tilik lama (mutu_auditjawabdetail) yang tidak berpasangan
+               dengan butir lingkup mana pun TIDAK ditampilkan di halaman ini:
+               daftar pertanyaannya murni mutu_lingkup. Nilai penilaian dari
+               baris tilik tetap terbaca lewat _penilaianLama() di atas, dan
+               daftar tilik lengkapnya ada pada halaman Daftar Tilik. */
 
             $jml_butir = 0;
             $jml_dijawab = 0;
@@ -843,29 +845,5 @@ class AuditjawabModel extends CI_Model {
         $item['lampiran'] = array_values($kumpul);
 
         return $item;
-    }
-
-    /** Susun baris tilik lama yang tidak berpasangan dengan butir lingkup. */
-    private function _susunButirLama($b, $lampiran_tilik) {
-        $dtjwb_id = (int) $b['dtjwb_id'];
-
-        return array(
-            'lingkup_id'      => 0,
-            'lingkup_isi'     => $b['dtjwb_pertanyaan'],
-            'lingkup_teks'    => lingkup_bersihkan($b['dtjwb_pertanyaan']),
-            'lingkup_urut'    => 0,
-            'dtform_id'       => (int) $b['dtform_id'],
-            'jwb_id'          => (int) $b['jwb_id'],
-            'jwb_jawaban'     => '',
-            'sudah_dijawab'   => FALSE,
-            'jwb_hasil'       => isset($b['dtjwb_hasil']) ? $b['dtjwb_hasil'] : '',
-            'jwb_temuan'      => isset($b['dtjwb_temuan']) ? $b['dtjwb_temuan'] : '',
-            'jwb_catatan'     => isset($b['dtjwb_catatan']) ? $b['dtjwb_catatan'] : '',
-            'jwb_koreksi'     => isset($b['jwb_koreksi']) ? $b['jwb_koreksi'] : '',
-            'dtjwb_id'        => $dtjwb_id,
-            'dtjwb_referensi' => isset($b['dtjwb_referensi']) ? $b['dtjwb_referensi'] : '',
-            'bisa_dijawab'    => FALSE,
-            'lampiran'        => isset($lampiran_tilik[$dtjwb_id]) ? $lampiran_tilik[$dtjwb_id] : array(),
-        );
     }
 }
