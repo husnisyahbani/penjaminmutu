@@ -31,14 +31,23 @@ $(function () {
     /* ------------------------------ tabel ------------------------------ */
 
     var tiliklist = $('#tilik').DataTable({
-        "responsive": true,
+        /* Kolom tidak dilipat/disembunyikan: semua kolom tampil dengan tombol
+           edit di dalamnya. Bila layar sempit, tabel digulir mendatar
+           (.ptk-tabel-kotak) bukan disembunyikan. */
+        "responsive": false,
+        "autoWidth": false,
         "processing": true,
         "serverSide": true,
         "searching": true,
         "order": [],
         "columnDefs": [
             {"targets": [0, 5], "orderable": false},
-            {"targets": [5], "className": "text-center tabel-aksi-sel"}
+            {"targets": [5], "className": "text-center tabel-aksi-sel"},
+            {"targets": [1], "className": "ptk-kolom-butir"},
+            {"targets": [2], "className": "ptk-kolom-hasil"},
+            {"targets": [3], "className": "ptk-kolom-temuan"},
+            {"targets": [4], "className": "ptk-kolom-catatan"},
+            {"targets": [5], "className": "ptk-kolom-aksi"}
         ],
         "ajax": {
             "url": base_url + "/delik/listdelik/" + jwb_id,
