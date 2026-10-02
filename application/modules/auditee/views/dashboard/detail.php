@@ -8,12 +8,14 @@
  *   3. kotak jawaban untuk TIAP butir lingkup (wajib, hanya saat DRAFT);
  *   4. lampiran jawaban per butir (opsional, boleh lebih dari satu berkas).
  *
- * Penilaian auditor (hasil/temuan/catatan), rencana koreksi, referensi, dan
- * daftar tilik TIDAK ditampilkan di sini - itu urutan kerja auditor dan halaman
- * PTK. Jawaban lama tingkat pertanyaan juga tidak ditampilkan lagi (datanya
- * tetap tersimpan dan masih terbaca di halaman auditor). Pertanyaan yang belum
- * punya butir lingkup tetap memakai kotak jawaban tingkat pertanyaan supaya
- * audit tidak terkunci.
+ * Penilaian auditor (hasil/temuan/catatan), rencana koreksi, dan referensi
+ * TIDAK ditampilkan di sini - itu urutan kerja auditor dan halaman PTK.
+ * Tombol "Daftar Tilik & Koreksi" tetap tersedia untuk membuka halaman Delik
+ * (auditee/delik?audit_id=..&dtform_id=..) bila butir tilik perlu dilihat.
+ * Jawaban lama tingkat pertanyaan juga tidak ditampilkan lagi (datanya tetap
+ * tersimpan dan masih terbaca di halaman auditor). Pertanyaan yang belum punya
+ * butir lingkup tetap memakai kotak jawaban tingkat pertanyaan supaya audit
+ * tidak terkunci.
  *
  * Data dari controller: $result, $audit_id, $topik, $lampiran_siap,
  * $lingkup_siap, $sudah_terkirim (jawaban dikunci bila status bukan DRAFT),
@@ -156,6 +158,13 @@ $jml_belum = $jml_wajib - $jml_dijawab;
                                         </span>
                                     </h4>
                                     <i class="icon md-chevron-down topik-panah" aria-hidden="true"></i>
+                                    <div class="topik-aksi">
+                                        <button type="button" class="delik btn btn-sm btn-primary"
+                                                dtform_id="<?php echo (int) $t['dtform_id']; ?>"
+                                                audit_id="<?php echo (int) $audit_id; ?>">
+                                            <i class="icon md-edit" aria-hidden="true"></i>Daftar Tilik &amp; Koreksi
+                                        </button>
+                                    </div>
                                 </header>
                                 <div class="aktivitas-daftar">
 
