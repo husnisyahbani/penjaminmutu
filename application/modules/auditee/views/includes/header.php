@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", function(){
     
     <!-- Fonts -->
     <!-- Kartu statistik & tombol aksi tabel (dipakai bersama admin/auditor/auditee) -->
-    <link rel="stylesheet" href="<?php echo asset_url();?>app/topik-aktivitas.css?v=1.3">
+    <link rel="stylesheet" href="<?php echo asset_url();?>app/topik-aktivitas.css?v=1.4">
     <link rel="stylesheet" href="<?php echo asset_url();?>app/filter-tabel.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>app/kartu-statistik.css?v=1.1">
     <link rel="stylesheet" href="<?php echo asset_url();?>app/tabel-aksi.css">

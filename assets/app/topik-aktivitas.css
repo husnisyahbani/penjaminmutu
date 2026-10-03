@@ -238,9 +238,26 @@
     margin-top: 10px;
 }
 
+/* Jawaban yang sudah tersimpan (tampilan hanya-baca, mis. pada halaman
+   auditee setelah dikirim atau pada daftar tilik auditor). */
+.jawaban-teks {
+    color: #3c4657;
+    line-height: 1.6;
+    word-break: break-word;
+}
+
 .jawaban-isi {
     min-height: 78px;
     font-size: 13px;
+}
+
+/* Judul "Lampiran" di atas daftar berkas. */
+.lampiran-judul {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #616161;
 }
 
 .jawaban-aksi {

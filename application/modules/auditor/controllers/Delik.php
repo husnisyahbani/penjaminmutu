@@ -37,9 +37,11 @@ class Delik extends MY_Controller {
             /* Ringkasan kartu: jumlah butir tilik per jenis penilaian.
                Sumbernya tabel yang sama dengan tabel di bawah. */
             $butir = $this->dtjwb->butirAudit($this->data['jwb_id']);
-            /* Daftar butir beserta jawaban auditee - ditampilkan pada panel
-               Informasi Pertanyaan (pengganti blok "Jawaban auditee"). */
-            $this->data['butir_lingkup'] = $butir;
+            /* Daftar lingkup (mutu_lingkup) pertanyaan ini lengkap dengan
+               jawaban auditee dan lampirannya - ditampilkan di bawah blok
+               tujuan pada panel Informasi Pertanyaan, sama seperti tampilan
+               butir lingkup pada halaman auditee/dashboard/detail. */
+            $this->data['lingkup_jawab'] = $this->_lingkupJawab($audit_id, $dtform_id);
             $ringkas = array('total' => count($butir), 'sesuai' => 0, 'observasi' => 0,
                              'minor' => 0, 'mayor' => 0);
             foreach ($butir as $b) {
@@ -59,6 +61,39 @@ class Delik extends MY_Controller {
             $this->template($this->data, $this->module); 
             
         }
+    }
+
+    /**
+     * Butir lingkup (mutu_lingkup) satu pertanyaan beserta jawaban auditee
+     * dan lampirannya.
+     *
+     * Dipakai panel Informasi Pertanyaan pada halaman daftar tilik auditor:
+     * bagian "Jawaban auditee" yang lama (baris tilik) diganti daftar ini,
+     * supaya yang tampil sama dengan halaman auditee - teks lingkup,
+     * jawaban, dan tautan lampiran bila ada. Penilaian auditor tidak
+     * ditampilkan di sini karena diisi pada tabel Daftar Tilik di bawahnya.
+     *
+     * @param  int   $audit_id
+     * @param  int   $dtform_id
+     * @return array daftar butir (lingkup_id, lingkup_teks, jwb_jawaban,
+     *               sudah_dijawab, lampiran[])
+     */
+    private function _lingkupJawab($audit_id, $dtform_id) {
+        $dtform_id = (int) $dtform_id;
+        if ($dtform_id < 1) {
+            return array();
+        }
+
+        /* petaLingkup() sudah menghimpun jawaban per butir dan lampiran
+           (termasuk lampiran lama pada baris tilik), jadi tinggal ambil
+           pertanyaan yang sedang dibuka. */
+        foreach ($this->auditjawab->petaLingkup($audit_id) as $t) {
+            if ((int) $t['dtform_id'] === $dtform_id) {
+                return $t['butir'];
+            }
+        }
+
+        return array();
     }
 
     public function tujuan() {

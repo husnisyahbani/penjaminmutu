@@ -6,6 +6,11 @@
        auditee/delik: kartu ringkasan di atas, lalu tabel butir. Tab lama
        (Evaluasi / Hasil Evaluasi / Tujuan / Daftar Tilik) dihapus.
 
+       Di bawah blok tujuan ditampilkan daftar lingkup (mutu_lingkup)
+       pertanyaan ini lengkap dengan jawaban auditee dan tautan lampirannya,
+       sama seperti tampilan butir lingkup pada halaman auditee. Bagian
+       "Jawaban auditee" yang lama (baris tilik) tidak ditampilkan lagi.
+
        Tujuan pertanyaan disunting langsung di atas tabel (input tujuan),
        dan butir tilik dikelola penuh (CRUD): tambah butir, sunting
        pertanyaan + referensi lewat ikon pada kolom Butir Lingkup, sunting
@@ -136,53 +141,70 @@
                   <span class="tujuan-pesan text-muted"></span>
                 </div>
               </div>
+            </div><!-- /#tujuan_kotak - tujuan tetap satu blok tersendiri -->
 
             <?php
-            /* Butir-butir lingkup pertanyaan ini beserta jawaban auditee.
-               Jawaban per butir dipakai bila ada (data lama); jika tidak,
-               jawaban pertanyaan yang ditampilkan. */
-            $butir_lingkup = isset($butir_lingkup) ? $butir_lingkup : array();
+            /* Daftar lingkup (mutu_lingkup) pertanyaan ini lengkap dengan
+               jawaban auditee dan lampirannya - tampilannya mengikuti butir
+               lingkup pada halaman auditee/dashboard/detail. Bagian
+               "Jawaban auditee" yang lama (baris tilik) sudah dihapus dari
+               halaman ini. Penilaian auditor (hasil/temuan/catatan) juga
+               tidak ditampilkan di sini karena diisi pada tabel Daftar
+               Tilik di bawah. */
+            $lingkup_jawab = isset($lingkup_jawab) ? $lingkup_jawab : array();
             ?>
-            <?php if (!empty($butir_lingkup)): ?>
+            <?php if (!empty($lingkup_jawab)): ?>
             <div class="pertanyaan-butir">
               <div class="butir-lingkup-judul">
-                Butir lingkup beserta jawaban auditee
-                <span class="badge badge-default"><?php echo count($butir_lingkup); ?> butir</span>
+                Daftar lingkup &amp; jawaban auditee
+                <span class="badge badge-default"><?php echo count($lingkup_jawab); ?> butir</span>
               </div>
               <div class="pertanyaan-butir__daftar" id="butir_lingkup">
-                <ol class="lingkup-daftar">
-                  <?php
-                  $warna_butir = array('S' => 'badge-success', 'OB' => 'badge-info',
-                                       'TS MINOR' => 'badge-warning', 'TS MAYOR' => 'badge-danger');
-                  foreach ($butir_lingkup as $b):
-                      $temuan_butir = strtoupper(trim((string) $b['dtjwb_temuan']));
-                      $warna = isset($warna_butir[$temuan_butir]) ? $warna_butir[$temuan_butir] : 'badge-default';
-                      $jawab_butir = trim((string) (isset($b['jwb_jawaban_butir']) ? $b['jwb_jawaban_butir'] : ''));
-                      if ($jawab_butir === '') {
-                          $jawab_butir = trim((string) (isset($b['jwb_jawaban_pertanyaan']) ? $b['jwb_jawaban_pertanyaan'] : ''));
-                      }
-                  ?>
-                  <li>
-                    <div class="butir-lingkup-teks"><?php echo html_escape(lingkup_bersihkan($b['dtjwb_pertanyaan'])); ?></div>
-                    <?php if (!empty($b['dtjwb_referensi']) && trim((string) $b['dtjwb_referensi']) !== ''): ?>
-                    <div class="tilik-ref"><strong>Referensi:</strong> <?php echo html_escape(lingkup_bersihkan($b['dtjwb_referensi'])); ?></div>
-                    <?php endif; ?>
-                    <?php if ($temuan_butir !== ''): ?>
-                    <div class="butir-lingkup-status"><span class="badge <?php echo $warna; ?>"><?php echo html_escape($temuan_butir); ?></span></div>
-                    <?php endif; ?>
-                    <div class="aktivitas-bukti">
-                      <span class="aktivitas-label">Jawaban auditee:</span>
-                      <?php echo $jawab_butir !== ''
-                          ? nl2br(html_escape(lingkup_bersihkan($jawab_butir)))
-                          : '<span class="text-muted">belum dijawab</span>'; ?>
+                <?php $nomor = 0; ?>
+                <?php foreach ($lingkup_jawab as $b):
+                    $nomor++;
+                    $jawaban = lingkup_bersihkan(isset($b['jwb_jawaban']) ? $b['jwb_jawaban'] : '');
+                    $sudah   = trim($jawaban) !== '';
+                ?>
+                <div class="aktivitas lingkup-item" data-lingkup_id="<?php echo (int) $b['lingkup_id']; ?>">
+                  <div class="aktivitas-isi">
+                    <span class="aktivitas-teks">
+                      <span class="lingkup-nomor"><?php echo $nomor; ?>.</span>
+                      <?php echo html_escape($b['lingkup_teks']); ?>
+                      <span class="badge lingkup-status <?php echo $sudah ? 'badge-success' : 'badge-warning'; ?>">
+                        <?php echo $sudah ? 'sudah dijawab' : 'belum dijawab'; ?>
+                      </span>
+                    </span>
+                    <div class="jawaban-kotak">
+                      <div class="jawaban-teks">
+                        <?php echo $sudah
+                            ? nl2br(html_escape($jawaban))
+                            : '<span class="text-muted">belum dijawab</span>'; ?>
+                      </div>
                     </div>
-                  </li>
-                  <?php endforeach; ?>
-                </ol>
+                    <?php if (!empty($b['lampiran'])): ?>
+                    <div class="lampiran-kotak">
+                      <span class="lampiran-judul">
+                        <i class="icon md-attachment" aria-hidden="true"></i>Lampiran
+                      </span>
+                      <div class="lampiran-daftar">
+                        <?php foreach ($b['lampiran'] as $l): ?>
+                        <div class="lampiran" data-lampiran_id="<?php echo (int) $l['lampiran_id']; ?>">
+                          <i class="icon md-file lampiran-ikon" aria-hidden="true"></i>
+                          <a class="lampiran-nama" target="_blank" rel="noopener"
+                             href="<?php echo $l['url']; ?>"><?php echo html_escape($l['lampiran_asli']); ?></a>
+                          <span class="lampiran-ukuran text-muted"><?php echo html_escape($l['ukuran_teks']); ?></span>
+                        </div>
+                        <?php endforeach; ?>
+                      </div>
+                    </div>
+                    <?php endif; ?>
+                  </div>
+                </div>
+                <?php endforeach; ?>
               </div>
             </div>
             <?php endif; ?>
-            </div>
           </div>
         </div>
       </div>
