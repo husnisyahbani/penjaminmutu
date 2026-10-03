@@ -21,11 +21,9 @@ $(function () {
        (lihat assets/app/topik-aktivitas.js), jadi tidak ada DataTable
        #daftarpertanyaan lagi di halaman itu. */
 
-    // $('#jwb_pertanyaan').summernote('code', jwb_pertanyaan);
-    // $('#jwb_referensi').summernote('code', jwb_referensi);
-    // $('#jwb_hasil').summernote('code', jwb_hasil);
-    // $('#jwb_catatan').summernote('code', jwb_catatan);
-    // $('#jwb_tujuan').summernote('code', jwb_tujuan);
+    /* Kolom jwb_pertanyaan/jwb_referensi/jwb_hasil/jwb_temuan/jwb_catatan
+       pada mutu_auditjawab sudah dihapus; formulir penilaian kini ditangani
+       pada halaman Daftar Tilik (mutu_auditjawabdetail). */
 
 
     /* Tombol "Daftar Tilik" pada tiap topik (halaman detail). */

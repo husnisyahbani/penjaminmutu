@@ -19,9 +19,9 @@ if (!defined('BASEPATH')) {
  * keduanya.
  *
  * Rencana koreksi disimpan per butir pada `auditjawabdetail.dtjwb_koreksi`
- * bila kolom itu sudah ada (lihat database/koreksi_butir.sql atau menu
- * Migrasi). Bila belum ada, yang dipakai kolom lama `auditjawab.jwb_koreksi`
- * (satu teks untuk satu pertanyaan) supaya halaman tetap berjalan.
+ * (lihat database/koreksi_butir.sql atau menu Migrasi). Kolom lama
+ * `auditjawab.jwb_koreksi` sudah dihapus, jadi kolom `dtjwb_koreksi`
+ * wajib tersedia agar rencana koreksi dapat disimpan.
  */
 class PtkModel extends CI_Model {
 
@@ -35,14 +35,13 @@ class PtkModel extends CI_Model {
     var $column_order = array(null,'f.form_nama','dj.dtjwb_pertanyaan','dj.dtjwb_hasil','dj.dtjwb_temuan','dj.dtjwb_catatan',null);
 
     /**
-     * Kolom rencana koreksi yang tersedia:
-     *   - auditjawabdetail.dtjwb_koreksi (satu teks per butir) bila ada,
-     *   - jika belum, auditjawab.jwb_koreksi (satu teks per pertanyaan).
+     * Kolom rencana koreksi: hanya `auditjawabdetail.dtjwb_koreksi`
+     * (satu teks per butir). Kolom lama `auditjawab.jwb_koreksi` sudah
+     * dihapus, jadi pastikan kolom ini ada (impor database/koreksi_butir.sql
+     * atau menu PPM > Migrasi Lingkup > "Siapkan Kolom Koreksi Butir").
      */
     private function _koreksi_sql() {
-        return $this->db->field_exists('dtjwb_koreksi', 'auditjawabdetail')
-            ? 'dj.dtjwb_koreksi'
-            : 'jb.jwb_koreksi';
+        return 'dj.dtjwb_koreksi';
     }
 
     /** Sudah ada kolom koreksi per butir? */
@@ -100,7 +99,9 @@ class PtkModel extends CI_Model {
         $this->db->select('dj.dtjwb_hasil AS jwb_hasil', FALSE);
         $this->db->select('dj.dtjwb_temuan AS jwb_temuan', FALSE);
         $this->db->select('dj.dtjwb_catatan AS jwb_catatan', FALSE);
-        $this->db->select($this->_koreksi_sql() . ' AS jwb_koreksi', FALSE);
+        if ($this->koreksiSiap()) {
+            $this->db->select($this->_koreksi_sql() . ' AS jwb_koreksi', FALSE);
+        }
 
         $this->db->from('auditjawabdetail dj');
         $this->db->join('auditjawab jb', 'jb.jwb_id = dj.jwb_id', 'inner');
@@ -224,11 +225,11 @@ class PtkModel extends CI_Model {
     }
 
     /**
-     * Simpan rencana koreksi satu butir.
+     * Simpan rencana koreksi satu butir pada `auditjawabdetail.dtjwb_koreksi`.
      *
-     * Kolom `auditjawabdetail.dtjwb_koreksi` dipakai bila sudah ada; bila
-     * belum, teks disimpan pada baris pertanyaan (`auditjawab.jwb_koreksi`)
-     * seperti versi lama. $data: audit_id, jwb_id, dtjwb_id, jwb_koreksi.
+     * Kolom lama `auditjawab.jwb_koreksi` sudah dihapus, jadi bila kolom
+     * `dtjwb_koreksi` belum tersedia penyimpanan dibatalkan (FALSE).
+     * $data: audit_id, jwb_id, dtjwb_id, jwb_koreksi.
      */
     public function koreksi($data) {
         /* Auditee hanya mengisi kolom dtjwb_koreksi, dan hanya setelah audit
@@ -243,14 +244,13 @@ class PtkModel extends CI_Model {
 
         $this->db->trans_start();
 
-        if ($this->koreksiSiap()) {
-            $this->db->where('dtjwb_id', $data['dtjwb_id']);
-            $this->db->update('auditjawabdetail', array('dtjwb_koreksi' => $data['jwb_koreksi']));
-        } else {
-            $this->db->where('audit_id', $data['audit_id']);
-            $this->db->where('jwb_id', $data['jwb_id']);
-            $this->db->update('auditjawab', array('jwb_koreksi' => $data['jwb_koreksi']));
+        if (!$this->koreksiSiap()) {
+            $this->db->trans_complete();
+            return FALSE;
         }
+
+        $this->db->where('dtjwb_id', $data['dtjwb_id']);
+        $this->db->update('auditjawabdetail', array('dtjwb_koreksi' => $data['jwb_koreksi']));
 
         $this->db->trans_complete();
         return $this->db->trans_status();

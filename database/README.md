@@ -230,3 +230,46 @@ Catatan:
 - Menghapus lampiran dari halaman detail ikut menghapus berkas fisiknya.
 - Rollback: `DROP TABLE mutu_lampiran;` (berkas fisik di `filedata/lampiran/`
   dihapus manual bila perlu).
+
+## `hapus_kolom_auditjawab.sql`
+
+Menghapus kolom penilaian lama pada `mutu_auditjawab`:
+`jwb_pertanyaan`, `jwb_referensi`, `jwb_temuan`, `jwb_hasil`, `jwb_catatan`,
+dan `jwb_koreksi`.
+
+Kolom-kolom itu tidak dipakai lagi. Penilaian auditor (hasil, temuan, catatan)
+dan rencana koreksi auditee kini tersimpan **per butir tilik** pada
+`mutu_auditjawabdetail` (`dtjwb_hasil`, `dtjwb_temuan`, `dtjwb_catatan`,
+`dtjwb_koreksi`), sedangkan `mutu_auditjawab` hanya menyimpan **jawaban
+auditee** (`jwb_jawaban`) dan **tujuan pertanyaan** (`jwb_tujuan`).
+
+| Data                     | Tempat baru                                                          |
+| ------------------------ | -------------------------------------------------------------------- |
+| Jawaban auditee          | `mutu_auditjawab`.`jwb_jawaban` (per butir lingkup: `lingkup_id` terisi) |
+| Tujuan pertanyaan        | `mutu_auditjawab`.`jwb_tujuan`                                        |
+| Hasil / temuan / catatan | `mutu_auditjawabdetail`.`dtjwb_hasil` / `dtjwb_temuan` / `dtjwb_catatan` |
+| Referensi butir          | `mutu_auditjawabdetail`.`dtjwb_referensi`                             |
+| Rencana koreksi          | `mutu_auditjawabdetail`.`dtjwb_koreksi`                               |
+
+Cara pakai:
+
+1. **Perbarui kode aplikasi lebih dahulu**, pastikan kolom-kolom di atas sudah
+   tidak dibaca/ditulis lagi.
+2. Cadangkan basis data.
+3. Impor berkas `database/hapus_kolom_auditjawab.sql` lewat phpMyAdmin (tab SQL).
+4. Sesuaikan prefix `mutu_` bila berbeda.
+
+Catatan:
+
+- Tidak aman dijalankan berulang kali: `DROP COLUMN` akan gagal bila kolomnya
+  sudah terlanjur dihapus. Pesan galat itu bisa diabaikan.
+- Rencana koreksi **wajib** memakai `mutu_auditjawabdetail`.`dtjwb_koreksi`.
+  Bila kolom itu belum ada, impor `database/koreksi_butir.sql` atau jalankan
+  **Admin → Migrasi Lingkup → Siapkan Kolom Koreksi Butir**. Tanpa kolom itu
+  rencana koreksi tidak dapat disimpan.
+- Migrasi jawaban lama (`Admin → Migrasi Lingkup`) kini hanya memindahkan
+  **penanda** `lingkup_id` pada baris tilik, bukan nilai penilaian - nilai
+  penilaian tetap dibaca langsung dari `mutu_auditjawabdetail`.
+- Rollback: buat kembali kolom-kolomnya bila benar-benar diperlukan
+  (`ALTER TABLE mutu_auditjawab ADD COLUMN jwb_hasil text ...`), tetapi data
+  yang sudah dihapus tidak dapat dikembalikan tanpa cadangan.
