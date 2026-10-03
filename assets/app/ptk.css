@@ -212,6 +212,21 @@
     margin: 0 0 6px 10px;
 }
 
+/* Tombol buka/tutup daftar lingkup & jawaban auditee pada panel Informasi
+   Pertanyaan (auditor/delik). Ikon panah berputar mengikuti aria-expanded
+   yang diatur Bootstrap saat collapse dibuka/ditutup. */
+.lingkup-toggle {
+    margin-bottom: 8px;
+}
+
+.lingkup-toggle__ikon {
+    transition: transform .15s ease;
+}
+
+.lingkup-toggle[aria-expanded="false"] .lingkup-toggle__ikon {
+    transform: rotate(-90deg);
+}
+
 /* Daftar butir lingkup + jawaban auditee pada panel Informasi Pertanyaan. */
 .butir-lingkup-judul {
     margin-bottom: 8px;

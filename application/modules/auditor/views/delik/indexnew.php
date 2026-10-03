@@ -155,11 +155,15 @@
             ?>
             <?php if (!empty($lingkup_jawab)): ?>
             <div class="pertanyaan-butir">
-              <div class="butir-lingkup-judul">
+              <?php /* Tombol buka/tutup: daftar lingkup dapat disembunyikan
+                       atau ditampilkan lagi (collapse Bootstrap). */ ?>
+              <button type="button" class="btn btn-sm btn-default lingkup-toggle" data-toggle="collapse"
+                      data-target="#butir_lingkup" aria-expanded="true" aria-controls="butir_lingkup">
+                <i class="icon md-chevron-down lingkup-toggle__ikon" aria-hidden="true"></i>
                 Daftar lingkup &amp; jawaban auditee
                 <span class="badge badge-default"><?php echo count($lingkup_jawab); ?> butir</span>
-              </div>
-              <div class="pertanyaan-butir__daftar" id="butir_lingkup">
+              </button>
+              <div class="collapse show pertanyaan-butir__daftar" id="butir_lingkup">
                 <?php $nomor = 0; ?>
                 <?php foreach ($lingkup_jawab as $b):
                     $nomor++;
