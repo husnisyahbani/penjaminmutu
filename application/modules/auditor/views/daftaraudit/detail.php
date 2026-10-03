@@ -2,7 +2,11 @@
 /**
  * Detail audit (auditor) gaya halaman kursus:
  *   topik    = pertanyaan formulir
- *   activity = butir lingkup + hasil/temuan/catatan yang sudah diisi
+ *   activity = butir lingkup + jawaban auditee + lampiran
+ *
+ * Penilaian (hasil/temuan/catatan/rencana koreksi) TIDAK ditampilkan di sini:
+ * auditor mengisinya pada halaman Daftar Tilik (tombol pada tiap topik) dan
+ * nilainya tetap terbaca di sana serta pada ekspor Excel.
  *
  * Tombol "Daftar Tilik" pada tiap topik membuka halaman pengisian seperti
  * semula (delik), sehingga alur pengisian tidak berubah.
@@ -27,15 +31,11 @@ $potong = function ($teks, $maks = 140) {
 
 $jml_pertanyaan = count($topik);
 $jml_lingkup = 0;
-$jml_dinilai = 0;
-$jml_temuan = 0;
 $jml_dijawab = 0;    // butir lingkup yang sudah dijawab auditee
 $jml_belum = 0;
 $jml_lampiran = 0;
 foreach ($topik as $t) {
     $jml_lingkup   += (int) $t['jml_butir'];
-    $jml_dinilai   += (int) $t['jml_dinilai'];
-    $jml_temuan    += (int) $t['jml_temuan'];
     $jml_dijawab   += (int) $t['jml_dijawab'];
     $jml_belum     += isset($t['jml_belum']) ? (int) $t['jml_belum'] : 0;
     $jml_lampiran  += (int) $t['jml_lampiran'];
@@ -70,8 +70,6 @@ foreach ($topik as $t) {
                             <span class="badge badge-success"><?php echo (int) $jml_dijawab; ?> dijawab</span>
                             <span class="badge badge-warning"><?php echo (int) $jml_belum; ?> belum dijawab</span>
                             <span class="badge badge-info"><?php echo (int) $jml_lampiran; ?> lampiran</span>
-                            <span class="badge badge-primary"><?php echo (int) $jml_dinilai; ?> dinilai</span>
-                            <span class="badge badge-warning"><?php echo (int) $jml_temuan; ?> temuan</span>
                         </div>
 
                         <div class="topik-berkas" id="topik_daftar">
@@ -83,8 +81,7 @@ foreach ($topik as $t) {
                                     . (!$punya_lingkup && isset($t['jwb']['jwb_jawaban'])
                                         ? lingkup_bersihkan($t['jwb']['jwb_jawaban']) : '') . ' '
                                     . implode(' ', array_map(function ($b) {
-                                    return $b['lingkup_teks'] . ' ' . $b['jwb_jawaban'] . ' '
-                                        . (string) $b['jwb_temuan'] . ' ' . lingkup_bersihkan($b['jwb_catatan']);
+                                    return $b['lingkup_teks'] . ' ' . $b['jwb_jawaban'];
                                 }, $t['butir'])));
                             ?>
                             <section class="topik" data-dtform_id="<?php echo (int) $t['dtform_id']; ?>"
@@ -104,12 +101,6 @@ foreach ($topik as $t) {
                                             <span class="badge <?php echo !empty($t['sudah_dijawab']) ? 'badge-success' : 'badge-warning'; ?>">
                                                 <?php echo !empty($t['sudah_dijawab']) ? 'sudah dijawab' : 'belum dijawab'; ?>
                                             </span>
-                                            <?php endif; ?>
-                                            <?php if ($t['jml_dinilai'] > 0): ?>
-                                            <span class="badge badge-success"><?php echo (int) $t['jml_dinilai']; ?> dinilai</span>
-                                            <?php endif; ?>
-                                            <?php if ($t['jml_temuan'] > 0): ?>
-                                            <span class="badge badge-warning"><?php echo (int) $t['jml_temuan']; ?> temuan</span>
                                             <?php endif; ?>
                                         </span>
                                     </h4>
@@ -166,15 +157,11 @@ foreach ($topik as $t) {
                                             $nomor++;
                                         }
                                         $jawaban = lingkup_bersihkan($b['jwb_jawaban']);
-                                        $hasil  = $potong($b['jwb_hasil']);
-                                        $temuan = trim((string) $b['jwb_temuan']);
-                                        $catatan = $potong($b['jwb_catatan'], 180);
-                                        $ada = ($hasil !== '' || $temuan !== '' || $catatan !== '');
                                     ?>
                                     <div class="aktivitas lingkup-item<?php echo $bisa_dijawab ? '' : ' lingkup-item--lama'; ?>"
                                          data-lingkup_id="<?php echo (int) $b['lingkup_id']; ?>"
                                          data-sudah-dijawab="<?php echo trim((string) $b['jwb_jawaban']) !== '' ? '1' : '0'; ?>"
-                                         data-cari="<?php echo html_escape(strtolower($b['lingkup_teks'] . ' ' . $jawaban . ' ' . $hasil . ' ' . $temuan . ' ' . $catatan)); ?>">
+                                         data-cari="<?php echo html_escape(strtolower($b['lingkup_teks'] . ' ' . $jawaban)); ?>">
                                         <i class="icon <?php echo $bisa_dijawab ? 'md-comment-text' : 'md-assignment'; ?> aktivitas-ikon" aria-hidden="true"></i>
                                         <div class="aktivitas-isi">
                                             <span class="aktivitas-teks">
@@ -212,28 +199,6 @@ foreach ($topik as $t) {
                                             </div>
                                             <?php endif; ?>
 
-                                            <?php if (!$ada): ?>
-                                            <div class="aktivitas-status">
-                                                <span class="text-muted">belum dinilai</span>
-                                            </div>
-                                            <?php else: ?>
-                                            <div class="aktivitas-status">
-                                                <?php if ($temuan !== ''): ?>
-                                                <span class="badge badge-warning"><?php echo html_escape($temuan); ?></span>
-                                                <?php endif; ?>
-                                                <?php if ($hasil !== ''): ?>
-                                                <span class="badge badge-primary">Hasil: <?php echo html_escape($hasil); ?></span>
-                                                <?php endif; ?>
-                                                <?php if ($catatan !== ''): ?>
-                                                <span class="badge badge-info">Catatan</span>
-                                                <?php endif; ?>
-                                            </div>
-                                            <?php if ($catatan !== ''): ?>
-                                            <div class="aktivitas-bukti">
-                                                <span class="aktivitas-label">Catatan:</span> <?php echo html_escape($catatan); ?>
-                                            </div>
-                                            <?php endif; ?>
-                                            <?php endif; ?>
                                         </div>
                                     </div>
                                     <?php endforeach; ?>

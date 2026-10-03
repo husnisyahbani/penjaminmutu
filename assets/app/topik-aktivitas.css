@@ -168,18 +168,6 @@
     align-self: flex-start;
 }
 
-/* Penanda status pada halaman detail audit */
-.aktivitas-status {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 6px;
-}
-
-.aktivitas-status .badge {
-    font-weight: 500;
-}
-
 .aktivitas-bukti {
     margin-top: 6px;
     color: #5b6475;

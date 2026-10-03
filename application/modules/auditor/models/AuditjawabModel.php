@@ -756,9 +756,6 @@ class AuditjawabModel extends CI_Model {
 
             $jml_butir = 0;
             $jml_dijawab = 0;
-            $jml_temuan = 0;
-            $jml_koreksi = 0;
-            $jml_dinilai = 0;
             $jml_lampiran = 0;
 
             foreach ($butir as $b) {
@@ -767,15 +764,6 @@ class AuditjawabModel extends CI_Model {
                     if (!empty($b['sudah_dijawab'])) {
                         $jml_dijawab++;
                     }
-                }
-                if (trim((string) $b['jwb_temuan']) !== '') {
-                    $jml_temuan++;
-                }
-                if (trim((string) $b['jwb_koreksi']) !== '') {
-                    $jml_koreksi++;
-                }
-                if (trim((string) $b['jwb_hasil']) !== '' || trim((string) $b['jwb_temuan']) !== '') {
-                    $jml_dinilai++;
                 }
                 $jml_lampiran += count($b['lampiran']);
             }
@@ -800,9 +788,6 @@ class AuditjawabModel extends CI_Model {
             $topik[$i]['jml_dijawab']    = $jml_dijawab;
             $topik[$i]['jml_belum']      = $jml_butir - $jml_dijawab;
             $topik[$i]['jml_wajib']      = $punya_lingkup ? $jml_butir : 1;
-            $topik[$i]['jml_dinilai']    = $jml_dinilai;
-            $topik[$i]['jml_temuan']     = $jml_temuan;
-            $topik[$i]['jml_koreksi']    = $jml_koreksi;
             $topik[$i]['jml_lampiran']   = $jml_lampiran;
         }
 
@@ -847,14 +832,12 @@ class AuditjawabModel extends CI_Model {
         return NULL;
     }
 
-    /** Susun satu butir lingkup beserta jawaban, penilaian, dan lampiran. */
+    /** Susun satu butir lingkup beserta jawaban auditee dan lampiran. */
     private function _susunButir($dtform_id, $b, $jawab_butir, $pen, $lampiran_butir, $lampiran_tilik) {
         $lid = (int) $b['lingkup_id'];
         $jb  = isset($jawab_butir[$lid]) ? $jawab_butir[$lid] : NULL;
 
         $jawaban = $jb ? trim((string) $jb['jwb_jawaban']) : '';
-
-        $koreksi = ($pen && isset($pen['jwb_koreksi'])) ? trim((string) $pen['jwb_koreksi']) : '';
 
         $item = array(
             'lingkup_id'      => $lid,
@@ -865,12 +848,9 @@ class AuditjawabModel extends CI_Model {
             'jwb_id'          => $jb ? (int) $jb['jwb_id'] : 0,
             'jwb_jawaban'     => $jawaban,
             'sudah_dijawab'   => ($jawaban !== ''),
-            'jwb_hasil'       => $pen ? $pen['dtjwb_hasil'] : '',
-            'jwb_temuan'      => $pen ? $pen['dtjwb_temuan'] : '',
-            'jwb_catatan'     => $pen ? $pen['dtjwb_catatan'] : '',
-            'jwb_koreksi'     => $koreksi,
+            /* dtjwb_id tetap diisi: dipakai untuk memetakan lampiran lama
+               yang menempel pada baris tilik (mutu_auditjawabdetail). */
             'dtjwb_id'        => $pen ? (int) $pen['dtjwb_id'] : 0,
-            'dtjwb_referensi' => ($pen && isset($pen['dtjwb_referensi'])) ? $pen['dtjwb_referensi'] : '',
             'bisa_dijawab'    => TRUE,
             'lampiran'        => array(),
         );
