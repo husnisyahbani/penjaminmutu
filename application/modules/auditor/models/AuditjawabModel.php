@@ -708,6 +708,14 @@ class AuditjawabModel extends CI_Model {
             $lama[(int) $b['dtform_id']][] = $b;
         }
 
+        /* Catatan auditor per butir lingkup: kelebihan & peluang untuk
+           peningkatan (tabel mutu_lingkup_nilai). Bila tabelnya belum ada,
+           kunci kelebihan/peluang dikosongkan. */
+        $this->load->model('LingkupnilaiModel', 'lingkupnilaimodel');
+        $nilai_lingkup = $this->lingkupnilaimodel->siap()
+            ? $this->lingkupnilaimodel->peta($audit_id)
+            : array();
+
         /* Lampiran: per butir (lingkup_id), per baris tilik lama
            (dtjwb_id), dan per jawaban pertanyaan (jwb_id). */
         $lampiran_butir = array();
@@ -744,7 +752,8 @@ class AuditjawabModel extends CI_Model {
             if (isset($peta_butir[$tid])) {
                 foreach ($peta_butir[$tid] as $b) {
                     $pen = $this->_penilaianLama((int) $b['lingkup_id'], $b['lingkup_isi'], $berdasar_id, $sisa);
-                    $butir[] = $this->_susunButir($tid, $b, $jawab_butir, $pen, $lampiran_butir, $lampiran_tilik);
+                    $butir[] = $this->_susunButir($tid, $b, $jawab_butir, $pen,
+                        $lampiran_butir, $lampiran_tilik, $nilai_lingkup);
                 }
             }
 
@@ -832,8 +841,39 @@ class AuditjawabModel extends CI_Model {
         return NULL;
     }
 
+    /**
+     * Penjagaan: butir lingkup ini termasuk salah satu pertanyaan pada audit
+     * tersebut? Dipakai endpoint penyimpanan catatan auditor (kelebihan &
+     * peluang untuk peningkatan) supaya data tidak bisa disuntik ke audit
+     * atau butir lain.
+     *
+     * @param  int $audit_id
+     * @param  int $lingkup_id
+     * @return bool
+     */
+    public function lingkupMilikAudit($audit_id, $lingkup_id) {
+        $audit_id   = (int) $audit_id;
+        $lingkup_id = (int) $lingkup_id;
+        if ($audit_id < 1 || $lingkup_id < 1) {
+            return FALSE;
+        }
+        if (!$this->db->table_exists('lingkup')) {
+            return FALSE;
+        }
+
+        $this->db->select('au.audit_id');
+        $this->db->from('audit au');
+        $this->db->join('detailform dt', 'dt.form_id = au.form_id', 'inner');
+        $this->db->join('lingkup lg', 'lg.dtform_id = dt.dtform_id', 'inner');
+        $this->db->where('au.audit_id', $audit_id);
+        $this->db->where('lg.lingkup_id', $lingkup_id);
+
+        return (bool) $this->db->get()->row_array();
+    }
+
     /** Susun satu butir lingkup beserta jawaban auditee dan lampiran. */
-    private function _susunButir($dtform_id, $b, $jawab_butir, $pen, $lampiran_butir, $lampiran_tilik) {
+    private function _susunButir($dtform_id, $b, $jawab_butir, $pen, $lampiran_butir,
+                                $lampiran_tilik, $nilai_lingkup = array()) {
         $lid = (int) $b['lingkup_id'];
         $jb  = isset($jawab_butir[$lid]) ? $jawab_butir[$lid] : NULL;
 
@@ -848,6 +888,10 @@ class AuditjawabModel extends CI_Model {
             'jwb_id'          => $jb ? (int) $jb['jwb_id'] : 0,
             'jwb_jawaban'     => $jawaban,
             'sudah_dijawab'   => ($jawaban !== ''),
+            /* Catatan auditor per butir lingkup (kelebihan & peluang
+               peningkatan) - kosong bila belum diisi. */
+            'kelebihan'       => isset($nilai_lingkup[$lid]['kelebihan']) ? $nilai_lingkup[$lid]['kelebihan'] : '',
+            'peluang'         => isset($nilai_lingkup[$lid]['peluang']) ? $nilai_lingkup[$lid]['peluang'] : '',
             /* dtjwb_id tetap diisi: dipakai untuk memetakan lampiran lama
                yang menempel pada baris tilik (mutu_auditjawabdetail). */
             'dtjwb_id'        => $pen ? (int) $pen['dtjwb_id'] : 0,

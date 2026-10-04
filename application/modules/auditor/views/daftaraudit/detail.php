@@ -29,6 +29,10 @@ $potong = function ($teks, $maks = 140) {
     return $t;
 };
 
+/* Fitur "Kelebihan & Peluang untuk peningkatan" tersimpan pada tabel
+   mutu_lingkup_nilai; tanpa tabel itu bagiannya disembunyikan. */
+$catatan_siap = !empty($catatan_siap);
+
 $jml_pertanyaan = count($topik);
 $jml_lingkup = 0;
 $jml_dijawab = 0;    // butir lingkup yang sudah dijawab auditee
@@ -72,7 +76,15 @@ foreach ($topik as $t) {
                             <span class="badge badge-info"><?php echo (int) $jml_lampiran; ?> lampiran</span>
                         </div>
 
-                        <div class="topik-berkas" id="topik_daftar">
+                        <?php if (!$catatan_siap): ?>
+                        <div class="alert alert-info" role="alert">
+                            Fitur <strong>Kelebihan &amp; Peluang untuk peningkatan</strong> belum disiapkan pada
+                            database ini. Impor <code>database/kelebihan_peluang.sql</code> agar auditor dapat
+                            mengisinya pada tiap butir lingkup.
+                        </div>
+                        <?php endif; ?>
+
+                        <div class="topik-berkas" id="topik_daftar" data-audit_id="<?php echo (int) $audit_id; ?>">
                             <?php foreach ($topik as $i => $t):
                                 $punya_lingkup = !empty($t['punya_lingkup']);
                                 $cari = strtolower($t['teks'] . ' '
@@ -178,6 +190,36 @@ foreach ($topik as $t) {
                                                 <?php echo $jawaban !== ''
                                                     ? nl2br(html_escape($jawaban))
                                                     : '<span class="text-muted">belum dijawab</span>'; ?>
+                                            </div>
+                                            <?php endif; ?>
+
+                                            <?php if ($catatan_siap && $bisa_dijawab): ?>
+                                            <!-- Catatan auditor: kelebihan & peluang untuk peningkatan -->
+                                            <div class="catatan-kotak" data-lingkup_id="<?php echo (int) $b['lingkup_id']; ?>">
+                                                <div class="catatan-baris">
+                                                    <label class="catatan-label" for="kelebihan_<?php echo (int) $b['lingkup_id']; ?>">
+                                                        Kelebihan
+                                                    </label>
+                                                    <textarea class="form-control catatan-isi" rows="2"
+                                                        id="kelebihan_<?php echo (int) $b['lingkup_id']; ?>"
+                                                        placeholder="Tulis kelebihan butir lingkup ini"><?php echo html_escape($b['kelebihan']); ?></textarea>
+                                                </div>
+                                                <div class="catatan-baris">
+                                                    <label class="catatan-label" for="peluang_<?php echo (int) $b['lingkup_id']; ?>">
+                                                        Peluang untuk peningkatan
+                                                    </label>
+                                                    <textarea class="form-control catatan-isi" rows="2"
+                                                        id="peluang_<?php echo (int) $b['lingkup_id']; ?>"
+                                                        placeholder="Tulis peluang peningkatan butir lingkup ini"><?php echo html_escape($b['peluang']); ?></textarea>
+                                                </div>
+                                                <div class="catatan-aksi">
+                                                    <button type="button" class="btn btn-sm btn-primary catatan-simpan"
+                                                            lingkup_id="<?php echo (int) $b['lingkup_id']; ?>"
+                                                            dtform_id="<?php echo (int) $t['dtform_id']; ?>">
+                                                        <i class="icon md-check" aria-hidden="true"></i>Simpan Catatan
+                                                    </button>
+                                                    <span class="catatan-pesan text-muted"></span>
+                                                </div>
                                             </div>
                                             <?php endif; ?>
 

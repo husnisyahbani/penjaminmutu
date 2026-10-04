@@ -381,3 +381,46 @@
     margin-top: 8px;
     padding-top: 8px;
 }
+
+/* ---------------------------------------------------------------------------
+   Catatan auditor per butir lingkup: Kelebihan & Peluang untuk peningkatan
+   (halaman auditor -> daftar audit -> detail)
+   --------------------------------------------------------------------------- */
+
+.catatan-kotak {
+    margin-top: 8px;
+    padding: 8px 10px;
+    border: 1px dashed #dbe3ee;
+    border-radius: 6px;
+    background: #fbfcff;
+}
+
+.catatan-baris + .catatan-baris {
+    margin-top: 8px;
+}
+
+.catatan-label {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #616161;
+}
+
+.catatan-isi {
+    min-height: 58px;
+    font-size: 13px;
+}
+
+.catatan-aksi {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.catatan-pesan {
+    font-size: 12px;
+    color: #757575;
+}

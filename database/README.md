@@ -273,3 +273,37 @@ Catatan:
 - Rollback: buat kembali kolom-kolomnya bila benar-benar diperlukan
   (`ALTER TABLE mutu_auditjawab ADD COLUMN jwb_hasil text ...`), tetapi data
   yang sudah dihapus tidak dapat dikembalikan tanpa cadangan.
+
+## `kelebihan_peluang.sql`
+
+Membuat tabel `mutu_lingkup_nilai` — tempat menyimpan **Kelebihan** dan
+**Peluang untuk peningkatan** yang diisi auditor pada tiap butir lingkup di
+halaman **Auditor → Daftar Audit → (detail)**, tepat di bawah jawaban auditee.
+
+| Kolom        | Isi                                                             |
+| ------------ | --------------------------------------------------------------- |
+| `audit_id`   | audit yang sedang dinilai                                        |
+| `lingkup_id` | butir lingkup (`mutu_lingkup`)                                   |
+| `kelebihan`  | teks kelebihan butir tersebut                                    |
+| `peluang`    | teks peluang untuk peningkatan                                   |
+| `users_id`   | auditor terakhir yang menyimpan                                  |
+| `nilai_create` / `nilai_update` | waktu pembuatan & perubahan           |
+
+Satu baris per pasangan (`audit_id`, `lingkup_id`) — ada kunci unik
+`nilai_unik`, sehingga penyimpanan berikutnya memperbarui baris yang sama.
+
+Cara pakai:
+
+1. Impor berkas `database/kelebihan_peluang.sql` lewat phpMyAdmin (tab SQL).
+2. Sesuaikan prefix `mutu_` bila berbeda.
+3. Muat ulang halaman detail audit: dua kotak isian (Kelebihan, Peluang untuk
+   peningkatan) lalu muncul pada tiap butir lingkup.
+
+Catatan:
+
+- Aman dijalankan berulang kali (`CREATE TABLE IF NOT EXISTS`).
+- Tanpa tabel ini aplikasi tetap berjalan: kotak isian tidak ditampilkan dan
+  halaman menampilkan keterangan bahwa fitur belum disiapkan.
+- Catatan ini **tidak** menggantikan penilaian (hasil/temuan/catatan) yang
+  tersimpan pada `mutu_auditjawabdetail` dan diisi lewat halaman Daftar Tilik.
+- Hapus tabel bila tidak diperlukan: `DROP TABLE mutu_lingkup_nilai;`

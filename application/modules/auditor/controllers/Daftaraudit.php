@@ -5,7 +5,7 @@ class Daftaraudit extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditor';
-        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=2.0"));
+        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=2.1"));
         // Informasi tombol aksi saat hover (lihat assets/app/tabel-aksi.css)
         $this->load->js(base_url("assets/app/tabel-aksi.js?v=1.0"));
         // Tampilan topik & activity pada halaman detail audit.
@@ -250,6 +250,12 @@ class Daftaraudit extends MY_Controller {
             /* Butir lingkup (mutu_lingkup) beserta jawaban auditee per butir,
                lampiran, dan hasil penilaian yang sudah tersimpan. */
             $this->data['topik'] = $this->auditjawab->petaLingkup($id);
+            /* Catatan auditor per butir lingkup: kelebihan & peluang untuk
+               peningkatan (tabel mutu_lingkup_nilai). Bila tabelnya belum
+               diimpor, bagian itu disembunyikan dan halaman menampilkan
+               keterangan, persis seperti perlakuan fitur lampiran. */
+            $this->load->model('LingkupnilaiModel', 'lingkupnilai');
+            $this->data['catatan_siap'] = $this->lingkupnilai->siap();
             $this->data['js'] = $this->load->get_js_files();
             $this->data['audit'] = 'active';
             $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
@@ -259,6 +265,54 @@ class Daftaraudit extends MY_Controller {
     }
 
     
+
+    /**
+     * Simpan catatan auditor untuk satu butir lingkup: "Kelebihan" dan
+     * "Peluang untuk peningkatan" (halaman detail audit).
+     *
+     * Data tersimpan pada mutu_lingkup_nilai, dipisahkan per audit dan per
+     * butir lingkup, sehingga tidak bergantung pada baris tilik.
+     */
+    public function simpancatatan() {
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
+
+        $audit_id   = (int) $this->input->post('audit_id');
+        $lingkup_id = (int) $this->input->post('lingkup_id');
+        $kelebihan  = trim(strip_tags((string) $this->input->post('kelebihan')));
+        $peluang    = trim(strip_tags((string) $this->input->post('peluang')));
+
+        $this->load->model('LingkupnilaiModel', 'lingkupnilai');
+
+        if (!$this->lingkupnilai->siap()) {
+            echo json_encode(array(
+                'status' => FALSE,
+                'pesan'  => 'Fitur catatan belum siap. Impor database/kelebihan_peluang.sql terlebih dahulu.',
+            ));
+            return;
+        }
+
+        if ($audit_id < 1 || $lingkup_id < 1) {
+            echo json_encode(array('status' => FALSE, 'pesan' => 'Butir lingkup tidak dikenal.'));
+            return;
+        }
+
+        /* Penjagaan: butir harus termasuk pertanyaan pada audit ini. */
+        if (!$this->auditjawab->lingkupMilikAudit($audit_id, $lingkup_id)) {
+            echo json_encode(array(
+                'status' => FALSE,
+                'pesan'  => 'Butir lingkup tidak ditemukan pada audit ini.',
+            ));
+            return;
+        }
+
+        $status = $this->lingkupnilai->simpan($audit_id, $lingkup_id, $kelebihan, $peluang);
+
+        echo json_encode(array(
+            'status' => $status,
+            'pesan'  => $status ? 'Catatan tersimpan.' : 'Catatan gagal disimpan.',
+        ));
+    }
 
    public function tambah() {
         $form_id = $this->input->post('form_id');
