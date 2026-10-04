@@ -1,0 +1,177 @@
+/* ==========================================================================
+   SIJAMU - stylesheet halaman turunan (login & sub halaman SPMI)
+   Dipakai bersama assets/desain/home.css agar tema sama dengan halaman depan.
+   ========================================================================== */
+
+/* ---------- hero pendek untuk halaman dalam ---------- */
+.hp-hero--page { padding: 158px 0 96px; }
+
+@media (max-width: 991.98px) {
+  .hp-hero--page { padding: 132px 0 78px; }
+}
+
+/* ---------- sub menu SPMI (pil navigasi) ---------- */
+.hp-spmi-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 32px;
+}
+.hp-spmi-nav__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  font-size: .88rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, .88);
+  background: rgba(255, 255, 255, .1);
+  border: 1px solid rgba(255, 255, 255, .3);
+  transition: transform .25s ease, background .25s ease, color .25s ease, box-shadow .25s ease;
+}
+.hp-spmi-nav__link:hover {
+  background: #fff;
+  color: var(--hp-primer-dark);
+  border-color: #fff;
+  transform: translateY(-3px);
+}
+.hp-spmi-nav__link.is-active {
+  background: #fff;
+  color: var(--hp-primer-dark);
+  border-color: #fff;
+  box-shadow: 0 16px 30px -18px rgba(2, 6, 23, .8);
+}
+
+/* ---------- kartu dokumen ---------- */
+.hp-dokumen__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.hp-dokumen__count {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: .84rem;
+  font-weight: 700;
+  color: var(--hp-primer);
+  background: color-mix(in srgb, var(--hp-primer) 12%, #fff);
+}
+
+/* ---------- halaman login ---------- */
+.hp-auth {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding-bottom: 90px;
+  text-align: left;
+}
+.hp-auth__card {
+  display: grid;
+  grid-template-columns: minmax(0, .9fr) minmax(0, 1fr);
+  background: #fff;
+  border-radius: var(--hp-radius);
+  overflow: hidden;
+  box-shadow: var(--hp-shadow-lg);
+  color: var(--hp-body);
+}
+.hp-auth__aside {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 46px 40px;
+  color: #fff;
+  background:
+    radial-gradient(420px 260px at 90% 0%, rgba(255, 255, 255, .16), transparent 65%),
+    linear-gradient(160deg, var(--hp-primer-dark), var(--hp-primer));
+}
+.hp-auth__brand { display: flex; align-items: center; gap: 12px; }
+.hp-auth__brand img {
+  height: 54px;
+  width: auto;
+  background: rgba(255, 255, 255, .96);
+  border-radius: 14px;
+  padding: 7px;
+}
+.hp-auth__brand strong { display: block; font-size: 1.15rem; color: #fff; }
+.hp-auth__brand span { font-size: .76rem; color: rgba(255, 255, 255, .8); }
+.hp-auth__aside h2 { color: #fff; font-size: 1.5rem; line-height: 1.32; margin: 4px 0 0; }
+.hp-auth__aside p { color: rgba(255, 255, 255, .85); font-size: .93rem; line-height: 1.8; margin: 0; }
+.hp-auth__list { list-style: none; margin: 6px 0 0; padding: 0; }
+.hp-auth__list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: .92rem;
+  line-height: 1.75;
+  color: rgba(255, 255, 255, .92);
+  margin-bottom: 12px;
+}
+.hp-auth__list i { color: var(--hp-aksen); margin-top: 3px; }
+.hp-auth__kembali {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .88rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, .85);
+  transition: gap .2s ease, color .2s ease;
+}
+.hp-auth__kembali:hover { color: #fff; gap: 12px; }
+
+.hp-auth__body { padding: 46px 44px; text-align: left; }
+.hp-auth__title { font-size: 1.6rem; margin-bottom: 8px; }
+.hp-auth__sub { font-size: .95rem; line-height: 1.8; margin-bottom: 24px; }
+
+.hp-auth__alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 18px;
+  border-radius: 14px;
+  font-size: .9rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+.hp-auth__alert--error { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+.hp-auth__alert--sukses { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+
+.hp-field { margin-bottom: 18px; }
+.hp-field__label {
+  display: block;
+  font-size: .84rem;
+  font-weight: 700;
+  color: var(--hp-ink);
+  margin-bottom: 8px;
+}
+.hp-field__input {
+  width: 100%;
+  padding: 14px 18px;
+  font-size: .95rem;
+  color: var(--hp-ink);
+  background: var(--hp-soft);
+  border: 1px solid var(--hp-line);
+  border-radius: 14px;
+  transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+}
+.hp-field__input::placeholder { color: var(--hp-muted); }
+.hp-field__input:focus {
+  outline: none;
+  background: #fff;
+  border-color: var(--hp-primer);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--hp-primer) 14%, #fff);
+}
+
+@media (max-width: 991.98px) {
+  .hp-auth { min-height: auto; padding-bottom: 64px; }
+  .hp-auth__card { grid-template-columns: 1fr; }
+  .hp-auth__aside { padding: 32px 26px; }
+  .hp-auth__body { padding: 32px 26px; }
+  .hp-auth__aside h2 { font-size: 1.3rem; }
+}

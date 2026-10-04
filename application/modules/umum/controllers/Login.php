@@ -6,7 +6,8 @@ class Login extends MY_Controller {
         parent::__construct();
         $this->module = 'umum';
         $this->load->model('UsersModel', 'users');
-        $this->load->js(base_url("assets/app/umum/login.js"));
+        // pengaturan tema halaman depan (warna, logo, teks) untuk tampilan login
+        $this->load->model('HomeModel', 'home');
     }
 
     public function index() {
@@ -28,10 +29,9 @@ class Login extends MY_Controller {
                     redirect(base_url('auditee'));
                 }
             } else {
-                echo "gagal";
-                $msg = 'Email atau Password Salah';
+                $msg = 'Username atau Password Salah';
                 $this->session->set_flashdata('pesanerror', $msg);
-                redirect(base_url());
+                redirect(base_url('login'));
             }
         } else {
             $role = $this->session->userdata('role');
@@ -42,13 +42,13 @@ class Login extends MY_Controller {
             }else if (isset($role) && $role == 'AUDITEE') {
                 redirect(base_url('auditee'));
             } else {
-                $this->data['content'] = 'login';
                 $this->data['title'] = 'Login';
-                $this->data['js'] = $this->load->get_js_files();
+                $this->data['home'] = $this->home;
                 $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
                 $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
-                $this->template($this->data, $this->module);
-                //$this->load->view('homepage');
+                // halaman login memakai shell tema halaman depan
+                // (umum/includes/hp_top & hp_bottom), bukan layout lama.
+                $this->load->view('login', $this->data);
             }
         }
     }

@@ -6,12 +6,13 @@ class Evaluasi extends MY_Controller {
         parent::__construct();
         $this->module = 'umum';
         $this->load->model('DataModel', 'datamodel');
+        $this->load->model('HomeModel', 'home');
     }
 
     public function index() {
         $evaluasi = $this->datamodel->getAllEvaluasi();
         //var_dump($evaluasi);
-        $this->load->view('dokumentku', array('dataku' => $evaluasi, 'judul' => 'Evaluasi'));
+        $this->load->view('dokumentku', array('dataku' => $evaluasi, 'judul' => 'Evaluasi', 'home' => $this->home));
     }
 
 }
