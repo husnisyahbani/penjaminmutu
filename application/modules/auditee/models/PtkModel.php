@@ -83,8 +83,10 @@ class PtkModel extends CI_Model {
      *
      * @param int|null $dtform_id  batasi ke satu pertanyaan (delik)
      * @param bool     $termasuk_s sertakan butir bernilai "S" (delik)
+     * @param int|null $periode_id batasi ke satu periode audit (filter PTK);
+     *                             kosong/NULL = semua periode
      */
-    private function _query_ptk($dtform_id = NULL, $termasuk_s = FALSE) {
+    private function _query_ptk($dtform_id = NULL, $termasuk_s = FALSE, $periode_id = NULL) {
         $this->db->select('au.audit_id, au.audit_status, au.form_id');
         $this->db->select('f.form_nama');
         $this->db->select('dt.dtform_id, dt.dtform_pertanyaan');
@@ -122,6 +124,12 @@ class PtkModel extends CI_Model {
             $this->db->where('jb.dtform_id', $dtform_id);
         }
 
+        /* Saringan periode: periode_id melekat pada audit (mutu_audit).
+           Kosong = semua periode. Dilewati bila kolomnya belum ada. */
+        if (!empty($periode_id) && $this->db->field_exists('periode_id', 'audit')) {
+            $this->db->where('au.periode_id', (int) $periode_id);
+        }
+
         $users_id = $this->session->userdata('users_id');
         if (isset($users_id)) {
             $this->db->where('au.auditee_id', $users_id);
@@ -144,25 +152,25 @@ class PtkModel extends CI_Model {
         return $this->db->get()->result_array();
     }
 
-    function get_datatables($length, $start, $search, $ordering) {
+    function get_datatables($length, $start, $search, $ordering, $periode_id = NULL) {
         $this->_get_datatables_query($search, $ordering);
         if ($length != -1) {
             $this->db->limit($length, $start);
         }
-        $this->_query_ptk();
+        $this->_query_ptk(NULL, FALSE, $periode_id);
         $query = $this->db->get();
         return $query->result();
     }
 
-    function count_filtered($search, $ordering) {
+    function count_filtered($search, $ordering, $periode_id = NULL) {
         $this->_get_datatables_query($search, $ordering);
-        $this->_query_ptk();
+        $this->_query_ptk(NULL, FALSE, $periode_id);
         $query = $this->db->get();
         return $query->num_rows();
     }
 
-    public function count_all() {
-        $this->_query_ptk();
+    public function count_all($periode_id = NULL) {
+        $this->_query_ptk(NULL, FALSE, $periode_id);
         return $this->db->count_all_results();
     }
 
@@ -170,8 +178,10 @@ class PtkModel extends CI_Model {
      * Ringkasan temuan unit auditee ini dalam satu kueri:
      * total, jumlah per kategori, dan jumlah yang belum punya rencana koreksi
      * (dipakai kartu statistik halaman PTK - angkanya sama dengan isi tabel).
+     *
+     * @param int|null $periode_id batasi ke satu periode audit (filter PTK)
      */
-    public function ringkasan() {
+    public function ringkasan($periode_id = NULL) {
         $koreksi = $this->_koreksi_sql();
 
         $this->db->select('COUNT(*) AS total', FALSE);
@@ -187,6 +197,11 @@ class PtkModel extends CI_Model {
             $this->db->where('ma.auditee_id', $users_id);
         }
         $this->db->where("dj.dtjwb_temuan IN ('OB','TS MINOR','TS MAYOR')");
+
+        /* Saringan periode (sama dengan _query_ptk): kolom melekat pada audit. */
+        if (!empty($periode_id) && $this->db->field_exists('periode_id', 'audit')) {
+            $this->db->where('ma.periode_id', (int) $periode_id);
+        }
 
         $row = $this->db->get()->row_array();
 

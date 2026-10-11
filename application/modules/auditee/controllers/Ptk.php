@@ -5,10 +5,11 @@ class Ptk extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditee';
-        $this->load->js(base_url("assets/app/auditee/ptk.js?v=3.0"));
+        $this->load->js(base_url("assets/app/auditee/ptk.js?v=3.1"));
         // Informasi tombol aksi saat hover (lihat assets/app/tabel-aksi.css)
         $this->load->js(base_url("assets/app/tabel-aksi.js?v=1.0"));
         $this->load->model('PtkModel', 'ptkmodel');
+        $this->load->model('PeriodeModel', 'periode');
         // Pembantu teks (lingkup_bersihkan) untuk merapikan isi kolom tabel.
         $this->load->helper('lingkup');
 
@@ -23,9 +24,18 @@ class Ptk extends MY_Controller {
             $this->data['title'] = 'PERMINTAAN TINDAKAN KOREKSI';
             $this->data['js'] = $this->load->get_js_files();
             $this->data['ptk'] = 'active';
+            /* Filter periode: bawaan = periode aktif. Bila tidak ada periode
+               aktif, seluruh temuan ditampilkan. Tabel dan kartu statistik
+               mengikuti periode yang dipilih.
+               Bila tabel periode belum disiapkan (kolom mutu_audit.periode_id
+               belum ada), kotak saring tidak ditampilkan. */
+            $this->data['list_periode'] = $this->periode->siap() ? $this->periode->getAll() : array();
+            $this->data['periode_aktif'] = $this->periode->aktifId();
+            $filter = $this->data['periode_aktif'];
+
             /* Angka kartu statistik: satu kueri untuk total, per kategori,
                dan yang belum punya rencana koreksi. */
-            $ringkasan = $this->ptkmodel->ringkasan();
+            $ringkasan = $this->ptkmodel->ringkasan($filter);
             $this->data['observasi'] = $ringkasan['observasi'];
             $this->data['minor'] = $ringkasan['minor'];
             $this->data['mayor'] = $ringkasan['mayor'];
@@ -37,7 +47,27 @@ class Ptk extends MY_Controller {
             $this->template($this->data, $this->module); 
     }
 
-   
+    /**
+     * Ringkasan temuan untuk periode terpilih - dipakai kartu statistik agar
+     * ikut berubah saat saringan periode diganti (lihat assets/app/auditee/ptk.js).
+     */
+    public function statistik() {
+        $this->output->set_content_type('application/json');
+
+        $periode_id = $this->input->post('periode_id');
+        $ringkasan  = $this->ptkmodel->ringkasan($periode_id);
+
+        echo json_encode(array(
+            'status'        => TRUE,
+            'total'         => (int) $ringkasan['total'],
+            'observasi'     => (int) $ringkasan['observasi'],
+            'minor'         => (int) $ringkasan['minor'],
+            'mayor'         => (int) $ringkasan['mayor'],
+            'tanpa_koreksi' => (int) $ringkasan['tanpa_koreksi'],
+            'sudah_koreksi' => (int) $ringkasan['total'] - (int) $ringkasan['tanpa_koreksi'],
+        ));
+    }
+
 
     public function koreksi() {
         $data = array();
@@ -97,8 +127,11 @@ class Ptk extends MY_Controller {
         $post['start'] = $this->input->post('start');
         $post['draw'] = $this->input->post('draw');
 
+        /* Saringan periode (bawaan periode aktif dikirim ptk.js;
+           kosong = semua periode). */
+        $periode_id = $this->input->post('periode_id');
 
-        $list = $this->ptkmodel->get_datatables($post['length'], $post['start'], $post['search'], $post['order']);
+        $list = $this->ptkmodel->get_datatables($post['length'], $post['start'], $post['search'], $post['order'], $periode_id);
         $data = array();
         $no = $this->input->post('start');
         foreach ($list as $field) {
@@ -158,8 +191,8 @@ class Ptk extends MY_Controller {
 
         $output = array(
             "draw" => $post['draw'],
-            "recordsTotal" => $this->ptkmodel->count_all(),
-            "recordsFiltered" => $this->ptkmodel->count_filtered($post['search'], $post['order']),
+            "recordsTotal" => $this->ptkmodel->count_all($periode_id),
+            "recordsFiltered" => $this->ptkmodel->count_filtered($post['search'], $post['order'], $periode_id),
             "data" => $data,
         );
         //output dalam format JSON

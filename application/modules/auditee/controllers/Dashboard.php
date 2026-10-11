@@ -36,8 +36,10 @@ class Dashboard extends MY_Controller {
             $this->data['dashboard'] = 'active';
             /* Filter periode: bawaan = periode aktif. Bila tidak ada periode
                aktif, seluruh data ditampilkan (periode_id = NULL). Tabel dan
-               kartu statistik mengikuti periode yang dipilih. */
-            $this->data['list_periode'] = $this->periode->getAll();
+               kartu statistik mengikuti periode yang dipilih.
+               Bila tabel periode belum disiapkan (kolom mutu_audit.periode_id
+               belum ada), kotak saring tidak ditampilkan. */
+            $this->data['list_periode'] = $this->periode->siap() ? $this->periode->getAll() : array();
             $this->data['periode_aktif'] = $this->periode->aktifId();
             $filter = $this->data['periode_aktif'];
 

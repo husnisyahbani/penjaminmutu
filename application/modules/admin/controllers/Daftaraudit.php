@@ -434,7 +434,7 @@ class Daftaraudit extends MY_Controller {
             $this->data['audit'] = 'active';
             /* Filter periode: bawaan = periode aktif; bila tidak ada periode
                aktif, seluruh data ditampilkan (periode_id = NULL). */
-            $this->data['list_periode'] = $this->periode->getAll();
+            $this->data['list_periode'] = $this->periode->siap() ? $this->periode->getAll() : array();
             $this->data['periode_aktif'] = $this->periode->aktifId();
             $filter = $this->data['periode_aktif'];
 

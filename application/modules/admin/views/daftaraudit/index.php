@@ -44,18 +44,7 @@
                         <div class="panel-heading-isi">
                             <h3 class="panel-title">Daftar Audit</h3>
                             <div class="panel-aksi">
-                                <div class="filter-kotak">
-                                    <label for="filter_periode"><i class="icon md-calendar" aria-hidden="true"></i>Periode</label>
-                                    <select class="form-control" id="filter_periode">
-                                        <option value="">Semua Periode</option>
-                                        <?php foreach ($list_periode as $p):
-                                            $label = html_escape($p['periode_tahun'])
-                                                . ' &middot; ' . date('d-m-Y', strtotime($p['periode_mulai']))
-                                                . ' s.d. ' . date('d-m-Y', strtotime($p['periode_selesai']))
-                                                . ($p['periode_aktif'] ? ' &middot; Aktif' : '');
-                                        ?><option value="<?php echo (int) $p['periode_id']; ?>" <?php echo ($periode_aktif == $p['periode_id']) ? 'selected' : ''; ?>><?php echo $label; ?></option><?php endforeach; ?>
-                                    </select>
-                                </div>
+                                <?php echo filter_periode($list_periode, $periode_aktif); ?>
                                 <div class="panel-aksi__tombol">
                                     <button type="button" class="btn btn-sm btn-primary" id="download">
                                         <i class="icon md-download" aria-hidden="true"></i>Download

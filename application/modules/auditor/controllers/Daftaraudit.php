@@ -5,7 +5,7 @@ class Daftaraudit extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditor';
-        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=2.1"));
+        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=2.2"));
         // Informasi tombol aksi saat hover (lihat assets/app/tabel-aksi.css)
         $this->load->js(base_url("assets/app/tabel-aksi.js?v=1.0"));
         // Tampilan topik & activity pada halaman detail audit.
@@ -29,10 +29,19 @@ class Daftaraudit extends MY_Controller {
             $this->data['title'] = 'Daftar Audit';
             $this->data['js'] = $this->load->get_js_files();
             $this->data['audit'] = 'active';
-            $this->data['totalterkirim'] = $this->mutu->totalTerkirim();
-            $this->data['totalproses'] = $this->mutu->totalProses();
-            $this->data['totalselesai'] = $this->mutu->totalSelesai();
-            $this->data['totaldraft'] = $this->mutu->totalDraft();
+            /* Filter periode: bawaan = periode aktif. Bila tidak ada periode
+               aktif, seluruh data ditampilkan. Tabel dan kartu statistik
+               mengikuti periode yang dipilih.
+               Bila tabel periode belum disiapkan (kolom mutu_audit.periode_id
+               belum ada), kotak saring tidak ditampilkan. */
+            $this->data['list_periode'] = $this->periode->siap() ? $this->periode->getAll() : array();
+            $this->data['periode_aktif'] = $this->periode->aktifId();
+            $filter = $this->data['periode_aktif'];
+
+            $this->data['totalterkirim'] = $this->mutu->totalTerkirim($filter);
+            $this->data['totalproses'] = $this->mutu->totalProses($filter);
+            $this->data['totalselesai'] = $this->mutu->totalSelesai($filter);
+            $this->data['totaldraft'] = $this->mutu->totalDraft($filter);
             $this->data['listauditor'] = $this->akun->getAllAuditor();
             $this->data['listauditee'] = $this->akun->getAllAuditee();
             /* Pilihan formulir mengikuti periode aktif (formulir lama tanpa periode
@@ -41,6 +50,24 @@ class Daftaraudit extends MY_Controller {
             $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
             $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
             $this->template($this->data, $this->module); 
+    }
+
+    /**
+     * Jumlah audit per status untuk periode terpilih - dipakai kartu
+     * statistik agar ikut berubah saat saringan periode diganti.
+     */
+    public function statistik() {
+        $this->output->set_content_type('application/json');
+
+        $periode_id = $this->input->post('periode_id');
+
+        echo json_encode(array(
+            'status'   => TRUE,
+            'draft'    => (int) $this->mutu->totalDraft($periode_id),
+            'terkirim' => (int) $this->mutu->totalTerkirim($periode_id),
+            'proses'   => (int) $this->mutu->totalProses($periode_id),
+            'selesai'  => (int) $this->mutu->totalSelesai($periode_id),
+        ));
     }
 
     public function download()
@@ -406,8 +433,11 @@ class Daftaraudit extends MY_Controller {
         $post['start'] = $this->input->post('start');
         $post['draw'] = $this->input->post('draw');
 
+        /* Saringan periode (bawaan periode aktif dikirim daftaraudit.js;
+           kosong = semua periode). */
+        $periode_id = $this->input->post('periode_id');
 
-        $list = $this->mutu->get_datatables($post['length'], $post['start'], $post['search'], $post['order']);
+        $list = $this->mutu->get_datatables($post['length'], $post['start'], $post['search'], $post['order'], $periode_id);
         $data = array();
         $no = $this->input->post('start');
         foreach ($list as $field) {
@@ -488,8 +518,8 @@ class Daftaraudit extends MY_Controller {
 
         $output = array(
             "draw" => $post['draw'],
-            "recordsTotal" => $this->mutu->count_all(),
-            "recordsFiltered" => $this->mutu->count_filtered($post['search'], $post['order']),
+            "recordsTotal" => $this->mutu->count_all($periode_id),
+            "recordsFiltered" => $this->mutu->count_filtered($post['search'], $post['order'], $periode_id),
             "data" => $data,
         );
         //output dalam format JSON
