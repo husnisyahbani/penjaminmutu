@@ -74,7 +74,7 @@ $jml_belum = $jml_wajib - $jml_dijawab;
                                         <i class="icon md-undo" aria-hidden="true"></i>Kembali
                                     </a>
                                     <?php if (!$sudah_terkirim): ?>
-                                    <button type="button" class="btn btn-sm btn-default" id="isi_excel"
+                                    <button type="button" class="btn btn-sm btn-warning" id="isi_excel"
                                             audit_id="<?php echo (int) $audit_id; ?>"
                                             title="Unduh format Excel, isi, lalu unggah kembali">
                                         <i class="icon md-file-text" aria-hidden="true"></i>Isi lewat Excel
