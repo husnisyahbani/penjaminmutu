@@ -331,8 +331,51 @@ $(function () {
     }
 
      $("#tambah").on("click", function () {
+        bersihkanTim();
         $("#addModal").modal('show');
     });
+
+    /* ------------------------------------------------------------------
+       Tim auditor (formulir tambah audit): satu audit boleh dikerjakan
+       beberapa auditor; satu di antaranya ketua, sisanya anggota.
+       ------------------------------------------------------------------ */
+    /* Kembalikan pemilih tim ke keadaan kosong. */
+    function bersihkanTim() {
+        $("#formadd .tim-centang").prop('checked', false);
+        $("#auditor_ketua").empty().append('<option value="">-- Pilih Ketua Tim --</option>');
+        $("#tim_kosong").hide();
+    }
+
+    function timTerpilih() {
+        var daftar = [];
+        $("#formadd .tim-centang:checked").each(function () {
+            daftar.push({id: String($(this).val()), nama: String($(this).data('nama') || '')});
+        });
+        return daftar;
+    }
+
+    function isiKetua() {
+        var pilih    = $("#auditor_ketua");
+        var terpilih = timTerpilih();
+        var nilai    = pilih.val();
+
+        pilih.empty().append('<option value="">-- Pilih Ketua Tim --</option>');
+        $.each(terpilih, function (i, a) {
+            pilih.append($('<option></option>').attr('value', a.id).text(a.nama));
+        });
+
+        if (terpilih.length === 1) {
+            /* Baru satu auditor: otomatis menjadi ketua. */
+            pilih.val(terpilih[0].id);
+        } else if (nilai) {
+            pilih.val(nilai);
+        }
+
+        $("#tim_kosong").toggle(terpilih.length === 0);
+        pilih.trigger('change');
+    }
+
+    $(document).on("change", "#formadd .tim-centang", isiKetua);
 
     $("#formadd").formValidation({
         framework: "bootstrap4",
@@ -351,6 +394,14 @@ $(function () {
         e.preventDefault();
 
         var $form = $(e.target);       // ✅ perbaikan
+
+        /* Penjagaan: minimal satu auditor tercentang. */
+        if ($("#formadd .tim-centang:checked").length === 0) {
+            $("#tim_kosong").show();
+            swal.fire("Oops", "Pilih minimal satu auditor.", "error");
+            return;
+        }
+
         var formData = new FormData(e.target);
 
         $.ajax({
@@ -375,6 +426,7 @@ $(function () {
                 var list = data == null ? [] : (data instanceof Array ? data : [data]);
                 $.each(list, function (index, org_types) {
                     if (org_types.status) {
+                        bersihkanTim();
                         daftaraudit.ajax.reload();
                     } else {
                         swal.fire("Oops", org_types.pesan, "error");

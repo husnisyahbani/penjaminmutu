@@ -5,7 +5,7 @@ class Daftaraudit extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'admin';
-        $this->load->js(base_url("assets/app/admin/daftaraudit.js?v=1.43"));
+        $this->load->js(base_url("assets/app/admin/daftaraudit.js?v=1.44"));
         $this->load->js(base_url("assets/app/tabel-aksi.js?v=1.0"));
         // Tampilan topik & activity pada halaman detail audit.
         $this->load->js(base_url("assets/app/topik-aktivitas.js?v=1.0"));
@@ -555,16 +555,34 @@ class Daftaraudit extends MY_Controller {
    public function tambah() {
         $form_id = $this->input->post('form_id');
         if($form_id){
+                /* Tim auditor: boleh lebih dari satu; satu di antaranya
+                   ketua. Bila id ketua tidak dikirim (formulir lama),
+                   auditor yang dipilih pertama menjadi ketua. */
+                $tim      = $this->_timTerpilih();
+                $ketua_id = (int) $this->input->post('auditor_ketua');
+
+                if (empty($tim)) {
+                    $query = array("status" => false, "pesan" => "Pilih minimal satu auditor");
+                    header('Access-Control-Allow-Origin: *');
+                    header('Content-Type: application/json');
+                    echo json_encode($query);
+                    return;
+                }
+
+                if ($ketua_id < 1 || !in_array($ketua_id, $tim)) {
+                    $ketua_id = (int) $tim[0];
+                }
+
                 $data = array();
                 $data['form_id'] = $form_id;
-                $data['auditor_id'] = $this->input->post('auditor');
+                $data['auditor_id'] = $ketua_id;   // kolom lama = ketua tim
                 $data['auditee_id']  = $this->input->post('auditee');
 
                 $akunauditee = $this->akun->getAkunById($data['auditee_id']);
                 $data['auditee'] = $akunauditee['nama'];
                 $data['unit'] = $akunauditee['unitkerja'];
 
-                $akunauditor = $this->akun->getAkunById($data['auditor_id']);
+                $akunauditor = $this->akun->getAkunById($ketua_id);
                 $data['auditor'] = $akunauditor['nama'];
 
                 // Audit baru ditempatkan pada periode yang sedang aktif (bila ada).
@@ -575,6 +593,12 @@ class Daftaraudit extends MY_Controller {
                 }
 
                 if ($this->mutu->add($data)) {
+                    /* Susunan tim disimpan terpisah (mutu_auditteams). Bila
+                       tabelnya belum diimpor, audit tetap tersimpan dengan
+                       satu auditor pada mutu_audit.auditor_id. */
+                    $this->load->model('TimauditModel', 'timaudit');
+                    $this->timaudit->simpan($this->db->insert_id(), $tim, $ketua_id);
+
                     $query = array("status" => true, "pesan" => "Berhasil");
                 } else {
                     $query = array("status" => false, "pesan" => "Gagal");
@@ -590,6 +614,40 @@ class Daftaraudit extends MY_Controller {
             header('Content-Type: application/json');
             echo json_encode($query);
         } 
+    }
+
+    /**
+     * Daftar users_id auditor yang dipilih pada formulir tambah audit.
+     *
+     * Hanya id yang benar-benar berrole AUDITOR yang diterima, urut
+     * sesuai pilihan pada formulir (ketua dipilih terpisah).
+     *
+     * @return array
+     */
+    private function _timTerpilih() {
+        $boleh = array();
+        foreach ($this->akun->getAllAuditor() as $a) {
+            $boleh[(int) $a['users_id']] = TRUE;
+        }
+
+        $kirim = $this->input->post('auditor');
+        if ($kirim === NULL) {
+            /* Formulir lama mengirim satu auditor pada kolom 'auditor'. */
+            $kirim = $this->input->post('auditor_id');
+        }
+        if (!is_array($kirim)) {
+            $kirim = ($kirim === NULL || $kirim === '') ? array() : array($kirim);
+        }
+
+        $tim = array();
+        foreach ($kirim as $uid) {
+            $uid = (int) $uid;
+            if ($uid > 0 && isset($boleh[$uid]) && !in_array($uid, $tim)) {
+                $tim[] = $uid;
+            }
+        }
+
+        return $tim;
     }
 
     public function getauditById($id) {
@@ -627,6 +685,11 @@ class Daftaraudit extends MY_Controller {
     public function hapus() {
         $id = $this->input->post('id');
         $status = $this->mutu->hapus($id);
+        /* Baris tim auditor ikut dibuang bersama auditnya. */
+        if ($status) {
+            $this->load->model('TimauditModel', 'timaudit');
+            $this->timaudit->hapusAudit($id);
+        }
         $query = array("status" => $status);
         header('Access-Control-Allow-Origin: *');
         header('Content-Type: application/json');
@@ -644,6 +707,16 @@ class Daftaraudit extends MY_Controller {
         $post['periode_id'] = $this->input->post('periode_id');
 
         $list = $this->mutu->get_datatables($post['length'], $post['start'], $post['search'], $post['order'], $post['periode_id']);
+
+        /* Tim auditor (ketua + anggota) untuk audit pada halaman ini,
+           diambil satu kueri supaya ringan. */
+        $this->load->model('TimauditModel', 'timaudit');
+        $id_halaman = array();
+        foreach ($list as $field) {
+            $id_halaman[] = (int) $field->audit_id;
+        }
+        $peta_tim = $this->timaudit->peta($id_halaman);
+
         $data = array();
         $no = $this->input->post('start');
         foreach ($list as $field) {
@@ -651,7 +724,11 @@ class Daftaraudit extends MY_Controller {
             $row = array();
             $row[] = '<input type="checkbox" class="pilih" value="'.$field->audit_id.'"> '.$no;
             $row[] = $field->form_nama;
-            $row[] = $field->auditor;
+            /* Kolom Auditor: seluruh nama tim, ketua ditandai "(Ketua)".
+               Audit lama yang belum punya tim tetap menampilkan
+               mutu_audit.auditor. */
+            $baris_tim = isset($peta_tim[(int) $field->audit_id]) ? $peta_tim[(int) $field->audit_id] : array();
+            $row[] = '<div class="tim-teks">' . html_escape($this->timaudit->teks($baris_tim, $field->auditor)) . '</div>';
             $row[] = $field->auditee;
             $row[] = $field->unit;
             

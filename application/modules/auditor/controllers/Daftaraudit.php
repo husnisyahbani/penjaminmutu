@@ -438,6 +438,15 @@ class Daftaraudit extends MY_Controller {
         $periode_id = $this->input->post('periode_id');
 
         $list = $this->mutu->get_datatables($post['length'], $post['start'], $post['search'], $post['order'], $periode_id);
+
+        /* Tim auditor (ketua + anggota) untuk audit pada halaman ini. */
+        $this->load->model('TimauditModel', 'timaudit');
+        $id_halaman = array();
+        foreach ($list as $field) {
+            $id_halaman[] = (int) $field->audit_id;
+        }
+        $peta_tim = $this->timaudit->peta($id_halaman);
+
         $data = array();
         $no = $this->input->post('start');
         foreach ($list as $field) {
@@ -445,7 +454,9 @@ class Daftaraudit extends MY_Controller {
             $row = array();
             $row[] = $no;
             $row[] = $field->form_nama;
-            $row[] = $field->auditor;
+            /* Kolom Auditor: seluruh nama tim, ketua ditandai "(Ketua)". */
+            $baris_tim = isset($peta_tim[(int) $field->audit_id]) ? $peta_tim[(int) $field->audit_id] : array();
+            $row[] = '<div class="tim-teks">' . html_escape($this->timaudit->teks($baris_tim, $field->auditor)) . '</div>';
             $row[] = $field->auditee;
             $row[] = $field->unit; 
 

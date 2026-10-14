@@ -95,6 +95,8 @@ div[role="log"][aria-live="assertive"] {
     
     <!-- Fonts -->
     <!-- Kartu statistik (dipakai bersama dashboard admin & daftar audit) -->
+    <!-- Tim auditor (ketua + anggota) pada satu audit -->
+    <link rel="stylesheet" href="<?php echo asset_url();?>app/tim-audit.css?v=1.0">
     <link rel="stylesheet" href="<?php echo asset_url();?>app/topik-aktivitas.css?v=1.6">
     <link rel="stylesheet" href="<?php echo asset_url();?>app/filter-tabel.css">
     <link rel="stylesheet" href="<?php echo asset_url();?>app/kartu-statistik.css?v=1.1">

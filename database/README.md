@@ -307,3 +307,42 @@ Catatan:
 - Catatan ini **tidak** menggantikan penilaian (hasil/temuan/catatan) yang
   tersimpan pada `mutu_auditjawabdetail` dan diisi lewat halaman Daftar Tilik.
 - Hapus tabel bila tidak diperlukan: `DROP TABLE mutu_lingkup_nilai;`
+
+## `tim_audit.sql`
+
+Menyimpan tim auditor pada satu audit: **satu ketua** dan **beberapa
+anggota**. Dipilih pada formulir **Tambah** di halaman
+**Audit → Daftar Audit** (menu PPM/admin).
+
+| Kolom         | Isi                                                       |
+| ------------- | --------------------------------------------------------- |
+| `audit_id`    | audit yang dikerjakan (`mutu_audit`)                       |
+| `users_id`    | auditor anggota tim (`users`, role `AUDITOR`)              |
+| `tim_peran`   | `KETUA` atau `ANGGOTA`                                     |
+| `tim_urut`    | urutan tampil: ketua `0`, anggota `1..n`                   |
+| `tim_create`  | waktu pencatatan                                           |
+
+Kolom lama `mutu_audit`.`auditor_id` **tetap dipakai** dan selalu berisi
+`users_id` **ketua** tim, sehingga ekspor Excel dan saringan lama tidak
+berubah.
+
+Cara pakai:
+
+1. Impor berkas `database/tim_audit.sql` lewat phpMyAdmin (tab SQL).
+2. Sesuaikan prefix `mutu_` bila berbeda.
+3. Buka **Audit → Daftar Audit**, klik **Tambah**, centang satu atau lebih
+   auditor pada kotak **Tim Auditor**, lalu pilih ketuanya pada
+   **Ketua Tim Auditor**.
+
+Catatan:
+
+- Aman dijalankan berulang kali (`CREATE TABLE IF NOT EXISTS`).
+- **Anggota tim ikut mengerjakan auditnya**: audit tersebut muncul pada Daftar
+  Audit miliknya, dapat dibuka rinciannya, dapat diisi Daftar Tiliknya, dan
+  temuannya ikut tampil pada menu **PTK** milik auditor.
+- Kolom **Auditor** pada tabel Daftar Audit menampilkan seluruh nama tim
+  dipisahkan koma, dengan ketua ditandai `(Ketua)`.
+- Tanpa tabel ini aplikasi tetap berjalan: setiap audit punya satu auditor
+  seperti sebelumnya (`mutu_audit`.`auditor_id`).
+- Baris tim dihapus otomatis bersama audit yang dihapus.
+- Hapus tabel bila tidak diperlukan: `DROP TABLE mutu_auditteams;`

@@ -88,11 +88,21 @@ class PtkdataModel extends CI_Model {
             return;
         }
 
-        $kolom    = ($this->pemilik === 'auditor') ? 'auditor_id' : 'auditee_id';
         $users_id = $this->session->userdata('users_id');
-        if (isset($users_id)) {
-            $this->db->where($alias . '.' . $kolom, $users_id);
+        if (!isset($users_id)) {
+            return;
         }
+
+        /* Auditor: audit yang ia tangani sendiri (ketua) DAN audit tempat
+           ia terdaftar sebagai anggota tim, sehingga anggota tim ikut
+           melihat temuan pada PTK-nya. */
+        if ($this->pemilik === 'auditor') {
+            $this->load->model('TimauditModel', 'timaudit');
+            $this->timaudit->saring($alias, 'auditor_id', $users_id);
+            return;
+        }
+
+        $this->db->where($alias . '.auditee_id', $users_id);
     }
 
     /**

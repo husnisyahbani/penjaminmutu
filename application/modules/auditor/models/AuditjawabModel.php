@@ -28,6 +28,18 @@ class AuditjawabModel extends CI_Model {
     var $column_order = array(null,'dtform_pertanyaan','dtform_pertanyaan','jwb_jawaban');
     var $order = array('audit_id' => 'asc');
 
+    /**
+     * Saringan "audit saya" untuk auditor: audit yang ia pimpin (ketua)
+     * atau audit tempat ia terdaftar sebagai anggota tim, supaya anggota
+     * tim ikut mengisi Daftar Tiliknya.
+     *
+     * @param string $alias alias tabel audit pada kueri (au / audit)
+     */
+    private function _saringAuditor($alias = 'audit') {
+        $this->load->model('TimauditModel', 'timaudit');
+        $this->timaudit->saring($alias, 'auditor_id');
+    }
+
     private function _get_datatables_query($search, $ordering) {
         $i = 0;
 
@@ -68,10 +80,7 @@ class AuditjawabModel extends CI_Model {
         $this->db->from('audit au');
         $this->db->join('detailform dt', 'dt.form_id = au.form_id', 'left');
         $this->db->where('au.audit_id',$id);
-        $users_id = $this->session->userdata('users_id');
-        if(isset($users_id)){
-            $this->db->where('au.auditor_id',$users_id);
-        }
+        $this->_saringAuditor('au');
         $query = $this->db->get();
         return $this->_lampirkanLingkup($query->result());
     }
@@ -123,10 +132,7 @@ class AuditjawabModel extends CI_Model {
         $this->db->from('audit au');
         $this->db->join('detailform dt', 'dt.form_id = au.form_id', 'left');
         $this->db->where('au.audit_id',$id);
-        $users_id = $this->session->userdata('users_id');
-        if(isset($users_id)){
-            $this->db->where('au.auditor_id',$users_id);
-        }
+        $this->_saringAuditor('au');
         $query = $this->db->get();
         return $query->num_rows();
     }
@@ -134,10 +140,7 @@ class AuditjawabModel extends CI_Model {
     public function count_all($id) {
         $this->db->from('audit');
         $this->db->where('audit.audit_id',$id);
-        $users_id = $this->session->userdata('users_id');
-        if(isset($users_id)){
-            $this->db->where('audit.auditor_id',$users_id);
-        }
+        $this->_saringAuditor('audit');
         return $this->db->count_all_results();
     }
 

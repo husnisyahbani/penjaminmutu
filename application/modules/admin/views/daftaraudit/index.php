@@ -132,15 +132,30 @@
                     </div>
 
                     <div class="col-md-12 center">
-                        <h4 class="example-title">Auditor</h4>
-                        <select class="form-control" name="auditor" id="auditor" data-fv-notempty="true"
-                        data-fv-notempty-message="Wajib Dipilih">                                 
-                            <option value="">-- Pilih Auditor --</option>
+                        <h4 class="example-title">Tim Auditor</h4>
+                        <p class="tim-petunjuk">Centang satu atau lebih auditor, lalu tentukan ketuanya.</p>
+                        <div class="tim-kotak">
                             <?php
                                 foreach($listauditor as $row){
-                                    echo '<option value="'.$row['users_id'].'">'.$row['nama'].'</option>';
-                                } 
+                                    echo '<label class="tim-pilih">'
+                                        . '<input type="checkbox" class="tim-centang" name="auditor[]" value="'.$row['users_id'].'"'
+                                        . ' data-nama="'.html_escape($row['nama']).'">'
+                                        . '<span class="tim-nama">'.html_escape($row['nama']).'</span>'
+                                        . '<span class="tim-unit">'.html_escape($row['unitkerja']).'</span>'
+                                        . '</label>';
+                                }
                             ?>
+                        </div>
+                        <div class="alert alert-warning tim-kosong" id="tim_kosong" style="display:none;">
+                            Pilih minimal satu auditor.
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 center">
+                        <h4 class="example-title">Ketua Tim Auditor</h4>
+                        <select class="form-control" name="auditor_ketua" id="auditor_ketua" data-fv-notempty="true"
+                        data-fv-notempty-message="Wajib Dipilih">
+                            <option value="">-- Pilih Ketua Tim --</option>
                         </select>
                     </div>
 
