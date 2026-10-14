@@ -315,6 +315,93 @@ $(function () {
         });
     });
 
+    /* --------------------------- isi jawaban lewat Excel ---------------------------
+
+       Alur: unduh format (sudah berisi butir lingkup formulir audit ini) ->
+       isi jawaban & tautan lampiran di Excel -> unggah kembali. Lampiran
+       tidak memakai berkas, cukup tautan (link) pada kolom Link Lampiran. */
+
+
+    function kotakHasil(tipe) {
+        return $('#excel_hasil').removeClass('alert-success alert-danger')
+            .addClass('alert alert-' + tipe).empty().show();
+    }
+
+    $('#isi_excel').on('click', function () {
+        $('#berkas_jawaban').val('');
+        $('#excel_hasil').hide().empty();
+        $('#excelModal').modal('show');
+    });
+
+    $('#unggah_jawaban').on('click', function () {
+        var masukan = $('#berkas_jawaban')[0];
+
+        if (!masukan || !masukan.files.length) {
+            pesan('Oops', 'Pilih berkas Excel yang sudah diisi terlebih dahulu.', 'error');
+            return;
+        }
+
+        var data = new FormData();
+        data.append('audit_id', auditId());
+        data.append('berkas', masukan.files[0]);
+
+        var tombol = $(this);
+        tombol.prop('disabled', true);
+        muat();
+
+        $.ajax({
+            url: base_url + "/dashboard/unggahjawaban",
+            type: "POST",
+            data: data,
+            processData: false,
+            contentType: false,
+            dataType: "json",
+            success: function (hasil) {
+                swal.close();
+                tombol.prop('disabled', false);
+
+                if (!hasil || !hasil.status) {
+                    var kotak = kotakHasil('danger');
+                    kotak.append($('<strong></strong>')
+                        .text(hasil && hasil.pesan ? hasil.pesan : 'Berkas gagal diproses.'));
+                    if (hasil && hasil.dilewati && hasil.dilewati.length) {
+                        var daftar = $('<ul class="excel-daftar"></ul>');
+                        $.each(hasil.dilewati, function (i, teks) {
+                            daftar.append($('<li></li>').text(teks));
+                        });
+                        kotak.append(daftar);
+                    }
+                    return;
+                }
+
+                var sukses = kotakHasil('success');
+                sukses.append($('<strong></strong>').text(hasil.pesan));
+                if (hasil.dilewati && hasil.dilewati.length) {
+                    var lewati = $('<ul class="excel-daftar"></ul>');
+                    $.each(hasil.dilewati, function (i, teks) {
+                        lewati.append($('<li></li>').text(teks));
+                    });
+                    sukses.append(lewati);
+                }
+
+                /* Muat ulang supaya jawaban & tautan baru langsung tampil. */
+                swal.fire({
+                    title: 'Tersimpan',
+                    text: hasil.pesan,
+                    type: 'success'
+                }).then(function () {
+                    window.location.reload();
+                });
+            },
+            error: function () {
+                swal.close();
+                tombol.prop('disabled', false);
+                kotakHasil('danger')
+                    .text('Tidak dapat menghubungi server. Pastikan ukuran berkas tidak melebihi 5 MB.');
+            }
+        });
+    });
+
     /* --------------------------- kirim hasil evaluasi --------------------------- */
 
     $('#kirim_hasil').on('click', function () {

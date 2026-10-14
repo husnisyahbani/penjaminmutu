@@ -13,6 +13,12 @@ if (!defined('BASEPATH')) {
  * Satu lingkup pada satu audit boleh memiliki banyak lampiran. Kolom
  * `lampiran_nama` berisi nama berkas di server (acak, dari encrypt_name),
  * sedangkan `lampiran_asli` nama berkas asli dari pengunggah.
+ *
+ * Selain berkas, lampiran boleh berupa TAUTAN (link) - dipakai pengisian
+ * jawaban lewat Excel, di mana auditee cukup menyertakan alamat berkasnya
+ * (mis. Google Drive). Baris tautan bertanda lampiran_tipe = 'link' dan
+ * kolom lampiran_nama berisi alamat lengkapnya, sehingga pembacaan
+ * (daftar()/peta()) langsung mengembalikan 'url' yang dapat diklik.
  */
 class LampiranModel extends CI_Model {
 
@@ -149,8 +155,9 @@ class LampiranModel extends CI_Model {
         $this->db->order_by('lampiran_id', 'ASC');
         $hasil = array();
         foreach ($this->db->get($this->tabel)->result_array() as $row) {
-            $row['url']         = $this->url($row['lampiran_nama']);
-            $row['ukuran_teks'] = $this->ukuranTeks($row['lampiran_ukuran']);
+            $row['url']         = $this->urlBaris($row);
+            $row['ukuran_teks'] = $this->ukuranBaris($row);
+            $row['tautan']      = $this->adalahTautan($row);
             $hasil[] = $row;
         }
         return $hasil;
@@ -180,8 +187,9 @@ class LampiranModel extends CI_Model {
         $this->db->where('audit_id', $audit_id);
         $this->db->order_by('lampiran_id', 'ASC');
         foreach ($this->db->get($this->tabel)->result_array() as $row) {
-            $row['url']         = $this->url($row['lampiran_nama']);
-            $row['ukuran_teks'] = $this->ukuranTeks($row['lampiran_ukuran']);
+            $row['url']         = $this->urlBaris($row);
+            $row['ukuran_teks'] = $this->ukuranBaris($row);
+            $row['tautan']      = $this->adalahTautan($row);
             $id = (int) $row[$kolom];
             if ($id < 1) {
                 continue;
@@ -303,6 +311,114 @@ class LampiranModel extends CI_Model {
         $this->db->where('lampiran_id', $lampiran_id);
         $this->db->delete($this->tabel);
         return TRUE;
+    }
+
+    /* ==================================================================
+       Lampiran berupa tautan (link) - pengisian jawaban lewat Excel
+       ================================================================== */
+
+    /** Baris ini lampiran berupa tautan (bukan berkas yang diunggah)? */
+    function adalahTautan($row) {
+        return is_array($row)
+            && isset($row['lampiran_tipe'])
+            && strtolower((string) $row['lampiran_tipe']) === 'link';
+    }
+
+    /** Alamat lampiran: tautan dipakai apa adanya, berkas lewat foldernya. */
+    function urlBaris($row) {
+        if ($this->adalahTautan($row)) {
+            return (string) $row['lampiran_nama'];
+        }
+        return $this->url($row['lampiran_nama']);
+    }
+
+    /** Keterangan ukuran: tautan tidak punya ukuran berkas. */
+    function ukuranBaris($row) {
+        if ($this->adalahTautan($row)) {
+            return 'tautan';
+        }
+        return $this->ukuranTeks($row['lampiran_ukuran']);
+    }
+
+    /**
+     * Simpan satu lampiran berupa tautan (link).
+     *
+     * @param int    $audit_id
+     * @param int    $butir_id  nilai kolom penanda (jwb_id / lingkup_id / dtjwb_id)
+     * @param string $tautan    alamat lengkap (http:// atau https://)
+     * @param string $kolom     kolom penanda
+     * @param array  $ekstra    kolom tambahan, mis. array('lingkup_id' => 12)
+     * @return int|NULL lampiran_id
+     */
+    function tambahTautan($audit_id, $butir_id, $tautan, $kolom = NULL, $ekstra = array()) {
+        $kolom = $kolom ? $kolom : $this->kolomButir();
+        if (!$kolom) {
+            return NULL;
+        }
+
+        $tautan = trim((string) $tautan);
+        if ($tautan === '') {
+            return NULL;
+        }
+
+        $isi = array(
+            'audit_id'        => $audit_id,
+            $kolom            => $butir_id,
+            'users_id'        => $this->session->userdata('users_id'),
+            'lampiran_nama'   => $tautan,
+            'lampiran_asli'   => $tautan,
+            'lampiran_ukuran' => 0,
+            'lampiran_create' => date('Y-m-d H:i:s'),
+        );
+
+        /* Penanda 'link' hanya diisi bila kolomnya tersedia (tabel lama). */
+        if ($this->db->field_exists('lampiran_tipe', $this->tabel)) {
+            $isi['lampiran_tipe'] = 'link';
+        }
+
+        /* Tabel lama punya lingkup_id NOT NULL - isi 0 bila kolom lain yang
+           dipakai supaya penyimpanan tidak gagal. */
+        if ($kolom !== 'lingkup_id' && $this->db->field_exists('lingkup_id', $this->tabel)) {
+            $isi['lingkup_id'] = 0;
+        }
+
+        if (is_array($ekstra)) {
+            foreach ($ekstra as $kolom_ekstra => $nilai) {
+                if ($this->db->field_exists($kolom_ekstra, $this->tabel)) {
+                    $isi[$kolom_ekstra] = $nilai;
+                }
+            }
+        }
+
+        $this->db->insert($this->tabel, $isi);
+        return $this->db->insert_id();
+    }
+
+    /**
+     * Buang lampiran TAUTAN lama pada satu butir/jawaban. Berkas hasil
+     * unggahan tidak tersentuh, hanya baris bertipe 'link' yang dihapus
+     * (supaya unggahan Excel berulang tidak menggandakan tautan).
+     */
+    function hapusTautan($audit_id, $butir_id, $kolom = NULL) {
+        if (!$this->siap()) {
+            return FALSE;
+        }
+
+        $kolom = $kolom ? $kolom : $this->kolomButir();
+        if (!$kolom || !$this->db->field_exists($kolom, $this->tabel)) {
+            return FALSE;
+        }
+
+        /* Tanpa kolom penanda jenis, tautan tidak dapat dibedakan dari
+           berkas, jadi penghapusan dilewati daripada salah menghapus. */
+        if (!$this->db->field_exists('lampiran_tipe', $this->tabel)) {
+            return FALSE;
+        }
+
+        $this->db->where('audit_id', $audit_id);
+        $this->db->where($kolom, $butir_id);
+        $this->db->where('lampiran_tipe', 'link');
+        return $this->db->delete($this->tabel);
     }
 
     /** Ukuran berkas dalam bentuk teks (mis. 512 KB, 1,2 MB). */

@@ -74,6 +74,11 @@ $jml_belum = $jml_wajib - $jml_dijawab;
                                         <i class="icon md-undo" aria-hidden="true"></i>Kembali
                                     </a>
                                     <?php if (!$sudah_terkirim): ?>
+                                    <button type="button" class="btn btn-sm btn-default" id="isi_excel"
+                                            audit_id="<?php echo (int) $audit_id; ?>"
+                                            title="Unduh format Excel, isi, lalu unggah kembali">
+                                        <i class="icon md-file-text" aria-hidden="true"></i>Isi lewat Excel
+                                    </button>
                                     <button type="button" class="btn btn-sm btn-success" id="kirim_hasil"
                                             audit_id="<?php echo (int) $audit_id; ?>">
                                         <i class="icon md-mail-send" aria-hidden="true"></i>Kirim Hasil Evaluasi
@@ -364,3 +369,62 @@ $jml_belum = $jml_wajib - $jml_dijawab;
         </div>
     </div>
 </div>
+
+<!-- =====================================================================
+     Isi jawaban lewat Excel.
+
+     Alurnya: unduh format jawaban (barisnya sudah disusun mengikuti
+     formulir audit ini) -> isi di Excel -> unggah kembali. Lampiran tidak
+     diunggah berkasnya: cukup tempel tautan (link) pada kolom
+     "Link Lampiran"; beberapa tautan dipisahkan koma.
+     ===================================================================== -->
+<div class="modal fade" id="excelModal" role="dialog" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-simple">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">Isi Jawaban Lewat Excel</h4>
+            </div>
+
+            <div class="modal-body">
+                <ol class="excel-langkah">
+                    <li>Unduh <strong>format jawaban</strong> di bawah - isinya sudah menyesuaikan
+                        formulir audit ini, lengkap dengan jawaban yang tersimpan.</li>
+                    <li>Isi kolom <strong>Jawaban</strong> pada setiap butir lingkup. Lampiran cukup
+                        berupa <strong>tautan (link)</strong> pada kolom <strong>Link Lampiran</strong>;
+                        bila lebih dari satu, pisahkan dengan koma.</li>
+                    <li>Simpan berkasnya, lalu unggah kembali di sini.</li>
+                </ol>
+
+                <a class="btn btn-sm btn-primary" id="unduh_format"
+                   href="<?php echo base_url('auditee/dashboard/formatjawaban/' . (int) $audit_id); ?>">
+                    <i class="icon md-download" aria-hidden="true"></i>Unduh Format Jawaban
+                </a>
+
+                <div class="excel-unggah">
+                    <label class="excel-label" for="berkas_jawaban">Berkas yang sudah diisi (.xls, .xlsx, .csv)</label>
+                    <input type="file" class="excel-berkas" id="berkas_jawaban" name="berkas"
+                           accept=".xls,.xlsx,.csv">
+                    <span class="excel-info text-muted">Maksimal 5 MB. Baris yang jawabannya kosong
+                        tidak mengubah jawaban yang sudah tersimpan; tautan pada satu butir
+                        menggantikan tautan sebelumnya.</span>
+                </div>
+
+                <div class="excel-hasil" id="excel_hasil" style="display:none;"></div>
+            </div>
+
+            <div class="modal-footer">
+                <div class="text-right">
+                    <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-sm btn-success" id="unggah_jawaban"
+                            audit_id="<?php echo (int) $audit_id; ?>">
+                        <i class="icon md-cloud-upload" aria-hidden="true"></i>Unggah &amp; Simpan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

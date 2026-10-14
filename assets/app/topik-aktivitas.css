@@ -424,3 +424,57 @@
     font-size: 12px;
     color: #757575;
 }
+
+/* ---------------------------------------------------------------------------
+   Isi jawaban lewat Excel (tombol "Isi lewat Excel" pada halaman detail
+   audit auditee: unduh format -> isi -> unggah kembali)
+   --------------------------------------------------------------------------- */
+
+.excel-langkah {
+    padding-left: 18px;
+    margin-bottom: 14px;
+    font-size: 13px;
+    color: #616161;
+}
+
+.excel-langkah li {
+    margin-bottom: 4px;
+}
+
+.excel-unggah {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px dashed #e0e0e0;
+}
+
+.excel-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #616161;
+}
+
+.excel-berkas {
+    display: block;
+    max-width: 100%;
+    margin-bottom: 6px;
+    font-size: 13px;
+}
+
+.excel-info {
+    display: block;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.excel-hasil {
+    margin-top: 14px;
+    margin-bottom: 0;
+    font-size: 13px;
+}
+
+.excel-hasil .excel-daftar {
+    margin: 8px 0 0;
+    padding-left: 18px;
+}

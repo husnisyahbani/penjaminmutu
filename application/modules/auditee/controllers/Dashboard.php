@@ -21,7 +21,7 @@ class Dashboard extends MY_Controller {
         $this->load->helper('lingkup');
 
         // Jawaban wajib + lampiran opsional per butir lingkup (halaman detail audit).
-        $this->load->js(base_url("assets/app/auditee/jawaban-lingkup.js?v=3.1"));
+        $this->load->js(base_url("assets/app/auditee/jawaban-lingkup.js?v=3.2"));
 
         $role = $this->session->userdata('role');
         if (!isset($role) || $role != 'AUDITEE') {
@@ -482,6 +482,389 @@ class Dashboard extends MY_Controller {
 
         $this->lampiran->hapus($lampiran_id);
         $this->_json(array('status' => true, 'pesan' => 'Lampiran dihapus.'));
+    }
+
+    /* ==================================================================
+       Pengisian jawaban lewat berkas Excel
+       ================================================================== */
+
+    /**
+     * Unduh berkas format jawaban yang sudah disusun mengikuti formulir
+     * audit ini: satu baris per butir lingkup, lengkap dengan jawaban dan
+     * tautan lampiran yang tersimpan, sehingga berkasnya dapat diisi
+     * ulang/dilanjutkan di Excel lalu diunggah kembali.
+     */
+    public function formatjawaban($audit_id = NULL) {
+        $audit = $this->_milikSendiri((int) $audit_id);
+        if (!$audit) {
+            show_404();
+            return;
+        }
+
+        $this->load->library('Jawabanexcel');
+
+        $baris = array();
+        foreach ($this->auditjawab->petaLingkup($audit['audit_id']) as $t) {
+            $dtform_id = isset($t['dtform_id']) ? (int) $t['dtform_id'] : 0;
+            $butir     = isset($t['butir']) ? $t['butir'] : array();
+
+            if (!empty($butir)) {
+                foreach ($butir as $b) {
+                    $baris[] = array(
+                        'id'         => (int) $b['lingkup_id'],
+                        'pertanyaan' => isset($t['teks']) ? $t['teks'] : '',
+                        'butir'      => isset($b['lingkup_teks']) ? $b['lingkup_teks'] : '',
+                        'jawaban'    => isset($b['jwb_jawaban']) ? $b['jwb_jawaban'] : '',
+                        'tautan'     => $this->_tautanTersimpan($b),
+                    );
+                }
+                continue;
+            }
+
+            /* Pertanyaan tanpa butir lingkup: id diberi awalan P supaya
+               tidak berbenturan dengan id butir. */
+            if ($dtform_id > 0) {
+                $jwb = isset($t['jwb']['jwb_jawaban']) ? $t['jwb']['jwb_jawaban'] : '';
+                $baris[] = array(
+                    'id'         => 'P' . $dtform_id,
+                    'pertanyaan' => isset($t['teks']) ? $t['teks'] : '',
+                    'butir'      => '(pertanyaan tanpa butir lingkup)',
+                    'jawaban'    => $jwb,
+                    'tautan'     => '',
+                );
+            }
+        }
+
+        $nama = 'Format-Jawaban-' . $audit['audit_id'];
+        $this->jawabanexcel->unduhFormat($nama, $audit['form_nama'], $baris);
+    }
+
+    /**
+     * Terima berkas Excel hasil pengisian, lalu simpan jawaban dan tautan
+     * lampirannya. Jawaban kosong pada berkas tidak menghapus jawaban yang
+     * sudah tersimpan, sedangkan tautan pada satu butir menggantikan tautan
+     * lama supaya unggahan berulang tidak mengganda.
+     */
+    public function unggahjawaban() {
+        $audit_id = (int) $this->input->post('audit_id');
+
+        $kunci = $this->_kunci($audit_id);
+        if ($kunci !== TRUE) {
+            $this->_json($kunci);
+            return;
+        }
+
+        if (!isset($_FILES['berkas']) || empty($_FILES['berkas']['name'])) {
+            $this->_json(array(
+                'status' => false,
+                'pesan'  => 'Pilih berkas Excel hasil pengisian terlebih dahulu.',
+            ));
+            return;
+        }
+
+        /* Berkas ditaruh di folder sementara, dibaca, lalu dibuang. */
+        $folder = FCPATH . 'filedata/tmp';
+        if (!is_dir($folder)) {
+            @mkdir($folder, 0777, TRUE);
+        }
+
+        $this->load->library('upload');
+        $this->upload->initialize(array(
+            'upload_path'   => $folder,
+            'allowed_types' => 'xls|xlsx|csv',
+            'max_size'      => 5120,   // 5 MB
+            'encrypt_name'  => TRUE,
+            'remove_spaces' => TRUE,
+        ));
+
+        if (!$this->upload->do_upload('berkas')) {
+            $this->_json(array(
+                'status' => false,
+                'pesan'  => 'Berkas gagal diunggah: ' . $this->_pesanGagalBerkas(),
+            ));
+            return;
+        }
+
+        $info = $this->upload->data();
+        $path = $info['full_path'];
+
+        try {
+            $this->load->library('Jawabanexcel');
+            $baris = $this->jawabanexcel->baca($path);
+        } catch (Exception $e) {
+            @unlink($path);
+            $this->_json(array(
+                'status' => false,
+                'pesan'  => 'Berkas tidak dapat dibaca. ' . $e->getMessage(),
+            ));
+            return;
+        }
+
+        $hasil = $this->_terapkanJawaban($audit_id, $baris);
+        @unlink($path);
+
+        $this->_json($hasil);
+    }
+
+    /** Audit milik auditee yang sedang masuk (tanpa syarat status). */
+    private function _milikSendiri($audit_id) {
+        $audit = $this->mutu->getAuditById($audit_id);
+        if (!$audit) {
+            return NULL;
+        }
+
+        $users_id = $this->session->userdata('users_id');
+        if (isset($audit['auditee_id']) && (int) $audit['auditee_id'] !== (int) $users_id) {
+            return NULL;
+        }
+
+        return $audit;
+    }
+
+    /** Tautan lampiran yang tersimpan pada satu butir, dipisahkan koma. */
+    private function _tautanTersimpan($butir) {
+        if (empty($butir['lampiran'])) {
+            return '';
+        }
+
+        $tautan = array();
+        foreach ($butir['lampiran'] as $l) {
+            if (!empty($l['tautan'])) {
+                $tautan[] = $l['lampiran_nama'];
+            }
+        }
+
+        return implode(', ', $tautan);
+    }
+
+    /** Kunci pencocokan teks butir (huruf kecil, tanpa tanda baca). */
+    private function _kunciTeks($teks) {
+        return preg_replace('/[^a-z0-9]+/', '', strtolower(trim((string) $teks)));
+    }
+
+    /**
+     * Peta sasaran penyimpanan: id pada berkas => butir lingkup / pertanyaan.
+     *
+     * Kuncinya berupa id butir (angka) atau "P<dtform_id>" untuk pertanyaan
+     * tanpa butir lingkup. Teks butir lingkup juga dipetakan sebagai
+     * cadangan, bila kolom Id pada berkas tidak terbaca.
+     */
+    private function _petaSasaran($audit_id) {
+        $peta = array();
+
+        foreach ($this->auditjawab->petaLingkup($audit_id) as $t) {
+            $dtform_id = isset($t['dtform_id']) ? (int) $t['dtform_id'] : 0;
+            $butir     = isset($t['butir']) ? $t['butir'] : array();
+
+            if (empty($butir)) {
+                if ($dtform_id > 0) {
+                    $peta['P' . $dtform_id] = array('lingkup_id' => 0, 'dtform_id' => $dtform_id);
+                }
+                continue;
+            }
+
+            foreach ($butir as $b) {
+                $lingkup_id = (int) $b['lingkup_id'];
+                if ($lingkup_id < 1) {
+                    continue;
+                }
+                $sasaran = array('lingkup_id' => $lingkup_id, 'dtform_id' => $dtform_id);
+                $peta[(string) $lingkup_id] = $sasaran;
+
+                $teks = $this->_kunciTeks(isset($b['lingkup_teks']) ? $b['lingkup_teks'] : '');
+                if ($teks !== '') {
+                    $peta[$teks] = $sasaran;
+                }
+            }
+        }
+
+        return $peta;
+    }
+
+    /** Pecah isi kolom tautan menjadi daftar alamat (http/https). */
+    private function _daftarTautan($teks) {
+        $teks = trim((string) $teks);
+        if ($teks === '') {
+            return array();
+        }
+
+        $hasil = array();
+        foreach (preg_split('/[\s,;]+/', $teks) as $potong) {
+            $potong = trim($potong);
+            if ($potong === '') {
+                continue;
+            }
+
+            /* Alamat tanpa skema dilengkapi (mis. drive.google.com/xxx). */
+            if (!preg_match('#^https?://#i', $potong)) {
+                if (!preg_match('#^(www\.|[a-z0-9\-]+\.[a-z]{2,}(/|$))#i', $potong)) {
+                    continue;
+                }
+                $potong = 'https://' . $potong;
+            }
+
+            if (strlen($potong) > 500) {
+                $potong = substr($potong, 0, 500);
+            }
+
+            $hasil[] = $potong;
+        }
+
+        return $hasil;
+    }
+
+    /** Simpan seluruh baris hasil pembacaan berkas ke database. */
+    private function _terapkanJawaban($audit_id, $baris) {
+        $peta      = $this->_petaSasaran($audit_id);
+        $tersimpan = 0;
+        $tautan    = 0;
+        $dilewati  = array();
+
+        foreach ($baris as $b) {
+            $id = strtoupper(trim((string) $b['id']));
+            if ($id === '') {
+                $dilewati[] = 'Baris ' . $b['baris'] . ': kolom Id Butir kosong.';
+                continue;
+            }
+
+            $sasaran = isset($peta[$id]) ? $peta[$id] : NULL;
+            if (!$sasaran) {
+                /* Cadangan: cocokkan berdasar teks butir lingkup. */
+                $teks = $this->_kunciTeks($b['butir']);
+                if ($teks !== '' && isset($peta[$teks])) {
+                    $sasaran = $peta[$teks];
+                }
+            }
+
+            if (!$sasaran) {
+                $dilewati[] = 'Baris ' . $b['baris'] . ': butir tidak dikenali pada audit ini (Id "' . $id . '").';
+                continue;
+            }
+
+            /* ---------- jawaban ---------- */
+            $teks = trim((string) $b['jawaban']);
+            if ($teks !== '') {
+                if ($sasaran['lingkup_id'] > 0) {
+                    $simpan = $this->auditjawab->simpanJawabanButir($audit_id, $sasaran['lingkup_id'], $teks);
+                } else {
+                    $simpan = $this->auditjawab->simpanJawabanPertanyaan($audit_id, $sasaran['dtform_id'], $teks);
+                }
+
+                if (!empty($simpan['status'])) {
+                    $tersimpan++;
+                } else {
+                    $dilewati[] = 'Baris ' . $b['baris'] . ': '
+                        . (isset($simpan['pesan']) ? $simpan['pesan'] : 'jawaban gagal disimpan.');
+                }
+            }
+
+            /* ---------- tautan lampiran ---------- */
+            $daftar = $this->_daftarTautan($b['tautan']);
+            if (empty($daftar)) {
+                continue;
+            }
+
+            if (!$this->lampiran->siap()) {
+                $dilewati[] = 'Baris ' . $b['baris'] . ': tautan lampiran dilewati, '
+                    . 'tabel lampiran belum tersedia (impor database/lampiran_lingkup.sql).';
+                continue;
+            }
+
+            $jumlah = $this->_simpanTautan($audit_id, $sasaran, $daftar);
+            $tautan += $jumlah;
+
+            if ($jumlah < count($daftar)) {
+                $dilewati[] = 'Baris ' . $b['baris'] . ': sebagian tautan lampiran gagal disimpan.';
+            }
+        }
+
+        $pesan = $tersimpan . ' jawaban tersimpan';
+        if ($tautan > 0) {
+            $pesan .= ', ' . $tautan . ' tautan lampiran tersimpan';
+        }
+        if ($tersimpan === 0 && $tautan === 0) {
+            $pesan = 'Tidak ada perubahan yang tersimpan.';
+        }
+        if (!empty($dilewati)) {
+            $pesan .= '. ' . count($dilewati) . ' baris dilewati.';
+        }
+
+        return array(
+            'status'    => ($tersimpan > 0 || $tautan > 0),
+            'pesan'     => $pesan,
+            'tersimpan' => $tersimpan,
+            'tautan'    => $tautan,
+            'dilewati'  => $dilewati,
+        );
+    }
+
+    /**
+     * Simpan daftar tautan lampiran untuk satu butir/pertanyaan. Tautan lama
+     * pada butir tersebut dibuang lebih dahulu supaya tidak mengganda.
+     *
+     * @return int jumlah tautan tersimpan
+     */
+    private function _simpanTautan($audit_id, $sasaran, $daftar) {
+        $kolom = $this->lampiran->kolomJawaban();   // jwb_id (baru) atau lingkup_id (lama)
+        if (!$kolom) {
+            return 0;
+        }
+
+        $lingkup_id = (int) $sasaran['lingkup_id'];
+        $ekstra     = array();
+
+        if ($lingkup_id > 0) {
+            $jwb_id = $this->auditjawab->pastikanButir($audit_id, $lingkup_id);
+            if (!$jwb_id) {
+                return 0;
+            }
+            $id_lampiran = ($kolom === 'jwb_id') ? $jwb_id : $lingkup_id;
+            if ($kolom === 'jwb_id') {
+                /* Penanda butir ikut tersimpan supaya lampiran mudah dibaca
+                   kembali per butir lingkup. */
+                $ekstra['lingkup_id'] = $lingkup_id;
+            }
+            $hapus_kolom = 'lingkup_id';
+            $hapus_id    = $lingkup_id;
+        } else {
+            $jwb_id = $this->auditjawab->pastikanPertanyaan($audit_id, $sasaran['dtform_id']);
+            if (!$jwb_id) {
+                return 0;
+            }
+            $id_lampiran = ($kolom === 'jwb_id') ? $jwb_id : $sasaran['dtform_id'];
+            $hapus_kolom = $kolom;
+            $hapus_id    = $id_lampiran;
+        }
+
+        $this->lampiran->hapusTautan($audit_id, $hapus_id, $hapus_kolom);
+
+        $jumlah = 0;
+        foreach ($daftar as $url) {
+            if ($this->lampiran->tambahTautan($audit_id, $id_lampiran, $url, $kolom, $ekstra)) {
+                $jumlah++;
+            }
+        }
+
+        return $jumlah;
+    }
+
+    /** Pesan gagal unggah berkas Excel, dalam bahasa Indonesia. */
+    private function _pesanGagalBerkas() {
+        $asli = strtolower(trim(preg_replace('/\s+/', ' ', strip_tags($this->upload->display_errors('', '')))));
+
+        if (strpos($asli, 'not allowed') !== FALSE || strpos($asli, 'filetype') !== FALSE) {
+            return 'jenis berkas tidak dikenali (harus .xls, .xlsx, atau .csv)';
+        }
+        if (strpos($asli, 'too large') !== FALSE || strpos($asli, 'exceeds') !== FALSE) {
+            return 'ukuran berkas melebihi 5 MB';
+        }
+        if (strpos($asli, 'upload path') !== FALSE || strpos($asli, 'not writable') !== FALSE) {
+            return 'folder penyimpanan sementara tidak dapat ditulis';
+        }
+        if ($asli === '') {
+            return 'berkas tidak dapat diproses';
+        }
+        return $asli;
     }
 
     /**
