@@ -5,6 +5,8 @@ class Akun extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'admin';
+        // Informasi tombol aksi saat hover (lihat assets/app/tabel-aksi.css)
+        $this->load->js(base_url("assets/app/tabel-aksi.js?v=1.0"));
         $this->load->js(base_url("assets/app/admin/akun.js?v=1.2"));
         $this->load->model('AkunModel', 'akun');
 
@@ -348,11 +350,14 @@ class Akun extends MY_Controller {
             $id_akun   = (int) $field->users_id;
             $id_menu   = 'aksi' . $id_akun;
 
+            /* Tombol pembuka menu dibuat sama dengan tombol aksi lain:
+               btn btn-sm btn-icon btn-default (tanpa btn-pure), sehingga
+               tampak sebagai tombol, bukan sekadar ikon. */
             $aksi = '<div class="dropdown tabel-aksi">'
-                . '<button type="button" class="btn btn-sm btn-icon btn-pure btn-default"'
+                . '<button type="button" class="btn btn-sm btn-icon btn-default"'
                 . ' id="' . $id_menu . '" data-toggle="dropdown"'
                 . ' aria-haspopup="true" aria-expanded="false"'
-                . ' title="Pilihan aksi" data-info="Pilihan aksi untuk akun ini">'
+                . ' data-info="Pilihan aksi untuk akun ini" aria-label="Pilihan aksi">'
                 . '<i class="icon md-more-vert" aria-hidden="true"></i></button>'
                 . '<div class="dropdown-menu dropdown-menu-right tabel-aksi-menu"'
                 . ' aria-labelledby="' . $id_menu . '">';

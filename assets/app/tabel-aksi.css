@@ -78,16 +78,19 @@
 }
 
 .tabel-aksi-menu .dropdown-item {
-    display: block;
+    display: flex;
+    align-items: center;
     padding: 7px 16px;
     cursor: pointer;
     white-space: nowrap;
 }
 
+/* Ikon dan teks disejajarkan dengan flex supaya setiap pilihan tampil
+   sama rata, apa pun ikonnya. */
 .tabel-aksi-menu .dropdown-item > .icon {
     margin-right: 10px;
     font-size: 16px;
-    vertical-align: -3px;
+    line-height: 1;
     color: #757575;
 }
 
