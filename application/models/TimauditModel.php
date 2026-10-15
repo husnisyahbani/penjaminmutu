@@ -42,6 +42,33 @@ class TimauditModel extends CI_Model {
      * ================================================================== */
 
     /**
+     * Nama tabel lengkap dengan awalan (dbprefix) dan terlindungi.
+     *
+     * @param  string $nama 'users' atau 'mutu_auditteams'
+     * @return string
+     */
+    private function _tabel($nama = NULL) {
+        if ($nama === NULL) {
+            $nama = $this->tabel;
+        }
+        return $this->db->protect_identifiers($nama, TRUE);
+    }
+
+    /**
+     * Seluruh kueri pada model ini dijalankan dengan $this->db->query(),
+     * BUKAN dengan penyusun kueri (query builder).
+     *
+     * Alasannya: model ini dipanggil dari tengah kueri milik model lain -
+     * misalnya MutuauditModel::_saringAuditor() yang sedang menyusun
+     * "FROM mutu_audit ...". Bila kueri tim ikut memakai penyusun kueri,
+     * keadaan kueri luar ikut terbawa (lalu ikut dikosongkan oleh get()),
+     * SQL-nya menjadi rusak dan get() mengembalikan FALSE - yang tampil
+     * sebagai "Call to a member function result_array() on bool".
+     * $this->db->query() tidak menyentuh keadaan penyusun kueri, sehingga
+     * kueri luar tetap utuh.
+     */
+
+    /**
      * Susunan tim beberapa audit sekaligus (satu kueri untuk seluruh
      * halaman tabel): audit_id => daftar anggota, ketua lebih dahulu.
      *
@@ -65,17 +92,20 @@ class TimauditModel extends CI_Model {
             return $hasil;
         }
 
-        $this->db->select('t.audit_id, t.users_id, t.tim_peran, t.tim_urut');
-        $this->db->select('u.nama, u.unitkerja');
-        $this->db->from($this->tabel . ' t');
-        $this->db->join($this->t_users . ' u', 'u.users_id = t.users_id', 'left');
-        $this->db->where_in('t.audit_id', $ids);
-        /* Ketua (tim_urut 0) tampil lebih dahulu, lalu anggota sesuai
-           urutan pemilihan. */
-        $this->db->order_by('t.tim_urut', 'ASC');
-        $this->db->order_by('t.tim_id', 'ASC');
+        $sql = 'SELECT t.audit_id, t.users_id, t.tim_peran, t.tim_urut, u.nama, u.unitkerja'
+            . ' FROM ' . $this->_tabel() . ' t'
+            . ' LEFT JOIN ' . $this->_tabel($this->t_users) . ' u ON u.users_id = t.users_id'
+            . ' WHERE t.audit_id IN (' . implode(',', $ids) . ')'   // $ids sudah berupa angka
+            . ' ORDER BY t.tim_urut ASC, t.tim_id ASC';
 
-        $baris = $this->db->get()->result_array();
+        $kueri = $this->db->query($sql);
+        if (!$kueri) {
+            /* Gagal membaca tim: anggap saja belum ada tim, jangan sampai
+               halaman ikut rusak. */
+            return $hasil;
+        }
+
+        $baris = $kueri->result_array();
         /* Peta manual supaya nama tabel tetap bisa memakai awalan apa pun. */
         foreach ($baris as $b) {
             $key = (int) $b['audit_id'];
@@ -121,9 +151,15 @@ class TimauditModel extends CI_Model {
             return $hasil;
         }
 
-        $this->db->select('audit_id');
-        $this->db->where('users_id', (int) $users_id);
-        foreach ($this->db->get($this->tabel)->result_array() as $r) {
+        $sql   = 'SELECT audit_id FROM ' . $this->_tabel()
+            . ' WHERE users_id = ' . (int) $users_id;
+        $kueri = $this->db->query($sql);
+
+        if (!$kueri) {
+            return $hasil;
+        }
+
+        foreach ($kueri->result_array() as $r) {
             $hasil[] = (int) $r['audit_id'];
         }
 
@@ -191,8 +227,8 @@ class TimauditModel extends CI_Model {
 
         $this->db->trans_start();
 
-        $this->db->where('audit_id', $audit_id);
-        $this->db->delete($this->tabel);
+        $this->db->query('DELETE FROM ' . $this->_tabel()
+            . ' WHERE audit_id = ' . $audit_id);
 
         $urut      = 1;
         $ketua_ok  = FALSE;
@@ -207,13 +243,13 @@ class TimauditModel extends CI_Model {
 
             $ketua   = ($uid === $ketua_id);
             $sekarang = date('Y-m-d H:i:s');
-            $this->db->insert($this->tabel, array(
+            $this->db->query($this->db->insert_string($this->tabel, array(
                 'audit_id'   => $audit_id,
                 'users_id'   => $uid,
                 'tim_peran'  => $ketua ? 'KETUA' : 'ANGGOTA',
                 'tim_urut'   => $ketua ? 0 : $urut,
                 'tim_create' => $sekarang,
-            ));
+            )));
 
             if ($ketua) {
                 $ketua_ok = TRUE;
@@ -224,13 +260,13 @@ class TimauditModel extends CI_Model {
 
         /* Penjagaan: ketua selalu tercatat. */
         if (!$ketua_ok) {
-            $this->db->insert($this->tabel, array(
+            $this->db->query($this->db->insert_string($this->tabel, array(
                 'audit_id'   => $audit_id,
                 'users_id'   => $ketua_id,
                 'tim_peran'  => 'KETUA',
                 'tim_urut'   => 0,
                 'tim_create' => date('Y-m-d H:i:s'),
-            ));
+            )));
         }
 
         $this->db->trans_complete();
@@ -243,8 +279,8 @@ class TimauditModel extends CI_Model {
             return FALSE;
         }
 
-        $this->db->where('audit_id', (int) $audit_id);
-        return $this->db->delete($this->tabel);
+        return $this->db->query('DELETE FROM ' . $this->_tabel()
+            . ' WHERE audit_id = ' . (int) $audit_id);
     }
 
     /* =====================================================================
