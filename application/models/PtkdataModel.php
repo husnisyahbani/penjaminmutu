@@ -39,10 +39,10 @@ class PtkdataModel extends CI_Model {
     /* Bawaan mengikuti halaman PTK auditee (7 kolom). Halaman lain yang
        memakai susunan kolom berbeda menimpanya lewat aturKolom()/aturCari(),
        sehingga perilaku pencarian & pengurutan halaman auditee tidak berubah. */
-    var $column_search = array('f.form_nama','dt.dtform_pertanyaan','dj.dtjwb_pertanyaan','dj.dtjwb_hasil','dj.dtjwb_temuan','dj.dtjwb_catatan');
+    var $column_search = array('f.form_nama','dt.dtform_pertanyaan','dj.dtjwb_pertanyaan','dj.dtjwb_hasil','dj.dtjwb_temuan','dj.dtjwb_catatan','dj.dtjwb_status');
     /* Urutan kolom tabel (No, Formulir, Butir, Hasil, Temuan, Catatan,
-       Koreksi); yang null tidak dapat diurutkan. */
-    var $column_order = array(null,'f.form_nama','dj.dtjwb_pertanyaan','dj.dtjwb_hasil','dj.dtjwb_temuan','dj.dtjwb_catatan',null);
+       Koreksi, Status); yang null tidak dapat diurutkan. */
+    var $column_order = array(null,'f.form_nama','dj.dtjwb_pertanyaan','dj.dtjwb_hasil','dj.dtjwb_temuan','dj.dtjwb_catatan',null,'dj.dtjwb_status');
 
     /**
      * Tetapkan urutan kolom DataTables pemanggil (null = tidak dapat
@@ -120,6 +120,11 @@ class PtkdataModel extends CI_Model {
         return $this->db->field_exists('dtjwb_koreksi', 'auditjawabdetail');
     }
 
+    /** Sudah ada kolom status per butir? */
+    public function statusSiap() {
+        return $this->db->field_exists('dtjwb_status', 'auditjawabdetail');
+    }
+
     private function _get_datatables_query($search, $ordering) {
         $i = 0;
 
@@ -179,6 +184,9 @@ class PtkdataModel extends CI_Model {
         $this->db->select('dj.dtjwb_catatan AS jwb_catatan', FALSE);
         if ($this->koreksiSiap()) {
             $this->db->select($this->_koreksi_sql() . ' AS jwb_koreksi', FALSE);
+        }
+        if ($this->statusSiap()) {
+            $this->db->select('dj.dtjwb_status AS jwb_status', FALSE);
         }
 
         $this->db->from('auditjawabdetail dj');
@@ -376,4 +384,28 @@ class PtkdataModel extends CI_Model {
         return($this->db->affected_rows() != 1) ? false : true;
     }
 
+    /**
+     * Perbarui status temuan PTK (OPEN / PROSES / CLOSED) oleh auditor.
+     *
+     * @param int    $dtjwb_id
+     * @param string $status
+     * @return bool
+     */
+    public function updateStatus($dtjwb_id, $status) {
+        if (!$this->statusSiap()) {
+            $this->load->dbforge();
+            $this->dbforge->add_column('auditjawabdetail', array(
+                'dtjwb_status' => array('type' => 'VARCHAR', 'constraint' => 20, 'null' => TRUE, 'after' => 'dtjwb_koreksi'),
+            ));
+        }
+
+        $this->db->trans_start();
+        $this->db->where('dtjwb_id', (int) $dtjwb_id);
+        $this->db->update('auditjawabdetail', array('dtjwb_status' => !empty($status) ? $status : NULL));
+        $this->db->trans_complete();
+
+        return $this->db->trans_status();
+    }
+
 }
+

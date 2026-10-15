@@ -5,7 +5,7 @@ class Ptk extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditee';
-        $this->load->js(base_url("assets/app/auditee/ptk.js?v=3.1"));
+        $this->load->js(base_url("assets/app/auditee/ptk.js?v=3.2"));
         // Informasi tombol aksi saat hover (lihat assets/app/tabel-aksi.css)
         $this->load->js(base_url("assets/app/tabel-aksi.js?v=1.0"));
         $this->load->model('PtkModel', 'ptkmodel');
@@ -185,6 +185,19 @@ class Ptk extends MY_Controller {
                 }
                 $row[] = $isi . $aksi;
             }
+
+            /* Kolom Status (diisi auditor) */
+            $status_ptk = isset($field->jwb_status) ? strtoupper(trim((string) $field->jwb_status)) : '';
+            if ($status_ptk === 'CLOSED') {
+                $status_badge = '<span class="badge badge-success">CLOSED</span>';
+            } elseif ($status_ptk === 'PROSES') {
+                $status_badge = '<span class="badge badge-warning">PROSES</span>';
+            } elseif ($status_ptk === 'OPEN') {
+                $status_badge = '<span class="badge badge-danger">OPEN</span>';
+            } else {
+                $status_badge = '<span class="badge badge-default">BELUM DIISI</span>';
+            }
+            $row[] = '<div class="text-center">' . $status_badge . '</div>';
 
             $data[] = $row;
         }

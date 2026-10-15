@@ -106,4 +106,13 @@ class PtkModel extends CI_Model {
         return $this->_data()->hapus($id);
     }
 
+    public function statusSiap() {
+        return $this->_data()->statusSiap();
+    }
+
+    public function updateStatus($dtjwb_id, $status) {
+        return $this->_data()->updateStatus($dtjwb_id, $status);
+    }
+
 }
+

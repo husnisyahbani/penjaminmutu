@@ -11,7 +11,7 @@
         <li class="site-menu-item <?php if(isset($ptk)){echo $ptk;} ?>">
           <a class="animsition-link" href="<?php echo base_url($module.'/ptk');?>">
                   <i class="site-menu-icon md-assignment-alert" aria-hidden="true"></i>
-                  <span class="site-menu-title">PTK</span>
+                  <span class="site-menu-title">MONITORING PTK</span>
               </a>
         </li>
 

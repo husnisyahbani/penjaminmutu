@@ -7,7 +7,7 @@
 $(function () {
 
     var daftarptk = $('#ptk').DataTable({
-        "responsive": true,
+        "responsive": false,
         /* Lebar kolom diatur CSS (persentase + table-layout fixed pada
            assets/app/ptk.css), bukan dihitung DataTables dari isi sel. */
         "autoWidth": false,
@@ -20,13 +20,14 @@ $(function () {
             {"targets": [0, 6], "orderable": false},
             /* Kelas kolom diambil dari header (lihat assets/app/ptk.css) supaya
                lebarnya proporsional dan tidak diatur inline oleh DataTables. */
-            {"targets": 0, "className": "ptk-kolom-no"},
+            {"targets": 0, "className": "ptk-kolom-no text-center"},
             {"targets": 1, "className": "ptk-kolom-formulir"},
             {"targets": 2, "className": "ptk-kolom-butir"},
             {"targets": 3, "className": "ptk-kolom-hasil"},
-            {"targets": 4, "className": "ptk-kolom-temuan"},
+            {"targets": 4, "className": "ptk-kolom-temuan text-center"},
             {"targets": 5, "className": "ptk-kolom-catatan"},
-            {"targets": 6, "className": "ptk-koreksi-sel"}
+            {"targets": 6, "className": "ptk-koreksi-sel"},
+            {"targets": 7, "className": "ptk-kolom-status text-center"}
         ],
         "ajax": {
             "url": base_url + "/ptk/listptk/",

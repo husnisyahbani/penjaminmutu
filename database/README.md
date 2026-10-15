@@ -366,3 +366,22 @@ Catatan:
 - Catatan ini tersimpan dan ditampilkan pada auditee saat mereka membuka kembali formulir evaluasi mereka.
 - Aplikasi juga mengecek keberadaan kolom secara otomatis sehingga aman jika dijalankan pada instalasi baru atau lama.
 
+## `status_ptk.sql`
+
+Menambahkan kolom status verifikasi / tindak lanjut temuan PTK oleh auditor:
+
+| Kolom                                | Isi                                                                       |
+| ------------------------------------ | ------------------------------------------------------------------------- |
+| `mutu_auditjawabdetail.dtjwb_status` | Status tindak lanjut PTK (`OPEN`, `PROSES`, `CLOSED`) diisi oleh auditor  |
+
+Cara pakai:
+
+1. Impor berkas `database/status_ptk.sql` lewat phpMyAdmin (tab SQL).
+2. Sesuaikan prefix `mutu_` bila berbeda.
+
+Catatan:
+
+- Pada menu **Monitoring PTK** milik auditor, terdapat kolom **Status** setelah Rencana Perbaikan untuk memilih status temuan (`OPEN`, `PROSES`, `CLOSED`).
+- Auditee dapat melihat status tersebut pada tabel PTK miliknya.
+
+

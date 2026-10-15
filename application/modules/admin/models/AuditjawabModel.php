@@ -338,4 +338,29 @@ class AuditjawabModel extends CI_Model {
         return $baris;
     }
 
+    /**
+     * Seluruh topik (pertanyaan) beserta butir lingkupnya dan jawaban auditee
+     * untuk satu audit.
+     *
+     * @param  int   $audit_id
+     * @return array
+     */
+    function petaLingkup($audit_id) {
+        $this->load->model('PetaauditModel', 'petaaudit');
+        return $this->petaaudit->peta($audit_id);
+    }
+
+    /**
+     * Penjagaan: butir lingkup ini termasuk salah satu pertanyaan pada audit
+     * tersebut?
+     *
+     * @param  int $audit_id
+     * @param  int $lingkup_id
+     * @return bool
+     */
+    public function lingkupMilikAudit($audit_id, $lingkup_id) {
+        $this->load->model('PetaauditModel', 'petaaudit');
+        return $this->petaaudit->lingkupMilikAudit($audit_id, $lingkup_id);
+    }
+
 }

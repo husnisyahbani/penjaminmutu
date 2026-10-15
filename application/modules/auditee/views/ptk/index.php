@@ -122,6 +122,7 @@
                                         <th class="ptk-kolom-temuan">Temuan</th>
                                         <th class="ptk-kolom-catatan">Catatan</th>
                                         <th class="ptk-kolom-koreksi">Rencana Koreksi</th>
+                                        <th class="ptk-kolom-status">Status</th>
                                     </tr>
                                 </thead>
 

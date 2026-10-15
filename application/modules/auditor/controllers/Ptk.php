@@ -15,7 +15,7 @@ class Ptk extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditor';
-        $this->load->js(base_url("assets/app/auditor/ptk.js?v=1.0"));
+        $this->load->js(base_url("assets/app/auditor/ptk.js?v=2.0"));
         // Informasi tombol aksi saat hover (lihat assets/app/tabel-aksi.css)
         $this->load->js(base_url("assets/app/tabel-aksi.js?v=1.0"));
         $this->load->model('PtkdataModel', 'ptkdata');
@@ -26,13 +26,13 @@ class Ptk extends MY_Controller {
         /* Baris yang tampil = tilik pada audit yang ditangani auditor ini. */
         $this->ptkdata->aturPemilik('auditor');
         /* Susunan kolom tabel halaman ini (No, Formulir, Auditee, Unit,
-           Butir, Hasil, Temuan, Catatan, Rencana Koreksi); null = tidak
+           Butir, Hasil, Temuan, Catatan, Rencana Koreksi, Status); null = tidak
            dapat diurutkan. */
         $this->ptkdata->aturKolom(array(null, 'f.form_nama', 'au.auditee', 'au.unit',
-            'dj.dtjwb_pertanyaan', 'dj.dtjwb_hasil', 'dj.dtjwb_temuan', 'dj.dtjwb_catatan', null));
+            'dj.dtjwb_pertanyaan', 'dj.dtjwb_hasil', 'dj.dtjwb_temuan', 'dj.dtjwb_catatan', null, 'dj.dtjwb_status'));
         $this->ptkdata->aturCari(array('f.form_nama', 'au.auditee', 'au.unit',
             'dt.dtform_pertanyaan', 'dj.dtjwb_pertanyaan', 'dj.dtjwb_hasil',
-            'dj.dtjwb_temuan', 'dj.dtjwb_catatan'));
+            'dj.dtjwb_temuan', 'dj.dtjwb_catatan', 'dj.dtjwb_status'));
 
         $role = $this->session->userdata('role');
         if (!isset($role) || $role != 'AUDITOR') {
@@ -42,7 +42,7 @@ class Ptk extends MY_Controller {
 
     public function index() {
         $this->data['content'] = 'ptk/index';
-        $this->data['title'] = 'PERMINTAAN TINDAKAN KOREKSI';
+        $this->data['title'] = 'MONITORING PTK';
         $this->data['js'] = $this->load->get_js_files();
         $this->data['ptk'] = 'active';
         /* Filter periode: bawaan = periode aktif. Bila tidak ada periode
@@ -139,6 +139,26 @@ class Ptk extends MY_Controller {
                 ? '<span class="ptk-koreksi-kosong">Belum ada rencana koreksi</span>'
                 : '<div class="ptk-klamp ptk-koreksi">' . nl2br(html_escape($koreksi)) . '</div>';
 
+            /* Kolom Status (diisi oleh auditor): OPEN / PROSES / CLOSED */
+            $status_ptk = isset($field->jwb_status) ? strtoupper(trim((string) $field->jwb_status)) : '';
+            $opt_open = ($status_ptk === 'OPEN') ? 'selected' : '';
+            $opt_proses = ($status_ptk === 'PROSES') ? 'selected' : '';
+            $opt_closed = ($status_ptk === 'CLOSED') ? 'selected' : '';
+
+            $select_status = '<div class="ptk-status-kotak">'
+                . '<select class="form-control form-control-sm ptk-status-select"'
+                . ' data-dtjwb_id="' . (int) $field->dtjwb_id . '"'
+                . ' data-sebelumnya="' . html_escape($status_ptk) . '"'
+                . ' title="Pilih status temuan PTK ini">'
+                . '<option value="">-- Pilih --</option>'
+                . '<option value="OPEN" ' . $opt_open . '>OPEN</option>'
+                . '<option value="PROSES" ' . $opt_proses . '>PROSES</option>'
+                . '<option value="CLOSED" ' . $opt_closed . '>CLOSED</option>'
+                . '</select>'
+                . '</div>';
+
+            $row[] = $select_status;
+
             $data[] = $row;
         }
 
@@ -152,6 +172,38 @@ class Ptk extends MY_Controller {
         echo json_encode($output);
     }
 
+    /**
+     * Perbarui status temuan PTK oleh auditor (OPEN / PROSES / CLOSED).
+     */
+    public function updatestatus() {
+        $dtjwb_id = (int) $this->input->post('dtjwb_id');
+        $status = strtoupper(trim((string) $this->input->post('status')));
+
+        $valid = array('', 'OPEN', 'PROSES', 'CLOSED');
+        if (!in_array($status, $valid, TRUE)) {
+            header('Access-Control-Allow-Origin: *');
+            header('Content-Type: application/json');
+            echo json_encode(array('status' => FALSE, 'pesan' => 'Status tidak valid.'));
+            return;
+        }
+
+        if ($dtjwb_id <= 0) {
+            header('Access-Control-Allow-Origin: *');
+            header('Content-Type: application/json');
+            echo json_encode(array('status' => FALSE, 'pesan' => 'ID temuan tidak valid.'));
+            return;
+        }
+
+        $hasil = $this->ptkdata->updateStatus($dtjwb_id, $status);
+
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
+        echo json_encode(array(
+            'status' => (bool) $hasil,
+            'pesan'  => $hasil ? 'Status berhasil diperbarui.' : 'Gagal memperbarui status di database.'
+        ));
+    }
+
     /** Teks polos satu baris (untuk kolom tabel). */
     private function _teks($nilai) {
         return lingkup_bersihkan($nilai);
@@ -163,3 +215,4 @@ class Ptk extends MY_Controller {
     }
 
 }
+

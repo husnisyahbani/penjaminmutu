@@ -9,7 +9,7 @@
 $(function () {
 
     var daftarptk = $('#ptk').DataTable({
-        "responsive": true,
+        "responsive": false,
         /* Lebar kolom diatur CSS (persentase + table-layout fixed pada
            assets/app/ptk.css), bukan dihitung DataTables dari isi sel. */
         "autoWidth": false,
@@ -18,8 +18,8 @@ $(function () {
         "searching": true,
         "order": [],
         "columnDefs": [
-            /* Kolom No & Rencana Koreksi tidak dapat diurutkan. */
-            {"targets": [0, 8], "orderable": false},
+            /* Kolom No, Rencana Koreksi & Status tidak dapat diurutkan. */
+            {"targets": [0, 8, 9], "orderable": false},
             /* Kelas kolom diambil dari header (lihat assets/app/ptk.css)
                supaya lebarnya proporsional. */
             {"targets": 0, "className": "ptk-kolom-no"},
@@ -30,7 +30,8 @@ $(function () {
             {"targets": 5, "className": "ptk-kolom-hasil"},
             {"targets": 6, "className": "ptk-kolom-temuan"},
             {"targets": 7, "className": "ptk-kolom-catatan"},
-            {"targets": 8, "className": "ptk-kolom-koreksi"}
+            {"targets": 8, "className": "ptk-kolom-koreksi"},
+            {"targets": 9, "className": "ptk-kolom-status"}
         ],
         "ajax": {
             "url": base_url + "/ptk/listptk/",
@@ -46,6 +47,11 @@ $(function () {
                 if (teks.length > 140) {
                     $(this).attr('title', teks);
                 }
+            });
+        },
+        "drawCallback": function () {
+            $('#ptk .ptk-status-select').each(function () {
+                aturWarnaSelect($(this), $(this).val());
             });
         }
     });
@@ -129,4 +135,79 @@ $(function () {
         });
     }
 
+    /* Warna latar & teks select status mengikuti nilai yang dipilih. */
+    function aturWarnaSelect($sel, status) {
+        $sel.removeClass('ptk-status--open ptk-status--proses ptk-status--closed ptk-status--kosong');
+        var st = String(status || '').toUpperCase();
+        if (st === 'CLOSED') {
+            $sel.addClass('ptk-status--closed');
+        } else if (st === 'PROSES') {
+            $sel.addClass('ptk-status--proses');
+        } else if (st === 'OPEN') {
+            $sel.addClass('ptk-status--open');
+        } else {
+            $sel.addClass('ptk-status--kosong');
+        }
+    }
+
+    /* Auditor memilih status temuan (OPEN / PROSES / CLOSED). */
+    $(document).on('change', '.ptk-status-select', function () {
+        var $sel = $(this);
+        var dtjwb_id = $sel.data('dtjwb_id');
+        var statusBaru = $sel.val();
+        var statusLama = $sel.data('sebelumnya') || '';
+
+        var teksTanya = statusBaru
+            ? "Ubah status temuan ini menjadi " + statusBaru + "?"
+            : "Kosongkan status temuan ini?";
+
+        swal.fire({
+            title: "Ubah Status PTK?",
+            text: teksTanya,
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Ya, Simpan!",
+            cancelButtonText: "Batal",
+            showLoaderOnConfirm: true,
+            preConfirm: function () {
+                return $.ajax({
+                    url: base_url + "/ptk/updatestatus",
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                        dtjwb_id: dtjwb_id,
+                        status: statusBaru
+                    }
+                }).then(function (res) {
+                    return res;
+                }).fail(function () {
+                    swal.fire("Oops", "Gagal menghubungi server!", "error");
+                });
+            }
+        }).then(function (result) {
+            if (result && (result.value || result === true)) {
+                var res = result.value || result;
+                if (res && res.status) {
+                    $sel.data('sebelumnya', statusBaru);
+                    aturWarnaSelect($sel, statusBaru);
+                    swal.fire({
+                        title: "Berhasil",
+                        text: "Status PTK berhasil diperbarui.",
+                        type: "success",
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                } else {
+                    swal.fire("Gagal", (res && res.pesan) ? res.pesan : "Gagal mengubah status.", "error");
+                    $sel.val(statusLama);
+                    aturWarnaSelect($sel, statusLama);
+                }
+            } else {
+                $sel.val(statusLama);
+                aturWarnaSelect($sel, statusLama);
+            }
+        });
+    });
+
 });
+

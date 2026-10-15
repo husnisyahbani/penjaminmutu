@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", function(){
     <!-- Tim auditor (ketua + anggota) pada satu audit -->
     <link rel="stylesheet" href="<?php echo asset_url();?>app/tim-audit.css?v=1.0">
     <!-- Tabel PTK ( Permintaan Tindakan Koreksi ) -->
-    <link rel="stylesheet" href="<?php echo asset_url();?>app/ptk.css?v=1.9">
+    <link rel="stylesheet" href="<?php echo asset_url();?>app/ptk.css?v=2.0">
     <!-- Kartu statistik (dipakai bersama dashboard admin & daftar audit) -->
     <link rel="stylesheet" href="<?php echo asset_url();?>app/topik-aktivitas.css?v=1.6">
     <link rel="stylesheet" href="<?php echo asset_url();?>app/kartu-statistik.css?v=1.1">

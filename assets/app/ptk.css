@@ -32,7 +32,7 @@
     /* Lebar kolom persis seperti yang ditentukan (persentase di bawah),
        bukan hasil hitungan isi sel, sehingga porsi antar kolom tetap. */
     table-layout: fixed;
-    min-width: 1040px;
+    min-width: 1150px;
 }
 
 .ptk-tabel thead th {
@@ -56,28 +56,33 @@
 }
 
 .ptk-kolom-formulir {
-    width: 13%;
+    width: 12%;
 }
 
 .ptk-kolom-butir {
-    width: 24%;
+    width: 22%;
 }
 
 .ptk-kolom-hasil {
-    width: 13%;
+    width: 12%;
 }
 
 .ptk-kolom-temuan {
-    width: 9%;
+    width: 8%;
     text-align: center;
 }
 
 .ptk-kolom-catatan {
-    width: 16%;
+    width: 14%;
 }
 
 .ptk-kolom-koreksi {
-    width: 21%;
+    width: 18%;
+}
+
+.ptk-kolom-status {
+    width: 10%;
+    text-align: center;
 }
 
 /* Kolom Aksi pada daftar tilik: hanya tombol hapus, jadi cukup sempit. */
@@ -88,7 +93,7 @@
 
 /* -----------------------------------------------------------------------------
    PTK auditor & PPM (.ptk-tabel--lengkap): kolomnya bertambah (Auditee,
-   Unit) maka lebar kolom disusun ulang. Jumlahnya tetap 100%.
+   Unit, Status) maka lebar kolom disusun ulang. Jumlahnya tetap 100%.
    -------------------------------------------------------------------------- */
 .ptk-kolom-auditee,
 .ptk-kolom-unit {
@@ -96,11 +101,11 @@
 }
 
 .ptk-tabel--lengkap .ptk-kolom-no {
-    width: 4%;
+    width: 3%;
 }
 
 .ptk-tabel--lengkap .ptk-kolom-formulir {
-    width: 12%;
+    width: 11%;
 }
 
 .ptk-tabel--lengkap .ptk-kolom-auditee,
@@ -109,11 +114,11 @@
 }
 
 .ptk-tabel--lengkap .ptk-kolom-butir {
-    width: 20%;
+    width: 18%;
 }
 
 .ptk-tabel--lengkap .ptk-kolom-hasil {
-    width: 11%;
+    width: 10%;
 }
 
 .ptk-tabel--lengkap .ptk-kolom-temuan {
@@ -121,17 +126,22 @@
 }
 
 .ptk-tabel--lengkap .ptk-kolom-catatan {
-    width: 14%;
+    width: 12%;
 }
 
 .ptk-tabel--lengkap .ptk-kolom-koreksi {
-    width: 13%;
+    width: 11%;
 }
 
-/* Tabel dengan 9 kolom butuh ruang lebih; kotaknya tetap bisa digeser
+.ptk-tabel--lengkap .ptk-kolom-status {
+    width: 9%;
+    text-align: center;
+}
+
+/* Tabel dengan 10 kolom butuh ruang lebih; kotaknya tetap bisa digeser
    mendatar (lihat .ptk-tabel-kotak). */
 .ptk-tabel--lengkap {
-    min-width: 1240px;
+    min-width: 1400px;
 }
 
 /* Isi sel yang panjang dipotong beberapa baris saja supaya tinggi baris
@@ -184,11 +194,14 @@
     color: #9e9e9e;
 }
 
-/* Di layar sempit, DataTables (responsive) melipat kolom; lebar minimum
-   tabel diturunkan supaya tidak memaksa gulir mendatar terlalu jauh. */
+/* Tabel PTK dipertahankan lebar penuhnya dengan scroll horizontal
+   agar tidak ada kolom yang tersembunyi atau tertekan di layar sempit. */
 @media (max-width: 991px) {
     .ptk-tabel {
-        min-width: 860px;
+        min-width: 1150px;
+    }
+    .ptk-tabel--lengkap {
+        min-width: 1400px;
     }
 }
 
@@ -353,4 +366,70 @@
 .tujuan-pesan {
     margin-left: 6px;
     font-size: 12px;
+}
+
+/* -----------------------------------------------------------------------------
+   Status PTK (Auditor: dropdown interaktif, Auditee: label badge informasi)
+   -------------------------------------------------------------------------- */
+.ptk-status-select {
+    display: inline-block;
+    width: 100%;
+    min-width: 95px;
+    max-width: 120px;
+    height: 32px;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.42857;
+    border-radius: 4px;
+    cursor: pointer;
+    outline: none;
+    transition: all .2s ease-in-out;
+}
+
+.ptk-status-select:focus {
+    box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.25);
+}
+
+.ptk-status-select option {
+    background-color: #ffffff;
+    color: #424242;
+    font-weight: normal;
+}
+
+.ptk-status--open {
+    background-color: #fbe9e7 !important;
+    color: #c62828 !important;
+    border: 1px solid #ffab91 !important;
+}
+
+.ptk-status--proses {
+    background-color: #fff8e1 !important;
+    color: #ef6c00 !important;
+    border: 1px solid #ffe082 !important;
+}
+
+.ptk-status--closed {
+    background-color: #e8f5e9 !important;
+    color: #2e7d32 !important;
+    border: 1px solid #a5d6a7 !important;
+}
+
+.ptk-status--kosong {
+    background-color: #fafafa !important;
+    color: #9e9e9e !important;
+    border: 1px solid #e0e0e0 !important;
+}
+
+/* Badge status pada PTK auditee */
+.ptk-status-badge {
+    display: inline-block;
+    min-width: 65px;
+    padding: 5px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    border-radius: 3px;
+    text-align: center;
 }
