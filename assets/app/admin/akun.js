@@ -12,7 +12,10 @@ $(function () {
         "searching": true,
         "order": [],
         "columnDefs": [
-            {"targets": [0,6], "orderable": false}
+            /* Kolom No tidak perlu diurutkan. */
+            {"targets": [0], "orderable": false},
+            /* Kolom Status & Aksi: rata tengah, tidak pernah membungkus. */
+            {"targets": [6,7], "orderable": false, "className": "text-center tabel-aksi-sel"}
         ],
         "ajax": {
             "url": base_url + "/akun/listakun",
@@ -26,8 +29,8 @@ $(function () {
     });
 
     $("#akun").on("click", ".delete", function () {
-        var id = $(this).attr('id');
-        hapus(id);
+        var tombol = $(this);
+        hapus(tombol.attr('id'), tombol.data('nama') || '');
     });
     
     $("#akun").on("click", ".reset", function () {
@@ -35,10 +38,28 @@ $(function () {
         reset(id);
     });
 
-    $("#akun").on("click", ".edit", function () {
-        var id = $(this).attr('id');
-        //window.open(base_url+ "/akun/edit?id="+id);
-        location.href = base_url+ "/akun/edit?id="+id;
+    /* Kolom Aksi hanya satu tombol (ikon titik tiga). Menu pilihannya
+       dibuka/ditutup oleh assets/app/tabel-aksi-menu.js, termasuk setelah
+       salah satu aksi dipilih.
+
+       Menu ditutup juga setiap kali tabel digambar ulang (pencarian,
+       ganti halaman, pengurutan) supaya tidak tertinggal di posisi
+       baris yang sudah tidak tampil. */
+    $('#akun').on('draw.dt', function () {
+        if (window.tabelAksiMenu) {
+            window.tabelAksiMenu.tutup();
+        }
+    });
+
+    /* Tombol status menggantikan tombol edit: pada laman ini yang diubah
+       hanya status Aktif / Tidak Aktif akunnya. */
+    $("#akun").on("click", ".status", function () {
+        var tombol = $(this);
+        ubahStatus(
+            tombol.attr('id'),
+            tombol.attr('data-aktif') === '1',
+            tombol.data('nama') || 'akun ini'
+        );
     });
 
     /* Login sebagai user terpilih (khusus admin PPM). */
@@ -88,36 +109,109 @@ $(function () {
     
     
 
-    function hapus($id)
+    /* ------------------------------ pembantu ------------------------------ */
+
+    function pesan(judul, teks, tipe) {
+        swal.fire(judul, teks, tipe || 'info');
+    }
+
+    function muat() {
+        swal.fire({
+            title: 'Loading',
+            allowEscapeKey: false,
+            allowOutsideClick: false,
+            didOpen: function () { swal.showLoading(); }
+        });
+    }
+
+    function selesai(teks) {
+        swal.fire({
+            title: "Berhasil",
+            text: teks,
+            type: "success"
+        }).then(function () {
+            location.href = base_url + "/akun";
+        });
+    }
+
+    /* --------------------- aktif / nonaktif akun --------------------- */
+
+    function ubahStatus(id, sedangAktif, nama)
     {
         swal.fire({
-            title: "Anda Yakin?",
-            text: "Anda Yakin Ingin Menghapus Akun Ini?",
+            title: sedangAktif ? "Nonaktifkan akun?" : "Aktifkan kembali akun?",
+            html: sedangAktif
+                ? "<b>" + nama + "</b> tidak dapat masuk ke aplikasi lagi dan tidak "
+                  + "muncul pada pilihan auditor/auditee. Data audit yang lalu tetap tersimpan."
+                : "<b>" + nama + "</b> dapat masuk ke aplikasi kembali.",
             type: "warning",
             showCancelButton: true,
-            showLoaderOnConfirm: true,
-            confirmButtonText: "Ya, Hapus!",
-            cancelButtonText: 'Tidak',
-            preConfirm: function () {
-                $.ajax({
-                    url: base_url + "/akun/hapus",
-                    type: "POST",
-                    data: { id: $id}
-                })
-                        .done(function (data) {
-                            swal.fire({
-                                title: "Hapus",
-                                text: "Data Akun Telah Terhapus!",
-                                type: "success",
-                                preConfirm: function () {
-                                    location.href = base_url + "/akun";
-                                }
-                            });
-                        })
-                        .error(function (data) {
-                            swal.fire("Oops", "No connection!", "error");
-                        });
+            confirmButtonText: sedangAktif ? "Ya, Nonaktifkan!" : "Ya, Aktifkan!",
+            cancelButtonText: 'Tidak'
+        }).then(function (konfirmasi) {
+            if (!konfirmasi.value) {
+                return;
             }
+
+            muat();
+            $.ajax({
+                url: base_url + "/akun/status",
+                type: "POST",
+                data: { id: id, aktif: sedangAktif ? 0 : 1 },
+                dataType: "json",
+                success: function (hasil) {
+                    swal.close();
+                    if (!hasil || !hasil.status) {
+                        pesan('Oops', hasil && hasil.pesan ? hasil.pesan : 'Status akun gagal diubah.', 'error');
+                        return;
+                    }
+                    selesai(hasil.pesan);
+                },
+                error: function () {
+                    swal.close();
+                    pesan('Oops', 'Tidak dapat menghubungi server.', 'error');
+                }
+            });
+        });
+    }
+
+    /* --------------------- hapus permanen --------------------- */
+
+    function hapus($id, $nama)
+    {
+        swal.fire({
+            title: "Hapus permanen?",
+            html: "Akun <b>" + ($nama || 'ini') + "</b> akan dibuang dari database dan "
+                + "tidak dapat dikembalikan.<br><br>Bila akun ini pernah mengikuti audit, "
+                + "sebaiknya pilih <b>Nonaktifkan</b> saja supaya data auditnya tetap utuh.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Ya, Hapus!",
+            cancelButtonText: 'Tidak'
+        }).then(function (konfirmasi) {
+            if (!konfirmasi.value) {
+                return;
+            }
+
+            muat();
+            $.ajax({
+                url: base_url + "/akun/hapus",
+                type: "POST",
+                data: { id: $id },
+                dataType: "json",
+                success: function (hasil) {
+                    swal.close();
+                    if (!hasil || !hasil.status) {
+                        pesan('Oops', hasil && hasil.pesan ? hasil.pesan : 'Akun gagal dihapus.', 'error');
+                        return;
+                    }
+                    selesai(hasil.pesan);
+                },
+                error: function () {
+                    swal.close();
+                    pesan('Oops', 'Tidak dapat menghubungi server.', 'error');
+                }
+            });
         });
     }
     
@@ -200,53 +294,7 @@ $(function () {
             invalid: 'has-danger'
         }
     });
-    
-    
-    $('#formeditakun').formValidation({
-        framework: "bootstrap4",
-        button: {
-            selector: '#validateButton',
-            disabled: 'disabled'
-        },
-        icon: null,
-        fields: {
-            
-           username: {
-                validators: {
-                    notEmpty: {
-                        message: 'Wajib Diisi'
-                    }
-                }
-            },
-            password: {
-                validators: {
-                    notEmpty: {
-                        message: 'Wajib Diisi'
-                    }
-                }
-            },
-            role: {
-                validators: {
-                    notEmpty: {
-                        message: 'Wajib Diisi'
-                    }
-                }
-            }
 
-        },
-        err: {
-            clazz: 'invalid-feedback'
-        },
-        control: {
-            // The CSS class for valid control
-            valid: 'is-valid',
-            // The CSS class for invalid control
-            invalid: 'is-invalid'
-        },
-        row: {
-            invalid: 'has-danger'
-        }
-    });
     
     
     

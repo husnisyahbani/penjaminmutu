@@ -2,10 +2,19 @@
 /**
  * Detail audit (auditor) gaya halaman kursus:
  *   topik    = pertanyaan formulir
- *   activity = butir lingkup + hasil/temuan/catatan yang sudah diisi
+ *   activity = butir lingkup + jawaban auditee + lampiran
+ *
+ * Penilaian (hasil/temuan/catatan/rencana koreksi) TIDAK ditampilkan di sini:
+ * auditor mengisinya pada halaman Daftar Tilik (tombol pada tiap topik) dan
+ * nilainya tetap terbaca di sana serta pada ekspor Excel.
  *
  * Tombol "Daftar Tilik" pada tiap topik membuka halaman pengisian seperti
  * semula (delik), sehingga alur pengisian tidak berubah.
+ *
+ * Jawaban lama tingkat pertanyaan tidak ditampilkan lagi, sama seperti
+ * halaman auditee: yang dinilai auditor adalah jawaban tiap butir lingkup.
+ * Pertanyaan yang belum punya butir lingkup tetap menampilkan jawaban
+ * tingkat pertanyaan supaya data lama masih terbaca.
  *
  * Data dari controller: $result, $audit_id, $topik.
  */
@@ -20,18 +29,20 @@ $potong = function ($teks, $maks = 140) {
     return $t;
 };
 
+/* Fitur "Kelebihan & Peluang untuk peningkatan" tersimpan pada tabel
+   mutu_lingkup_nilai; tanpa tabel itu bagiannya disembunyikan. */
+$catatan_siap = !empty($catatan_siap);
+
 $jml_pertanyaan = count($topik);
 $jml_lingkup = 0;
-$jml_dinilai = 0;
-$jml_temuan = 0;
-$jml_dijawab = 0;
+$jml_dijawab = 0;    // butir lingkup yang sudah dijawab auditee
+$jml_belum = 0;
 $jml_lampiran = 0;
 foreach ($topik as $t) {
-    $jml_lingkup   += $t['jml_butir'];
-    $jml_dinilai   += $t['jml_dinilai'];
-    $jml_temuan    += $t['jml_temuan'];
-    $jml_dijawab   += !empty($t['sudah_dijawab']) ? 1 : 0;
-    $jml_lampiran  += $t['jml_lampiran'];
+    $jml_lingkup   += (int) $t['jml_butir'];
+    $jml_dijawab   += (int) $t['jml_dijawab'];
+    $jml_belum     += isset($t['jml_belum']) ? (int) $t['jml_belum'] : 0;
+    $jml_lampiran  += (int) $t['jml_lampiran'];
 }
 ?>
 <div class="page">
@@ -59,20 +70,30 @@ foreach ($topik as $t) {
 
                         <div class="topik-ringkas mb-15">
                             <span class="badge badge-info"><?php echo (int) $jml_pertanyaan; ?> pertanyaan</span>
-                            <span class="badge badge-info"><?php echo (int) $jml_lingkup; ?> butir tilik</span>
-                            <span class="badge badge-success"><?php echo (int) $jml_dijawab; ?> pertanyaan dijawab</span>
+                            <span class="badge badge-info"><?php echo (int) $jml_lingkup; ?> butir lingkup</span>
+                            <span class="badge badge-success"><?php echo (int) $jml_dijawab; ?> dijawab</span>
+                            <span class="badge badge-warning"><?php echo (int) $jml_belum; ?> belum dijawab</span>
                             <span class="badge badge-info"><?php echo (int) $jml_lampiran; ?> lampiran</span>
-                            <span class="badge badge-primary"><?php echo (int) $jml_dinilai; ?> dinilai</span>
-                            <span class="badge badge-warning"><?php echo (int) $jml_temuan; ?> temuan</span>
                         </div>
 
-                        <div class="topik-berkas" id="topik_daftar">
+                        <?php if (!$catatan_siap): ?>
+                        <div class="alert alert-info" role="alert">
+                            Fitur <strong>Kelebihan &amp; Peluang untuk peningkatan</strong> belum disiapkan pada
+                            database ini. Impor <code>database/kelebihan_peluang.sql</code> agar auditor dapat
+                            mengisinya pada tiap butir lingkup.
+                        </div>
+                        <?php endif; ?>
+
+                        <div class="topik-berkas" id="topik_daftar" data-audit_id="<?php echo (int) $audit_id; ?>">
                             <?php foreach ($topik as $i => $t):
+                                $punya_lingkup = !empty($t['punya_lingkup']);
                                 $cari = strtolower($t['teks'] . ' '
-                                    . (isset($t['jwb']['jwb_jawaban']) ? lingkup_bersihkan($t['jwb']['jwb_jawaban']) : '') . ' '
+                                    /* Jawaban tingkat pertanyaan hanya diindeks bila memang
+                                       ditampilkan, yaitu pada pertanyaan tanpa butir lingkup. */
+                                    . (!$punya_lingkup && isset($t['jwb']['jwb_jawaban'])
+                                        ? lingkup_bersihkan($t['jwb']['jwb_jawaban']) : '') . ' '
                                     . implode(' ', array_map(function ($b) {
-                                    return $b['lingkup_teks'] . ' ' . (string) $b['jwb_temuan'] . ' '
-                                        . lingkup_bersihkan($b['jwb_catatan']);
+                                    return $b['lingkup_teks'] . ' ' . $b['jwb_jawaban'];
                                 }, $t['butir'])));
                             ?>
                             <section class="topik" data-dtform_id="<?php echo (int) $t['dtform_id']; ?>"
@@ -82,15 +103,16 @@ foreach ($topik as $t) {
                                     <h4 class="topik-judul">
                                         <?php echo html_escape($t['teks']); ?>
                                         <span class="topik-info">
-                                            <span class="badge badge-info"><?php echo (int) $t['jml_butir']; ?> butir tilik</span>
+                                            <?php if ($punya_lingkup): ?>
+                                            <span class="badge badge-info"><?php echo (int) $t['jml_butir']; ?> butir lingkup</span>
+                                            <span class="badge <?php echo (int) $t['jml_belum'] === 0 ? 'badge-success' : 'badge-warning'; ?>">
+                                                <?php echo (int) $t['jml_dijawab']; ?>/<?php echo (int) $t['jml_butir']; ?> dijawab
+                                            </span>
+                                            <?php else: ?>
+                                            <span class="badge badge-default">tanpa butir lingkup</span>
                                             <span class="badge <?php echo !empty($t['sudah_dijawab']) ? 'badge-success' : 'badge-warning'; ?>">
                                                 <?php echo !empty($t['sudah_dijawab']) ? 'sudah dijawab' : 'belum dijawab'; ?>
                                             </span>
-                                            <?php if ($t['jml_dinilai'] > 0): ?>
-                                            <span class="badge badge-success"><?php echo (int) $t['jml_dinilai']; ?> dinilai</span>
-                                            <?php endif; ?>
-                                            <?php if ($t['jml_temuan'] > 0): ?>
-                                            <span class="badge badge-warning"><?php echo (int) $t['jml_temuan']; ?> temuan</span>
                                             <?php endif; ?>
                                         </span>
                                     </h4>
@@ -104,7 +126,14 @@ foreach ($topik as $t) {
                                     </div>
                                 </header>
                                 <div class="aktivitas-daftar">
-                                    <!-- Jawaban auditee untuk pertanyaan ini (auditee mengisi di halaman detail audit) -->
+                                    <?php /* Jawaban lama tingkat pertanyaan tidak ditampilkan lagi, sama
+                                            seperti halaman auditee: yang dinilai auditor adalah jawaban
+                                            tiap butir lingkup. Datanya tetap tersimpan di
+                                            mutu_auditjawab. */ ?>
+
+                                    <?php if (!$punya_lingkup): ?>
+                                    <!-- Pertanyaan tanpa butir lingkup: jawaban tingkat pertanyaan
+                                         (auditee mengisi di halaman detail audit) -->
                                     <div class="aktivitas-bukti">
                                         <span class="aktivitas-label">Jawaban auditee:</span>
                                         <?php
@@ -114,6 +143,7 @@ foreach ($topik as $t) {
                                             : '<span class="text-muted">belum dijawab auditee</span>';
                                         ?>
                                     </div>
+                                    <?php endif; ?>
 
                                     <?php if (!empty($t['lampiran'])): ?>
                                     <!-- Lampiran jawaban auditee untuk pertanyaan ini -->
@@ -132,16 +162,66 @@ foreach ($topik as $t) {
                                     </div>
                                     <?php endif; ?>
 
+                                    <?php $nomor = 0; ?>
                                     <?php foreach ($t['butir'] as $b):
-                                        $hasil  = $potong($b['jwb_hasil']);
-                                        $temuan = trim((string) $b['jwb_temuan']);
-                                        $catatan = $potong($b['jwb_catatan'], 180);
-                                        $ada = ($hasil !== '' || $temuan !== '' || $catatan !== '');
+                                        $bisa_dijawab = !empty($b['bisa_dijawab']) && (int) $b['lingkup_id'] > 0;
+                                        if ($bisa_dijawab) {
+                                            $nomor++;
+                                        }
+                                        $jawaban = lingkup_bersihkan($b['jwb_jawaban']);
                                     ?>
-                                    <div class="aktivitas" data-cari="<?php echo html_escape(strtolower($b['lingkup_teks'] . ' ' . $hasil . ' ' . $temuan . ' ' . $catatan)); ?>">
-                                        <i class="icon md-assignment aktivitas-ikon" aria-hidden="true"></i>
+                                    <div class="aktivitas lingkup-item<?php echo $bisa_dijawab ? '' : ' lingkup-item--lama'; ?>"
+                                         data-lingkup_id="<?php echo (int) $b['lingkup_id']; ?>"
+                                         data-sudah-dijawab="<?php echo trim((string) $b['jwb_jawaban']) !== '' ? '1' : '0'; ?>"
+                                         data-cari="<?php echo html_escape(strtolower($b['lingkup_teks'] . ' ' . $jawaban)); ?>">
+                                        <i class="icon <?php echo $bisa_dijawab ? 'md-comment-text' : 'md-assignment'; ?> aktivitas-ikon" aria-hidden="true"></i>
                                         <div class="aktivitas-isi">
-                                            <span class="aktivitas-teks"><?php echo html_escape($b['lingkup_teks']); ?></span>
+                                            <span class="aktivitas-teks">
+                                                <?php if ($bisa_dijawab): ?>
+                                                <span class="lingkup-nomor"><?php echo $nomor; ?>.</span>
+                                                <?php endif; ?>
+                                                <?php echo html_escape($b['lingkup_teks']); ?>
+                                            </span>
+
+                                            <?php if ($bisa_dijawab): ?>
+                                            <!-- Jawaban auditee untuk butir lingkup ini -->
+                                            <div class="aktivitas-bukti">
+                                                <span class="aktivitas-label">Jawaban auditee:</span>
+                                                <?php echo $jawaban !== ''
+                                                    ? nl2br(html_escape($jawaban))
+                                                    : '<span class="text-muted">belum dijawab</span>'; ?>
+                                            </div>
+                                            <?php endif; ?>
+
+                                            <?php if ($catatan_siap && $bisa_dijawab): ?>
+                                            <!-- Catatan auditor: kelebihan & peluang untuk peningkatan -->
+                                            <div class="catatan-kotak" data-lingkup_id="<?php echo (int) $b['lingkup_id']; ?>">
+                                                <div class="catatan-baris">
+                                                    <label class="catatan-label" for="kelebihan_<?php echo (int) $b['lingkup_id']; ?>">
+                                                        Kelebihan
+                                                    </label>
+                                                    <textarea class="form-control catatan-isi" rows="2"
+                                                        id="kelebihan_<?php echo (int) $b['lingkup_id']; ?>"
+                                                        placeholder="Tulis kelebihan butir lingkup ini"><?php echo html_escape($b['kelebihan']); ?></textarea>
+                                                </div>
+                                                <div class="catatan-baris">
+                                                    <label class="catatan-label" for="peluang_<?php echo (int) $b['lingkup_id']; ?>">
+                                                        Peluang untuk peningkatan
+                                                    </label>
+                                                    <textarea class="form-control catatan-isi" rows="2"
+                                                        id="peluang_<?php echo (int) $b['lingkup_id']; ?>"
+                                                        placeholder="Tulis peluang peningkatan butir lingkup ini"><?php echo html_escape($b['peluang']); ?></textarea>
+                                                </div>
+                                                <div class="catatan-aksi">
+                                                    <button type="button" class="btn btn-sm btn-primary catatan-simpan"
+                                                            lingkup_id="<?php echo (int) $b['lingkup_id']; ?>"
+                                                            dtform_id="<?php echo (int) $t['dtform_id']; ?>">
+                                                        <i class="icon md-check" aria-hidden="true"></i>Simpan Catatan
+                                                    </button>
+                                                    <span class="catatan-pesan text-muted"></span>
+                                                </div>
+                                            </div>
+                                            <?php endif; ?>
 
                                             <?php if (!empty($b['lampiran'])): ?>
                                             <div class="lampiran-kotak">
@@ -161,34 +241,15 @@ foreach ($topik as $t) {
                                             </div>
                                             <?php endif; ?>
 
-                                            <?php if (!$ada): ?>
-                                            <div class="aktivitas-status">
-                                                <span class="text-muted">belum dinilai</span>
-                                            </div>
-                                            <?php else: ?>
-                                            <div class="aktivitas-status">
-                                                <?php if ($temuan !== ''): ?>
-                                                <span class="badge badge-warning"><?php echo html_escape($temuan); ?></span>
-                                                <?php endif; ?>
-                                                <?php if ($hasil !== ''): ?>
-                                                <span class="badge badge-primary">Hasil: <?php echo html_escape($hasil); ?></span>
-                                                <?php endif; ?>
-                                                <?php if ($catatan !== ''): ?>
-                                                <span class="badge badge-info">Catatan</span>
-                                                <?php endif; ?>
-                                            </div>
-                                            <?php if ($catatan !== ''): ?>
-                                            <div class="aktivitas-bukti">
-                                                <span class="aktivitas-label">Catatan:</span> <?php echo html_escape($catatan); ?>
-                                            </div>
-                                            <?php endif; ?>
-                                            <?php endif; ?>
                                         </div>
                                     </div>
                                     <?php endforeach; ?>
 
                                     <?php if (empty($t['butir'])): ?>
-                                    <div class="aktivitas-kosong">Belum ada butir tilik pada pertanyaan ini (diisi lewat halaman Daftar Tilik).</div>
+                                    <div class="aktivitas-kosong">
+                                        Pertanyaan ini belum memiliki butir lingkup pada tabel
+                                        <code>mutu_lingkup</code>. Butir lingkup diatur PPM pada menu Formulir Audit.
+                                    </div>
                                     <?php endif; ?>
                                 </div>
                             </section>

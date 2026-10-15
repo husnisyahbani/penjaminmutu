@@ -13,19 +13,50 @@ $(function () {
         ],
         "ajax": {
             "url": base_url + "/daftaraudit/listmutu/",
-            "type": "POST"
+            "type": "POST",
+            /* Saringan periode ikut dikirim; kosong = semua periode */
+            "data": function (d) {
+                d.periode_id = $('#filter_periode').val();
+            }
         }
     });
+
+    /* Ganti periode: muat ulang tabel + perbarui kartu statistik.
+       Bawaan di halaman = periode aktif. */
+    $('#filter_periode').on('change', function () {
+        daftaraudit.ajax.reload();
+        perbaruiKartu($(this).val());
+    });
+
+    function angka(nilai) {
+        return String(nilai === null || nilai === undefined ? 0 : nilai)
+            .replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
+    function perbaruiKartu(periode_id) {
+        $.ajax({
+            url: base_url + "/daftaraudit/statistik",
+            type: "POST",
+            dataType: "json",
+            data: {periode_id: periode_id}
+        }).done(function (data) {
+            if (!data || !data.status) {
+                return;
+            }
+            $('#stat_draft').text(angka(data.draft));
+            $('#stat_terkirim').text(angka(data.terkirim));
+            $('#stat_proses').text(angka(data.proses));
+            $('#stat_selesai').text(angka(data.selesai));
+        });
+    }
 
     /* Halaman detail audit kini berbentuk topik/activity yang dirender server
        (lihat assets/app/topik-aktivitas.js), jadi tidak ada DataTable
        #daftarpertanyaan lagi di halaman itu. */
 
-    // $('#jwb_pertanyaan').summernote('code', jwb_pertanyaan);
-    // $('#jwb_referensi').summernote('code', jwb_referensi);
-    // $('#jwb_hasil').summernote('code', jwb_hasil);
-    // $('#jwb_catatan').summernote('code', jwb_catatan);
-    // $('#jwb_tujuan').summernote('code', jwb_tujuan);
+    /* Kolom jwb_pertanyaan/jwb_referensi/jwb_hasil/jwb_temuan/jwb_catatan
+       pada mutu_auditjawab sudah dihapus; formulir penilaian kini ditangani
+       pada halaman Daftar Tilik (mutu_auditjawabdetail). */
 
 
     /* Tombol "Daftar Tilik" pada tiap topik (halaman detail). */
@@ -305,6 +336,55 @@ $('#formtujuan').formValidation({
 
      $("#tambah").on("click", function () {
         $("#addModal").modal('show');
+    });
+
+    /* ------------------------------------------------------------------
+       Catatan auditor per butir lingkup pada halaman detail audit:
+       "Kelebihan" dan "Peluang untuk peningkatan".
+       ------------------------------------------------------------------ */
+    function auditHalaman() {
+        return $('#topik_daftar').data('audit_id') || $('#topik_daftar .delik').first().attr('audit_id');
+    }
+
+    function jamSekarang() {
+        var w = new Date();
+        function dua(n) { return (n < 10 ? '0' : '') + n; }
+        return dua(w.getHours()) + ':' + dua(w.getMinutes()) + ':' + dua(w.getSeconds());
+    }
+
+    $(document).on("click", ".catatan-simpan", function () {
+        var tombol  = $(this);
+        var kotak   = tombol.closest('.catatan-kotak');
+        var pesan   = kotak.find('.catatan-pesan');
+        var isi     = {
+            audit_id:   auditHalaman(),
+            lingkup_id: tombol.attr('lingkup_id'),
+            kelebihan:  kotak.find('textarea[id^="kelebihan_"]').val(),
+            peluang:    kotak.find('textarea[id^="peluang_"]').val()
+        };
+
+        tombol.prop('disabled', true);
+        pesan.text('menyimpan...');
+
+        $.ajax({
+            url: base_url + "/daftaraudit/simpancatatan",
+            type: "POST",
+            dataType: "json",
+            data: isi,
+            success: function (hasil) {
+                if (!hasil || !hasil.status) {
+                    pesan.text((hasil && hasil.pesan) ? hasil.pesan : 'Gagal menyimpan catatan.');
+                    return;
+                }
+                pesan.text('tersimpan ' + jamSekarang());
+            },
+            error: function () {
+                pesan.text('Tidak ada koneksi ke server.');
+            },
+            complete: function () {
+                tombol.prop('disabled', false);
+            }
+        });
     });
 
 });

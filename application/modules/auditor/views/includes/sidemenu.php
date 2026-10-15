@@ -8,6 +8,13 @@
         </li>
         
 
+        <li class="site-menu-item <?php if(isset($ptk)){echo $ptk;} ?>">
+          <a class="animsition-link" href="<?php echo base_url($module.'/ptk');?>">
+                  <i class="site-menu-icon md-assignment-alert" aria-hidden="true"></i>
+                  <span class="site-menu-title">PTK</span>
+              </a>
+        </li>
+
         <li class="site-menu-item has-sub <?php if(isset($data)){echo $data;} ?>">
           <a href="javascript:void(0)">
                   <i class="site-menu-icon md-library" aria-hidden="true"></i>

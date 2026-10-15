@@ -12,20 +12,7 @@
                 <div class="panel-heading-isi">
                     <h3 class="panel-title">Formulir</h3>
                     <div class="panel-aksi">
-                        <?php if (!empty($list_periode)): ?>
-                        <div class="filter-kotak">
-                            <label for="filter_periode"><i class="icon md-calendar" aria-hidden="true"></i>Periode</label>
-                            <select class="form-control" id="filter_periode">
-                                <option value="">Semua Periode</option>
-                                <?php foreach ($list_periode as $p):
-                                    $label = html_escape($p['periode_tahun'])
-                                        . ' &middot; ' . date('d-m-Y', strtotime($p['periode_mulai']))
-                                        . ' s.d. ' . date('d-m-Y', strtotime($p['periode_selesai']))
-                                        . (!empty($p['periode_aktif']) ? ' &middot; Aktif' : '');
-                                ?><option value="<?php echo (int) $p['periode_id']; ?>" <?php echo ($periode_aktif == $p['periode_id']) ? 'selected' : ''; ?>><?php echo $label; ?></option><?php endforeach; ?>
-                            </select>
-                        </div>
-                        <?php endif; ?>
+                        <?php echo filter_periode($list_periode, $periode_aktif); ?>
                         <div class="panel-aksi__tombol">
                             <button type="button" class="btn btn-sm btn-success" id="tambah">
                                 <i class="icon md-plus" aria-hidden="true"></i>Tambah
@@ -97,7 +84,7 @@
                             <option value="">Tanpa Periode</option>
                             <?php foreach ($list_periode as $p): ?>
                             <option value="<?php echo (int) $p['periode_id']; ?>" <?php echo ($periode_aktif == $p['periode_id']) ? 'selected' : ''; ?>>
-                                <?php echo html_escape($p['periode_tahun']) . ' (' . date('d-m-Y', strtotime($p['periode_mulai'])) . ' s.d. ' . date('d-m-Y', strtotime($p['periode_selesai'])) . ')'; ?>
+                                <?php echo html_escape($p['periode_tahun']); ?>
                             </option>
                             <?php endforeach; ?>
                         </select>
@@ -155,7 +142,7 @@
                             <option value="">Tanpa Periode</option>
                             <?php foreach ($list_periode as $p): ?>
                             <option value="<?php echo (int) $p['periode_id']; ?>">
-                                <?php echo html_escape($p['periode_tahun']) . ' (' . date('d-m-Y', strtotime($p['periode_mulai'])) . ' s.d. ' . date('d-m-Y', strtotime($p['periode_selesai'])) . ')'; ?>
+                                <?php echo html_escape($p['periode_tahun']); ?>
                             </option>
                             <?php endforeach; ?>
                         </select>

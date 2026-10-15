@@ -182,24 +182,27 @@ Catatan:
   dan catatan tiap butir tilik disimpan pada `mutu_auditjawabdetail`
   (`dtjwb_hasil`, `dtjwb_temuan`, `dtjwb_catatan`). Baris butir dapat
   ditambah/disunting lewat halaman **Daftar Tilik** (tombol *Tambah Butir*).
-- **Auditee tidak mengisi `mutu_auditjawabdetail`.** Auditee menjawab pada
-  tingkat **pertanyaan** (`mutu_auditjawab`.`jwb_jawaban`) di halaman
-  *Auditee → Daftar Audit → Detail*, dengan lampiran opsional pada
-  `mutu_lampiran`.`jwb_id`. Rencana koreksi tiap butir
+- **Auditee tidak mengisi `mutu_auditjawabdetail`.** Yang dijawab auditee ada
+  pada halaman *Auditee → Daftar Audit → Detail*, yaitu **tiap butir lingkup**
+  pada tabel `mutu_lingkup`: jawaban tersimpan pada `mutu_auditjawab` dengan
+  kolom `lingkup_id` terisi. Pertanyaan yang belum punya butir lingkup tetap
+  memakai jawaban tingkat pertanyaan (`lingkup_id` bernilai `NULL`), supaya
+  formulir lama tidak terkunci. Lampiran mengikuti butirnya
+  (`mutu_lampiran`.`jwb_id` + `lingkup_id`). Rencana koreksi tiap butir
   (`mutu_auditjawabdetail`.`dtjwb_koreksi`) baru diisi auditee setelah audit
   berstatus **SELESAI**.
 
 ## `lampiran_lingkup.sql`
 
 Membuat tabel lampiran jawaban audit. Pada halaman
-**Auditee → Daftar Audit → (detail)**, setiap **pertanyaan wajib dijawab**, dan
-tiap jawaban boleh dilengkapi **lampiran opsional lebih dari satu berkas**.
-Butir tilik (`mutu_auditjawabdetail`) hanya diisi auditor, auditee tidak
-menjawabnya.
+**Auditee → Daftar Audit → (detail)**, daftar pertanyaan yang dijawab berasal
+dari `mutu_lingkup` dan **setiap butir lingkup wajib dijawab**; tiap jawaban
+boleh dilengkapi **lampiran opsional lebih dari satu berkas**. Butir tilik
+(`mutu_auditjawabdetail`) hanya diisi auditor, auditee tidak menjawabnya.
 
 | Objek             | Isi                                                                              |
 | ----------------- | -------------------------------------------------------------------------------- |
-| `mutu_lampiran`   | berkas lampiran per jawaban pertanyaan: `audit_id`, `jwb_id` (baris `mutu_auditjawab`), `users_id`, `lampiran_nama` (nama simpan), `lampiran_asli` (nama asli), `lampiran_tipe`, `lampiran_ukuran`, `lampiran_create` |
+| `mutu_lampiran`   | berkas lampiran per jawaban: `audit_id`, `jwb_id` (baris `mutu_auditjawab` — baris butir lingkup bila ada), `lingkup_id` (butir lingkup), `dtjwb_id` (baris tilik lama), `users_id`, `lampiran_nama` (nama simpan), `lampiran_asli` (nama asli), `lampiran_tipe`, `lampiran_ukuran`, `lampiran_create` |
 
 Cara pakai:
 
@@ -227,3 +230,119 @@ Catatan:
 - Menghapus lampiran dari halaman detail ikut menghapus berkas fisiknya.
 - Rollback: `DROP TABLE mutu_lampiran;` (berkas fisik di `filedata/lampiran/`
   dihapus manual bila perlu).
+
+## `hapus_kolom_auditjawab.sql`
+
+Menghapus kolom penilaian lama pada `mutu_auditjawab`:
+`jwb_pertanyaan`, `jwb_referensi`, `jwb_temuan`, `jwb_hasil`, `jwb_catatan`,
+dan `jwb_koreksi`.
+
+Kolom-kolom itu tidak dipakai lagi. Penilaian auditor (hasil, temuan, catatan)
+dan rencana koreksi auditee kini tersimpan **per butir tilik** pada
+`mutu_auditjawabdetail` (`dtjwb_hasil`, `dtjwb_temuan`, `dtjwb_catatan`,
+`dtjwb_koreksi`), sedangkan `mutu_auditjawab` hanya menyimpan **jawaban
+auditee** (`jwb_jawaban`) dan **tujuan pertanyaan** (`jwb_tujuan`).
+
+| Data                     | Tempat baru                                                          |
+| ------------------------ | -------------------------------------------------------------------- |
+| Jawaban auditee          | `mutu_auditjawab`.`jwb_jawaban` (per butir lingkup: `lingkup_id` terisi) |
+| Tujuan pertanyaan        | `mutu_auditjawab`.`jwb_tujuan`                                        |
+| Hasil / temuan / catatan | `mutu_auditjawabdetail`.`dtjwb_hasil` / `dtjwb_temuan` / `dtjwb_catatan` |
+| Referensi butir          | `mutu_auditjawabdetail`.`dtjwb_referensi`                             |
+| Rencana koreksi          | `mutu_auditjawabdetail`.`dtjwb_koreksi`                               |
+
+Cara pakai:
+
+1. **Perbarui kode aplikasi lebih dahulu**, pastikan kolom-kolom di atas sudah
+   tidak dibaca/ditulis lagi.
+2. Cadangkan basis data.
+3. Impor berkas `database/hapus_kolom_auditjawab.sql` lewat phpMyAdmin (tab SQL).
+4. Sesuaikan prefix `mutu_` bila berbeda.
+
+Catatan:
+
+- Tidak aman dijalankan berulang kali: `DROP COLUMN` akan gagal bila kolomnya
+  sudah terlanjur dihapus. Pesan galat itu bisa diabaikan.
+- Rencana koreksi **wajib** memakai `mutu_auditjawabdetail`.`dtjwb_koreksi`.
+  Bila kolom itu belum ada, impor `database/koreksi_butir.sql` atau jalankan
+  **Admin → Migrasi Lingkup → Siapkan Kolom Koreksi Butir**. Tanpa kolom itu
+  rencana koreksi tidak dapat disimpan.
+- Migrasi jawaban lama (`Admin → Migrasi Lingkup`) kini hanya memindahkan
+  **penanda** `lingkup_id` pada baris tilik, bukan nilai penilaian - nilai
+  penilaian tetap dibaca langsung dari `mutu_auditjawabdetail`.
+- Rollback: buat kembali kolom-kolomnya bila benar-benar diperlukan
+  (`ALTER TABLE mutu_auditjawab ADD COLUMN jwb_hasil text ...`), tetapi data
+  yang sudah dihapus tidak dapat dikembalikan tanpa cadangan.
+
+## `kelebihan_peluang.sql`
+
+Membuat tabel `mutu_lingkup_nilai` — tempat menyimpan **Kelebihan** dan
+**Peluang untuk peningkatan** yang diisi auditor pada tiap butir lingkup di
+halaman **Auditor → Daftar Audit → (detail)**, tepat di bawah jawaban auditee.
+
+| Kolom        | Isi                                                             |
+| ------------ | --------------------------------------------------------------- |
+| `audit_id`   | audit yang sedang dinilai                                        |
+| `lingkup_id` | butir lingkup (`mutu_lingkup`)                                   |
+| `kelebihan`  | teks kelebihan butir tersebut                                    |
+| `peluang`    | teks peluang untuk peningkatan                                   |
+| `users_id`   | auditor terakhir yang menyimpan                                  |
+| `nilai_create` / `nilai_update` | waktu pembuatan & perubahan           |
+
+Satu baris per pasangan (`audit_id`, `lingkup_id`) — ada kunci unik
+`nilai_unik`, sehingga penyimpanan berikutnya memperbarui baris yang sama.
+
+Cara pakai:
+
+1. Impor berkas `database/kelebihan_peluang.sql` lewat phpMyAdmin (tab SQL).
+2. Sesuaikan prefix `mutu_` bila berbeda.
+3. Muat ulang halaman detail audit: dua kotak isian (Kelebihan, Peluang untuk
+   peningkatan) lalu muncul pada tiap butir lingkup.
+
+Catatan:
+
+- Aman dijalankan berulang kali (`CREATE TABLE IF NOT EXISTS`).
+- Tanpa tabel ini aplikasi tetap berjalan: kotak isian tidak ditampilkan dan
+  halaman menampilkan keterangan bahwa fitur belum disiapkan.
+- Catatan ini **tidak** menggantikan penilaian (hasil/temuan/catatan) yang
+  tersimpan pada `mutu_auditjawabdetail` dan diisi lewat halaman Daftar Tilik.
+- Hapus tabel bila tidak diperlukan: `DROP TABLE mutu_lingkup_nilai;`
+
+## `tim_audit.sql`
+
+Menyimpan tim auditor pada satu audit: **satu ketua** dan **beberapa
+anggota**. Dipilih pada formulir **Tambah** di halaman
+**Audit → Daftar Audit** (menu PPM/admin).
+
+| Kolom         | Isi                                                       |
+| ------------- | --------------------------------------------------------- |
+| `audit_id`    | audit yang dikerjakan (`mutu_audit`)                       |
+| `users_id`    | auditor anggota tim (`users`, role `AUDITOR`)              |
+| `tim_peran`   | `KETUA` atau `ANGGOTA`                                     |
+| `tim_urut`    | urutan tampil: ketua `0`, anggota `1..n`                   |
+| `tim_create`  | waktu pencatatan                                           |
+
+Kolom lama `mutu_audit`.`auditor_id` **tetap dipakai** dan selalu berisi
+`users_id` **ketua** tim, sehingga ekspor Excel dan saringan lama tidak
+berubah.
+
+Cara pakai:
+
+1. Impor berkas `database/tim_audit.sql` lewat phpMyAdmin (tab SQL).
+2. Sesuaikan prefix `mutu_` bila berbeda.
+3. Buka **Audit → Daftar Audit**, klik **Tambah**, centang satu atau lebih
+   auditor pada kotak **Tim Auditor**, lalu pilih ketuanya pada
+   **Ketua Tim Auditor**.
+
+Catatan:
+
+- Aman dijalankan berulang kali (`CREATE TABLE IF NOT EXISTS`).
+- **Anggota tim ikut mengerjakan auditnya**: audit tersebut muncul pada Daftar
+  Audit miliknya, dapat dibuka rinciannya, dapat diisi Daftar Tiliknya, dan
+  temuannya ikut tampil pada menu **PTK** milik auditor.
+- Kolom **Auditor** pada tabel Daftar Audit menampilkan seluruh nama tim
+  dipisahkan koma, dengan ketua ditandai `(Ketua)`.
+- Tanpa tabel ini aplikasi tetap berjalan: setiap audit punya satu auditor
+  seperti sebelumnya (`mutu_audit`.`auditor_id`).
+- Baris tim dihapus otomatis bersama audit yang dihapus.
+- Hapus tabel bila tidak diperlukan: `DROP TABLE mutu_auditteams;`

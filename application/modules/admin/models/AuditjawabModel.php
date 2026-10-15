@@ -21,9 +21,11 @@ class AuditjawabModel extends CI_Model {
         parent::__construct();
     }
 
-    var $column_search = array('dtform_pertanyaan','jwb_jawaban','jwb_hasil','jwb_temuan','jwb_catatan');
+    /* Kolom penilaian (jwb_hasil/jwb_temuan/jwb_catatan) sudah dihapus
+       dari mutu_auditjawab. */
+    var $column_search = array('dtform_pertanyaan','jwb_jawaban');
     /* Lingkup kini berupa daftar butir (ditampilkan dari tabel lingkup). */
-    var $column_order = array(null,'dtform_pertanyaan','dtform_pertanyaan','jwb_jawaban','jwb_hasil','jwb_temuan','jwb_catatan');
+    var $column_order = array(null,'dtform_pertanyaan','dtform_pertanyaan','jwb_jawaban');
     var $order = array('audit_id' => 'asc');
 
     private function _get_datatables_query($search, $ordering) {
@@ -61,9 +63,6 @@ class AuditjawabModel extends CI_Model {
         $this->db->select("audit_status");
         $this->db->select("dt.dtform_id as dtform_id");
         $this->db->select("dt.dtform_pertanyaan as dtform_pertanyaan");
-        $this->db->select("(SELECT jwb_catatan from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id" . $this->_lingkupNull() . ") as jwb_catatan");
-        $this->db->select("(SELECT jwb_temuan from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id" . $this->_lingkupNull() . ") as jwb_temuan");
-        $this->db->select("(SELECT jwb_hasil from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id" . $this->_lingkupNull() . ") as jwb_hasil");
         $this->db->select("(SELECT jwb_jawaban from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id" . $this->_lingkupNull() . ") as jwb_jawaban");
         $this->db->from('audit au');
         $this->db->join('detailform dt', 'dt.form_id = au.form_id', 'left');
@@ -115,9 +114,6 @@ class AuditjawabModel extends CI_Model {
         $this->db->select("audit_status");
         $this->db->select("dt.dtform_id as dtform_id");
         $this->db->select("dt.dtform_pertanyaan as dtform_pertanyaan");
-        $this->db->select("(SELECT jwb_catatan from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id" . $this->_lingkupNull() . ") as jwb_catatan");
-        $this->db->select("(SELECT jwb_temuan from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id" . $this->_lingkupNull() . ") as jwb_temuan");
-        $this->db->select("(SELECT jwb_hasil from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id" . $this->_lingkupNull() . ") as jwb_hasil");
         $this->db->select("(SELECT jwb_jawaban from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id" . $this->_lingkupNull() . ") as jwb_jawaban");
         $this->db->from('audit au');
         $this->db->join('detailform dt', 'dt.form_id = au.form_id', 'left');
@@ -214,6 +210,47 @@ class AuditjawabModel extends CI_Model {
 
 
     /**
+     * Penilaian auditor & rencana koreksi per butir lingkup pada satu
+     * pertanyaan, dibaca dari mutu_auditjawabdetail.
+     *
+     * Kolom penilaian pada mutu_auditjawab (jwb_hasil, jwb_temuan,
+     * jwb_catatan, jwb_koreksi) sudah dihapus, jadi satu-satunya sumber
+     * nilai adalah baris tilik (mutu_auditjawabdetail) yang
+     * lingkup_id-nya terisi.
+     *
+     * @param  int $audit_id
+     * @param  int $dtform_id
+     * @return array lingkup_id => array(dtjwb_hasil, dtjwb_temuan,
+     *               dtjwb_catatan, dtjwb_koreksi, dtjwb_referensi)
+     */
+    private function _nilaiPerLingkup($audit_id, $dtform_id) {
+        $nilai = array();
+        if (!$this->db->field_exists('lingkup_id', 'auditjawabdetail')) {
+            return $nilai;
+        }
+
+        $this->db->select('d.dtjwb_id, d.lingkup_id, d.dtjwb_referensi');
+        $this->db->select('d.dtjwb_hasil, d.dtjwb_temuan, d.dtjwb_catatan');
+        if ($this->db->field_exists('dtjwb_koreksi', 'auditjawabdetail')) {
+            $this->db->select('d.dtjwb_koreksi');
+        }
+        $this->db->from('auditjawabdetail d');
+        $this->db->join('auditjawab j', 'j.jwb_id = d.jwb_id', 'inner');
+        $this->db->where('j.audit_id', (int) $audit_id);
+        $this->db->where('j.dtform_id', (int) $dtform_id);
+        $this->db->where('d.lingkup_id IS NOT NULL', NULL, FALSE);
+        $this->db->order_by('d.dtjwb_id', 'ASC');
+        foreach ($this->db->get()->result_array() as $d) {
+            $lid = (int) $d['lingkup_id'];
+            if ($lid > 0 && !isset($nilai[$lid])) {
+                $nilai[$lid] = $d;
+            }
+        }
+
+        return $nilai;
+    }
+
+    /**
      * Baris daftar tilik satu pertanyaan, digabung dari struktur baru
      * (butir lingkup + auditjawab) dan sisa data lama yang belum terpetakan.
      * Kunci keluaran mengikuti nama lama (dtjwb_*) agar tampilan/ekspor tetap jalan.
@@ -222,11 +259,13 @@ class AuditjawabModel extends CI_Model {
         /* Bila tabel lingkup (struktur lama) belum ada, butir tilik dibaca
            dari mutu_auditjawabdetail dengan kunci lama (dtjwb_*). */
         if (!$this->db->table_exists('lingkup')) {
-            $kolom_koreksi = $this->db->field_exists('dtjwb_koreksi', 'auditjawabdetail')
-                ? 'd.dtjwb_koreksi' : 'j.jwb_koreksi';
+            /* Rencana koreksi tersimpan pada mutu_auditjawabdetail.dtjwb_koreksi;
+               kolom lama mutu_auditjawab.jwb_koreksi sudah dihapus. */
             $this->db->select('d.dtjwb_id, d.dtjwb_referensi, d.dtjwb_pertanyaan');
             $this->db->select('d.dtjwb_hasil, d.dtjwb_temuan, d.dtjwb_catatan');
-            $this->db->select($kolom_koreksi . ' AS dtjwb_koreksi', FALSE);
+            if ($this->db->field_exists('dtjwb_koreksi', 'auditjawabdetail')) {
+                $this->db->select('d.dtjwb_koreksi');
+            }
             $this->db->from('auditjawabdetail d');
             $this->db->join('auditjawab j', 'j.jwb_id = d.jwb_id', 'inner');
             $this->db->where('j.audit_id', $audit_id);
@@ -235,6 +274,9 @@ class AuditjawabModel extends CI_Model {
 
             $baris = array();
             foreach ($this->db->get()->result_array() as $b) {
+                if (!isset($b['dtjwb_koreksi'])) {
+                    $b['dtjwb_koreksi'] = '';
+                }
                 $b['lingkup_id'] = $b['dtjwb_id'];
                 $b['baris']      = 'butir';
                 $baris[]         = $b;
@@ -247,22 +289,27 @@ class AuditjawabModel extends CI_Model {
         $baris = array();
 
         // a) butir lingkup struktur baru
+        /* Penilaian (hasil/temuan/catatan) serta rencana koreksi tersimpan
+           pada mutu_auditjawabdetail; kolom penilaian pada mutu_auditjawab
+           (jwb_hasil/jwb_temuan/jwb_catatan/jwb_koreksi) sudah dihapus. */
+        $nilai = $this->_nilaiPerLingkup($audit_id, $dtform_id);
+
         $this->db->select('lg.lingkup_id, lg.lingkup_isi');
-        $this->db->select('jb.jwb_hasil, jb.jwb_temuan, jb.jwb_catatan, jb.jwb_koreksi');
         $this->db->from('lingkup lg');
-        $this->db->join('auditjawab jb', 'jb.audit_id = ' . (int) $audit_id . ' AND jb.lingkup_id = lg.lingkup_id', 'left');
         $this->db->where('lg.dtform_id', $dtform_id);
         $this->db->order_by('lg.lingkup_urut', 'asc');
         $this->db->order_by('lg.lingkup_id', 'asc');
         foreach ($this->db->get()->result_array() as $b) {
+            $lid = (int) $b['lingkup_id'];
+            $n   = isset($nilai[$lid]) ? $nilai[$lid] : array();
             $baris[] = array(
                 'dtjwb_id'         => $b['lingkup_id'],
-                'dtjwb_referensi'  => '',
+                'dtjwb_referensi'  => isset($n['dtjwb_referensi']) ? $n['dtjwb_referensi'] : '',
                 'dtjwb_pertanyaan' => $b['lingkup_isi'],
-                'dtjwb_hasil'      => $b['jwb_hasil'],
-                'dtjwb_temuan'     => $b['jwb_temuan'],
-                'dtjwb_catatan'    => $b['jwb_catatan'],
-                'dtjwb_koreksi'    => $b['jwb_koreksi'],
+                'dtjwb_hasil'      => isset($n['dtjwb_hasil']) ? $n['dtjwb_hasil'] : '',
+                'dtjwb_temuan'     => isset($n['dtjwb_temuan']) ? $n['dtjwb_temuan'] : '',
+                'dtjwb_catatan'    => isset($n['dtjwb_catatan']) ? $n['dtjwb_catatan'] : '',
+                'dtjwb_koreksi'    => isset($n['dtjwb_koreksi']) ? $n['dtjwb_koreksi'] : '',
                 'lingkup_id'       => $b['lingkup_id'],
                 'baris'            => 'butir',
             );
@@ -276,13 +323,12 @@ class AuditjawabModel extends CI_Model {
             $this->db->where('lingkup_id IS NULL', NULL, FALSE);
         }
             foreach ($this->db->get('auditjawabdetail')->result_array() as $d) {
-                /* Baris lama tidak punya kolom koreksi (kolom itu ada pada
-                   auditjawab.jwb_koreksi) dan boleh jadi tidak punya kolom
-                   referensi. Lengkapi kuncinya agar bentuknya sama dengan
-                   baris butir, sehingga pemakai tidak menemui "undefined
-                   index" dan koreksi lama tetap terbaca. */
+                /* Baris lama boleh jadi tidak punya kolom koreksi
+                   (mutu_auditjawabdetail.dtjwb_koreksi) dan kolom referensi.
+                   Lengkapi kuncinya agar bentuknya sama dengan baris butir,
+                   sehingga pemakai tidak menemui "undefined index". */
                 $d['dtjwb_referensi'] = isset($d['dtjwb_referensi']) ? $d['dtjwb_referensi'] : '';
-                $d['dtjwb_koreksi']   = isset($jwb['jwb_koreksi']) ? $jwb['jwb_koreksi'] : '';
+                $d['dtjwb_koreksi']   = isset($d['dtjwb_koreksi']) ? $d['dtjwb_koreksi'] : '';
                 $d['lingkup_id']      = isset($d['lingkup_id']) ? $d['lingkup_id'] : NULL;
                 $d['baris'] = 'lama';
                 $baris[] = $d;

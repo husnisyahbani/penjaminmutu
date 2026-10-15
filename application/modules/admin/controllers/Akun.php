@@ -5,7 +5,11 @@ class Akun extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'admin';
-        $this->load->js(base_url("assets/app/admin/akun.js"));
+        // Informasi tombol aksi saat hover (lihat assets/app/tabel-aksi.css)
+        $this->load->js(base_url("assets/app/tabel-aksi.js?v=1.0"));
+        // Menu aksi (satu tombol titik tiga) pada tabel
+        $this->load->js(base_url("assets/app/tabel-aksi-menu.js?v=1.0"));
+        $this->load->js(base_url("assets/app/admin/akun.js?v=1.3"));
         $this->load->model('AkunModel', 'akun');
 
         $role = $this->session->userdata('role');
@@ -64,6 +68,16 @@ class Akun extends MY_Controller {
 
         if ((int) $akun['users_id'] === (int) $this->session->userdata('users_id')) {
             echo json_encode(array('status' => FALSE, 'pesan' => 'Anda sudah masuk sebagai akun ini.'));
+            return;
+        }
+
+        /* Akun yang dinonaktifkan tidak boleh dipakai, termasuk lewat
+           fitur "login sebagai". */
+        if ($this->akun->statusSiap() && isset($akun['valid']) && (int) $akun['valid'] !== 1) {
+            echo json_encode(array(
+                'status' => FALSE,
+                'pesan'  => 'Akun ' . $akun['nama'] . ' tidak aktif, sehingga tidak dapat dipakai.',
+            ));
             return;
         }
 
@@ -162,46 +176,106 @@ class Akun extends MY_Controller {
         redirect(base_url());
     }
 
+    /**
+     * Hapus akun secara PERMANEN (barisnya dibuang dari tabel users).
+     *
+     * Untuk sekadar menutup akses tanpa membuang data, pakai tombol
+     * nonaktifkan (endpoint status): akun tidak dapat masuk lagi, tetapi
+     * data audit yang lalu tetap utuh.
+     */
     public function hapus() {
-        $id = $this->input->post('id');
-        $this->akun->hapus($id);
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
+
+        $id = (int) $this->input->post('id');
+
+        if ($id < 1) {
+            echo json_encode(array('status' => false, 'pesan' => 'Akun tidak dikenal.'));
+            return;
+        }
+
+        /* Penjagaan: akun yang sedang dipakai tidak boleh menghapus dirinya. */
+        if ($id === (int) $this->session->userdata('users_id')) {
+            echo json_encode(array(
+                'status' => false,
+                'pesan'  => 'Akun Anda sendiri tidak dapat dihapus.',
+            ));
+            return;
+        }
+
+        $akun = $this->akun->getAkunById($id);
+        if (empty($akun)) {
+            echo json_encode(array('status' => false, 'pesan' => 'Akun tidak ditemukan.'));
+            return;
+        }
+
+        $hasil = $this->akun->hapus($id);
+        echo json_encode(array(
+            'status' => $hasil,
+            'pesan'  => $hasil ? 'Akun dihapus permanen.' : 'Akun gagal dihapus.',
+        ));
+    }
+
+    /**
+     * Aktifkan / nonaktifkan satu akun - pengganti form edit pada laman Akun.
+     *
+     * Kiriman: id (users_id) dan aktif (1 = aktifkan, 0 = nonaktifkan).
+     * Akun yang dinonaktifkan tidak dapat masuk ke aplikasi dan tidak
+     * ditawarkan lagi pada pilihan auditor/auditee.
+     */
+    public function status() {
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
+
+        $id    = (int) $this->input->post('id');
+        $aktif = ((string) $this->input->post('aktif') === '1');
+
+        if (!$this->akun->statusSiap()) {
+            echo json_encode(array(
+                'status' => false,
+                'pesan'  => 'Kolom status (users.valid) belum tersedia pada database ini.',
+            ));
+            return;
+        }
+
+        $akun = $this->akun->getAkunById($id);
+        if (empty($akun)) {
+            echo json_encode(array('status' => false, 'pesan' => 'Akun tidak ditemukan.'));
+            return;
+        }
+
+        /* Penjagaan: admin tidak boleh menonaktifkan akunnya sendiri
+           (supaya tidak terkunci dari aplikasi). */
+        if (!$aktif && $id === (int) $this->session->userdata('users_id')) {
+            echo json_encode(array(
+                'status' => false,
+                'pesan'  => 'Akun Anda sendiri tidak dapat dinonaktifkan.',
+            ));
+            return;
+        }
+
+        /* Penjagaan: minimal satu akun PPM tetap aktif. */
+        if (!$aktif && strtoupper(trim($akun['role'])) === 'PPM'
+                && $this->akun->hitungAktif('PPM') <= 1) {
+            echo json_encode(array(
+                'status' => false,
+                'pesan'  => 'Tidak dapat menonaktifkan: akun PPM ini yang terakhir masih aktif.',
+            ));
+            return;
+        }
+
+        $hasil = $this->akun->ubahStatus($id, $aktif);
+        echo json_encode(array(
+            'status' => $hasil,
+            'pesan'  => $hasil
+                ? ($aktif ? 'Akun diaktifkan kembali.' : 'Akun dinonaktifkan.')
+                : 'Status akun gagal diubah.',
+        ));
     }
     
     public function reset() {
         $id = $this->input->post('id');
         $this->akun->reset($id);
-    }
-
-    public function edit() {
-        $submitakun = $this->input->post('submitakun');
-        $id = $this->input->get('id');
-        if (isset($submitakun)) {
-            $data = array();
-            $data['users_id'] = $id;
-            $data['nama'] = $this->input->post('nama');
-            $data['unitkerja'] = $this->input->post('unitkerja');
-            $data['username'] = $this->input->post('username');
-            $data['role'] = $this->input->post('role');
-
-            if($this->akun->edit($data)){
-                $msg = 'Berhasil';
-                $this->session->set_flashdata('pesanberhasil', $msg);
-            }else{
-                $msg = 'Gagal, Data Akun Telah Ada';
-                $this->session->set_flashdata('pesanerror', $msg);
-            }
-           redirect(base_url($this->module.'/akun'));
-        } else {
-            $this->data['content'] = 'edit_akun';
-            $this->data['title'] = 'Akun';
-            $this->data['akun'] = 'active';
-            $this->data['result'] = $this->akun->getAkunById($id);
-            $this->data['js'] = $this->load->get_js_files();
-            $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
-            $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
-            $this->data['result'] = $this->akun->getAkunById($id);
-            $this->template($this->data, $this->module);
-        }
     }
 
     public function tambah() {
@@ -254,16 +328,99 @@ class Akun extends MY_Controller {
             $row[] = $field->password;
             $row[] = $field->role;
 
-            $row[] = '<button class="login-as btn btn-sm btn-icon btn-pure btn-primary on-default"
-                      data-toggle="tooltip" data-original-title="Login sebagai user ini"
-                      data-nama="' . htmlspecialchars($field->nama, ENT_QUOTES) . '"
-                      data-username="' . htmlspecialchars($field->username, ENT_QUOTES) . '"
-                      data-role="' . htmlspecialchars($field->role, ENT_QUOTES) . '"
-                      id=' . $field->users_id . '><i class="icon md-account-add" aria-hidden="true"></i></button><button class="reset btn btn-sm btn-icon btn-pure btn-default on-default reset-row"
-                      data-toggle="tooltip" data-original-title="Reset" id=' . $field->users_id . '><i class="icon md-refresh" aria-hidden="true"></i></button><button class="edit btn btn-sm btn-icon btn-pure btn-default on-default edit-row"
-                      data-toggle="tooltip" data-original-title="Edit" id=' . $field->users_id . '><i class="icon md-edit" aria-hidden="true"></i></button>
-                    <button class="delete btn btn-sm btn-icon btn-pure btn-default on-default remove-row"
-                      data-toggle="tooltip" data-original-title="Remove" id=' . $field->users_id . '><i class="icon md-delete" aria-hidden="true"></i></button>';
+            /* Status akun: Aktif / Tidak Aktif (kolom users.valid). Bila
+               kolomnya belum tersedia, seluruh akun dianggap aktif dan kolom
+               status tidak ditampilkan. */
+            $status_siap = $this->akun->statusSiap();
+            $aktif       = TRUE;
+
+            if ($status_siap) {
+                $aktif = (!isset($field->valid) || (int) $field->valid === 1);
+            }
+
+            /* Kolom status selalu dikirim supaya jumlah kolom tabel tetap
+               sama (bila kolom users.valid belum ada, semua akun Aktif). */
+            $row[] = '<span class="badge ' . ($aktif ? 'badge-success' : 'badge-danger') . '">'
+                . ($aktif ? 'Aktif' : 'Tidak Aktif') . '</span>';
+
+            /* ---- kolom Aksi ----
+               Satu tombol; pilihan aksi (login sebagai, reset password,
+               aktif/nonaktif, hapus permanen) muncul saat tombol diklik.
+               Tombol pensil pengubah data sudah tidak dipakai lagi: pada
+               laman ini yang diubah hanya status aktif akunnya. */
+            $nama_akun = htmlspecialchars($field->nama, ENT_QUOTES);
+            $id_akun   = (int) $field->users_id;
+            $id_menu   = 'aksi' . $id_akun;
+
+            /* Tombol pembuka menu memakai pola yang sama dengan tombol aksi
+               lain: btn btn-sm btn-icon btn-default. Menu yang muncul
+               diurus oleh assets/app/tabel-aksi-menu.js. */
+            $pilihan = array();
+
+            $pilihan[] = array(
+                'aksi' => 'login-as',
+                'ikon' => 'md-account-add',
+                'teks' => 'Login sebagai',
+                'data' => array(
+                    'nama'     => $nama_akun,
+                    'username' => htmlspecialchars($field->username, ENT_QUOTES),
+                    'role'     => htmlspecialchars($field->role, ENT_QUOTES),
+                ),
+            );
+
+            $pilihan[] = array(
+                'aksi' => 'reset',
+                'ikon' => 'md-refresh',
+                'teks' => 'Reset password',
+                'data' => array(),
+            );
+
+            if ($status_siap) {
+                /* Sedang aktif -> pilihan menonaktifkan, dan sebaliknya. */
+                $pilihan[] = array(
+                    'aksi' => 'status',
+                    'ikon' => $aktif ? 'md-block' : 'md-check-circle',
+                    'teks' => $aktif ? 'Nonaktifkan akun' : 'Aktifkan kembali',
+                    'data' => array(
+                        'aktif' => $aktif ? '1' : '0',
+                        'nama'  => $nama_akun,
+                    ),
+                );
+            }
+
+            /* Seluruh pilihan ditampilkan seragam (tanpa garis pemisah dan
+               tanpa warna khusus); risiko aksi hapus dijelaskan pada kotak
+               konfirmasi yang muncul setelahnya. */
+            $pilihan[] = array(
+                'aksi' => 'delete',
+                'ikon' => 'md-delete',
+                'teks' => 'Hapus permanen',
+                'data' => array('nama' => $nama_akun),
+            );
+
+            $menu = '';
+            foreach ($pilihan as $item) {
+                $atribut = '';
+                foreach ($item['data'] as $kunci => $nilai) {
+                    $atribut .= ' data-' . $kunci . '="' . $nilai . '"';
+                }
+                $menu .= '<button type="button" class="tabel-aksi-item ' . $item['aksi'] . '"'
+                    . ' role="menuitem" id="' . $id_akun . '"' . $atribut . '>'
+                    . '<i class="icon ' . $item['ikon'] . '" aria-hidden="true"></i>'
+                    . '<span>' . $item['teks'] . '</span></button>';
+            }
+
+            $aksi = '<div class="tabel-aksi">'
+                . '<button type="button" class="btn btn-sm btn-icon btn-default tabel-aksi-buka"'
+                . ' id="' . $id_menu . '-tombol" data-tabel-aksi-menu="' . $id_menu . '"'
+                . ' aria-haspopup="true" aria-expanded="false" aria-controls="' . $id_menu . '"'
+                . ' data-info="Pilihan aksi untuk akun ini" aria-label="Pilihan aksi">'
+                . '<i class="icon md-more-vert" aria-hidden="true"></i></button>'
+                . '<div class="tabel-aksi-menu" id="' . $id_menu . '" role="menu"'
+                . ' aria-labelledby="' . $id_menu . '-tombol">' . $menu . '</div>'
+                . '</div>';
+
+            $row[] = $aksi;
             $data[] = $row;
         }
 

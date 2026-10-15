@@ -96,6 +96,13 @@
               </a>
             </li>
 
+            <li class="site-menu-item <?php if(isset($ptk)){echo $ptk;} ?>">
+              <a class="animsition-link" href="<?php echo base_url($module.'/ptk');?>">
+                <i class="icon md-assignment-alert" aria-hidden="true"></i>
+                <span class="site-menu-title">PTK</span>
+              </a>
+            </li>
+
          </ul>
         </li>
 

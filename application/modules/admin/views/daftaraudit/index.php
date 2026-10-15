@@ -44,18 +44,7 @@
                         <div class="panel-heading-isi">
                             <h3 class="panel-title">Daftar Audit</h3>
                             <div class="panel-aksi">
-                                <div class="filter-kotak">
-                                    <label for="filter_periode"><i class="icon md-calendar" aria-hidden="true"></i>Periode</label>
-                                    <select class="form-control" id="filter_periode">
-                                        <option value="">Semua Periode</option>
-                                        <?php foreach ($list_periode as $p):
-                                            $label = html_escape($p['periode_tahun'])
-                                                . ' &middot; ' . date('d-m-Y', strtotime($p['periode_mulai']))
-                                                . ' s.d. ' . date('d-m-Y', strtotime($p['periode_selesai']))
-                                                . ($p['periode_aktif'] ? ' &middot; Aktif' : '');
-                                        ?><option value="<?php echo (int) $p['periode_id']; ?>" <?php echo ($periode_aktif == $p['periode_id']) ? 'selected' : ''; ?>><?php echo $label; ?></option><?php endforeach; ?>
-                                    </select>
-                                </div>
+                                <?php echo filter_periode($list_periode, $periode_aktif); ?>
                                 <div class="panel-aksi__tombol">
                                     <button type="button" class="btn btn-sm btn-primary" id="download">
                                         <i class="icon md-download" aria-hidden="true"></i>Download
@@ -143,15 +132,30 @@
                     </div>
 
                     <div class="col-md-12 center">
-                        <h4 class="example-title">Auditor</h4>
-                        <select class="form-control" name="auditor" id="auditor" data-fv-notempty="true"
-                        data-fv-notempty-message="Wajib Dipilih">                                 
-                            <option value="">-- Pilih Auditor --</option>
+                        <h4 class="example-title">Tim Auditor</h4>
+                        <p class="tim-petunjuk">Centang satu atau lebih auditor, lalu tentukan ketuanya.</p>
+                        <div class="tim-kotak">
                             <?php
                                 foreach($listauditor as $row){
-                                    echo '<option value="'.$row['users_id'].'">'.$row['nama'].'</option>';
-                                } 
+                                    echo '<label class="tim-pilih">'
+                                        . '<input type="checkbox" class="tim-centang" name="auditor[]" value="'.$row['users_id'].'"'
+                                        . ' data-nama="'.html_escape($row['nama']).'">'
+                                        . '<span class="tim-nama">'.html_escape($row['nama']).'</span>'
+                                        . '<span class="tim-unit">'.html_escape($row['unitkerja']).'</span>'
+                                        . '</label>';
+                                }
                             ?>
+                        </div>
+                        <div class="alert alert-warning tim-kosong" id="tim_kosong" style="display:none;">
+                            Pilih minimal satu auditor.
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 center">
+                        <h4 class="example-title">Ketua Tim Auditor</h4>
+                        <select class="form-control" name="auditor_ketua" id="auditor_ketua" data-fv-notempty="true"
+                        data-fv-notempty-message="Wajib Dipilih">
+                            <option value="">-- Pilih Ketua Tim --</option>
                         </select>
                     </div>
 

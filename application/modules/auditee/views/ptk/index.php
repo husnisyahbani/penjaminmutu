@@ -20,6 +20,7 @@
 
         $kartu_temuan = array(
             array(
+                'id'     => 'stat_total',
                 'judul'  => 'Total Temuan',
                 'nilai'  => $total,
                 'ikon'   => 'md-assignment',
@@ -31,31 +32,34 @@
                 'bar_ket' => $total > 0 ? $persen($siap) . '% sudah ada rencana koreksi' : '',
             ),
             array(
+                'id'     => 'stat_observasi',
                 'judul'  => 'Observasi',
                 'nilai'  => isset($observasi) ? (int) $observasi : 0,
                 'ikon'   => 'md-info-outline',
                 'warna'  => '#1e88e5',
                 'ket'    => 'Catatan perbaikan (OB)',
                 'bar'    => $persen(isset($observasi) ? (int) $observasi : 0),
-                'bar_ket' => $persen(isset($observasi) ? (int) $observasi : 0) . '% dari total temuan',
+                'bar_ket' => $total > 0 ? $persen(isset($observasi) ? (int) $observasi : 0) . '% dari total temuan' : '',
             ),
             array(
+                'id'     => 'stat_minor',
                 'judul'  => 'Minor',
                 'nilai'  => isset($minor) ? (int) $minor : 0,
                 'ikon'   => 'md-alert-triangle',
                 'warna'  => '#fb8c00',
                 'ket'    => 'Ketidaksesuaian minor (TS MINOR)',
                 'bar'    => $persen(isset($minor) ? (int) $minor : 0),
-                'bar_ket' => $persen(isset($minor) ? (int) $minor : 0) . '% dari total temuan',
+                'bar_ket' => $total > 0 ? $persen(isset($minor) ? (int) $minor : 0) . '% dari total temuan' : '',
             ),
             array(
+                'id'     => 'stat_mayor',
                 'judul'  => 'Mayor',
                 'nilai'  => isset($mayor) ? (int) $mayor : 0,
                 'ikon'   => 'md-alert-octagon',
                 'warna'  => '#e53935',
                 'ket'    => 'Ketidaksesuaian mayor (TS MAYOR)',
                 'bar'    => $persen(isset($mayor) ? (int) $mayor : 0),
-                'bar_ket' => $persen(isset($mayor) ? (int) $mayor : 0) . '% dari total temuan',
+                'bar_ket' => $total > 0 ? $persen(isset($mayor) ? (int) $mayor : 0) . '% dari total temuan' : '',
             ),
         );
         ?>
@@ -67,15 +71,18 @@
               <div class="kartu-stat" style="background-color:<?php echo $k['warna']; ?>;">
                 <i class="icon <?php echo $k['ikon']; ?> kartu-stat__ikon" aria-hidden="true"></i>
                 <div class="kartu-stat__isi">
-                  <div class="kartu-stat__angka"><?php echo number_format($k['nilai'], 0, ',', '.'); ?></div>
+                  <?php /* Penanda id dipakai ptk.js untuk memperbarui angka
+                           kartu saat saringan periode diganti. */ ?>
+                  <div class="kartu-stat__angka" id="<?php echo $k['id']; ?>"><?php echo number_format($k['nilai'], 0, ',', '.'); ?></div>
                   <div class="kartu-stat__judul"><?php echo $k['judul']; ?></div>
-                  <div class="kartu-stat__ket"><?php echo $k['ket']; ?></div>
-                  <?php if ($k['bar_ket'] !== ''): ?>
-                  <div class="kartu-stat__bar" role="img" aria-label="<?php echo html_escape($k['bar_ket']); ?>">
-                    <span class="kartu-stat__bar-isi" style="width:<?php echo (int) $k['bar']; ?>%;"></span>
+                  <div class="kartu-stat__ket" id="<?php echo $k['id']; ?>_ket"><?php echo $k['ket']; ?></div>
+                  <div class="kartu-stat__bar" id="<?php echo $k['id']; ?>_bar_kotak" role="img"
+                       aria-label="<?php echo html_escape($k['bar_ket']); ?>"
+                       <?php echo $k['bar_ket'] === '' ? 'style="display:none;"' : ''; ?>>
+                    <span class="kartu-stat__bar-isi" id="<?php echo $k['id']; ?>_bar" style="width:<?php echo (int) $k['bar']; ?>%;"></span>
                   </div>
-                  <div class="kartu-stat__bar-ket"><?php echo $k['bar_ket']; ?></div>
-                  <?php endif; ?>
+                  <div class="kartu-stat__bar-ket" id="<?php echo $k['id']; ?>_bar_ket"
+                       <?php echo $k['bar_ket'] === '' ? 'style="display:none;"' : ''; ?>><?php echo $k['bar_ket']; ?></div>
                 </div>
               </div>
             </div>
@@ -91,6 +98,10 @@
                         <div class="panel-heading-isi">
                             <h3 class="panel-title"><?=$title?></h3>
                             <div class="panel-aksi">
+                                <?php /* Kotak saring periode memakai komponen bersama
+                                         (application/helpers/periode_helper.php); bawaan =
+                                         periode aktif dan hanya menampilkan tahun. */ ?>
+                                <?php echo filter_periode($list_periode, $periode_aktif); ?>
                                 <div class="filter-kotak">
                                     <label for="cari_ptk"><i class="icon md-search" aria-hidden="true"></i>Cari</label>
                                     <input type="text" class="form-control" id="cari_ptk"

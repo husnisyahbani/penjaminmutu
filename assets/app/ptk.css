@@ -1,12 +1,17 @@
 /* =============================================================================
    Daftar butir lingkup + form rencana koreksi.
 
-   Dipakai dua halaman:
+   Dipakai empat halaman:
      - PTK auditee (/auditee/ptk) .......... tabel .ptk-tabel + form koreksi
+     - PTK auditor (/auditor/ptk) .......... tabel .ptk-tabel--lengkap
+     - PTK PPM (/admin/ptk) ................ tabel .ptk-tabel--lengkap
      - Delik auditee (/auditee/delik) ...... tabel & kolom sama persis
        dengan PTK (kueri sama: PtkModel::daftar), hanya dibatasi pada satu
        pertanyaan dan nilai "S" ikut tampil. Rencana koreksi disunting
        langsung pada kolomnya (.koreksi-kotak).
+
+   Tabel .ptk-tabel--lengkap (PTK auditor & PPM) menambah kolom Auditee dan
+   Unit, sehingga lebar kolomnya disusun ulang di bawah.
 
    - Lebar kolom dibuat proporsional: kolom sempit (No, Temuan) tetap kecil,
      kolom teks panjang (Butir Lingkup, Catatan) diberi porsi lebih besar,
@@ -79,6 +84,54 @@
 .ptk-kolom-aksi {
     width: 8%;
     text-align: center;
+}
+
+/* -----------------------------------------------------------------------------
+   PTK auditor & PPM (.ptk-tabel--lengkap): kolomnya bertambah (Auditee,
+   Unit) maka lebar kolom disusun ulang. Jumlahnya tetap 100%.
+   -------------------------------------------------------------------------- */
+.ptk-kolom-auditee,
+.ptk-kolom-unit {
+    width: 12%;
+}
+
+.ptk-tabel--lengkap .ptk-kolom-no {
+    width: 4%;
+}
+
+.ptk-tabel--lengkap .ptk-kolom-formulir {
+    width: 12%;
+}
+
+.ptk-tabel--lengkap .ptk-kolom-auditee,
+.ptk-tabel--lengkap .ptk-kolom-unit {
+    width: 9%;
+}
+
+.ptk-tabel--lengkap .ptk-kolom-butir {
+    width: 20%;
+}
+
+.ptk-tabel--lengkap .ptk-kolom-hasil {
+    width: 11%;
+}
+
+.ptk-tabel--lengkap .ptk-kolom-temuan {
+    width: 8%;
+}
+
+.ptk-tabel--lengkap .ptk-kolom-catatan {
+    width: 14%;
+}
+
+.ptk-tabel--lengkap .ptk-kolom-koreksi {
+    width: 13%;
+}
+
+/* Tabel dengan 9 kolom butuh ruang lebih; kotaknya tetap bisa digeser
+   mendatar (lihat .ptk-tabel-kotak). */
+.ptk-tabel--lengkap {
+    min-width: 1240px;
 }
 
 /* Isi sel yang panjang dipotong beberapa baris saja supaya tinggi baris
@@ -210,6 +263,21 @@
 .tilik-edit {
     float: right;
     margin: 0 0 6px 10px;
+}
+
+/* Tombol buka/tutup daftar lingkup & jawaban auditee pada panel Informasi
+   Pertanyaan (auditor/delik). Ikon panah berputar mengikuti aria-expanded
+   yang diatur Bootstrap saat collapse dibuka/ditutup. */
+.lingkup-toggle {
+    margin-bottom: 8px;
+}
+
+.lingkup-toggle__ikon {
+    transition: transform .15s ease;
+}
+
+.lingkup-toggle[aria-expanded="false"] .lingkup-toggle__ikon {
+    transform: rotate(-90deg);
 }
 
 /* Daftar butir lingkup + jawaban auditee pada panel Informasi Pertanyaan. */

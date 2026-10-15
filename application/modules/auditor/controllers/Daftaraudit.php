@@ -5,7 +5,7 @@ class Daftaraudit extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditor';
-        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=2.0"));
+        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=2.2"));
         // Informasi tombol aksi saat hover (lihat assets/app/tabel-aksi.css)
         $this->load->js(base_url("assets/app/tabel-aksi.js?v=1.0"));
         // Tampilan topik & activity pada halaman detail audit.
@@ -29,10 +29,19 @@ class Daftaraudit extends MY_Controller {
             $this->data['title'] = 'Daftar Audit';
             $this->data['js'] = $this->load->get_js_files();
             $this->data['audit'] = 'active';
-            $this->data['totalterkirim'] = $this->mutu->totalTerkirim();
-            $this->data['totalproses'] = $this->mutu->totalProses();
-            $this->data['totalselesai'] = $this->mutu->totalSelesai();
-            $this->data['totaldraft'] = $this->mutu->totalDraft();
+            /* Filter periode: bawaan = periode aktif. Bila tidak ada periode
+               aktif, seluruh data ditampilkan. Tabel dan kartu statistik
+               mengikuti periode yang dipilih.
+               Bila tabel periode belum disiapkan (kolom mutu_audit.periode_id
+               belum ada), kotak saring tidak ditampilkan. */
+            $this->data['list_periode'] = $this->periode->siap() ? $this->periode->getAll() : array();
+            $this->data['periode_aktif'] = $this->periode->aktifId();
+            $filter = $this->data['periode_aktif'];
+
+            $this->data['totalterkirim'] = $this->mutu->totalTerkirim($filter);
+            $this->data['totalproses'] = $this->mutu->totalProses($filter);
+            $this->data['totalselesai'] = $this->mutu->totalSelesai($filter);
+            $this->data['totaldraft'] = $this->mutu->totalDraft($filter);
             $this->data['listauditor'] = $this->akun->getAllAuditor();
             $this->data['listauditee'] = $this->akun->getAllAuditee();
             /* Pilihan formulir mengikuti periode aktif (formulir lama tanpa periode
@@ -41,6 +50,24 @@ class Daftaraudit extends MY_Controller {
             $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
             $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
             $this->template($this->data, $this->module); 
+    }
+
+    /**
+     * Jumlah audit per status untuk periode terpilih - dipakai kartu
+     * statistik agar ikut berubah saat saringan periode diganti.
+     */
+    public function statistik() {
+        $this->output->set_content_type('application/json');
+
+        $periode_id = $this->input->post('periode_id');
+
+        echo json_encode(array(
+            'status'   => TRUE,
+            'draft'    => (int) $this->mutu->totalDraft($periode_id),
+            'terkirim' => (int) $this->mutu->totalTerkirim($periode_id),
+            'proses'   => (int) $this->mutu->totalProses($periode_id),
+            'selesai'  => (int) $this->mutu->totalSelesai($periode_id),
+        ));
     }
 
     public function download()
@@ -247,9 +274,15 @@ class Daftaraudit extends MY_Controller {
             $this->data['title'] = 'Daftar Audit';
             $this->data['audit_id'] = $id;
             $this->data['result'] = $this->mutu->getAuditById($id);
-            /* Pertanyaan (topik) + lingkup (butir) beserta jawaban/lampiran
-               auditee dan hasil yang sudah tersimpan. */
-            $this->data['topik'] = $this->auditjawab->petaTilik($id);
+            /* Butir lingkup (mutu_lingkup) beserta jawaban auditee per butir,
+               lampiran, dan hasil penilaian yang sudah tersimpan. */
+            $this->data['topik'] = $this->auditjawab->petaLingkup($id);
+            /* Catatan auditor per butir lingkup: kelebihan & peluang untuk
+               peningkatan (tabel mutu_lingkup_nilai). Bila tabelnya belum
+               diimpor, bagian itu disembunyikan dan halaman menampilkan
+               keterangan, persis seperti perlakuan fitur lampiran. */
+            $this->load->model('LingkupnilaiModel', 'lingkupnilai');
+            $this->data['catatan_siap'] = $this->lingkupnilai->siap();
             $this->data['js'] = $this->load->get_js_files();
             $this->data['audit'] = 'active';
             $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
@@ -259,6 +292,54 @@ class Daftaraudit extends MY_Controller {
     }
 
     
+
+    /**
+     * Simpan catatan auditor untuk satu butir lingkup: "Kelebihan" dan
+     * "Peluang untuk peningkatan" (halaman detail audit).
+     *
+     * Data tersimpan pada mutu_lingkup_nilai, dipisahkan per audit dan per
+     * butir lingkup, sehingga tidak bergantung pada baris tilik.
+     */
+    public function simpancatatan() {
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
+
+        $audit_id   = (int) $this->input->post('audit_id');
+        $lingkup_id = (int) $this->input->post('lingkup_id');
+        $kelebihan  = trim(strip_tags((string) $this->input->post('kelebihan')));
+        $peluang    = trim(strip_tags((string) $this->input->post('peluang')));
+
+        $this->load->model('LingkupnilaiModel', 'lingkupnilai');
+
+        if (!$this->lingkupnilai->siap()) {
+            echo json_encode(array(
+                'status' => FALSE,
+                'pesan'  => 'Fitur catatan belum siap. Impor database/kelebihan_peluang.sql terlebih dahulu.',
+            ));
+            return;
+        }
+
+        if ($audit_id < 1 || $lingkup_id < 1) {
+            echo json_encode(array('status' => FALSE, 'pesan' => 'Butir lingkup tidak dikenal.'));
+            return;
+        }
+
+        /* Penjagaan: butir harus termasuk pertanyaan pada audit ini. */
+        if (!$this->auditjawab->lingkupMilikAudit($audit_id, $lingkup_id)) {
+            echo json_encode(array(
+                'status' => FALSE,
+                'pesan'  => 'Butir lingkup tidak ditemukan pada audit ini.',
+            ));
+            return;
+        }
+
+        $status = $this->lingkupnilai->simpan($audit_id, $lingkup_id, $kelebihan, $peluang);
+
+        echo json_encode(array(
+            'status' => $status,
+            'pesan'  => $status ? 'Catatan tersimpan.' : 'Catatan gagal disimpan.',
+        ));
+    }
 
    public function tambah() {
         $form_id = $this->input->post('form_id');
@@ -352,8 +433,20 @@ class Daftaraudit extends MY_Controller {
         $post['start'] = $this->input->post('start');
         $post['draw'] = $this->input->post('draw');
 
+        /* Saringan periode (bawaan periode aktif dikirim daftaraudit.js;
+           kosong = semua periode). */
+        $periode_id = $this->input->post('periode_id');
 
-        $list = $this->mutu->get_datatables($post['length'], $post['start'], $post['search'], $post['order']);
+        $list = $this->mutu->get_datatables($post['length'], $post['start'], $post['search'], $post['order'], $periode_id);
+
+        /* Tim auditor (ketua + anggota) untuk audit pada halaman ini. */
+        $this->load->model('TimauditModel', 'timaudit');
+        $id_halaman = array();
+        foreach ($list as $field) {
+            $id_halaman[] = (int) $field->audit_id;
+        }
+        $peta_tim = $this->timaudit->peta($id_halaman);
+
         $data = array();
         $no = $this->input->post('start');
         foreach ($list as $field) {
@@ -361,7 +454,9 @@ class Daftaraudit extends MY_Controller {
             $row = array();
             $row[] = $no;
             $row[] = $field->form_nama;
-            $row[] = $field->auditor;
+            /* Kolom Auditor: seluruh nama tim, ketua ditandai "(Ketua)". */
+            $baris_tim = isset($peta_tim[(int) $field->audit_id]) ? $peta_tim[(int) $field->audit_id] : array();
+            $row[] = '<div class="tim-teks">' . html_escape($this->timaudit->teks($baris_tim, $field->auditor)) . '</div>';
             $row[] = $field->auditee;
             $row[] = $field->unit; 
 
@@ -434,8 +529,8 @@ class Daftaraudit extends MY_Controller {
 
         $output = array(
             "draw" => $post['draw'],
-            "recordsTotal" => $this->mutu->count_all(),
-            "recordsFiltered" => $this->mutu->count_filtered($post['search'], $post['order']),
+            "recordsTotal" => $this->mutu->count_all($periode_id),
+            "recordsFiltered" => $this->mutu->count_filtered($post['search'], $post['order'], $periode_id),
             "data" => $data,
         );
         //output dalam format JSON
