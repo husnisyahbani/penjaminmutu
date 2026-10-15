@@ -143,29 +143,65 @@ $(function () {
     });
 
     $("#daftaraudit").on("click", ".kembali", function () {
-         var id = $(this).attr('id');
-         kembali(id);
+        var id = $(this).attr('id');
+        $('#kembali_audit_id').val(id);
+        $('#kembali_catatan').val('');
+
+        // Ambil catatan pengembalian sebelumnya jika ada
+        $.ajax({
+            url: base_url + "/daftaraudit/getauditById/" + id,
+            type: "GET",
+            dataType: "json",
+            success: function (res) {
+                if (res && res.audit_catatan) {
+                    $('#kembali_catatan').val(res.audit_catatan);
+                }
+            }
+        });
+
+        $('#modalKembali').modal('show');
     });
 
-    function kembali($id)
-    {
+    $('#modalKembali').on('shown.bs.modal', function () {
+        $('#kembali_catatan').focus();
+    });
+
+    $('#formkembali').on('submit', function (e) {
+        e.preventDefault();
+        var id = $('#kembali_audit_id').val();
+        var catatan = $.trim($('#kembali_catatan').val());
+
+        if (!catatan) {
+            swal.fire({
+                title: "Perhatian",
+                text: "Harap masukkan catatan pengembalian untuk auditee!",
+                type: "warning"
+            });
+            $('#kembali_catatan').focus();
+            return false;
+        }
+
         swal.fire({
             title: "Anda Yakin?",
-            text: "Anda Yakin Ingin Mengembalikan Evaluasi Ini Kepada Auditee?",
+            text: "Anda yakin ingin mengembalikan evaluasi ini kepada auditee beserta catatan tersebut?",
             type: "warning",
             showCancelButton: true,
             showLoaderOnConfirm: true,
             confirmButtonText: "Ya, Kembalikan!",
-            cancelButtonText: 'Tidak',
+            cancelButtonText: 'Batal',
             preConfirm: function () {
-                $.ajax({
+                return $.ajax({
                     url: base_url + "/daftaraudit/kembali",
                     type: "POST",
-                    data: { id: $id}
-                })
-                        .done(function (data) {
-                            if(data.status){
-                                    swal.fire({
+                    dataType: "json",
+                    data: {
+                        id: id,
+                        catatan: catatan
+                    }
+                }).done(function (data) {
+                    if (data.status) {
+                        $('#modalKembali').modal('hide');
+                        swal.fire({
                                         title: "Berhasil",
                                         text: "Evaluasi telah dikembalikan ke auditee!",
                                         type: "success",
@@ -190,7 +226,7 @@ $(function () {
                         });
             }
         });
-    }
+    });
 
     function proses(idku)
     {

@@ -5,7 +5,7 @@ class Daftaraudit extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditor';
-        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=2.2"));
+        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=2.3"));
         // Informasi tombol aksi saat hover (lihat assets/app/tabel-aksi.css)
         $this->load->js(base_url("assets/app/tabel-aksi.js?v=1.0"));
         // Tampilan topik & activity pada halaman detail audit.
@@ -415,11 +415,36 @@ class Daftaraudit extends MY_Controller {
 
     public function kembali() {
         $id = $this->input->post('id');
+        $catatan = $this->input->post('catatan');
+
+        if (empty($id)) {
+            header('Access-Control-Allow-Origin: *');
+            header('Content-Type: application/json');
+            echo json_encode(array('status' => false, 'pesan' => 'ID audit tidak valid.'));
+            return;
+        }
+
+        // Pastikan kolom audit_catatan ada di tabel mutu_audit
+        if (!$this->db->field_exists('audit_catatan', 'mutu_audit')) {
+            $this->load->dbforge();
+            $this->dbforge->add_column('mutu_audit', array(
+                'audit_catatan' => array('type' => 'TEXT', 'null' => TRUE, 'after' => 'audit_status'),
+            ));
+        }
+
         $data = array();
         $data['audit_status'] = 'DRAFT'; 
         $data['audit_id'] = $id;
+        if ($this->db->field_exists('audit_catatan', 'mutu_audit')) {
+            $data['audit_catatan'] = $catatan !== null ? trim($catatan) : '';
+        }
+
         $status = $this->mutu->edit($data);
-        $query = array("status" => $status);
+        $query = array("status" => (bool) $status);
+        if (!$status) {
+            $query['pesan'] = 'Gagal menyimpan perubahan ke database.';
+        }
+
         header('Access-Control-Allow-Origin: *');
         header('Content-Type: application/json');
         echo json_encode($query);

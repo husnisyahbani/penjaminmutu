@@ -346,3 +346,23 @@ Catatan:
   seperti sebelumnya (`mutu_audit`.`auditor_id`).
 - Baris tim dihapus otomatis bersama audit yang dihapus.
 - Hapus tabel bila tidak diperlukan: `DROP TABLE mutu_auditteams;`
+
+## `catatan_kembali_audit.sql`
+
+Menambahkan kolom catatan pengembalian formulir audit dari auditor ke auditee:
+
+| Kolom                     | Isi                                                              |
+| ------------------------- | ---------------------------------------------------------------- |
+| `mutu_audit.audit_catatan` | Catatan / alasan pengembalian audit dari auditor untuk auditee  |
+
+Cara pakai:
+
+1. Impor berkas `database/catatan_kembali_audit.sql` lewat phpMyAdmin (tab SQL).
+2. Sesuaikan prefix `mutu_` bila berbeda.
+
+Catatan:
+
+- Saat auditor menekan tombol **Kembalikan ke auditee**, muncul form modal untuk mengisi catatan pengembalian.
+- Catatan ini tersimpan dan ditampilkan pada auditee saat mereka membuka kembali formulir evaluasi mereka.
+- Aplikasi juga mengecek keberadaan kolom secara otomatis sehingga aman jika dijalankan pada instalasi baru atau lama.
+

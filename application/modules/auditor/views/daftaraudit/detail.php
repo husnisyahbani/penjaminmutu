@@ -76,6 +76,15 @@ foreach ($topik as $t) {
                             <span class="badge badge-info"><?php echo (int) $jml_lampiran; ?> lampiran</span>
                         </div>
 
+                        <?php if (!empty($result['audit_catatan'])): ?>
+                        <div class="alert alert-warning" role="alert">
+                            <h4 class="alert-heading" style="margin-top: 0; font-size: 15px; font-weight: bold;">
+                                <i class="icon md-info mr-5" aria-hidden="true"></i>Catatan Pengembalian ke Auditee
+                            </h4>
+                            <p style="margin-bottom: 0; white-space: pre-wrap;"><?php echo html_escape($result['audit_catatan']); ?></p>
+                        </div>
+                        <?php endif; ?>
+
                         <?php if (!$catatan_siap): ?>
                         <div class="alert alert-info" role="alert">
                             Fitur <strong>Kelebihan &amp; Peluang untuk peningkatan</strong> belum disiapkan pada

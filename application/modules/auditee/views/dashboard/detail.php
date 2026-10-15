@@ -98,6 +98,15 @@ $jml_belum = $jml_wajib - $jml_dijawab;
                             <span class="badge badge-default" id="jml_lampiran"><?php echo (int) $jml_lampiran; ?> lampiran</span>
                         </div>
 
+                        <?php if (!$sudah_terkirim && !empty($result['audit_catatan'])): ?>
+                        <div class="alert alert-danger" role="alert">
+                            <h4 class="alert-heading" style="margin-top: 0; font-size: 15px; font-weight: bold;">
+                                <i class="icon md-alert-circle mr-5" aria-hidden="true"></i>Catatan Pengembalian dari Auditor
+                            </h4>
+                            <p style="margin-bottom: 0; white-space: pre-wrap;"><?php echo html_escape($result['audit_catatan']); ?></p>
+                        </div>
+                        <?php endif; ?>
+
                         <?php if ($sudah_terkirim): ?>
                         <div class="alert alert-info" role="alert">
                             <?php echo $pesan_kunci; ?>

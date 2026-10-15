@@ -183,3 +183,39 @@
     </form>
 </div>
 
+<div
+    class="modal fade"
+    id="modalKembali"
+    aria-hidden="true"
+    aria-labelledby="modalKembaliLabel"
+    role="dialog"
+    tabindex="-1">
+    <div class="modal-dialog modal-simple">
+        <form id="formkembali" class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title" id="modalKembaliLabel">Kembalikan ke Auditee</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="id" id="kembali_audit_id">
+                <div class="form-group">
+                    <label for="kembali_catatan" class="form-control-label"><strong>Catatan Pengembalian</strong> <span class="text-danger">*</span></label>
+                    <textarea class="form-control" name="catatan" id="kembali_catatan" rows="4" placeholder="Masukkan catatan atau alasan pengembalian untuk auditee..." required></textarea>
+                    <small class="text-muted">Catatan ini akan dikirimkan kepada auditee sebagai panduan perbaikan evaluasi.</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="text-right">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-danger" id="submitkembali">
+                        <i class="icon md-undo mr-5" aria-hidden="true"></i>Kembalikan
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
