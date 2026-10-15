@@ -98,6 +98,13 @@
 
 /* Seluruh pilihan ditampilkan seragam - termasuk "Hapus permanen" - supaya
    menu tampak rapi; penjelasan risikonya ada pada kotak konfirmasi. */
+
+/* Aksi "Hapus permanen" diberi jarak dari pilihan di atasnya supaya tidak
+   menempel, tanpa garis pemisah agar seluruh pilihan tetap seragam. */
+.tabel-aksi-menu .dropdown-item.delete {
+    margin-top: 8px;
+}
+
 .tabel-aksi-menu .dropdown-divider {
     margin: 6px 0;
 }
