@@ -24,7 +24,7 @@
                             <th>Password</th>
                             <th>Role</th>
                             <th width="90px">Status</th>
-                            <th width="180px">Aksi</th>
+                            <th width="80px">Aksi</th>
                         </tr>
                     </thead>
 

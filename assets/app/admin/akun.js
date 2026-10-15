@@ -36,6 +36,18 @@ $(function () {
         reset(id);
     });
 
+    /* Kolom Aksi hanya satu tombol (ikon titik tiga). Menu pilihannya
+       ditutup kembali setelah salah satu aksi dipilih. */
+    $("#akun").on("click", ".dropdown-item", function () {
+        var induk = $(this).closest('.dropdown');
+
+        if ($.fn.dropdown) {
+            induk.find('[data-toggle="dropdown"]').dropdown('hide');
+        }
+        induk.removeClass('show');
+        induk.find('.dropdown-menu').removeClass('show');
+    });
+
     /* Tombol status menggantikan tombol edit: pada laman ini yang diubah
        hanya status Aktif / Tidak Aktif akunnya. */
     $("#akun").on("click", ".status", function () {

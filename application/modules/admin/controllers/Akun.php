@@ -5,7 +5,7 @@ class Akun extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'admin';
-        $this->load->js(base_url("assets/app/admin/akun.js?v=1.1"));
+        $this->load->js(base_url("assets/app/admin/akun.js?v=1.2"));
         $this->load->model('AkunModel', 'akun');
 
         $role = $this->session->userdata('role');
@@ -340,37 +340,48 @@ class Akun extends MY_Controller {
                 . ($aktif ? 'Aktif' : 'Tidak Aktif') . '</span>';
 
             /* ---- kolom Aksi ----
-               login sebagai | reset password | aktif/nonaktif | hapus permanen.
-               Tombol "edit" lama diganti tombol status: pada laman ini yang
-               diubah hanya status aktif akunnya. */
+               Satu tombol; pilihan aksi (login sebagai, reset password,
+               aktif/nonaktif, hapus permanen) muncul saat tombol diklik.
+               Tombol pensil pengubah data sudah tidak dipakai lagi: pada
+               laman ini yang diubah hanya status aktif akunnya. */
             $nama_akun = htmlspecialchars($field->nama, ENT_QUOTES);
+            $id_akun   = (int) $field->users_id;
+            $id_menu   = 'aksi' . $id_akun;
 
-            $aksi = '<button class="login-as btn btn-sm btn-icon btn-pure btn-primary on-default"'
-                      . ' data-toggle="tooltip" data-original-title="Login sebagai user ini"'
-                      . ' data-nama="' . $nama_akun . '"'
-                      . ' data-username="' . htmlspecialchars($field->username, ENT_QUOTES) . '"'
-                      . ' data-role="' . htmlspecialchars($field->role, ENT_QUOTES) . '"'
-                      . ' id=' . $field->users_id . '><i class="icon md-account-add" aria-hidden="true"></i></button>';
+            $aksi = '<div class="dropdown tabel-aksi">'
+                . '<button type="button" class="btn btn-sm btn-icon btn-pure btn-default"'
+                . ' id="' . $id_menu . '" data-toggle="dropdown"'
+                . ' aria-haspopup="true" aria-expanded="false"'
+                . ' title="Pilihan aksi" data-info="Pilihan aksi untuk akun ini">'
+                . '<i class="icon md-more-vert" aria-hidden="true"></i></button>'
+                . '<div class="dropdown-menu dropdown-menu-right tabel-aksi-menu"'
+                . ' aria-labelledby="' . $id_menu . '">';
 
-            $aksi .= '<button class="reset btn btn-sm btn-icon btn-pure btn-default on-default reset-row"'
-                      . ' data-toggle="tooltip" data-original-title="Reset password"'
-                      . ' id=' . $field->users_id . '><i class="icon md-refresh" aria-hidden="true"></i></button>';
+            $aksi .= '<button type="button" class="dropdown-item login-as"'
+                . ' data-nama="' . $nama_akun . '"'
+                . ' data-username="' . htmlspecialchars($field->username, ENT_QUOTES) . '"'
+                . ' data-role="' . htmlspecialchars($field->role, ENT_QUOTES) . '"'
+                . ' id="' . $id_akun . '">'
+                . '<i class="icon md-account-add" aria-hidden="true"></i>Login sebagai</button>';
+
+            $aksi .= '<button type="button" class="dropdown-item reset" id="' . $id_akun . '">'
+                . '<i class="icon md-refresh" aria-hidden="true"></i>Reset password</button>';
 
             if ($status_siap) {
-                /* Sedang aktif -> tombol menonaktifkan, dan sebaliknya. */
-                $aksi .= '<button class="status btn btn-sm btn-icon btn-pure btn-default on-default"'
-                      . ' data-toggle="tooltip" data-original-title="'
-                      . ($aktif ? 'Nonaktifkan akun ini' : 'Aktifkan kembali akun ini') . '"'
-                      . ' data-aktif="' . ($aktif ? '1' : '0') . '"'
-                      . ' data-nama="' . $nama_akun . '"'
-                      . ' id=' . $field->users_id . '><i class="icon '
-                      . ($aktif ? 'md-block' : 'md-check-circle') . '" aria-hidden="true"></i></button>';
+                /* Sedang aktif -> pilihan menonaktifkan, dan sebaliknya. */
+                $aksi .= '<button type="button" class="dropdown-item status"'
+                    . ' data-aktif="' . ($aktif ? '1' : '0') . '"'
+                    . ' data-nama="' . $nama_akun . '" id="' . $id_akun . '">'
+                    . '<i class="icon ' . ($aktif ? 'md-block' : 'md-check-circle') . '" aria-hidden="true"></i>'
+                    . ($aktif ? 'Nonaktifkan akun' : 'Aktifkan kembali') . '</button>';
             }
 
-            $aksi .= '<button class="delete btn btn-sm btn-icon btn-pure btn-default on-default remove-row"'
-                      . ' data-toggle="tooltip" data-original-title="Hapus permanen"'
-                      . ' data-nama="' . $nama_akun . '"'
-                      . ' id=' . $field->users_id . '><i class="icon md-delete" aria-hidden="true"></i></button>';
+            $aksi .= '<div class="dropdown-divider"></div>'
+                . '<button type="button" class="dropdown-item delete"'
+                . ' data-nama="' . $nama_akun . '" id="' . $id_akun . '">'
+                . '<i class="icon md-delete" aria-hidden="true"></i>Hapus permanen</button>';
+
+            $aksi .= '</div></div>';
 
             $row[] = $aksi;
             $data[] = $row;

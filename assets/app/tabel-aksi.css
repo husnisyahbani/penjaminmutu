@@ -62,3 +62,46 @@
   opacity: 1;
   visibility: visible;
 }
+
+/* ------------------------------------------------------------------
+   Menu aksi pada tabel: satu tombol (ikon titik tiga) yang membuka
+   daftar pilihan aksi untuk baris tersebut - dipakai laman Akun (admin).
+
+   .tabel-aksi-menu berada di dalam .dropdown (posisi relatif), sehingga
+   menu menempel pada tombolnya dan tidak terpotong batas tabel.
+   ------------------------------------------------------------------ */
+
+.tabel-aksi .dropdown-menu {
+    min-width: 210px;
+    padding: 6px 0;
+    font-size: 13px;
+}
+
+.tabel-aksi-menu .dropdown-item {
+    display: block;
+    padding: 7px 16px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.tabel-aksi-menu .dropdown-item > .icon {
+    margin-right: 10px;
+    font-size: 16px;
+    vertical-align: -3px;
+    color: #757575;
+}
+
+.tabel-aksi-menu .dropdown-item:hover > .icon,
+.tabel-aksi-menu .dropdown-item:focus > .icon {
+    color: inherit;
+}
+
+/* Pilihan yang membuang data diberi warna merah. */
+.tabel-aksi-menu .dropdown-item.delete,
+.tabel-aksi-menu .dropdown-item.delete > .icon {
+    color: #f44336;
+}
+
+.tabel-aksi-menu .dropdown-divider {
+    margin: 6px 0;
+}
