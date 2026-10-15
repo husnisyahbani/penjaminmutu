@@ -376,8 +376,10 @@ class Akun extends MY_Controller {
                     . ($aktif ? 'Nonaktifkan akun' : 'Aktifkan kembali') . '</button>';
             }
 
-            $aksi .= '<div class="dropdown-divider"></div>'
-                . '<button type="button" class="dropdown-item delete"'
+            /* Seluruh pilihan ditampilkan seragam (tanpa garis pemisah dan
+               tanpa warna khusus); risiko aksi hapus dijelaskan pada kotak
+               konfirmasi yang muncul setelahnya. */
+            $aksi .= '<button type="button" class="dropdown-item delete"'
                 . ' data-nama="' . $nama_akun . '" id="' . $id_akun . '">'
                 . '<i class="icon md-delete" aria-hidden="true"></i>Hapus permanen</button>';
 

@@ -96,12 +96,8 @@
     color: inherit;
 }
 
-/* Pilihan yang membuang data diberi warna merah. */
-.tabel-aksi-menu .dropdown-item.delete,
-.tabel-aksi-menu .dropdown-item.delete > .icon {
-    color: #f44336;
-}
-
+/* Seluruh pilihan ditampilkan seragam - termasuk "Hapus permanen" - supaya
+   menu tampak rapi; penjelasan risikonya ada pada kotak konfirmasi. */
 .tabel-aksi-menu .dropdown-divider {
     margin: 6px 0;
 }
