@@ -14,8 +14,13 @@ $(function () {
         "columnDefs": [
             /* Kolom No tidak perlu diurutkan. */
             {"targets": [0], "orderable": false},
-            /* Kolom Status & Aksi: rata tengah, tidak pernah membungkus. */
-            {"targets": [6,7], "orderable": false, "className": "text-center tabel-aksi-sel"}
+            /* Kolom Status: rata tengah, tidak pernah membungkus. */
+            {"targets": [6], "orderable": false, "className": "text-center tabel-aksi-sel"},
+            /* Kolom Aksi: rata tengah, tidak pernah membungkus, dan SELALU
+               ditampilkan - kelas "all" dibaca DataTables Responsive,
+               sehingga tombol aksi tidak ikut disembunyikan (dan tidak
+               dipindah ke baris anak) pada layar ponsel. */
+            {"targets": [7], "orderable": false, "className": "text-center tabel-aksi-sel all"}
         ],
         "ajax": {
             "url": base_url + "/akun/listakun",

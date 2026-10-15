@@ -9,7 +9,7 @@ class Akun extends MY_Controller {
         $this->load->js(base_url("assets/app/tabel-aksi.js?v=1.0"));
         // Menu aksi (satu tombol titik tiga) pada tabel
         $this->load->js(base_url("assets/app/tabel-aksi-menu.js?v=1.0"));
-        $this->load->js(base_url("assets/app/admin/akun.js?v=1.3"));
+        $this->load->js(base_url("assets/app/admin/akun.js?v=1.4"));
         $this->load->model('AkunModel', 'akun');
 
         $role = $this->session->userdata('role');

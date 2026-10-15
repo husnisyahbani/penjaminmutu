@@ -24,7 +24,7 @@
                             <th>Password</th>
                             <th>Role</th>
                             <th width="90px" class="text-center tabel-aksi-sel">Status</th>
-                            <th width="80px" class="text-center tabel-aksi-sel">Aksi</th>
+                            <th width="80px" class="text-center tabel-aksi-sel all">Aksi</th>
                         </tr>
                     </thead>
 

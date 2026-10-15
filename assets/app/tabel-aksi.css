@@ -78,7 +78,10 @@
     position: fixed;
     z-index: 1080;
     min-width: 210px;
-    max-width: 300px;
+    /* Pada layar ponsel lebar menu dibatasi lebar layar (dikurangi jarak
+       8px kiri-kanan) supaya seluruh pilihan tetap terbaca dan tidak
+       keluar dari layar. */
+    max-width: calc(100vw - 16px);
     padding: 6px 0;
     margin: 0;
     background-color: #fff;
