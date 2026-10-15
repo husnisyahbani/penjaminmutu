@@ -17,7 +17,15 @@ class Login extends MY_Controller {
             $this->data['password'] = $this->input->post('password');
 
             $output = $this->users->login($this->data);
-            
+
+            /* Akun dikenal, tetapi sudah dinonaktifkan PPM. */
+            if ($output === 'nonaktif') {
+                $msg = 'Akun Anda tidak aktif. Silakan hubungi PPM.';
+                $this->session->set_flashdata('pesanerror', $msg);
+                redirect(base_url('login'));
+                return;
+            }
+
             if ($output) {
                
                 $role = $this->session->userdata('role');

@@ -22,8 +22,9 @@
                             <th>Unit Kerja</th>
                             <th>Username</th>
                             <th>Password</th>
-                            <th>Status</th>
-                            <th width="170px">Aksi</th>
+                            <th>Role</th>
+                            <th width="90px">Status</th>
+                            <th width="180px">Aksi</th>
                         </tr>
                     </thead>
 

@@ -33,8 +33,12 @@ class AkunModel extends CI_Model {
             $i++;
         }
 
-        if (isset($ordering)) {
-            $this->db->order_by($this->column_order[$ordering[0]['column']], $ordering[0]['dir']);
+        if (isset($ordering) && isset($this->column_order[$ordering[0]['column']])) {
+            /* Penjagaan: abaikan permintaan pengurutan pada kolom yang tidak
+               dikenal (mis. kolom Status/Aksi yang baru ditambahkan). */
+            if ($this->column_order[$ordering[0]['column']] !== NULL) {
+                $this->db->order_by($this->column_order[$ordering[0]['column']], $ordering[0]['dir']);
+            }
         } else if (isset($this->order)) {
             $order = $this->order;
             $this->db->order_by(key($order), $order[key($order)]);
@@ -64,6 +68,43 @@ class AkunModel extends CI_Model {
     public function count_all() {
         $this->db->from($this->table);
         return $this->db->count_all_results();
+    }
+
+    /* ==================================================================
+       Status akun: Aktif (valid = 1) / Tidak Aktif (valid = 0)
+       ================================================================== */
+
+    /** Kolom penanda status (users.valid) tersedia pada database ini? */
+    public function statusSiap() {
+        return $this->db->field_exists('valid', $this->table);
+    }
+
+    /** Abaikan akun yang sudah dinonaktifkan (bila kolomnya tersedia). */
+    private function _hanyaAktif() {
+        if ($this->statusSiap()) {
+            $this->db->where('(valid IS NULL OR valid = 1)', NULL, FALSE);
+        }
+    }
+
+    /** Aktifkan (TRUE) atau nonaktifkan (FALSE) satu akun. */
+    public function ubahStatus($id, $aktif) {
+        if (!$this->statusSiap() || empty($id)) {
+            return FALSE;
+        }
+
+        $this->db->where('users_id', (int) $id);
+        $this->db->set('valid', $aktif ? 1 : 0);
+        return $this->db->update($this->table);
+    }
+
+    /** Jumlah akun yang masih aktif, seluruhnya atau per peran. */
+    public function hitungAktif($role = NULL) {
+        $this->db->from($this->table);
+        if (!empty($role)) {
+            $this->db->where('role', $role);
+        }
+        $this->_hanyaAktif();
+        return (int) $this->db->count_all_results();
     }
     
     public function hapus($id) {
@@ -120,6 +161,8 @@ class AkunModel extends CI_Model {
     function getAllAuditor() {
         $this->db->from($this->table);
         $this->db->where("role","AUDITOR");
+        /* Akun yang dinonaktifkan tidak lagi ditawarkan sebagai auditor. */
+        $this->_hanyaAktif();
         $query = $this->db->get();
         return $query->result_array();
     }
@@ -127,6 +170,8 @@ class AkunModel extends CI_Model {
     function getAllAuditee() {
         $this->db->from($this->table);
         $this->db->where("role","AUDITEE");
+        /* Akun yang dinonaktifkan tidak lagi ditawarkan sebagai auditee. */
+        $this->_hanyaAktif();
         $query = $this->db->get();
         return $query->result_array();
     }
