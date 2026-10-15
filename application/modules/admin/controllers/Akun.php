@@ -7,7 +7,9 @@ class Akun extends MY_Controller {
         $this->module = 'admin';
         // Informasi tombol aksi saat hover (lihat assets/app/tabel-aksi.css)
         $this->load->js(base_url("assets/app/tabel-aksi.js?v=1.0"));
-        $this->load->js(base_url("assets/app/admin/akun.js?v=1.2"));
+        // Menu aksi (satu tombol titik tiga) pada tabel
+        $this->load->js(base_url("assets/app/tabel-aksi-menu.js?v=1.0"));
+        $this->load->js(base_url("assets/app/admin/akun.js?v=1.3"));
         $this->load->model('AkunModel', 'akun');
 
         $role = $this->session->userdata('role');
@@ -350,45 +352,73 @@ class Akun extends MY_Controller {
             $id_akun   = (int) $field->users_id;
             $id_menu   = 'aksi' . $id_akun;
 
-            /* Tombol pembuka menu dibuat sama dengan tombol aksi lain:
-               btn btn-sm btn-icon btn-default (tanpa btn-pure), sehingga
-               tampak sebagai tombol, bukan sekadar ikon. */
-            $aksi = '<div class="dropdown tabel-aksi">'
-                . '<button type="button" class="btn btn-sm btn-icon btn-default"'
-                . ' id="' . $id_menu . '" data-toggle="dropdown"'
-                . ' aria-haspopup="true" aria-expanded="false"'
-                . ' data-info="Pilihan aksi untuk akun ini" aria-label="Pilihan aksi">'
-                . '<i class="icon md-more-vert" aria-hidden="true"></i></button>'
-                . '<div class="dropdown-menu dropdown-menu-right tabel-aksi-menu"'
-                . ' aria-labelledby="' . $id_menu . '">';
+            /* Tombol pembuka menu memakai pola yang sama dengan tombol aksi
+               lain: btn btn-sm btn-icon btn-default. Menu yang muncul
+               diurus oleh assets/app/tabel-aksi-menu.js. */
+            $pilihan = array();
 
-            $aksi .= '<button type="button" class="dropdown-item login-as"'
-                . ' data-nama="' . $nama_akun . '"'
-                . ' data-username="' . htmlspecialchars($field->username, ENT_QUOTES) . '"'
-                . ' data-role="' . htmlspecialchars($field->role, ENT_QUOTES) . '"'
-                . ' id="' . $id_akun . '">'
-                . '<i class="icon md-account-add" aria-hidden="true"></i>Login sebagai</button>';
+            $pilihan[] = array(
+                'aksi' => 'login-as',
+                'ikon' => 'md-account-add',
+                'teks' => 'Login sebagai',
+                'data' => array(
+                    'nama'     => $nama_akun,
+                    'username' => htmlspecialchars($field->username, ENT_QUOTES),
+                    'role'     => htmlspecialchars($field->role, ENT_QUOTES),
+                ),
+            );
 
-            $aksi .= '<button type="button" class="dropdown-item reset" id="' . $id_akun . '">'
-                . '<i class="icon md-refresh" aria-hidden="true"></i>Reset password</button>';
+            $pilihan[] = array(
+                'aksi' => 'reset',
+                'ikon' => 'md-refresh',
+                'teks' => 'Reset password',
+                'data' => array(),
+            );
 
             if ($status_siap) {
                 /* Sedang aktif -> pilihan menonaktifkan, dan sebaliknya. */
-                $aksi .= '<button type="button" class="dropdown-item status"'
-                    . ' data-aktif="' . ($aktif ? '1' : '0') . '"'
-                    . ' data-nama="' . $nama_akun . '" id="' . $id_akun . '">'
-                    . '<i class="icon ' . ($aktif ? 'md-block' : 'md-check-circle') . '" aria-hidden="true"></i>'
-                    . ($aktif ? 'Nonaktifkan akun' : 'Aktifkan kembali') . '</button>';
+                $pilihan[] = array(
+                    'aksi' => 'status',
+                    'ikon' => $aktif ? 'md-block' : 'md-check-circle',
+                    'teks' => $aktif ? 'Nonaktifkan akun' : 'Aktifkan kembali',
+                    'data' => array(
+                        'aktif' => $aktif ? '1' : '0',
+                        'nama'  => $nama_akun,
+                    ),
+                );
             }
 
             /* Seluruh pilihan ditampilkan seragam (tanpa garis pemisah dan
                tanpa warna khusus); risiko aksi hapus dijelaskan pada kotak
                konfirmasi yang muncul setelahnya. */
-            $aksi .= '<button type="button" class="dropdown-item delete"'
-                . ' data-nama="' . $nama_akun . '" id="' . $id_akun . '">'
-                . '<i class="icon md-delete" aria-hidden="true"></i>Hapus permanen</button>';
+            $pilihan[] = array(
+                'aksi' => 'delete',
+                'ikon' => 'md-delete',
+                'teks' => 'Hapus permanen',
+                'data' => array('nama' => $nama_akun),
+            );
 
-            $aksi .= '</div></div>';
+            $menu = '';
+            foreach ($pilihan as $item) {
+                $atribut = '';
+                foreach ($item['data'] as $kunci => $nilai) {
+                    $atribut .= ' data-' . $kunci . '="' . $nilai . '"';
+                }
+                $menu .= '<button type="button" class="tabel-aksi-item ' . $item['aksi'] . '"'
+                    . ' role="menuitem" id="' . $id_akun . '"' . $atribut . '>'
+                    . '<i class="icon ' . $item['ikon'] . '" aria-hidden="true"></i>'
+                    . '<span>' . $item['teks'] . '</span></button>';
+            }
+
+            $aksi = '<div class="tabel-aksi">'
+                . '<button type="button" class="btn btn-sm btn-icon btn-default tabel-aksi-buka"'
+                . ' id="' . $id_menu . '-tombol" data-tabel-aksi-menu="' . $id_menu . '"'
+                . ' aria-haspopup="true" aria-expanded="false" aria-controls="' . $id_menu . '"'
+                . ' data-info="Pilihan aksi untuk akun ini" aria-label="Pilihan aksi">'
+                . '<i class="icon md-more-vert" aria-hidden="true"></i></button>'
+                . '<div class="tabel-aksi-menu" id="' . $id_menu . '" role="menu"'
+                . ' aria-labelledby="' . $id_menu . '-tombol">' . $menu . '</div>'
+                . '</div>';
 
             $row[] = $aksi;
             $data[] = $row;

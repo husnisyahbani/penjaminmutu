@@ -12,8 +12,10 @@ $(function () {
         "searching": true,
         "order": [],
         "columnDefs": [
-            /* Kolom No, Status, dan Aksi tidak perlu diurutkan. */
-            {"targets": [0,6,7], "orderable": false}
+            /* Kolom No tidak perlu diurutkan. */
+            {"targets": [0], "orderable": false},
+            /* Kolom Status & Aksi: rata tengah, tidak pernah membungkus. */
+            {"targets": [6,7], "orderable": false, "className": "text-center tabel-aksi-sel"}
         ],
         "ajax": {
             "url": base_url + "/akun/listakun",
@@ -37,15 +39,16 @@ $(function () {
     });
 
     /* Kolom Aksi hanya satu tombol (ikon titik tiga). Menu pilihannya
-       ditutup kembali setelah salah satu aksi dipilih. */
-    $("#akun").on("click", ".dropdown-item", function () {
-        var induk = $(this).closest('.dropdown');
+       dibuka/ditutup oleh assets/app/tabel-aksi-menu.js, termasuk setelah
+       salah satu aksi dipilih.
 
-        if ($.fn.dropdown) {
-            induk.find('[data-toggle="dropdown"]').dropdown('hide');
+       Menu ditutup juga setiap kali tabel digambar ulang (pencarian,
+       ganti halaman, pengurutan) supaya tidak tertinggal di posisi
+       baris yang sudah tidak tampil. */
+    $('#akun').on('draw.dt', function () {
+        if (window.tabelAksiMenu) {
+            window.tabelAksiMenu.tutup();
         }
-        induk.removeClass('show');
-        induk.find('.dropdown-menu').removeClass('show');
     });
 
     /* Tombol status menggantikan tombol edit: pada laman ini yang diubah
