@@ -5,7 +5,7 @@ class Ptk extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditee';
-        $this->load->js(base_url("assets/app/auditee/ptk.js?v=3.2"));
+        $this->load->js(base_url("assets/app/auditee/ptk.js?v=3.3"));
         // Informasi tombol aksi saat hover (lihat assets/app/tabel-aksi.css)
         $this->load->js(base_url("assets/app/tabel-aksi.js?v=1.0"));
         $this->load->model('PtkModel', 'ptkmodel');
@@ -186,18 +186,33 @@ class Ptk extends MY_Controller {
                 $row[] = $isi . $aksi;
             }
 
-            /* Kolom Status (diisi auditor) */
-            $status_ptk = isset($field->jwb_status) ? strtoupper(trim((string) $field->jwb_status)) : '';
-            if ($status_ptk === 'CLOSED') {
-                $status_badge = '<span class="badge badge-success">CLOSED</span>';
-            } elseif ($status_ptk === 'PROSES') {
-                $status_badge = '<span class="badge badge-warning">PROSES</span>';
-            } elseif ($status_ptk === 'OPEN') {
-                $status_badge = '<span class="badge badge-danger">OPEN</span>';
+            /* Kolom Status (diisi auditor dengan TEKS BEBAS).
+               Tiga nilai lama (OPEN / PROSES / CLOSED) tetap diberi warna
+               badgenya; teks lain ditampilkan apa adanya supaya status yang
+               diketik auditor tidak terbaca "belum diisi". */
+            $status_ptk  = isset($field->jwb_status) ? trim((string) $field->jwb_status) : '';
+            $status_atur = strtoupper($status_ptk);
+
+            if ($status_ptk === '') {
+                $isi_status = '<span class="badge badge-default">BELUM DIISI</span>';
+            } elseif ($status_atur === 'CLOSED') {
+                $isi_status = '<span class="badge badge-success">CLOSED</span>';
+            } elseif ($status_atur === 'PROSES') {
+                $isi_status = '<span class="badge badge-warning">PROSES</span>';
+            } elseif ($status_atur === 'OPEN') {
+                $isi_status = '<span class="badge badge-danger">OPEN</span>';
             } else {
-                $status_badge = '<span class="badge badge-default">BELUM DIISI</span>';
+                $isi_status = '<div class="ptk-klamp ptk-status-teks">'
+                    . nl2br(html_escape($this->_teksBaris($status_ptk))) . '</div>';
             }
-            $row[] = '<div class="text-center">' . $status_badge . '</div>';
+
+            /* Badge ditengahkan, teks bebas diratakan kiri supaya enak dibaca. */
+            $pakai_badge = ($status_ptk === '')
+                || in_array($status_atur, array('OPEN', 'PROSES', 'CLOSED'), TRUE);
+
+            $row[] = $pakai_badge
+                ? '<div class="text-center">' . $isi_status . '</div>'
+                : $isi_status;
 
             $data[] = $row;
         }

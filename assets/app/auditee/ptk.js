@@ -27,7 +27,7 @@ $(function () {
             {"targets": 4, "className": "ptk-kolom-temuan text-center"},
             {"targets": 5, "className": "ptk-kolom-catatan"},
             {"targets": 6, "className": "ptk-koreksi-sel"},
-            {"targets": 7, "className": "ptk-kolom-status text-center"}
+            {"targets": 7, "className": "ptk-kolom-status"}
         ],
         "ajax": {
             "url": base_url + "/ptk/listptk/",
@@ -36,14 +36,6 @@ $(function () {
             "data": function (d) {
                 d.periode_id = $('#filter_periode').val();
             }
-        },
-        "createdRow": function (baris) {
-            $(baris).find('.ptk-klamp').each(function () {
-                var teks = $(this).text();
-                if (teks.length > 140) {
-                    $(this).attr('title', teks);
-                }
-            });
         }
     });
 

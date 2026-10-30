@@ -15,7 +15,7 @@ class Ptk extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'admin';
-        $this->load->js(base_url("assets/app/admin/ptk.js?v=1.0"));
+        $this->load->js(base_url("assets/app/admin/ptk.js?v=1.1"));
         // Informasi tombol aksi saat hover (lihat assets/app/tabel-aksi.css)
         $this->load->js(base_url("assets/app/tabel-aksi.js?v=1.0"));
         $this->load->model('PtkdataModel', 'ptkdata');

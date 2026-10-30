@@ -32,7 +32,10 @@
     /* Lebar kolom persis seperti yang ditentukan (persentase di bawah),
        bukan hasil hitungan isi sel, sehingga porsi antar kolom tetap. */
     table-layout: fixed;
-    min-width: 1150px;
+    /* min-width sengaja besar supaya tiap kolom cukup lebar menampung
+       teks penuh (isi kolom tidak lagi disingkat); kelebihan lebarnya
+       digeser mendatar lewat .ptk-tabel-kotak. */
+    min-width: 1320px;
 }
 
 .ptk-tabel thead th {
@@ -107,43 +110,46 @@
 }
 
 .ptk-tabel--lengkap .ptk-kolom-formulir {
-    width: 12%;
+    width: 11%;
 }
 
 .ptk-tabel--lengkap .ptk-kolom-auditee,
 .ptk-tabel--lengkap .ptk-kolom-unit {
-    width: 9%;
-}
-
-.ptk-tabel--lengkap .ptk-kolom-butir {
-    width: 16%;
-}
-
-.ptk-tabel--lengkap .ptk-kolom-hasil {
-    width: 10%;
-}
-
-.ptk-tabel--lengkap .ptk-kolom-temuan {
     width: 8%;
 }
 
-.ptk-tabel--lengkap .ptk-kolom-catatan {
+.ptk-tabel--lengkap .ptk-kolom-butir {
+    width: 19%;
+}
+
+.ptk-tabel--lengkap .ptk-kolom-hasil {
     width: 11%;
 }
 
+.ptk-tabel--lengkap .ptk-kolom-temuan {
+    width: 7%;
+}
+
+.ptk-tabel--lengkap .ptk-kolom-catatan {
+    width: 13%;
+}
+
 .ptk-tabel--lengkap .ptk-kolom-koreksi {
-    width: 10%;
+    width: 12%;
 }
 
 .ptk-tabel--lengkap .ptk-kolom-status {
-    width: 12%;
+    width: 8%;
     text-align: left;
 }
 
 /* Tabel dengan 10 kolom butuh ruang lebih; kotaknya tetap bisa digeser
    mendatar (lihat .ptk-tabel-kotak). */
+/* Tabel dengan 10 kolom butuh ruang lebih; kolomnya sengaja dibuat lebar
+   supaya teks penuh tidak menumpuk ke bawah. Kelebihan lebarnya digeser
+   mendatar lewat .ptk-tabel-kotak. */
 .ptk-tabel--lengkap {
-    min-width: 1400px;
+    min-width: 1800px;
 }
 
 /* Isi sel yang panjang dipotong beberapa baris saja supaya tinggi baris
@@ -200,10 +206,10 @@
    agar tidak ada kolom yang tersembunyi atau tertekan di layar sempit. */
 @media (max-width: 991px) {
     .ptk-tabel {
-        min-width: 1150px;
+        min-width: 1320px;
     }
     .ptk-tabel--lengkap {
-        min-width: 1400px;
+        min-width: 1800px;
     }
 }
 

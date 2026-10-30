@@ -39,14 +39,6 @@ $(function () {
             "data": function (d) {
                 d.periode_id = $('#filter_periode').val();
             }
-        },
-        "createdRow": function (baris) {
-            $(baris).find('.ptk-klamp').each(function () {
-                var teks = $(this).text();
-                if (teks.length > 140) {
-                    $(this).attr('title', teks);
-                }
-            });
         }
     });
 

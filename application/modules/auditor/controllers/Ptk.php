@@ -15,7 +15,7 @@ class Ptk extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditor';
-        $this->load->js(base_url("assets/app/auditor/ptk.js?v=2.1"));
+        $this->load->js(base_url("assets/app/auditor/ptk.js?v=2.2"));
         // Informasi tombol aksi saat hover (lihat assets/app/tabel-aksi.css)
         $this->load->js(base_url("assets/app/tabel-aksi.js?v=1.0"));
         $this->load->model('PtkdataModel', 'ptkdata');
