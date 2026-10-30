@@ -80,9 +80,11 @@
     width: 18%;
 }
 
+/* Status tindak lanjut: teks bebas, jadi rata kiri dan diberi porsi
+   cukup lebar agar beberapa kata tampil dalam satu baris. */
 .ptk-kolom-status {
-    width: 10%;
-    text-align: center;
+    width: 12%;
+    text-align: left;
 }
 
 /* Kolom Aksi pada daftar tilik: hanya tombol hapus, jadi cukup sempit. */
@@ -105,7 +107,7 @@
 }
 
 .ptk-tabel--lengkap .ptk-kolom-formulir {
-    width: 11%;
+    width: 12%;
 }
 
 .ptk-tabel--lengkap .ptk-kolom-auditee,
@@ -114,7 +116,7 @@
 }
 
 .ptk-tabel--lengkap .ptk-kolom-butir {
-    width: 18%;
+    width: 16%;
 }
 
 .ptk-tabel--lengkap .ptk-kolom-hasil {
@@ -126,16 +128,16 @@
 }
 
 .ptk-tabel--lengkap .ptk-kolom-catatan {
-    width: 12%;
-}
-
-.ptk-tabel--lengkap .ptk-kolom-koreksi {
     width: 11%;
 }
 
+.ptk-tabel--lengkap .ptk-kolom-koreksi {
+    width: 10%;
+}
+
 .ptk-tabel--lengkap .ptk-kolom-status {
-    width: 9%;
-    text-align: center;
+    width: 12%;
+    text-align: left;
 }
 
 /* Tabel dengan 10 kolom butuh ruang lebih; kotaknya tetap bisa digeser
@@ -146,12 +148,12 @@
 
 /* Isi sel yang panjang dipotong beberapa baris saja supaya tinggi baris
    tetap rapi; teks lengkapnya muncul saat kursor diarahkan (title). */
+/* Isi sel ditampilkan PENUH - tidak disingkat (permintaan PPM).
+   Sebelumnya teks dijepit pada 5 baris (-webkit-line-clamp) sehingga
+   butir lingkup, hasil, catatan, dan rencana koreksi yang panjang
+   terpotong. Berlaku pada semua laman PTK (auditor, PPM, auditee). */
 .ptk-klamp {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 5;
-    line-clamp: 5;
-    overflow: hidden;
+    display: block;
 }
 
 /* Rencana koreksi: teks di kiri, tombol tulis di kanan atas. */
@@ -422,6 +424,16 @@
 }
 
 /* Badge status pada PTK auditee */
+/* Status tindak lanjut yang ditulis auditor (teks bebas). */
+.ptk-status-teks {
+    color: #424242;
+}
+
+/* Kolom status sebelum kolomnya disiapkan pada basis data. */
+.ptk-status-notsiap {
+    color: #bdbdbd;
+}
+
 .ptk-status-badge {
     display: inline-block;
     min-width: 65px;

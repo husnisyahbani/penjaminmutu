@@ -208,3 +208,49 @@
         </div>
     </form>
 </div>
+
+
+<?php /* Modal status tindak lanjut: teks bebas yang diketik auditor,
+         bentuknya sama seperti modal rencana koreksi milik auditee. */ ?>
+<div class="modal fade" id="statusModal" aria-hidden="false" aria-labelledby="statusModalLabel"
+     role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <form id="formstatus" class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title" id="statusModalLabel">Status Tindak Lanjut</h4>
+            </div>
+            <div class="modal-body">
+
+                <input type="hidden" id="status_dtjwb_id" name="dtjwb_id"/>
+                <input type="hidden" id="status_audit_id" name="audit_id"/>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4 class="example-title">Butir Lingkup</h4>
+                        <div id="status_butir" class="ptk-teks"></div>
+                    </div>
+                    <div class="col-md-12">
+                        <h4 class="example-title">Rencana Koreksi (auditee)</h4>
+                        <div id="status_koreksi" class="ptk-teks"></div>
+                    </div>
+                    <div class="col-md-12">
+                        <h4 class="example-title">Status</h4>
+                        <textarea id="ptk_status" class="form-control ptk-koreksi-input" name="ptk_status"
+                                  rows="5" placeholder="Tulis status tindak lanjut untuk temuan ini..."></textarea>
+                        <div class="ptk-rencana-info">Teks bebas; enter dipakai untuk memisahkan poin.</div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <div class="text-right">
+                    <button type="submit" class="btn btn-primary" id="submitstatus" name="submitstatus"
+                            value="submitstatus">Simpan</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

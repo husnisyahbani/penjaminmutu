@@ -385,23 +385,74 @@ class PtkdataModel extends CI_Model {
     }
 
     /**
-     * Perbarui status temuan PTK (OPEN / PROSES / CLOSED) oleh auditor.
+     * Siapkan kolom status tindak lanjut (auditjawabdetail.dtjwb_status).
      *
-     * @param int    $dtjwb_id
-     * @param string $status
+     * Status PTK kini berupa TEKS BEBAS yang diketik auditor (bukan lagi
+     * pilihan tetap OPEN / PROSES / CLOSED), karena itu tipenya TEXT.
+     * Bila kolom sudah ada sebagai VARCHAR(20) - bentuk lama - lebarnya
+     * diperbesar menjadi TEXT supaya status yang panjang tidak terpotong.
+     *
+     * Aman dijalankan berulang kali.
+     *
      * @return bool
      */
-    public function updateStatus($dtjwb_id, $status) {
+    public function installStatus() {
         if (!$this->statusSiap()) {
             $this->load->dbforge();
             $this->dbforge->add_column('auditjawabdetail', array(
-                'dtjwb_status' => array('type' => 'VARCHAR', 'constraint' => 20, 'null' => TRUE, 'after' => 'dtjwb_koreksi'),
+                'dtjwb_status' => array('type' => 'TEXT', 'null' => TRUE),
             ));
+            return $this->statusSiap();
+        }
+
+        /* Kolom sudah ada: perbesar bila masih VARCHAR (bentuk lama).
+           Pemeriksaan tipe hanya dijalankan pada MySQL/MariaDB. */
+        if (in_array($this->db->dbdriver, array('mysql', 'mysqli'), TRUE)) {
+            $kolom = $this->db->query('SHOW COLUMNS FROM '
+                . $this->db->protect_identifiers('auditjawabdetail', TRUE)
+                . ' LIKE ' . $this->db->escape('dtjwb_status'))->row_array();
+
+            if (!empty($kolom) && isset($kolom['Type']) && stripos($kolom['Type'], 'text') === FALSE) {
+                $this->load->dbforge();
+                $this->dbforge->modify_column('auditjawabdetail', array(
+                    'dtjwb_status' => array('type' => 'TEXT', 'null' => TRUE),
+                ));
+            }
+        }
+
+        return TRUE;
+    }
+
+    /**
+     * Perbarui status tindak lanjut PTK (teks bebas) oleh auditor.
+     *
+     * Bila kolomnya belum ada, kolom disiapkan lebih dahulu (TEXT) supaya
+     * halaman tetap dapat dipakai tanpa membuka phpMyAdmin.
+     *
+     * @param int    $dtjwb_id
+     * @param string $status   teks bebas; kosong = dikosongkan
+     * @param int    $audit_id bila diisi, butir harus ditemukan pada audit
+     *                         ini oleh kueri yang sudah tersaring pemiliknya
+     * @return bool
+     */
+    public function updateStatus($dtjwb_id, $status, $audit_id = NULL) {
+        if (!$this->statusSiap() && !$this->installStatus()) {
+            return FALSE;
+        }
+
+        /* Penjagaan: bila id audit ikut dikirim, butir harus ditemukan pada
+           kueri yang sudah tersaring pemiliknya - sehingga auditor hanya
+           dapat mengubah status pada audit yang ia tangani sendiri. */
+        if (!empty($audit_id)) {
+            $butir = $this->getButir($audit_id, $dtjwb_id);
+            if (empty($butir)) {
+                return FALSE;
+            }
         }
 
         $this->db->trans_start();
         $this->db->where('dtjwb_id', (int) $dtjwb_id);
-        $this->db->update('auditjawabdetail', array('dtjwb_status' => !empty($status) ? $status : NULL));
+        $this->db->update('auditjawabdetail', array('dtjwb_status' => ($status === '' ? NULL : $status)));
         $this->db->trans_complete();
 
         return $this->db->trans_status();

@@ -49,11 +49,6 @@ $(function () {
                 }
             });
         },
-        "drawCallback": function () {
-            $('#ptk .ptk-status-select').each(function () {
-                aturWarnaSelect($(this), $(this).val());
-            });
-        }
     });
 
     /* Kotak cari pada kepala panel (menggantikan kotak bawaan DataTables,
@@ -136,78 +131,86 @@ $(function () {
     }
 
     /* Warna latar & teks select status mengikuti nilai yang dipilih. */
-    function aturWarnaSelect($sel, status) {
-        $sel.removeClass('ptk-status--open ptk-status--proses ptk-status--closed ptk-status--kosong');
-        var st = String(status || '').toUpperCase();
-        if (st === 'CLOSED') {
-            $sel.addClass('ptk-status--closed');
-        } else if (st === 'PROSES') {
-            $sel.addClass('ptk-status--proses');
-        } else if (st === 'OPEN') {
-            $sel.addClass('ptk-status--open');
-        } else {
-            $sel.addClass('ptk-status--kosong');
-        }
-    }
 
-    /* Auditor memilih status temuan (OPEN / PROSES / CLOSED). */
-    $(document).on('change', '.ptk-status-select', function () {
-        var $sel = $(this);
-        var dtjwb_id = $sel.data('dtjwb_id');
-        var statusBaru = $sel.val();
-        var statusLama = $sel.data('sebelumnya') || '';
+    /* ------------------------------------------------------------------
+       Kolom Status: TEKS BEBAS yang ditulis auditor untuk menandai tindak
+       lanjut tiap temuan. Cara isinya sama dengan rencana koreksi pada
+       halaman PTK auditee: tombol pensil -> modal -> textarea -> simpan.
+       ------------------------------------------------------------------ */
+    var status_dtjwb_id = 0;
+    var status_audit_id = 0;
 
-        var teksTanya = statusBaru
-            ? "Ubah status temuan ini menjadi " + statusBaru + "?"
-            : "Kosongkan status temuan ini?";
+    $('#ptk').on('click', '.edit-status', function () {
+        var $btn = $(this);
+        status_dtjwb_id = $btn.attr('dtjwb_id');
+        status_audit_id = $btn.attr('audit_id');
 
-        swal.fire({
-            title: "Ubah Status PTK?",
-            text: teksTanya,
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Ya, Simpan!",
-            cancelButtonText: "Batal",
-            showLoaderOnConfirm: true,
-            preConfirm: function () {
-                return $.ajax({
-                    url: base_url + "/ptk/updatestatus",
-                    type: "POST",
-                    dataType: "json",
-                    data: {
-                        dtjwb_id: dtjwb_id,
-                        status: statusBaru
-                    }
-                }).then(function (res) {
-                    return res;
-                }).fail(function () {
-                    swal.fire("Oops", "Gagal menghubungi server!", "error");
-                });
-            }
-        }).then(function (result) {
-            if (result && (result.value || result === true)) {
-                var res = result.value || result;
-                if (res && res.status) {
-                    $sel.data('sebelumnya', statusBaru);
-                    aturWarnaSelect($sel, statusBaru);
-                    swal.fire({
-                        title: "Berhasil",
-                        text: "Status PTK berhasil diperbarui.",
-                        type: "success",
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
-                } else {
-                    swal.fire("Gagal", (res && res.pesan) ? res.pesan : "Gagal mengubah status.", "error");
-                    $sel.val(statusLama);
-                    aturWarnaSelect($sel, statusLama);
+        $.ajax({
+            url: base_url + "/ptk/getbutir/" + status_audit_id + "/" + status_dtjwb_id,
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                if (!data.status) {
+                    swal.fire("Oops", data.pesan || "Data tidak ditemukan", "error");
+                    return;
                 }
-            } else {
-                $sel.val(statusLama);
-                aturWarnaSelect($sel, statusLama);
+
+                $('#status_dtjwb_id').val(status_dtjwb_id);
+                $('#status_audit_id').val(status_audit_id);
+                $('#status_butir').text(data.lingkup_isi || '-');
+                $('#status_koreksi').text(data.jwb_koreksi || 'Belum ada rencana koreksi');
+                $('#ptk_status').val(data.jwb_status || '');
+                $('#statusModal').modal('show');
+            },
+            error: function () {
+                swal.fire("Oops", "No connection!", "error");
             }
         });
     });
 
+    $('#formstatus').on('submit', function (e) {
+        e.preventDefault();
+
+        var teks = $('#ptk_status').val() || '';
+
+        $('#statusModal').modal('hide');
+        swal.fire({
+            title: 'Menyimpan...',
+            allowEscapeKey: false,
+            allowOutsideClick: false,
+            onOpen: function () {
+                swal.showLoading();
+            }
+        });
+
+        $.ajax({
+            url: base_url + "/ptk/updatestatus",
+            type: "POST",
+            dataType: "json",
+            data: {
+                audit_id: $('#status_audit_id').val(),
+                dtjwb_id: $('#status_dtjwb_id').val(),
+                ptk_status: teks
+            }
+        }).done(function (res) {
+            swal.close();
+
+            if (res && res.status) {
+                daftarptk.ajax.reload();
+                swal.fire({
+                    title: "Berhasil",
+                    text: res.pesan || "Status tersimpan.",
+                    type: "success",
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            } else {
+                swal.fire("Gagal", (res && res.pesan) ? res.pesan : "Gagal menyimpan status.", "error");
+            }
+        }).fail(function () {
+            swal.close();
+            swal.fire("Oops", "Gagal menghubungi server!", "error");
+        });
+    });
 });
 
