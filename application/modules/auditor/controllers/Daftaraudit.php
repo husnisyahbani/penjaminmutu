@@ -5,7 +5,7 @@ class Daftaraudit extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditor';
-        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=2.3"));
+        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=2.4"));
         // Informasi tombol aksi saat hover (lihat assets/app/tabel-aksi.css)
         $this->load->js(base_url("assets/app/tabel-aksi.js?v=1.0"));
         // Tampilan topik & activity pada halaman detail audit.
@@ -401,11 +401,97 @@ class Daftaraudit extends MY_Controller {
         $this->mutu->edit($data);
     }
 
+    /**
+     * Selesaikan penilaian.
+     *
+     * Penilaian hanya boleh diselesaikan bila tujuan setiap pertanyaan sudah
+     * diisi dan pilihan temuan setiap butir daftar tilik (delik) sudah
+     * ditentukan - permintaan PPM. Bila belum lengkap, status audit tidak
+     * diubah dan rincian kekurangannya dikirim balik supaya ditampilkan
+     * kepada auditor (lihat assets/app/auditor/daftaraudit.js).
+     */
     public function selesai() {
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
+
+        $audit_id = (int) $this->input->post('id');
+
+        if ($audit_id < 1) {
+            echo json_encode(array('status' => FALSE, 'pesan' => 'Audit tidak dikenal.'));
+            return;
+        }
+
+        $cek = $this->auditjawab->kelengkapan($audit_id);
+
+        if (!$cek) {
+            echo json_encode(array('status' => FALSE, 'pesan' => 'Audit tidak ditemukan.'));
+            return;
+        }
+
+        if (!$cek['lengkap']) {
+            echo json_encode(array(
+                'status' => FALSE,
+                'pesan'  => $this->_pesanBelumLengkap($cek),
+            ));
+            return;
+        }
+
         $data = array();
-        $data['audit_id'] = $this->input->post('id');
+        $data['audit_id'] = $audit_id;
         $data['audit_status'] = "SELESAI";
-        $this->mutu->edit($data);
+        $status = $this->mutu->edit($data);
+
+        echo json_encode(array(
+            'status' => (bool) $status,
+            'pesan'  => $status
+                ? 'Formulir telah selesai diproses.'
+                : 'Gagal menyimpan perubahan ke database.',
+        ));
+    }
+
+    /**
+     * Susun pesan kekurangan penilaian: berapa tujuan dan berapa butir
+     * daftar tilik yang belum terisi, disertai beberapa contoh supaya
+     * auditor tahu bagian mana yang harus dilengkapi.
+     *
+     * @param  array $cek keluaran AuditjawabModel::kelengkapan()
+     * @return string
+     */
+    private function _pesanBelumLengkap($cek) {
+        $bagian = array();
+
+        if (!empty($cek['tujuan_kosong'])) {
+            $bagian[] = count($cek['tujuan_kosong']) . ' dari ' . $cek['pertanyaan_total']
+                . ' tujuan pertanyaan belum diisi';
+        }
+
+        if (!empty($cek['delik_kosong'])) {
+            $bagian[] = count($cek['delik_kosong']) . ' dari ' . $cek['delik_total']
+                . ' butir daftar tilik belum ditentukan temuannya';
+        }
+
+        $pesan = 'Penilaian belum bisa diselesaikan: ' . implode(' dan ', $bagian) . '.';
+
+        $contoh = array();
+        foreach (array_slice($cek['tujuan_kosong'], 0, 2) as $t) {
+            $contoh[] = '- Tujuan belum diisi pada pertanyaan: ' . $t;
+        }
+        foreach (array_slice($cek['delik_kosong'], 0, 2) as $d) {
+            $contoh[] = '- Temuan belum dipilih pada butir: ' . $d;
+        }
+
+        if (!empty($contoh)) {
+            $pesan .= "\n" . implode("\n", $contoh);
+        }
+
+        /* json_encode gagal bila menjumpai karakter bukan UTF-8 (mis. data
+           impor lama). Balasan yang kosong akan dibaca penampil sebagai
+           penilaian berhasil diselesaikan, jadi karakter itu dibuang dulu. */
+        if (function_exists('mb_convert_encoding')) {
+            $pesan = mb_convert_encoding($pesan, 'UTF-8', 'UTF-8');
+        }
+
+        return $pesan;
     }
 
     public function hapus() {

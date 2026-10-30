@@ -266,6 +266,17 @@ $(function () {
         selesai(id);
     });
 
+    /* Pesan balasan server bisa berbaris-baris (rincian kekurangan
+       penilaian). Ubah menjadi HTML yang aman sebelum ditampilkan swal. */
+    function teksAman(pesan)
+    {
+        if (!pesan) {
+            return '';
+        }
+
+        return $('<div/>').text(pesan).html().replace(/\n/g, '<br>');
+    }
+
     function selesai($id)
     {
         swal.fire({
@@ -283,9 +294,31 @@ $(function () {
                     data: { id: $id}
                 })
                         .done(function (data) {
+                            var hasil = data;
+                            if (typeof data === 'string') {
+                                try {
+                                    hasil = $.parseJSON(data);
+                                } catch (e) {
+                                    hasil = null;
+                                }
+                            }
+
+                            /* Penilaian yang belum lengkap (tujuan pertanyaan
+                               atau pilihan temuan butir tilik belum terisi)
+                               tidak jadi diselesaikan: server mengirim status
+                               false beserta rincian kekurangannya. */
+                            if (hasil && hasil.status === false) {
+                                swal.fire({
+                                    title: "Penilaian Belum Bisa Diselesaikan",
+                                    html: teksAman(hasil.pesan),
+                                    type: "error"
+                                });
+                                return;
+                            }
+
                             swal.fire({
                                 title: "Selesai",
-                                text: "Formulir Telah Selesai Diproses!",
+                                text: (hasil && hasil.pesan) ? hasil.pesan : "Formulir Telah Selesai Diproses!",
                                 type: "success",
                                 preConfirm: function () {
                                     daftaraudit.ajax.reload();

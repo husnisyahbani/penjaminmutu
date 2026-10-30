@@ -647,4 +647,191 @@ class AuditjawabModel extends CI_Model {
         return $this->petaaudit->lingkupMilikAudit($audit_id, $lingkup_id);
     }
 
+
+    /* =========================================================================
+       Pemeriksaan kelengkapan penilaian
+       Dipakai tombol "Selesaikan penilaian" pada daftar audit auditor:
+       penilaian hanya boleh diselesaikan bila tujuan setiap pertanyaan sudah
+       diisi dan pilihan temuan setiap butir daftar tilik sudah ditentukan.
+       ========================================================================= */
+
+    /**
+     * Teks dianggap terisi bila setelah tag HTML, entitas, dan spasi kosong
+     * dibuang masih menyisakan isi. Berguna untuk kolom yang diisi dengan
+     * penyunting kaya (summernote): "<p><br></p>" atau "&nbsp;" harus
+     * dihitung kosong.
+     *
+     * @param  string $teks
+     * @return bool
+     */
+    private function _teksTerisi($teks) {
+        if (!is_string($teks)) {
+            return FALSE;
+        }
+
+        $teks = html_entity_decode(strip_tags($teks), ENT_QUOTES, 'UTF-8');
+        /* &nbsp; (U+00A0) tidak dibuang trim(), jadi diganti spasi dulu. */
+        $teks = str_replace("\xC2\xA0", ' ', $teks);
+
+        return trim($teks) !== '';
+    }
+
+    /**
+     * Ringkas teks pertanyaan/butir untuk ditampilkan pada pesan kekurangan.
+     *
+     * @param  string $teks
+     * @param  int    $maks jumlah karakter
+     * @return string
+     */
+    private function _ringkasTeks($teks, $maks = 70) {
+        $teks = html_entity_decode(strip_tags((string) $teks), ENT_QUOTES, 'UTF-8');
+        $teks = str_replace("\xC2\xA0", ' ', $teks);
+        $teks = trim(preg_replace('/\s+/', ' ', $teks));
+
+        if ($teks === '') {
+            return '(tanpa teks)';
+        }
+
+        $panjang = function_exists('mb_strlen') ? mb_strlen($teks, 'UTF-8') : strlen($teks);
+        if ($panjang > $maks) {
+            $teks = function_exists('mb_substr')
+                ? mb_substr($teks, 0, $maks - 1, 'UTF-8')
+                : substr($teks, 0, $maks - 1);
+            $teks .= '...';
+        }
+
+        return $teks;
+    }
+
+    /**
+     * Periksa apakah penilaian audit sudah lengkap sehingga boleh
+     * diselesaikan.
+     *
+     * Syaratnya (permintaan PPM):
+     *   1. Tujuan terisi pada SETIAP pertanyaan formulir audit
+     *      (mutu_auditjawab.jwb_tujuan - diisi auditor pada halaman Daftar
+     *      Tilik, lihat Delik::tujuan()).
+     *   2. Pilihan temuan terisi pada SETIAP butir daftar tilik / delik
+     *      (mutu_auditjawabdetail.dtjwb_temuan: S, OB, TS MINOR, TS MAYOR).
+     *
+     * Butir tilik yang dihitung sama dengan yang tampil pada halaman Daftar
+     * Tilik (barisTilik()): seluruh butir mutu_lingkup pada pertanyaan
+     * formulir ini, ditambah baris lama yang belum dipetakan ke butir mana
+     * pun (lingkup_id NULL).
+     *
+     * @param  int $audit_id
+     * @return array|FALSE FALSE bila audit tidak ditemukan; selainnya
+     *                     pertanyaan_total, tujuan_kosong (daftar teks),
+     *                     delik_total, delik_kosong (daftar teks), lengkap
+     */
+    public function kelengkapan($audit_id) {
+        $audit_id = (int) $audit_id;
+
+        $audit = $this->db->select('form_id')
+            ->where('audit_id', $audit_id)
+            ->get('audit')
+            ->row_array();
+
+        if (!$audit) {
+            return FALSE;
+        }
+
+        $form_id = (int) $audit['form_id'];
+
+        /* --- 1. Tujuan pada setiap pertanyaan -------------------------- */
+        $this->db->select('dtform_id, dtform_pertanyaan');
+        $this->db->from('detailform');
+        $this->db->where('form_id', $form_id);
+        $this->db->order_by('dtform_id', 'asc');
+        $pertanyaan = $this->db->get()->result_array();
+
+        /* Tujuan tersimpan pada baris pertanyaan (lingkup_id NULL). */
+        $tujuan_ada = array();
+        $this->db->select('dtform_id, jwb_tujuan');
+        $this->db->from('auditjawab');
+        $this->db->where('audit_id', $audit_id);
+        if ($this->_adaLingkup()) {
+            $this->db->where('lingkup_id IS NULL', NULL, FALSE);
+        }
+        foreach ($this->db->get()->result_array() as $j) {
+            if ($this->_teksTerisi($j['jwb_tujuan'])) {
+                $tujuan_ada[(int) $j['dtform_id']] = TRUE;
+            }
+        }
+
+        $tujuan_kosong = array();
+        foreach ($pertanyaan as $p) {
+            if (!isset($tujuan_ada[(int) $p['dtform_id']])) {
+                $tujuan_kosong[] = $this->_ringkasTeks($p['dtform_pertanyaan']);
+            }
+        }
+
+        /* --- 2. Temuan pada setiap butir tilik ------------------------- */
+        $delik_total  = 0;
+        $delik_kosong = array();
+
+        $pakai_lingkup = $this->db->table_exists('lingkup')
+            && $this->db->field_exists('lingkup_id', 'auditjawabdetail');
+
+        if ($pakai_lingkup) {
+            /* Nilai yang sudah tersimpan per butir lingkup. */
+            $nilai = array();
+            $this->db->select('d.lingkup_id, d.dtjwb_temuan');
+            $this->db->from('auditjawabdetail d');
+            $this->db->join('auditjawab j', 'j.jwb_id = d.jwb_id', 'inner');
+            $this->db->where('j.audit_id', $audit_id);
+            $this->db->where('d.lingkup_id IS NOT NULL', NULL, FALSE);
+            foreach ($this->db->get()->result_array() as $d) {
+                $lid = (int) $d['lingkup_id'];
+                if ($lid > 0 && !isset($nilai[$lid]) && $this->_teksTerisi($d['dtjwb_temuan'])) {
+                    $nilai[$lid] = TRUE;
+                }
+            }
+
+            /* Butir wajib: seluruh butir mutu_lingkup pada formulir audit ini. */
+            $this->db->select('lg.lingkup_id, lg.lingkup_isi');
+            $this->db->from('lingkup lg');
+            $this->db->join('detailform dt', 'dt.dtform_id = lg.dtform_id', 'inner');
+            $this->db->where('dt.form_id', $form_id);
+            $this->db->order_by('lg.dtform_id', 'asc');
+            $this->db->order_by('lg.lingkup_urut', 'asc');
+            $this->db->order_by('lg.lingkup_id', 'asc');
+            foreach ($this->db->get()->result_array() as $b) {
+                $delik_total++;
+                if (!isset($nilai[(int) $b['lingkup_id']])) {
+                    $delik_kosong[] = $this->_ringkasTeks($b['lingkup_isi']);
+                }
+            }
+
+            /* Baris tilik lama yang belum dipetakan ke butir mana pun tetap
+               wajib dinilai (bagian "b" pada barisTilik()). */
+            $this->db->select('d.dtjwb_pertanyaan, d.dtjwb_temuan');
+            $this->db->from('auditjawabdetail d');
+            $this->db->join('auditjawab j', 'j.jwb_id = d.jwb_id', 'inner');
+            $this->db->where('j.audit_id', $audit_id);
+            $this->db->where('d.lingkup_id IS NULL', NULL, FALSE);
+        } else {
+            /* Struktur lama: butir tilik ada di mutu_auditjawabdetail. */
+            $this->db->select('d.dtjwb_pertanyaan, d.dtjwb_temuan');
+            $this->db->from('auditjawabdetail d');
+            $this->db->join('auditjawab j', 'j.jwb_id = d.jwb_id', 'inner');
+            $this->db->where('j.audit_id', $audit_id);
+        }
+
+        foreach ($this->db->get()->result_array() as $d) {
+            $delik_total++;
+            if (!$this->_teksTerisi($d['dtjwb_temuan'])) {
+                $delik_kosong[] = $this->_ringkasTeks($d['dtjwb_pertanyaan']);
+            }
+        }
+
+        return array(
+            'pertanyaan_total' => count($pertanyaan),
+            'tujuan_kosong'    => $tujuan_kosong,
+            'delik_total'      => $delik_total,
+            'delik_kosong'     => $delik_kosong,
+            'lengkap'          => empty($tujuan_kosong) && empty($delik_kosong),
+        );
+    }
+
 }
