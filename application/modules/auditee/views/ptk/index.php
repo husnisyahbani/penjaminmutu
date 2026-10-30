@@ -112,7 +112,7 @@
                     </header>
                     <div class="panel-body">
                         <div class="ptk-tabel-kotak">
-                            <table class="table table-hover dataTable ptk-tabel" id="ptk">
+                            <table class="table table-hover dataTable ptk-tabel ptk-tabel--ptk" id="ptk">
                                 <thead>
                                     <tr>
                                         <th class="ptk-kolom-no">No</th>

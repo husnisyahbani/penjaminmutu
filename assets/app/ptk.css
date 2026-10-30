@@ -143,13 +143,107 @@
     text-align: left;
 }
 
-/* Tabel dengan 10 kolom butuh ruang lebih; kotaknya tetap bisa digeser
-   mendatar (lihat .ptk-tabel-kotak). */
 /* Tabel dengan 10 kolom butuh ruang lebih; kolomnya sengaja dibuat lebar
    supaya teks penuh tidak menumpuk ke bawah. Kelebihan lebarnya digeser
    mendatar lewat .ptk-tabel-kotak. */
 .ptk-tabel--lengkap {
     min-width: 1800px;
+}
+
+/* -----------------------------------------------------------------------------
+
+   Tabel PTK (.ptk-tabel--ptk): Butir Lingkup & Hasil selebar 2x lipat.
+
+   Lebar kolom memakai persen dan tabelnya table-layout: fixed, maka
+   penggandaan dilakukan lewat min-width tabel yang diperbesar. Dengan begitu
+   Butir Lingkup dan Hasil benar-benar dua kali lebih lebar, sementara kolom
+   lain (Catatan, Rencana Koreksi, Status, dst.) tidak ikut menyusut.
+   Perbandingan lebar kolom (sebelum -> sesudah):
+     - PTK auditee/PPM: Butir 290px -> 576px, Hasil 158px -> 324px
+       (min-width 1320px -> 1800px)
+     - PTK auditor     : Butir 342px -> 682px, Hasil 198px -> 400px
+       (min-width 1800px -> 2350px)
+   Hanya tabel PTK yang berubah; daftar tilik (.ptk-tabel saja) tetap seperti
+   sediakala.
+   -------------------------------------------------------------------------- */
+
+/* PTK auditee (8 kolom) */
+.ptk-tabel--ptk {
+    min-width: 1800px;
+}
+
+.ptk-tabel--ptk .ptk-kolom-no {
+    width: 3%;
+}
+
+.ptk-tabel--ptk .ptk-kolom-formulir {
+    width: 9%;
+}
+
+.ptk-tabel--ptk .ptk-kolom-butir {
+    width: 32%;
+}
+
+.ptk-tabel--ptk .ptk-kolom-hasil {
+    width: 18%;
+}
+
+.ptk-tabel--ptk .ptk-kolom-temuan {
+    width: 6%;
+}
+
+.ptk-tabel--ptk .ptk-kolom-catatan {
+    width: 10%;
+}
+
+.ptk-tabel--ptk .ptk-kolom-koreksi {
+    width: 13%;
+}
+
+.ptk-tabel--ptk .ptk-kolom-status {
+    width: 9%;
+}
+
+/* PTK auditor & PPM (10 kolom) */
+.ptk-tabel--ptk.ptk-tabel--lengkap {
+    min-width: 2350px;
+}
+
+.ptk-tabel--ptk.ptk-tabel--lengkap .ptk-kolom-no {
+    width: 2%;
+}
+
+.ptk-tabel--ptk.ptk-tabel--lengkap .ptk-kolom-formulir {
+    width: 8%;
+}
+
+.ptk-tabel--ptk.ptk-tabel--lengkap .ptk-kolom-auditee,
+.ptk-tabel--ptk.ptk-tabel--lengkap .ptk-kolom-unit {
+    width: 6%;
+}
+
+.ptk-tabel--ptk.ptk-tabel--lengkap .ptk-kolom-butir {
+    width: 29%;
+}
+
+.ptk-tabel--ptk.ptk-tabel--lengkap .ptk-kolom-hasil {
+    width: 17%;
+}
+
+.ptk-tabel--ptk.ptk-tabel--lengkap .ptk-kolom-temuan {
+    width: 5%;
+}
+
+.ptk-tabel--ptk.ptk-tabel--lengkap .ptk-kolom-catatan {
+    width: 11%;
+}
+
+.ptk-tabel--ptk.ptk-tabel--lengkap .ptk-kolom-koreksi {
+    width: 9%;
+}
+
+.ptk-tabel--ptk.ptk-tabel--lengkap .ptk-kolom-status {
+    width: 7%;
 }
 
 /* Isi sel yang panjang dipotong beberapa baris saja supaya tinggi baris
@@ -210,6 +304,13 @@
     }
     .ptk-tabel--lengkap {
         min-width: 1800px;
+    }
+    /* Tabel PTK: Butir Lingkup & Hasil 2x lebih lebar (lihat .ptk-tabel--ptk). */
+    .ptk-tabel--ptk {
+        min-width: 1800px;
+    }
+    .ptk-tabel--ptk.ptk-tabel--lengkap {
+        min-width: 2350px;
     }
 }
 
