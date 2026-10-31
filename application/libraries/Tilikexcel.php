@@ -123,10 +123,42 @@ class Tilikexcel {
      * @param array  $data        kunci: tanggal_audit, unit, auditor, auditee,
      *                            baris (keluaran susun())
      */
+    /**
+     * Susun berkas Daftar Tilik AMI lalu kirim ke peramban (langsung keluar).
+     *
+     * @param string $nama_berkas nama berkas tanpa ekstensi
+     * @param array  $data        kunci: tanggal_audit, unit, auditor, auditee,
+     *                            baris (keluaran susun())
+     */
     public function unduh($nama_berkas, $data) {
         $excel = new PHPExcel();
-        $sheet = $excel->getSheet(0);
-        $sheet->setTitle('Daftar Tilik AMI');
+        $this->lembar($excel, $data, 'Daftar Tilik AMI', 0);
+        $this->kirim($excel, $nama_berkas);
+    }
+
+    /**
+     * Bentuk SATU lembar Daftar Tilik AMI pada buku kerja yang sudah ada.
+     *
+     * Dipakai unduh() (satu lembar) dan oleh tombol "Unduh hasil audit" pada
+     * daftar audit, yang dapat menampung beberapa audit sekaligus - satu
+     * lembar per audit.
+     *
+     * @param  PHPExcel $excel
+     * @param  array    $data       kunci: tanggal_audit, unit, auditor,
+     *                              auditee, baris (keluaran susun())
+     * @param  string   $nama_sheet nama lembar (dibersihkan & dibatasi 31
+     *                              karakter mengikuti aturan Excel)
+     * @param  int      $index      0 = lembar pertama yang sudah tersedia
+     * @return PHPExcel_Worksheet
+     */
+    public function lembar($excel, $data, $nama_sheet = 'Daftar Tilik AMI', $index = 0) {
+        if ((int) $index === 0) {
+            $sheet = $excel->setActiveSheetIndex(0);
+        } else {
+            $sheet = $excel->createSheet((int) $index);
+            $excel->setActiveSheetIndex((int) $index);
+        }
+        $sheet->setTitle($this->_namaSheet($nama_sheet));
         $sheet->getDefaultStyle()->getFont()->setName('Arial')->setSize(10);
 
         foreach ($this->lebar as $huruf => $lebar) {
@@ -173,8 +205,19 @@ class Tilikexcel {
         $this->_halaman($sheet, $total_tinggi);
         $this->_aturCetak($sheet, 'A1:K' . $footer, $total_tinggi);
 
-        /* ---------------- kirim ---------------- */
-        $nama = preg_replace('/[^A-Za-z0-9_\-]/', '-', (string) $nama_berkas);
+        return $sheet;
+    }
+
+    /**
+     * Kirim buku kerja ke peramban sebagai berkas .xlsx lalu hentikan
+     * permintaan (dipanggil paling akhir).
+     *
+     * @param PHPExcel $excel
+     * @param string   $nama_berkas nama berkas tanpa ekstensi
+     */
+    public function kirim($excel, $nama_berkas) {
+        $nama = trim(preg_replace('/[^A-Za-z0-9_\-]+/', '-', (string) $nama_berkas), '-');
+        $nama = preg_replace('/-{2,}/', '-', $nama);
         if ($nama === '') {
             $nama = 'Daftar-Tilik-AMI';
         }
@@ -367,35 +410,66 @@ class Tilikexcel {
      * @param int                $jumlah jumlah baris yang disediakan
      * @param array              $tinggi tinggi baris (diubah bila perlu)
      */
+    /**
+     * Baris isian (dimulai baris 13).
+     *
+     * Gaya diterapkan per baris, bukan per sel, supaya ekspor yang memuat
+     * ratusan butir (tombol "Unduh hasil audit" tanpa saringan pertanyaan)
+     * tidak memakan waktu dan memori berlebih.
+     *
+     * @param PHPExcel_Worksheet $sheet
+     * @param array              $baris  keluaran susun()
+     * @param int                $jumlah jumlah baris yang disediakan
+     * @param array              $tinggi tinggi baris (diubah bila perlu)
+     */
     private function _isian($sheet, $baris, $jumlah, &$tinggi) {
-        $isi    = array('vertikal' => 'atas', 'bungkus' => TRUE);
-        $nomor  = array('rata' => 'tengah', 'vertikal' => 'tengah', 'bungkus' => TRUE, 'angka' => TRUE);
-        $tanda  = array('rata' => 'tengah', 'vertikal' => 'tengah');
-        $baris  = is_array($baris) ? $baris : array();
+        $baris = is_array($baris) ? $baris : array();
+        $lebar_catatan = $this->lebar['J'] + $this->lebar['K'];
 
         for ($i = 0; $i < $jumlah; $i++) {
             $b = $this->baris_awal + $i;
             $r = isset($baris[$i]) ? $baris[$i] : array();
             $temuan = isset($r['temuan']) ? $r['temuan'] : '';
+            $rentang = 'A' . $b . ':K' . $b;
 
-            $this->_isi($sheet, 'A' . $b, $i + 1, $nomor);
-            $this->_isi($sheet, 'B' . $b, $this->ambil($r, 'tujuan'), $isi);
-            $this->_isi($sheet, 'C' . $b, $this->ambil($r, 'referensi'), $isi);
-            $this->_isi($sheet, 'D' . $b, $this->ambil($r, 'pertanyaan'), $isi);
-            $this->_isi($sheet, 'E' . $b, $this->ambil($r, 'hasil'), $isi);
-            $this->_isi($sheet, 'F' . $b, $this->penanda($temuan, 'S'), $tanda);
-            $this->_isi($sheet, 'G' . $b, $this->penanda($temuan, 'OB'), $tanda);
-            $this->_isi($sheet, 'H' . $b, $this->penanda($temuan, 'TS MAYOR'), $tanda);
-            $this->_isi($sheet, 'I' . $b, $this->penanda($temuan, 'TS MINOR'), $tanda);
-            $this->_isi($sheet, 'J' . $b . ':K' . $b, $this->ambil($r, 'catatan'), $isi);
+            /* ---- gaya satu baris ---- */
+            $sheet->getStyle($rentang)->applyFromArray($this->_gayaKotak());
+            $sheet->getStyle($rentang)->getFont()->setName('Arial')->setSize(10);
+            $sheet->getStyle($rentang)->getAlignment()
+                ->setWrapText(TRUE)
+                ->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP)
+                ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+            $sheet->getStyle('A' . $b)->getAlignment()
+                ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)
+                ->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+            $sheet->getStyle('F' . $b . ':I' . $b)->getAlignment()
+                ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)
+                ->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
 
-            /* Tinggi baris mengikuti isian terpanjang pada kolom B..E. */
+            /* Catatan menempati dua kolom (J:K). */
+            $sheet->mergeCells('J' . $b . ':K' . $b);
+
+            /* ---- isi ---- */
+            $sheet->setCellValue('A' . $b, $i + 1);
+            $sheet->setCellValueExplicit('B' . $b, $this->ambil($r, 'tujuan'), PHPExcel_Cell_DataType::TYPE_STRING);
+            $sheet->setCellValueExplicit('C' . $b, $this->ambil($r, 'referensi'), PHPExcel_Cell_DataType::TYPE_STRING);
+            $sheet->setCellValueExplicit('D' . $b, $this->ambil($r, 'pertanyaan'), PHPExcel_Cell_DataType::TYPE_STRING);
+            $sheet->setCellValueExplicit('E' . $b, $this->ambil($r, 'hasil'), PHPExcel_Cell_DataType::TYPE_STRING);
+            $sheet->setCellValueExplicit('F' . $b, $this->penanda($temuan, 'S'), PHPExcel_Cell_DataType::TYPE_STRING);
+            $sheet->setCellValueExplicit('G' . $b, $this->penanda($temuan, 'OB'), PHPExcel_Cell_DataType::TYPE_STRING);
+            $sheet->setCellValueExplicit('H' . $b, $this->penanda($temuan, 'TS MAYOR'), PHPExcel_Cell_DataType::TYPE_STRING);
+            $sheet->setCellValueExplicit('I' . $b, $this->penanda($temuan, 'TS MINOR'), PHPExcel_Cell_DataType::TYPE_STRING);
+            $sheet->setCellValueExplicit('J' . $b, $this->ambil($r, 'catatan'), PHPExcel_Cell_DataType::TYPE_STRING);
+
+            /* Tinggi baris mengikuti isian terpanjang pada kolom B..E dan
+               catatan (J:K). */
             $butuh = $this->tinggi_isi;
             foreach (array('B' => 'tujuan', 'C' => 'referensi', 'D' => 'pertanyaan', 'E' => 'hasil') as $huruf => $kunci) {
                 $butuh = max($butuh, $this->_tinggiTeks(
                     $this->ambil($r, $kunci), $this->lebar[$huruf]
                 ));
             }
+            $butuh = max($butuh, $this->_tinggiTeks($this->ambil($r, 'catatan'), $lebar_catatan));
             $butuh = min(409, (int) ceil($butuh));    // batas tinggi baris Excel
             $tinggi[$b] = max($tinggi[$b], $butuh);
         }
@@ -420,6 +494,19 @@ class Tilikexcel {
        BANTUAN
        ================================================================== */
 
+    /**
+     * Bersihkan nama lembar: karakter terlarang Excel diganti spasi dan
+     * panjangnya dibatasi 31 karakter.
+     */
+    private function _namaSheet($nama) {
+        $nama = trim(preg_replace('/[\\\/\?\*\[\]:]+/', ' ', (string) $nama));
+        if ($nama === '') {
+            $nama = 'Daftar Tilik AMI';
+        }
+
+        return substr($nama, 0, 31);
+    }
+
     /** Ambil kunci dari array dengan aman. */
     public function ambil($data, $kunci) {
         return isset($data[$kunci]) ? $data[$kunci] : '';
@@ -430,13 +517,9 @@ class Tilikexcel {
         return ($temuan === $kode) ? 'X' : '';
     }
 
-    /** Border tipis + latar putih pada rentang (digabung bila perlu). */
-    private function _kotak($sheet, $rentang) {
-        if (strpos($rentang, ':') !== FALSE) {
-            $sheet->mergeCells($rentang);
-        }
-
-        $sheet->getStyle($rentang)->applyFromArray(array(
+    /** Border tipis + latar putih: susunan gaya yang dipakai _kotak(). */
+    private function _gayaKotak() {
+        return array(
             'borders' => array(
                 'allborders' => array(
                     'style' => PHPExcel_Style_Border::BORDER_THIN,
@@ -447,7 +530,16 @@ class Tilikexcel {
                 'type'  => PHPExcel_Style_Fill::FILL_SOLID,
                 'color' => array('rgb' => 'FFFFFF'),
             ),
-        ));
+        );
+    }
+
+    /** Border tipis + latar putih pada rentang (digabung bila perlu). */
+    private function _kotak($sheet, $rentang) {
+        if (strpos($rentang, ':') !== FALSE) {
+            $sheet->mergeCells($rentang);
+        }
+
+        $sheet->getStyle($rentang)->applyFromArray($this->_gayaKotak());
     }
 
     /**
