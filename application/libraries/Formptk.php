@@ -64,6 +64,17 @@ class Formptk {
     /** Baris terakhir form (footer berakhir di baris 40). */
     var $baris_akhir = 40;
 
+    /** Tinggi baris yang dipakai pada lembar sedang dibentuk (bisa membesar). */
+    var $tinggi_terpakai = array();
+
+    /* Batas tinggi form (poin) yang masih dicetak pada SATU halaman.
+       Kertas A4 portrait dengan margin 0.5" menyisakan +/- 770 pt; form
+       bawaan +/- 894 pt, jadi sudah menyesuaikan skala. Bila isian
+       membuat form jauh lebih tinggi, cetak dialirkan ke halaman
+       berikutnya (fitToHeight 0) supaya hurufnya tidak mengecil sampai
+       tidak terbaca. */
+    var $tinggi_maks = 1150;
+
     function __construct() {
         require_once APPPATH . 'third_party/PHPExcel.php';
         require_once APPPATH . 'third_party/PHPExcel/IOFactory.php';
@@ -227,9 +238,10 @@ class Formptk {
         foreach ($this->lebar as $huruf => $lebar) {
             $sheet->getColumnDimension($huruf)->setWidth($lebar);
         }
-        foreach ($this->tinggi as $baris => $tinggi) {
-            $sheet->getRowDimension($baris)->setRowHeight($tinggi);
-        }
+
+        /* Tinggi baris diterapkan SETELAH seluruh isi ditulis: isian yang
+           panjang dapat menambah tinggi bloknya (lihat _sesuaikanTinggi). */
+        $this->tinggi_terpakai = $this->tinggi;
 
         /* ---- 1. judul ---- */
         $this->_blok($sheet, 'A1:H1', 'PERMINTAAN TINDAKAN KOREKSI (PTK)', array(
@@ -307,7 +319,11 @@ class Formptk {
         ), 'tengah');
         $this->_blok($sheet, 'G38:H40', 'Paraf PPM', array('ukuran' => 8, 'rata' => 'tengah', 'vertikal' => 'atas'));
 
-        $this->_aturCetak($sheet);
+        foreach ($this->tinggi_terpakai as $baris => $tinggi) {
+            $sheet->getRowDimension($baris)->setRowHeight($tinggi);
+        }
+
+        $this->_aturCetak($sheet, array_sum($this->tinggi_terpakai));
     }
 
     /* ==================================================================
@@ -369,6 +385,11 @@ class Formptk {
             $sheet->setCellValueExplicit(
                 $this->awal($rentang), (string) $nilai, PHPExcel_Cell_DataType::TYPE_STRING
             );
+            /* Isian yang panjang melebihi tinggi bawaan -> tinggi blok
+               ditambah. Excel tidak pernah menyesuaikan tinggi sel yang
+               digabung (merge) secara otomatis. */
+            $this->_sesuaikanTinggi($rentang, $nilai,
+                isset($gaya['ukuran']) ? (int) $gaya['ukuran'] : 10);
         }
 
         $this->_gaya($sheet, $rentang, $gaya);
@@ -415,6 +436,18 @@ class Formptk {
         }
 
         $sheet->setCellValue($this->awal($rentang), $kaya);
+
+        /* Ukur juga teks kepala/footer: bila melipat, barisnya ditinggikan. */
+        $gabung = '';
+        $ukuran = 10;
+        foreach ($bagian as $b) {
+            $gabung .= isset($b[0]) ? $b[0] : '';
+            if (isset($b[1]['ukuran']) && (int) $b[1]['ukuran'] > $ukuran) {
+                $ukuran = (int) $b[1]['ukuran'];
+            }
+        }
+        $this->_sesuaikanTinggi($rentang, $gabung, $ukuran);
+
         $this->_gaya($sheet, $rentang, array('rata' => $rata, 'vertikal' => 'tengah'));
     }
 
@@ -468,6 +501,110 @@ class Formptk {
         }
     }
 
+    /**
+     * Tambah tinggi blok bila teksnya tidak muat pada tinggi bawaan.
+     *
+     * Excel tidak pernah menyesuaikan tinggi sel yang digabung (merge)
+     * secara otomatis, maka tinggi dihitung sendiri: jumlah baris teks
+     * (pemotongan baris otomatis dihitung dari lebar kolom) dikali tinggi
+     * satu baris, lalu dibagi rata ke seluruh baris yang digabung.
+     *
+     * @param string $rentang mis. 'A12:H16'
+     * @param string $teks    isi sel
+     * @param int    $ukuran  ukuran font (pt)
+     */
+    private function _sesuaikanTinggi($rentang, $teks, $ukuran = 10) {
+        $teks = (string) $teks;
+        if ($teks === '') {
+            return;
+        }
+
+        if (!preg_match('/^([A-Z]+)(\d+)(?::([A-Z]+)(\d+))?$/', $rentang, $m)) {
+            return;
+        }
+
+        $kolom_awal  = $m[1];
+        $kolom_akhir = (isset($m[3]) && $m[3] !== '') ? $m[3] : $m[1];
+        $baris_awal  = (int) $m[2];
+        $baris_akhir = (isset($m[4]) && $m[4] !== '') ? (int) $m[4] : (int) $m[2];
+
+        /* Jumlah baris: baris nyata (tanda 
+) ditambah pemotongan otomatis. */
+        $per_baris = $this->_karakterPerBaris(
+            $this->_lebarRentang($kolom_awal, $kolom_akhir), $ukuran
+        );
+
+        $jumlah_baris = 0;
+        foreach (explode("\n", $teks) as $baris) {
+            $panjang = strlen($baris);
+            $jumlah_baris += max(1, (int) ceil($panjang / $per_baris));
+        }
+
+        /* Tinggi satu baris = 1,35 x ukuran font (sudah longgar untuk
+           Arial), ditambah jarak tepi 6 pt. Karena itu isian satu baris
+           tidak mengubah tinggi bawaan, sedangkan isian panjang
+           menambahnya. */
+        $tinggi_butuh = $jumlah_baris * ($ukuran * 1.35) + 6;
+
+        $jumlah_sel = $baris_akhir - $baris_awal + 1;
+        $tinggi_ada = 0;
+        for ($b = $baris_awal; $b <= $baris_akhir; $b++) {
+            $tinggi_ada += isset($this->tinggi_terpakai[$b]) ? $this->tinggi_terpakai[$b] : 20;
+        }
+
+        if ($tinggi_butuh <= $tinggi_ada) {
+            return;                     // masih muat pada tinggi bawaan
+        }
+
+        $per_row = $tinggi_butuh / $jumlah_sel;
+        if ($per_row > 409) {
+            $per_row = 409;             // batas tinggi baris Excel
+        }
+        $per_row = (int) ceil($per_row);
+
+        for ($b = $baris_awal; $b <= $baris_akhir; $b++) {
+            $lama = isset($this->tinggi_terpakai[$b]) ? $this->tinggi_terpakai[$b] : 20;
+            $this->tinggi_terpakai[$b] = max($lama, $per_row);
+        }
+    }
+
+    /**
+     * Perkiraan jumlah karakter yang muat pada satu baris.
+     *
+     * 1 satuan lebar kolom ~ 5,25 pt; lebar rata-rata huruf Arial ~ 0,5 x
+     * ukuran font. Dikali 0,95 agar perhitungan sedikit berhati-hati
+     * (lebih tinggi daripada kepotong).
+     *
+     * @param  int $lebar  total lebar kolom (satuan Excel)
+     * @param  int $ukuran ukuran font (pt)
+     * @return int
+     */
+    private function _karakterPerBaris($lebar, $ukuran) {
+        if ($lebar <= 0 || $ukuran <= 0) {
+            return 40;
+        }
+
+        $per_baris = floor((($lebar * 5.25) / ($ukuran * 0.5)) * 0.95);
+
+        return max(8, (int) $per_baris);
+    }
+
+    /** Total lebar (satuan Excel) kolom-kolom dalam rentang. */
+    private function _lebarRentang($kolom_awal, $kolom_akhir) {
+        $huruf = array_keys($this->lebar);
+        $i1    = PHPExcel_Cell::columnIndexFromString($kolom_awal) - 1;
+        $i2    = PHPExcel_Cell::columnIndexFromString($kolom_akhir) - 1;
+
+        $total = 0;
+        for ($i = $i1; $i <= $i2; $i++) {
+            if (isset($huruf[$i])) {
+                $total += $this->lebar[$huruf[$i]];
+            }
+        }
+
+        return $total;
+    }
+
     /** Sel pertama dari sebuah rentang ('C3:H3' -> 'C3'). */
     private function awal($rentang) {
         list($awal, $akhir) = $this->ujung($rentang);
@@ -487,14 +624,24 @@ class Formptk {
        PENGATURAN CETAK & TEKS
        ================================================================== */
 
-    /** Kertas A4 portrait, fit to one page, tanpa gridlines, di tengah. */
-    private function _aturCetak($sheet) {
+    /**
+     * Kertas A4 portrait, tanpa gridlines, di tengah halaman.
+     *
+     * Form yang masih muat dicetak pada SATU halaman (fit to one page).
+     * Bila isian panjang membuat tinggi form melewati batas, pencetakan
+     * dialirkan ke halaman berikutnya (fitToHeight 0, lebar tetap pas)
+     * supaya tulisannya tidak mengecil sampai tidak terbaca.
+     *
+     * @param PHPExcel_Worksheet $sheet
+     * @param int                $total_tinggi tinggi seluruh baris (poin)
+     */
+    private function _aturCetak($sheet, $total_tinggi = 0) {
         $atur = $sheet->getPageSetup();
         $atur->setPaperSize(PHPExcel_Worksheet_PageSetup::PAPERSIZE_A4);
         $atur->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_PORTRAIT);
         $atur->setFitToPage(TRUE);
         $atur->setFitToWidth(1);
-        $atur->setFitToHeight(1);
+        $atur->setFitToHeight(($total_tinggi > 0 && $total_tinggi > $this->tinggi_maks) ? 0 : 1);
         $atur->setHorizontalCentered(TRUE);
         $atur->setVerticalCentered(TRUE);
         $atur->setPrintArea('A1:H' . $this->baris_akhir);
