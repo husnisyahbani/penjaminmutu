@@ -231,6 +231,11 @@
                   <button type="button" class="btn btn-sm btn-primary" id="tambahtilik">
                     <i class="icon md-plus" aria-hidden="true"></i>Tambah Butir Tilik
                   </button>
+                  <a href="#" class="btn btn-sm btn-success" id="unduh_tilik"
+                     data-audit_id="<?php echo (int) $audit_id; ?>"
+                     data-dtform_id="<?php echo (int) $dtform_id; ?>">
+                    <i class="icon md-download" aria-hidden="true"></i>Unduh Excel
+                  </a>
                 </div>
               </div>
             </div>

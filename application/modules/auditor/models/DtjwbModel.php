@@ -75,6 +75,11 @@ class DtjwbModel extends CI_Model {
            jwb_hasil/jwb_temuan/jwb_catatan tetap membaca nilainya. */
         $this->db->select('dj.dtjwb_hasil AS jwb_hasil, dj.dtjwb_temuan AS jwb_temuan,'
             . ' dj.dtjwb_catatan AS jwb_catatan', FALSE);
+        /* Tanggal butir tilik dibuat: dipakai sebagai Tanggal Audit pada
+           Daftar Tilik AMI (tabel mutu_auditjawabdetail). */
+        if ($this->db->field_exists('dtjwb_create', 'auditjawabdetail')) {
+            $this->db->select('dj.dtjwb_create', FALSE);
+        }
         /* Jawaban auditee: kolom per butir bila ada (data lama), jika tidak
            dipakai jawaban pertanyaan (jwb_jawaban) sebagai cadangan. */
         if ($this->db->field_exists('dtjwb_jawaban', 'auditjawabdetail')) {

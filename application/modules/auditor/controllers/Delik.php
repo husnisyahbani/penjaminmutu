@@ -5,7 +5,7 @@ class Delik extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditor';
-        $this->load->js(base_url("assets/app/auditor/delik.js?v=5.1"));
+        $this->load->js(base_url("assets/app/auditor/delik.js?v=5.2"));
         $this->load->model('AuditjawabModel', 'auditjawab');
         $this->load->model('MutuauditModel', 'mutu');
         $this->load->model('DtformModel', 'dtform');
@@ -61,6 +61,54 @@ class Delik extends MY_Controller {
             $this->template($this->data, $this->module); 
             
         }
+    }
+
+    /**
+     * Unduh Daftar Tilik AMI (.xlsx) pertanyaan (delik) yang sedang dibuka.
+     *
+     * Isi sel diambil dari butir tilik pada tabel di atas:
+     *   Tujuan                     <- mutu_auditjawab.jwb_tujuan
+     *   Referensi/butir pertanyaan <- mutu_auditjawabdetail.dtjwb_referensi
+     *   Lingkup Pertanyaan         <- mutu_auditjawabdetail.dtjwb_pertanyaan
+     *   Hasil observasi            <- mutu_auditjawabdetail.dtjwb_hasil
+     *   S / OB / Mayor / Minor     <- tanda X sesuai dtjwb_temuan
+     *   Catatan                    <- mutu_auditjawabdetail.dtjwb_catatan
+     *   Tanggal Audit              <- tanggal butir tilik dibuat (dtjwb_create)
+     *
+     * Dipanggil tombol "Unduh Excel" pada panel Daftar Tilik
+     * (lihat assets/app/<modul>/delik.js): ?audit_id=..&dtform_id=..
+     */
+    public function tilikexcel() {
+        $audit_id  = (int) $this->input->get('audit_id');
+        $dtform_id = (int) $this->input->get('dtform_id');
+        if ($audit_id < 1 || $dtform_id < 1) {
+            redirect(base_url($this->module));
+        }
+
+        $jwb_id = $this->dtjwb->getJwbid($audit_id, $dtform_id);
+        $butir  = $this->dtjwb->butirAudit($jwb_id);
+        $audit  = $this->mutu->getAuditById($audit_id);
+        $jawab  = $this->auditjawab->getAuditJawab($audit_id, $dtform_id);
+
+        /* Nama tim audit (ketua ditandai), sama seperti pada Form PTK. */
+        $this->load->model('TimauditModel', 'timaudit');
+        $tim = $this->timaudit->daftar($audit_id);
+
+        $this->load->library('tilikexcel');
+        $baris = $this->tilikexcel->susun(
+            $butir,
+            isset($jawab['jwb_tujuan']) ? $jawab['jwb_tujuan'] : ''
+        );
+
+        $data = array(
+            'tanggal_audit' => $this->tilikexcel->tanggalAudit($baris),
+            'unit'          => isset($audit['unit']) ? $audit['unit'] : '',
+            'auditor'       => $this->timaudit->teks($tim, isset($audit['auditor']) ? $audit['auditor'] : ''),
+            'auditee'       => isset($audit['auditee']) ? $audit['auditee'] : '',
+            'baris'         => $baris,
+        );
+
+        $this->tilikexcel->unduh('Daftar Tilik AMI', $data);
     }
 
     /**

@@ -283,6 +283,27 @@ $(function () {
         });
     });
 
+    /* ------------------------- unduh excel ------------------------- */
+
+    /* Unduh Daftar Tilik AMI (.xlsx): replikasi formulir DAFTAR TILIK AMI,
+       isinya diambil dari butir tilik pada tabel di atas
+       (lihat application/libraries/Tilikexcel.php). */
+    $('#unduh_tilik').on('click', function (e) {
+        e.preventDefault();
+
+        var audit_id  = String($(this).attr('data-audit_id') || '');
+        var dtform_id = String($(this).attr('data-dtform_id') || '');
+
+        if (audit_id === '' || dtform_id === '') {
+            pesan('Oops', 'Audit atau pertanyaan belum dikenali.', 'error');
+            return;
+        }
+
+        window.location.href = base_url + '/delik/tilikexcel'
+            + '?audit_id=' + encodeURIComponent(audit_id)
+            + '&dtform_id=' + encodeURIComponent(dtform_id);
+    });
+
     /* --------------------------- kembali --------------------------- */
 
     $('#kembali').on('click', function () {
