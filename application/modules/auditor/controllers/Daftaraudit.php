@@ -158,6 +158,7 @@ class Daftaraudit extends MY_Controller {
         $tim = $this->timaudit->daftar($audit_id);
 
         return array(
+            'kode'          => isset($audit['form_kode']) ? $audit['form_kode'] : '',
             'tanggal_audit' => $tanggal,
             'unit'          => isset($audit['unit']) ? $audit['unit'] : '',
             'auditor'       => $this->timaudit->teks($tim, isset($audit['auditor']) ? $audit['auditor'] : ''),

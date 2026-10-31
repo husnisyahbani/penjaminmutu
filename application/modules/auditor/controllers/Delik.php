@@ -101,6 +101,7 @@ class Delik extends MY_Controller {
         );
 
         $data = array(
+            'kode'          => isset($audit['form_kode']) ? $audit['form_kode'] : '',
             'tanggal_audit' => $this->tilikexcel->tanggalAudit($baris),
             'unit'          => isset($audit['unit']) ? $audit['unit'] : '',
             'auditor'       => $this->timaudit->teks($tim, isset($audit['auditor']) ? $audit['auditor'] : ''),

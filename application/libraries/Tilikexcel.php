@@ -8,7 +8,7 @@ if (!defined('BASEPATH')) {
  * DAFTAR TILIK AMI (Audit Mutu Internal) dalam bentuk berkas Excel .xlsx.
  *
  * Bentuknya mereplikasi formulir kertas Daftar Tilik AMI:
- *   - header identitas dokumen (logo, nama institusi, kode, revisi),
+ *   - header identitas dokumen (logo, nama institusi, kode formulir, revisi),
  *   - informasi pelaksanaan audit (tanggal, unit kerja, auditor, auditee),
  *   - tabel bertingkat: No | Tujuan | Referensi/butir pertanyaan | Lingkup
  *     Pertanyaan | Hasil observasi | Temuan (S, OB, TS Mayor/Minor) | Catatan,
@@ -189,8 +189,7 @@ class Tilikexcel {
         $tinggi[$jarak]  = 8;
         $tinggi[$footer] = 34;
 
-        $this->_header($sheet);
-        $this->_logo($sheet);
+        $this->_header($sheet, $data);
         $this->_pelaksanaan($sheet, $data);
         $this->_kepala($sheet);
         $this->_isian($sheet, $baris, $jumlah, $tinggi);
@@ -201,6 +200,10 @@ class Tilikexcel {
             $sheet->getRowDimension($b)->setRowHeight($h);
             $total_tinggi += $h;
         }
+
+        /* Logo disisipkan terakhir: ukuran dan posisinya dihitung dari
+           lebar kolom dan tinggi baris yang sudah diterapkan. */
+        $this->_logo($sheet);
 
         $this->_halaman($sheet, $total_tinggi);
         $this->_aturCetak($sheet, 'A1:K' . $footer, $total_tinggi);
@@ -246,8 +249,18 @@ class Tilikexcel {
        BAGIAN-BAGIAN FORMULIR
        ================================================================== */
 
-    /** Header identitas institusi & dokumen (baris 1-4, kolom A..K). */
-    private function _header($sheet) {
+    /**
+     * Header identitas institusi & dokumen (baris 1-4, kolom A..K).
+     *
+     * KODE diambil dari kode formulir audit (mutu_formulir.form_kode); bila
+     * formulirnya belum punya kode, dipakai kode dokumen pada formulir
+     * referensi. Isian Revisi sengaja dikosongkan: diisi tangan bila
+     * formulir ini direvisi.
+     *
+     * @param PHPExcel_Worksheet $sheet
+     * @param array              $data kunci 'kode' = kode formulir
+     */
+    private function _header($sheet, $data = array()) {
         $tengah = array('tebal' => TRUE, 'rata' => 'tengah', 'vertikal' => 'tengah', 'bungkus' => TRUE);
 
         /* A1:A4 = logo STIK Siti Khadijah (disisipkan oleh _logo()). */
@@ -258,13 +271,20 @@ class Tilikexcel {
         $this->_isi($sheet, 'B4:E4', 'DOKUMEN DAFTAR TILIK AMI', $tengah);
 
         $this->_isi($sheet, 'F1:K1', 'KODE', $tengah);
-        $this->_isi($sheet, 'F2:K2', 'STIK.SK-FORM.A.04.004', $tengah);
+
+        /* KODE = kode formulir audit; cadangannya kode dokumen referensi. */
+        $kode = isset($data['kode']) ? trim((string) $data['kode']) : '';
+        if ($kode === '') {
+            $kode = 'STIK.SK-FORM.A.04.004';
+        }
+        $this->_isi($sheet, 'F2:K2', $kode, $tengah);
         /* F3:H3 = nomor halaman; diisi oleh _halaman() setelah tinggi
            seluruh baris diketahui. */
         $this->_kotak($sheet, 'F3:H3');
         $this->_isi($sheet, 'I3:K3', 'Tanggal: 20 Desember 2024', $tengah);
         $this->_isi($sheet, 'F4:H4', 'Revisi', $tengah);
-        $this->_isi($sheet, 'I4:K4', '02', $tengah);
+        /* Isian Revisi dikosongkan (kotaknya tetap dibuat). */
+        $this->_kotak($sheet, 'I4:K4');
     }
 
     /**
@@ -341,22 +361,33 @@ class Tilikexcel {
             $gambar->setPath($berkas);
             $gambar->setCoordinates('A1');
 
-            /* Ukuran menyesuaikan blok A1:A4 (lebar kolom A x 4 baris). */
-            $kotak_lebar  = $this->lebar['A'] * 5.25;
-            $kotak_tinggi = 4 * 22;
+            /* Ukuran blok A1:A4 dalam PIKSEL - offset gambar dihitung
+               dalam piksel oleh PHPExcel (lihat Writer/Excel2007/Drawing). */
+            $kotak_lebar = PHPExcel_Shared_Drawing::cellDimensionToPixels(
+                $sheet->getColumnDimension('A')->getWidth(),
+                $sheet->getDefaultStyle()->getFont()
+            );
+            $kotak_tinggi = 0;
+            for ($b = 1; $b <= 4; $b++) {
+                $kotak_tinggi += PHPExcel_Shared_Drawing::pointsToPixels(
+                    max(0, $sheet->getRowDimension($b)->getRowHeight())
+                );
+            }
+
             $lebar  = (float) $gambar->getWidth();
             $tinggi = (float) $gambar->getHeight();
-            if ($lebar > 0 && $tinggi > 0) {
-                $skala  = min($kotak_lebar / $lebar, $kotak_tinggi / $tinggi);
-                $lebar  = $lebar * $skala;
-                $tinggi = $tinggi * $skala;
+            if ($lebar > 0 && $tinggi > 0 && $kotak_lebar > 0 && $kotak_tinggi > 0) {
+                /* Mengecil mengikuti kotak, menyisakan sedikit ruang tepi. */
+                $skala  = min($kotak_lebar / $lebar, $kotak_tinggi / $tinggi) * 0.9;
+                $lebar  = (int) round($lebar * $skala);
+                $tinggi = (int) round($tinggi * $skala);
                 $gambar->setWidth($lebar);
                 $gambar->setHeight($tinggi);
             }
 
-            /* Dipusatkan di dalam kotak (offset dalam piksel). */
-            $gambar->setOffsetX(max(0, PHPExcel_Shared_Drawing::pointsToPixels(($kotak_lebar - $lebar) / 2)));
-            $gambar->setOffsetY(max(0, PHPExcel_Shared_Drawing::pointsToPixels(($kotak_tinggi - $tinggi) / 2)));
+            /* Rata tengah terhadap sel: sisa ruang dibagi dua. */
+            $gambar->setOffsetX(max(0, (int) round(($kotak_lebar - $lebar) / 2)));
+            $gambar->setOffsetY(max(0, (int) round(($kotak_tinggi - $tinggi) / 2)));
             $gambar->setWorksheet($sheet);
         } catch (Exception $e) {
             /* Lewatkan saja: blok logo tetap berupa kotak kosong. */
