@@ -293,9 +293,12 @@ class TimauditModel extends CI_Model {
      *
      * @param  array  $baris    hasil peta()/daftar()
      * @param  string $cadangan teks bila tim belum ada (mutu_audit.auditor)
+     * @param  string $pemisah  pemisah antar nama. Bawaan ', '; kolom tabel
+     *                          Daftar Audit memakai "\n" supaya setiap nama
+     *                          ditulis pada barisnya sendiri.
      * @return string
      */
-    public function teks($baris, $cadangan = '') {
+    public function teks($baris, $cadangan = '', $pemisah = ', ') {
         if (empty($baris) || !is_array($baris)) {
             return (string) $cadangan;
         }
@@ -312,6 +315,6 @@ class TimauditModel extends CI_Model {
             $nama[] = $teks;
         }
 
-        return implode(', ', $nama);
+        return implode($pemisah, $nama);
     }
 }

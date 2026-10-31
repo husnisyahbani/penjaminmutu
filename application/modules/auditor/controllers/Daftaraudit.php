@@ -466,7 +466,10 @@ class Daftaraudit extends MY_Controller {
             $row[] = $field->form_nama;
             /* Kolom Auditor: seluruh nama tim, ketua ditandai "(Ketua)". */
             $baris_tim = isset($peta_tim[(int) $field->audit_id]) ? $peta_tim[(int) $field->audit_id] : array();
-            $row[] = '<div class="tim-teks">' . html_escape($this->timaudit->teks($baris_tim, $field->auditor)) . '</div>';
+            /* Satu nama per baris: dipisahkan baris baru lalu diubah
+               menjadi <br> setelah karakter HTML-nya disaring. */
+            $nama_tim = $this->timaudit->teks($baris_tim, $field->auditor, "\n");
+            $row[] = '<div class="tim-teks">' . nl2br(html_escape($nama_tim)) . '</div>';
             $row[] = $field->auditee;
             $row[] = $field->unit; 
 
