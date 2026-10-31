@@ -204,5 +204,20 @@ $(function () {
             swal.fire("Oops", "Gagal menghubungi server!", "error");
         });
     });
+
+    /* Unduh Form PTK: satu lembar per temuan pada saringan yang sedang
+       aktif, dengan kolom isian yang sudah terisi datanya (Formptk.php).
+       Saringan dikirim melalui query string supaya berkas dihasilkan
+       persis dari baris yang sedang tampil. */
+    $('#unduh_formptk').on('click', function (e) {
+        e.preventDefault();
+
+        var periode = String($('#filter_periode').val() || '');
+        var cari    = String($('#cari_ptk').val() || '').trim();
+
+        window.location.href = base_url + "/ptk/formexcel"
+            + "?periode_id=" + encodeURIComponent(periode)
+            + "&cari=" + encodeURIComponent(cari);
+    });
 });
 

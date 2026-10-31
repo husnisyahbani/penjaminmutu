@@ -15,7 +15,7 @@ class Ptk extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditor';
-        $this->load->js(base_url("assets/app/auditor/ptk.js?v=2.2"));
+        $this->load->js(base_url("assets/app/auditor/ptk.js?v=2.3"));
         // Informasi tombol aksi saat hover (lihat assets/app/tabel-aksi.css)
         $this->load->js(base_url("assets/app/tabel-aksi.js?v=1.0"));
         $this->load->model('PtkdataModel', 'ptkdata');
@@ -87,6 +87,29 @@ class Ptk extends MY_Controller {
             'tanpa_koreksi' => (int) $ringkasan['tanpa_koreksi'],
             'sudah_koreksi' => (int) $ringkasan['total'] - (int) $ringkasan['tanpa_koreksi'],
         ));
+    }
+
+    /**
+     * Unduh Form PTK: tabel form DIULANG untuk setiap temuan pada saringan
+     * yang sedang aktif (satu temuan = satu lembar), dan kolom-kolom
+     * isiannya sudah terisi dari data PTK - Program Studi/Unit, Kaprodi,
+     * Auditor, PTK No, Kategori (kotak yang sesuai dicentang), Referensi,
+     * Uraian Temuan (hasil + catatan), serta Rencana Tindakan Koreksi.
+     *
+     * Saringan periode dan kata cari dikirim lewat ?periode_id= dan ?cari=
+     * oleh tombol "Form PTK" (lihat assets/app/<modul>/ptk.js).
+     * Baris yang diambil sama dengan yang tampil pada tabel: pemilik baris
+     * sudah ditetapkan pada konstruktor (auditor / PPM / auditee).
+     */
+    public function formexcel() {
+        $periode_id = $this->input->get('periode_id');
+        $cari       = $this->input->get('cari');
+
+        /* -1 = tanpa paging: seluruh temuan pada saringan ini diambil. */
+        $list = $this->ptkdata->get_datatables(-1, 0, array('value' => $cari), array(), $periode_id);
+
+        $this->load->library('formptk');
+        $this->formptk->unduh('Form-PTK', $this->formptk->susun($list));
     }
 
     /** Sumber data DataTables halaman PTK. */

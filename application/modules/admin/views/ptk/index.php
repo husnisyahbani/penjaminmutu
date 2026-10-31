@@ -107,12 +107,11 @@
                         <div class="panel-heading-isi">
                             <h3 class="panel-title"><?=$title?></h3>
                             <div class="panel-aksi">
-                                <?php /* Form PTK kosong (Excel): diunduh, diisi, lalu
-                                         dicetak dan ditandatangani sesuai bagiannya. */ ?>
-                                <a class="btn btn-sm btn-primary"
-                                   href="<?php echo base_url('assets/template/Form-PTK.xlsx'); ?>"
-                                   download target="_blank" rel="noopener"
-                                   title="Unduh Form PTK kosong (Excel)">
+                                <?php /* Form PTK: satu lembar untuk setiap temuan pada
+                                         saringan yang sedang aktif, kolomnya terisi
+                                         dari data PTK (lihat ptk/formexcel). */ ?>
+                                <a class="btn btn-sm btn-primary" href="#" id="unduh_formptk"
+                                   title="Unduh Form PTK untuk setiap temuan (Excel)">
                                     <i class="icon md-download" aria-hidden="true"></i> Form PTK
                                 </a>
                                 <?php /* Kotak saring periode memakai komponen bersama
