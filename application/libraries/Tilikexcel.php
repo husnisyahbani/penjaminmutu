@@ -268,16 +268,19 @@ class Tilikexcel {
     }
 
     /**
-     * Nomor halaman pada blok header (F3:H3) dan pada footer halaman.
+     * Total halaman pada blok header (F3:H3) dan nomor halaman pada footer.
      *
      * Baris 1-4 diulang di setiap halaman cetak (setRowsToRepeatAtTop),
-     * jadi sel F3 selalu berisi teks yang sama: "Halaman 1 dari N" dengan N
-     * = jumlah halaman lembar ini. Nomor halaman yang benar per lembar
-     * ditulis pada footer memakai kode Excel &P (halaman ini) dan &N
-     * (total halaman), sehingga halaman 2 dan seterusnya ikut bernomor.
+     * sehingga SEL yang sama tercetak pada semua halaman: isinya tidak
+     * dapat berubah mengikuti nomor halaman. Karena itu F3:H3 hanya
+     * mencantumkan TOTAL halaman lembar ini ("Total Halaman: N").
+     *
+     * Nomor halaman per lembar ditulis pada footer memakai kode Excel &P
+     * (halaman ini) dan &N (total halaman), sehingga halaman 2 dan
+     * seterusnya tetap bernomor benar saat dicetak.
      */
     private function _halaman($sheet, $total_tinggi) {
-        $this->_isi($sheet, 'F3:H3', 'Halaman 1 dari ' . $this->_jumlahHalaman($total_tinggi),
+        $this->_isi($sheet, 'F3:H3', 'Total Halaman: ' . $this->_jumlahHalaman($total_tinggi),
             array('tebal' => TRUE, 'rata' => 'tengah', 'vertikal' => 'tengah', 'bungkus' => TRUE));
 
         $kepala = $sheet->getHeaderFooter();

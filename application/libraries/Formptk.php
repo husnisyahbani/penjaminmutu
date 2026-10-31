@@ -655,6 +655,16 @@ class Formptk {
         $margin->setBottom(0.5);
         $margin->setHeader(0.3);
         $margin->setFooter(0.3);
+
+        /* Nomor halaman per lembar dicetak pada footer memakai kode Excel:
+           &P = halaman ini, &N = total halaman. Form PTK tidak memiliki
+           blok "Halaman ... dari ..." pada kepalanya, dan sel yang diulang
+           di setiap halaman tidak dapat berubah isinya per halaman, maka
+           penomoran diserahkan ke footer ini. */
+        $kepala = $sheet->getHeaderFooter();
+        $kepala->setDifferentOddEven(FALSE);
+        $kepala->setScaleWithDocument(TRUE);
+        $kepala->setOddFooter('&RHalaman &P dari &N');
     }
 
     /**
