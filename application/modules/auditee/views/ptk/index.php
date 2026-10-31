@@ -101,8 +101,7 @@
                                 <?php /* Form PTK: satu lembar untuk setiap temuan pada
                                          saringan yang sedang aktif, kolomnya terisi
                                          dari data PTK (lihat ptk/formexcel). */ ?>
-                                <a class="btn btn-sm btn-primary" href="#" id="unduh_formptk"
-                                   title="Unduh Form PTK untuk setiap temuan (Excel)">
+                                <a class="btn btn-sm btn-primary" href="#" id="unduh_formptk">
                                     <i class="icon md-download" aria-hidden="true"></i> Form PTK
                                 </a>
                                 <?php /* Kotak saring periode memakai komponen bersama

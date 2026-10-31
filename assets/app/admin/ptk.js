@@ -9,7 +9,9 @@
 $(function () {
 
     var daftarptk = $('#ptk').DataTable({
-        "responsive": true,
+        /* Sama seperti PTK auditor & auditee: lebarnya diatur CSS dan
+           digeser mendatar, jadi tidak ada kolom yang disembunyikan. */
+        "responsive": false,
         /* Lebar kolom diatur CSS (persentase + table-layout fixed pada
            assets/app/ptk.css), bukan dihitung DataTables dari isi sel. */
         "autoWidth": false,
@@ -18,8 +20,8 @@ $(function () {
         "searching": true,
         "order": [],
         "columnDefs": [
-            /* Kolom No & Rencana Koreksi tidak dapat diurutkan. */
-            {"targets": [0, 8], "orderable": false},
+            /* Kolom No, Rencana Koreksi & Status tidak dapat diurutkan. */
+            {"targets": [0, 8, 9], "orderable": false},
             /* Kelas kolom diambil dari header (lihat assets/app/ptk.css)
                supaya lebarnya proporsional. */
             {"targets": 0, "className": "ptk-kolom-no"},
@@ -30,7 +32,8 @@ $(function () {
             {"targets": 5, "className": "ptk-kolom-hasil"},
             {"targets": 6, "className": "ptk-kolom-temuan"},
             {"targets": 7, "className": "ptk-kolom-catatan"},
-            {"targets": 8, "className": "ptk-kolom-koreksi"}
+            {"targets": 8, "className": "ptk-kolom-koreksi"},
+            {"targets": 9, "className": "ptk-kolom-status"}
         ],
         "ajax": {
             "url": base_url + "/ptk/listptk/",
@@ -121,6 +124,87 @@ $(function () {
         });
     }
 
+
+    /* ------------------------------------------------------------------
+       Kolom Status: TEKS BEBAS penanda tindak lanjut tiap temuan.
+       Sama seperti laman PTK auditor: tombol pensil -> modal -> textarea
+       -> simpan, sehingga PPM ikut dapat menulis statusnya.
+       ------------------------------------------------------------------ */
+    var status_dtjwb_id = 0;
+    var status_audit_id = 0;
+
+    $('#ptk').on('click', '.edit-status', function () {
+        var $btn = $(this);
+        status_dtjwb_id = $btn.attr('dtjwb_id');
+        status_audit_id = $btn.attr('audit_id');
+
+        $.ajax({
+            url: base_url + "/ptk/getbutir/" + status_audit_id + "/" + status_dtjwb_id,
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                if (!data.status) {
+                    swal.fire("Oops", data.pesan || "Data tidak ditemukan", "error");
+                    return;
+                }
+
+                $('#status_dtjwb_id').val(status_dtjwb_id);
+                $('#status_audit_id').val(status_audit_id);
+                $('#status_butir').text(data.lingkup_isi || '-');
+                $('#status_koreksi').text(data.jwb_koreksi || 'Belum ada rencana koreksi');
+                $('#ptk_status').val(data.jwb_status || '');
+                $('#statusModal').modal('show');
+            },
+            error: function () {
+                swal.fire("Oops", "No connection!", "error");
+            }
+        });
+    });
+
+    $('#formstatus').on('submit', function (e) {
+        e.preventDefault();
+
+        var teks = $('#ptk_status').val() || '';
+
+        $('#statusModal').modal('hide');
+        swal.fire({
+            title: 'Menyimpan...',
+            allowEscapeKey: false,
+            allowOutsideClick: false,
+            onOpen: function () {
+                swal.showLoading();
+            }
+        });
+
+        $.ajax({
+            url: base_url + "/ptk/updatestatus",
+            type: "POST",
+            dataType: "json",
+            data: {
+                audit_id: $('#status_audit_id').val(),
+                dtjwb_id: $('#status_dtjwb_id').val(),
+                ptk_status: teks
+            }
+        }).done(function (res) {
+            swal.close();
+
+            if (res && res.status) {
+                daftarptk.ajax.reload();
+                swal.fire({
+                    title: "Berhasil",
+                    text: res.pesan || "Status tersimpan.",
+                    type: "success",
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            } else {
+                swal.fire("Gagal", (res && res.pesan) ? res.pesan : "Gagal menyimpan status.", "error");
+            }
+        }).fail(function () {
+            swal.close();
+            swal.fire("Oops", "Gagal menghubungi server!", "error");
+        });
+    });
 
     /* Unduh Form PTK: satu lembar per temuan pada saringan yang sedang
        aktif, dengan kolom isian yang sudah terisi datanya (Formptk.php).
