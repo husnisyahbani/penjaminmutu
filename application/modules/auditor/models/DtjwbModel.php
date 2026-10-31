@@ -83,6 +83,10 @@ class DtjwbModel extends CI_Model {
             $this->db->select('NULL AS jwb_jawaban_butir', FALSE);
         }
         $this->db->select('j.jwb_jawaban AS jwb_jawaban_pertanyaan', FALSE);
+        /* Penanda butir lingkup (mutu_lingkup) pada baris tilik lama. */
+        if ($this->db->field_exists('lingkup_id', 'auditjawabdetail')) {
+            $this->db->select('dj.lingkup_id AS dtjwb_lingkup_id', FALSE);
+        }
         $this->db->from('auditjawabdetail dj');
         $this->db->join('auditjawab j', 'j.jwb_id = dj.jwb_id', 'left');
         $this->db->where('dj.jwb_id', $jwb_id);
@@ -128,7 +132,82 @@ class DtjwbModel extends CI_Model {
     /** Butir tilik + nilainya, tanpa paging (dipakai hitungan & ekspor). */
     function butirAudit($jwb_id) {
         $this->_get_datatables_query(array('value' => ''), array(), $jwb_id);
-        return $this->db->get()->result_array();
+        return $this->_lengkapiJawaban($this->db->get()->result_array(), $jwb_id);
+    }
+
+    /**
+     * Lengkapi jawaban auditee PER BUTIR LINGKUP pada baris tilik.
+     *
+     * Auditee menjawab tiap butir lingkup (mutu_auditjawab.lingkup_id), bukan
+     * baris tilik auditor. Jawaban itu dilampirkan ke baris tilik yang cocok:
+     *   1. lewat kolom auditjawabdetail.lingkup_id,
+     *   2. lewat kecocokan teks butir (data lama yang belum dimigrasi),
+     *   3. sisanya tetap memakai jawaban tingkat pertanyaan.
+     */
+    private function _lengkapiJawaban($rows, $jwb_id) {
+        if (empty($rows)) {
+            return $rows;
+        }
+
+        $this->load->helper('lingkup');
+
+        $induk = $this->db->select('audit_id')
+            ->where('jwb_id', $jwb_id)->get('auditjawab')->row_array();
+        if (!$induk) {
+            return $rows;
+        }
+
+        $peta = $this->_jawabanLingkup((int) $induk['audit_id']);
+        if (empty($peta['id']) && empty($peta['teks'])) {
+            return $rows;
+        }
+
+        foreach ($rows as $k => $r) {
+            $jawaban = '';
+            $lid = isset($r['dtjwb_lingkup_id']) ? (int) $r['dtjwb_lingkup_id'] : 0;
+
+            if ($lid > 0 && isset($peta['id'][$lid])) {
+                $jawaban = $peta['id'][$lid];
+            }
+            if ($jawaban === '') {
+                $kunci = lingkup_normal($r['dtjwb_pertanyaan']);
+                if ($kunci !== '' && isset($peta['teks'][$kunci])) {
+                    $jawaban = $peta['teks'][$kunci];
+                }
+            }
+            if ($jawaban !== '') {
+                $rows[$k]['jwb_jawaban_butir'] = $jawaban;
+            }
+        }
+
+        return $rows;
+    }
+
+    /** Peta jawaban per butir lingkup: berdasar lingkup_id dan teks butir. */
+    private function _jawabanLingkup($audit_id) {
+        $hasil = array('id' => array(), 'teks' => array());
+
+        if (!$this->db->field_exists('lingkup_id', 'auditjawab') || !$this->db->table_exists('lingkup')) {
+            return $hasil;
+        }
+
+        $this->db->select('jb.jwb_jawaban, jb.lingkup_id, lg.lingkup_isi');
+        $this->db->from('auditjawab jb');
+        $this->db->join('lingkup lg', 'lg.lingkup_id = jb.lingkup_id', 'inner');
+        $this->db->where('jb.audit_id', $audit_id);
+        $this->db->where('jb.lingkup_id IS NOT NULL', NULL, FALSE);
+        foreach ($this->db->get()->result_array() as $j) {
+            if (trim((string) $j['jwb_jawaban']) === '') {
+                continue;
+            }
+            $hasil['id'][(int) $j['lingkup_id']] = $j['jwb_jawaban'];
+            $kunci = lingkup_normal($j['lingkup_isi']);
+            if ($kunci !== '') {
+                $hasil['teks'][$kunci] = $j['jwb_jawaban'];
+            }
+        }
+
+        return $hasil;
     }
 
     /** Satu baris butir tilik (untuk modal edit). */

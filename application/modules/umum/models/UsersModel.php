@@ -59,6 +59,23 @@ class UsersModel extends CI_Model {
         redirect(base_url());
     }
 
+    /**
+     * Kolom penanda status akun (users.valid) tersedia?
+     *
+     * Nama tabel ditulis TANPA awalan karena CodeIgniter menambahkan
+     * dbprefix ('mutu_') sendiri pada pemeriksaan kolom.
+     */
+    function statusSiap() {
+        return $this->db->field_exists('valid', 'users');
+    }
+
+    /**
+     * Proses masuk.
+     *
+     * @return bool|string TRUE bila berhasil, FALSE bila username/password
+     *                     salah, dan 'nonaktif' bila akunnya dinonaktifkan
+     *                     PPM (supaya pesannya dapat dibedakan).
+     */
     function login($data) {
         $this->db->from('mutu_users');
         $this->db->where('username', $data['username']);
@@ -67,6 +84,12 @@ class UsersModel extends CI_Model {
         // Let's check if there are any results
         if ($query->num_rows() == 1 ) {
             $row = $query->row();
+
+            /* Akun yang dinonaktifkan PPM tidak boleh masuk. */
+            if ($this->statusSiap() && isset($row->valid) && (int) $row->valid !== 1) {
+                return 'nonaktif';
+            }
+
             $data = array(
                 'users_id' => $row->users_id,
                 'username' => $row->username,

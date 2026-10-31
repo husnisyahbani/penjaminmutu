@@ -518,8 +518,9 @@ class LingkupModel extends CI_Model {
     }
 
     /**
-     * Pindahkan jawaban lama (auditjawabdetail) ke baris jawaban per butir
-     * lingkup (auditjawab + kolom lingkup_id).
+     * Tautkan jawaban lama (auditjawabdetail) ke baris jawaban per butir
+     * lingkup (auditjawab + kolom lingkup_id) dan tandai lingkup_id pada
+     * baris tiliknya, supaya penilaian lama terbaca per butir lingkup.
      *
      * Pencocokan memakai teks pertanyaan butir; baris yang tidak menemukan
      * pasangannya dibiarkan (ditandai dihasil).
@@ -560,25 +561,18 @@ class LingkupModel extends CI_Model {
             $this->db->where('lingkup_id', $butir['lingkup_id']);
             $ada = $this->db->get($this->t_jawab)->row_array();
 
-            $nilai = array();
-            foreach (array('jwb_hasil' => 'dtjwb_hasil', 'jwb_temuan' => 'dtjwb_temuan', 'jwb_catatan' => 'dtjwb_catatan') as $kolom => $asal) {
-                if (isset($d[$asal]) && trim((string) $d[$asal]) !== '') {
-                    $nilai[$kolom] = $d[$asal];
-                }
-            }
-
+            /* Penilaian (hasil/temuan/catatan) tetap dibaca dari baris
+               mutu_auditjawabdetail, jadi yang dipindahkan hanya penanda
+               lingkup_id-nya. Kolom penilaian pada mutu_auditjawab
+               (jwb_hasil / jwb_temuan / jwb_catatan) sudah dihapus. */
             if ($ada) {
-                if ($nilai) {
-                    $this->db->where('jwb_id', $ada['jwb_id']);
-                    $this->db->update($this->t_jawab, $nilai);
-                }
                 $hasil['digabung']++;
             } else {
-                $this->db->insert($this->t_jawab, array_merge(array(
-                    'audit_id'  => $induk['audit_id'],
-                    'dtform_id' => $induk['dtform_id'],
+                $this->db->insert($this->t_jawab, array(
+                    'audit_id'   => $induk['audit_id'],
+                    'dtform_id'  => $induk['dtform_id'],
                     'lingkup_id' => $butir['lingkup_id'],
-                ), $nilai));
+                ));
                 $hasil['dipindah']++;
             }
 

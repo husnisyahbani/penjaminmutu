@@ -137,59 +137,8 @@ class Delik extends MY_Controller {
         echo json_encode($query);
     }
 
-    public function jawaban() {
-        $data = array();
-        $data['dtform_id'] = $this->input->post('dtform_id');
-        $data['audit_id'] = $this->input->post('audit_id');
-        $data['jwb_jawaban'] = $this->input->post('jwb_jawaban');
-        if($this->auditjawab->is_exist($data)){
-            $status = $this->auditjawab->jawab($data);
-        }else{
-            $status = $this->auditjawab->add($data);
-        }
-        
-        $query = array("status" => $status);
-        header('Access-Control-Allow-Origin: *');
-        header('Content-Type: application/json');
-        echo json_encode($query);
-    }
 
-    public function referensi() {
-        $data = array();
-        $data['dtform_id'] = $this->input->post('dtform_id');
-        $data['audit_id'] = $this->input->post('audit_id');
-        $data['jwb_referensi'] = $this->input->post('jwb_referensi');
-        if($this->auditjawab->is_exist($data)){
-            $status = $this->auditjawab->jawab($data);
-        }else{
-            $status = $this->auditjawab->add($data);
-        }
-        
-        $query = array("status" => $status);
-        header('Access-Control-Allow-Origin: *');
-        header('Content-Type: application/json');
-        echo json_encode($query);
-    }
 
-    public function pertanyaan() {
-        
-        $data = array();
-        $data['dtform_id'] = $this->input->post('dtform_id');
-        $data['audit_id'] = $this->input->post('audit_id');
-        $data['jwb_pertanyaan'] = $this->input->post('jwb_pertanyaan');
-        $allowed_tags = '<p><br><b><i><u><strong><em><ul><ol><li>';
-        $data['jwb_pertanyaan'] = strip_tags($data['jwb_pertanyaan'], $allowed_tags);
-        if($this->auditjawab->is_exist($data)){
-            $status = $this->auditjawab->jawab($data);
-        }else{
-            $status = $this->auditjawab->add($data);
-        }
-        
-        $query = array("status" => $status);
-        header('Access-Control-Allow-Origin: *');
-        header('Content-Type: application/json');
-        echo json_encode($query);
-    }
 
     public function tujuan() {
         $data = array();
@@ -210,61 +159,7 @@ class Delik extends MY_Controller {
         echo json_encode($query);
     }
 
-    public function catatan() {
-        $data = array();
-        $data['dtform_id'] = $this->input->post('dtform_id');
-        $data['audit_id'] = $this->input->post('audit_id');
-        $data['jwb_catatan'] = $this->input->post('jwb_catatan');
-        $allowed_tags = '<p><br><b><i><u><strong><em><ul><ol><li>';
-        $data['jwb_catatan'] = strip_tags($data['jwb_catatan'], $allowed_tags);
-        if($this->auditjawab->is_exist($data)){
-            $status = $this->auditjawab->jawab($data);
-        }else{
-            $status = $this->auditjawab->add($data);
-        }
-        
-        $query = array("status" => $status);
-        header('Access-Control-Allow-Origin: *');
-        header('Content-Type: application/json');
-        echo json_encode($query);
-    }
 
-    public function temuan() {
-        $data = array();
-        $data['dtform_id'] = $this->input->post('dtform_id');
-        $data['audit_id'] = $this->input->post('audit_id');
-        $data['jwb_temuan'] = $this->input->post('jwb_temuan');
-        $allowed_tags = '<p><br><b><i><u><strong><em><ul><ol><li>';
-        $data['jwb_temuan'] = strip_tags($data['jwb_temuan'], $allowed_tags);
-        if($this->auditjawab->is_exist($data)){
-            $status = $this->auditjawab->jawab($data);
-        }else{
-            $status = $this->auditjawab->add($data);
-        }
-        
-        $query = array("status" => $status);
-        header('Access-Control-Allow-Origin: *');
-        header('Content-Type: application/json');
-        echo json_encode($query);
-    }
 
-    public function hasil() {
-        $data = array();
-        $data['dtform_id'] = $this->input->post('dtform_id');
-        $data['audit_id'] = $this->input->post('audit_id');
-        $data['jwb_hasil'] = $this->input->post('jwb_hasil');
-        $allowed_tags = '<p><br><b><i><u><strong><em><ul><ol><li>';
-        $data['jwb_hasil'] = strip_tags($data['jwb_hasil'], $allowed_tags);
-        if($this->auditjawab->is_exist($data)){
-            $status = $this->auditjawab->jawab($data);
-        }else{
-            $status = $this->auditjawab->add($data);
-        }
-        
-        $query = array("status" => $status);
-        header('Access-Control-Allow-Origin: *');
-        header('Content-Type: application/json');
-        echo json_encode($query);
-    }
 
 }

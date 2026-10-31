@@ -6,7 +6,8 @@ class Login extends MY_Controller {
         parent::__construct();
         $this->module = 'umum';
         $this->load->model('UsersModel', 'users');
-        $this->load->js(base_url("assets/app/umum/login.js"));
+        // pengaturan tema halaman depan (warna, logo, teks) untuk tampilan login
+        $this->load->model('HomeModel', 'home');
     }
 
     public function index() {
@@ -16,7 +17,15 @@ class Login extends MY_Controller {
             $this->data['password'] = $this->input->post('password');
 
             $output = $this->users->login($this->data);
-            
+
+            /* Akun dikenal, tetapi sudah dinonaktifkan PPM. */
+            if ($output === 'nonaktif') {
+                $msg = 'Akun Anda tidak aktif. Silakan hubungi PPM.';
+                $this->session->set_flashdata('pesanerror', $msg);
+                redirect(base_url('login'));
+                return;
+            }
+
             if ($output) {
                
                 $role = $this->session->userdata('role');
@@ -28,27 +37,26 @@ class Login extends MY_Controller {
                     redirect(base_url('auditee'));
                 }
             } else {
-                echo "gagal";
-                $msg = 'Email atau Password Salah';
+                $msg = 'Username atau Password Salah';
                 $this->session->set_flashdata('pesanerror', $msg);
-                redirect(base_url());
+                redirect(base_url('login'));
             }
         } else {
             $role = $this->session->userdata('role');
-            if (isset($role) && $role == 'LPM') {
+            if (isset($role) && $role == 'PPM') {
                 redirect(base_url('admin'));
             }else if (isset($role) && $role == 'AUDITOR') {
                 redirect(base_url('auditor'));
             }else if (isset($role) && $role == 'AUDITEE') {
                 redirect(base_url('auditee'));
             } else {
-                $this->data['content'] = 'login';
                 $this->data['title'] = 'Login';
-                $this->data['js'] = $this->load->get_js_files();
+                $this->data['home'] = $this->home;
                 $this->data['pesanerror'] = $this->session->flashdata('pesanerror');
                 $this->data['pesanberhasil'] = $this->session->flashdata('pesanberhasil');
-                $this->template($this->data, $this->module);
-                //$this->load->view('homepage');
+                // halaman login memakai shell tema halaman depan
+                // (umum/includes/hp_top & hp_bottom), bukan layout lama.
+                $this->load->view('login', $this->data);
             }
         }
     }

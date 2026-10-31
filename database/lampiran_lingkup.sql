@@ -30,7 +30,6 @@ CREATE TABLE IF NOT EXISTS `mutu_lampiran` (
   `lampiran_ukuran` int(11) NOT NULL DEFAULT 0,
   `lampiran_create` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`lampiran_id`),
-  PRIMARY KEY (`lampiran_id`),
   KEY `lampiran_audit_id` (`audit_id`),
   KEY `lampiran_jwb_id` (`jwb_id`),
   KEY `lampiran_dtjwb_id` (`dtjwb_id`),
@@ -53,10 +52,13 @@ CREATE TABLE IF NOT EXISTS `mutu_lampiran` (
 --   dihapus, sehingga tidak ada berkas yatim di database.
 -- - Menghapus baris di tabel ini tidak menghapus berkas fisik; aplikasi
 --   menghapus berkasnya lebih dahulu (lihat LampiranModel::hapus()).
--- - Lampiran menempel pada JAWABAN PERTANYAAN (`jwb_id` ->
---   mutu_auditjawab baris pertanyaan). Auditee menjawab pertanyaan, bukan
---   butir tilik - butir tilik (mutu_auditjawabdetail) hanya diisi auditor.
---   Kolom `dtjwb_id`/`lingkup_id` tetap ada untuk data lama.
+-- - Lampiran menempel pada JAWABAN BUTIR LINGKUP (`jwb_id` -> mutu_auditjawab
+--   baris yang `lingkup_id`-nya terisi, dengan `lingkup_id` ikut tercatat).
+--   Auditee menjawab tiap butir lingkup (mutu_lingkup) pada halaman
+--   Auditee -> Daftar Audit -> Detail, bukan butir tilik - butir tilik
+--   (mutu_auditjawabdetail) hanya diisi auditor.
+--   Lampiran lama yang menempel pada pertanyaan (`jwb_id` baris pertanyaan)
+--   tetap terbaca dan hanya ditampilkan, tidak bisa ditambah lagi.
 -- - Jawaban auditee disimpan pada `mutu_auditjawab`.`jwb_jawaban`.
 
 -- ---------------------------------------------------------------------------

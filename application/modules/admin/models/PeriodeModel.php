@@ -39,9 +39,16 @@ class PeriodeModel extends CI_Model {
      * Apakah tabel periode sudah ada DAN kolom relasi pada mutu_audit ada.
      */
     public function installed() {
+        return $this->siap() && $this->formulirSiap();
+    }
+
+    /**
+     * Tabel periode dan kolom mutu_audit.periode_id siap dipakai - syarat
+     * agar kotak saring periode pada Daftar Audit berfungsi.
+     */
+    public function siap() {
         return $this->db->table_exists($this->tabel)
-            && $this->db->field_exists($this->kol_audit, $this->t_audit)
-            && $this->formulirSiap();
+            && $this->db->field_exists($this->kol_audit, $this->t_audit);
     }
 
     /** Kolom relasi periode pada mutu_formulir sudah ada? */

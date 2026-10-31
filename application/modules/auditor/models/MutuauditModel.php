@@ -14,7 +14,35 @@ class MutuauditModel extends CI_Model {
     var $column_order = array(null,'form_nama','auditor','auditee','audit_create',null);
     var $order = array('audit_create' => 'desc');
 
-    private function _get_datatables_query($search, $ordering) {
+    /**
+     * Saringan periode pada tabel audit.
+     *
+     * Kolom periode_id baru ada setelah tabel periode disiapkan
+     * (database/periode_audit.sql); sebelum itu saringan dilewati supaya
+     * tidak terjadi galat SQL.
+     */
+    private function _filter_periode($periode_id) {
+        if (!empty($periode_id) && $this->db->field_exists('periode_id', 'mutu_audit')) {
+            $this->db->where('mutu_audit.periode_id', $periode_id);
+        }
+    }
+
+    /**
+     * Saringan "audit saya" untuk auditor:
+     *   - audit yang auditor_id-nya pengguna ini (ketua tim), atau
+     *   - audit tempat pengguna ini terdaftar sebagai anggota tim.
+     *
+     * Dengan begitu anggota tim ikut melihat dan menilai audit tersebut,
+     * sedangkan auditor lain tetap tidak melihatnya.
+     *
+     * @param string $alias alias tabel mutu_audit pada kueri
+     */
+    private function _saringAuditor($alias = 'mutu_audit') {
+        $this->load->model('TimauditModel', 'timaudit');
+        $this->timaudit->saring($alias, 'auditor_id');
+    }
+
+    private function _get_datatables_query($search, $ordering, $periode_id = NULL) {
         $i = 0;
 
         foreach ($this->column_search as $item) { // looping awal
@@ -38,42 +66,38 @@ class MutuauditModel extends CI_Model {
             $order = $this->order;
             $this->db->order_by(key($order), $order[key($order)]);
         }
+
+        $this->_filter_periode($periode_id);
     }
 
-    function get_datatables($length, $start, $search, $ordering) {
-        $this->_get_datatables_query($search, $ordering);
+    function get_datatables($length, $start, $search, $ordering, $periode_id = NULL) {
+        $this->_get_datatables_query($search, $ordering, $periode_id);
         if ($length != -1) {
             $this->db->limit($length, $start);
         }
         
         $this->db->from('mutu_audit');
         $this->db->join('formulir', 'formulir.form_id = mutu_audit.form_id', 'left');
-        $users_id = $this->session->userdata('users_id');
-        if(isset($users_id)){
-            $this->db->where('auditor_id',$users_id);
-        }
+        $this->_saringAuditor('mutu_audit');
+        $this->_filter_periode($periode_id);
         $query = $this->db->get();
         return $query->result();
     }
 
-    function count_filtered($search, $ordering) {
-        $this->_get_datatables_query($search, $ordering);
+    function count_filtered($search, $ordering, $periode_id = NULL) {
+        $this->_get_datatables_query($search, $ordering, $periode_id);
         $this->db->from('mutu_audit');
         $this->db->join('formulir', 'formulir.form_id = mutu_audit.form_id', 'left');
-        $users_id = $this->session->userdata('users_id');
-        if(isset($users_id)){
-            $this->db->where('auditor_id',$users_id);
-        }
+        $this->_saringAuditor('mutu_audit');
+        $this->_filter_periode($periode_id);
         $query = $this->db->get();
         return $query->num_rows();
     }
 
-    public function count_all() {
+    public function count_all($periode_id = NULL) {
         $this->db->from('mutu_audit');
-        $users_id = $this->session->userdata('users_id');
-        if(isset($users_id)){
-            $this->db->where('auditor_id',$users_id);
-        }
+        $this->_saringAuditor('mutu_audit');
+        $this->_filter_periode($periode_id);
         return $this->db->count_all_results();
     }
 
@@ -104,46 +128,38 @@ class MutuauditModel extends CI_Model {
         return $this->db->trans_status();
     }
 
-    public function totalTerkirim(){
+    public function totalTerkirim($periode_id = NULL){
         $this->db->from('mutu_audit');
-        $users_id = $this->session->userdata('users_id');
-        if(isset($users_id)){
-            $this->db->where('auditor_id',$users_id);
-        }
+        $this->_saringAuditor('mutu_audit');
         $this->db->where("audit_status","TERKIRIM");
+        $this->_filter_periode($periode_id);
         $query = $this->db->get();
         return $query->num_rows();
     }
 
-    public function totalProses(){
+    public function totalProses($periode_id = NULL){
         $this->db->from('mutu_audit');
-        $users_id = $this->session->userdata('users_id');
-        if(isset($users_id)){
-            $this->db->where('auditor_id',$users_id);
-        }
+        $this->_saringAuditor('mutu_audit');
         $this->db->where("audit_status","PROSES");
+        $this->_filter_periode($periode_id);
         $query = $this->db->get();
         return $query->num_rows();
     }
 
-    public function totalSelesai(){
+    public function totalSelesai($periode_id = NULL){
         $this->db->from('mutu_audit');
-        $users_id = $this->session->userdata('users_id');
-        if(isset($users_id)){
-            $this->db->where('auditor_id',$users_id);
-        }
+        $this->_saringAuditor('mutu_audit');
         $this->db->where("audit_status","SELESAI");
+        $this->_filter_periode($periode_id);
         $query = $this->db->get();
         return $query->num_rows();
     }
 
-    public function totalDraft(){
+    public function totalDraft($periode_id = NULL){
         $this->db->from('mutu_audit');
-        $users_id = $this->session->userdata('users_id');
-        if(isset($users_id)){
-            $this->db->where('auditor_id',$users_id);
-        }
+        $this->_saringAuditor('mutu_audit');
         $this->db->where("audit_status","DRAFT");
+        $this->_filter_periode($periode_id);
         $query = $this->db->get();
         return $query->num_rows();
     }

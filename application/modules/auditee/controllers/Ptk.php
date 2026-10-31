@@ -5,10 +5,11 @@ class Ptk extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditee';
-        $this->load->js(base_url("assets/app/auditee/ptk.js?v=3.0"));
+        $this->load->js(base_url("assets/app/auditee/ptk.js?v=3.4"));
         // Informasi tombol aksi saat hover (lihat assets/app/tabel-aksi.css)
         $this->load->js(base_url("assets/app/tabel-aksi.js?v=1.0"));
         $this->load->model('PtkModel', 'ptkmodel');
+        $this->load->model('PeriodeModel', 'periode');
         // Pembantu teks (lingkup_bersihkan) untuk merapikan isi kolom tabel.
         $this->load->helper('lingkup');
 
@@ -23,9 +24,18 @@ class Ptk extends MY_Controller {
             $this->data['title'] = 'PERMINTAAN TINDAKAN KOREKSI';
             $this->data['js'] = $this->load->get_js_files();
             $this->data['ptk'] = 'active';
+            /* Filter periode: bawaan = periode aktif. Bila tidak ada periode
+               aktif, seluruh temuan ditampilkan. Tabel dan kartu statistik
+               mengikuti periode yang dipilih.
+               Bila tabel periode belum disiapkan (kolom mutu_audit.periode_id
+               belum ada), kotak saring tidak ditampilkan. */
+            $this->data['list_periode'] = $this->periode->siap() ? $this->periode->getAll() : array();
+            $this->data['periode_aktif'] = $this->periode->aktifId();
+            $filter = $this->data['periode_aktif'];
+
             /* Angka kartu statistik: satu kueri untuk total, per kategori,
                dan yang belum punya rencana koreksi. */
-            $ringkasan = $this->ptkmodel->ringkasan();
+            $ringkasan = $this->ptkmodel->ringkasan($filter);
             $this->data['observasi'] = $ringkasan['observasi'];
             $this->data['minor'] = $ringkasan['minor'];
             $this->data['mayor'] = $ringkasan['mayor'];
@@ -37,7 +47,27 @@ class Ptk extends MY_Controller {
             $this->template($this->data, $this->module); 
     }
 
-   
+    /**
+     * Ringkasan temuan untuk periode terpilih - dipakai kartu statistik agar
+     * ikut berubah saat saringan periode diganti (lihat assets/app/auditee/ptk.js).
+     */
+    public function statistik() {
+        $this->output->set_content_type('application/json');
+
+        $periode_id = $this->input->post('periode_id');
+        $ringkasan  = $this->ptkmodel->ringkasan($periode_id);
+
+        echo json_encode(array(
+            'status'        => TRUE,
+            'total'         => (int) $ringkasan['total'],
+            'observasi'     => (int) $ringkasan['observasi'],
+            'minor'         => (int) $ringkasan['minor'],
+            'mayor'         => (int) $ringkasan['mayor'],
+            'tanpa_koreksi' => (int) $ringkasan['tanpa_koreksi'],
+            'sudah_koreksi' => (int) $ringkasan['total'] - (int) $ringkasan['tanpa_koreksi'],
+        ));
+    }
+
 
     public function koreksi() {
         $data = array();
@@ -89,6 +119,29 @@ class Ptk extends MY_Controller {
         return lingkup_teks_baris($nilai);
     }
 
+    /**
+     * Unduh Form PTK: tabel form DIULANG untuk setiap temuan pada saringan
+     * yang sedang aktif (satu temuan = satu lembar), dan kolom-kolom
+     * isiannya sudah terisi dari data PTK - Program Studi/Unit, Kaprodi,
+     * Auditor, PTK No, Kategori (kotak yang sesuai dicentang), Referensi,
+     * Uraian Temuan (hasil + catatan), serta Rencana Tindakan Koreksi.
+     *
+     * Saringan periode dan kata cari dikirim lewat ?periode_id= dan ?cari=
+     * oleh tombol "Form PTK" (lihat assets/app/<modul>/ptk.js).
+     * Baris yang diambil sama dengan yang tampil pada tabel: pemilik baris
+     * sudah ditetapkan pada konstruktor (auditor / PPM / auditee).
+     */
+    public function formexcel() {
+        $periode_id = $this->input->get('periode_id');
+        $cari       = $this->input->get('cari');
+
+        /* -1 = tanpa paging: seluruh temuan pada saringan ini diambil. */
+        $list = $this->ptkmodel->get_datatables(-1, 0, array('value' => $cari), array(), $periode_id);
+
+        $this->load->library('formptk');
+        $this->formptk->unduh('Form-PTK', $this->formptk->susun($list));
+    }
+
     public function listptk() {
         $post = array();
         $post['search'] = $this->input->post('search');
@@ -97,8 +150,11 @@ class Ptk extends MY_Controller {
         $post['start'] = $this->input->post('start');
         $post['draw'] = $this->input->post('draw');
 
+        /* Saringan periode (bawaan periode aktif dikirim ptk.js;
+           kosong = semua periode). */
+        $periode_id = $this->input->post('periode_id');
 
-        $list = $this->ptkmodel->get_datatables($post['length'], $post['start'], $post['search'], $post['order']);
+        $list = $this->ptkmodel->get_datatables($post['length'], $post['start'], $post['search'], $post['order'], $periode_id);
         $data = array();
         $no = $this->input->post('start');
         foreach ($list as $field) {
@@ -153,13 +209,41 @@ class Ptk extends MY_Controller {
                 $row[] = $isi . $aksi;
             }
 
+            /* Kolom Status (diisi auditor dengan TEKS BEBAS).
+               Tiga nilai lama (OPEN / PROSES / CLOSED) tetap diberi warna
+               badgenya; teks lain ditampilkan apa adanya supaya status yang
+               diketik auditor tidak terbaca "belum diisi". */
+            $status_ptk  = isset($field->jwb_status) ? trim((string) $field->jwb_status) : '';
+            $status_atur = strtoupper($status_ptk);
+
+            if ($status_ptk === '') {
+                $isi_status = '<span class="badge badge-default">BELUM DIISI</span>';
+            } elseif ($status_atur === 'CLOSED') {
+                $isi_status = '<span class="badge badge-success">CLOSED</span>';
+            } elseif ($status_atur === 'PROSES') {
+                $isi_status = '<span class="badge badge-warning">PROSES</span>';
+            } elseif ($status_atur === 'OPEN') {
+                $isi_status = '<span class="badge badge-danger">OPEN</span>';
+            } else {
+                $isi_status = '<div class="ptk-klamp ptk-status-teks">'
+                    . nl2br(html_escape($this->_teksBaris($status_ptk))) . '</div>';
+            }
+
+            /* Badge ditengahkan, teks bebas diratakan kiri supaya enak dibaca. */
+            $pakai_badge = ($status_ptk === '')
+                || in_array($status_atur, array('OPEN', 'PROSES', 'CLOSED'), TRUE);
+
+            $row[] = $pakai_badge
+                ? '<div class="text-center">' . $isi_status . '</div>'
+                : $isi_status;
+
             $data[] = $row;
         }
 
         $output = array(
             "draw" => $post['draw'],
-            "recordsTotal" => $this->ptkmodel->count_all(),
-            "recordsFiltered" => $this->ptkmodel->count_filtered($post['search'], $post['order']),
+            "recordsTotal" => $this->ptkmodel->count_all($periode_id),
+            "recordsFiltered" => $this->ptkmodel->count_filtered($post['search'], $post['order'], $periode_id),
             "data" => $data,
         );
         //output dalam format JSON

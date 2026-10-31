@@ -26,7 +26,8 @@
 
 .topik-kepala {
     display: flex;
-    align-items: flex-start;
+    /* Nomor, judul, dan panah sejajar di tengah secara vertikal. */
+    align-items: center;
     gap: 12px;
     padding: 13px 16px;
     background: #f7f9fc;
@@ -69,7 +70,10 @@
 .topik-panah {
     flex: 0 0 auto;
     color: #8a94a6;
-    margin-top: 4px;
+    /* Sejajar tengah dengan nomor & judul (mengikuti align-items: center
+       pada .topik-kepala), jadi tidak perlu margin atas lagi. */
+    display: flex;
+    align-items: center;
     transition: transform .15s ease;
 }
 
@@ -164,18 +168,6 @@
     align-self: flex-start;
 }
 
-/* Penanda status pada halaman detail audit */
-.aktivitas-status {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 6px;
-}
-
-.aktivitas-status .badge {
-    font-weight: 500;
-}
-
 .aktivitas-bukti {
     margin-top: 6px;
     color: #5b6475;
@@ -234,9 +226,26 @@
     margin-top: 10px;
 }
 
+/* Jawaban yang sudah tersimpan (tampilan hanya-baca, mis. pada halaman
+   auditee setelah dikirim atau pada daftar tilik auditor). */
+.jawaban-teks {
+    color: #3c4657;
+    line-height: 1.6;
+    word-break: break-word;
+}
+
 .jawaban-isi {
     min-height: 78px;
     font-size: 13px;
+}
+
+/* Judul "Lampiran" di atas daftar berkas. */
+.lampiran-judul {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #616161;
 }
 
 .jawaban-aksi {
@@ -322,4 +331,150 @@
 .ringkas-berubah {
     animation: ringkasPop 0.45s ease-out;
     display: inline-block;
+}
+
+/* ---------------------------------------------------------------------------
+   Butir lingkup (mutu_lingkup) sebagai daftar pertanyaan yang dijawab auditee
+   --------------------------------------------------------------------------- */
+
+.lingkup-item {
+    border-left: 3px solid #c5cae9;
+}
+
+.lingkup-item[data-sudah-dijawab="1"] {
+    border-left-color: #66bb6a;
+}
+
+.lingkup-item[data-sudah-dijawab="0"] {
+    border-left-color: #ffb74d;
+}
+
+/* Baris tilik lama yang tidak berpasangan dengan butir lingkup: hanya
+   penilaian auditor, tanpa kotak jawaban. */
+.lingkup-item.lingkup-item--lama {
+    border-left-color: #e0e0e0;
+    background: #fbfbfc;
+}
+
+.lingkup-nomor {
+    display: inline-block;
+    min-width: 16px;
+    margin-right: 4px;
+    color: #8a94a6;
+    font-weight: 600;
+}
+
+.lingkup-status {
+    margin-left: 6px;
+    font-weight: 500;
+}
+
+.lingkup-item .jawaban-kotak {
+    margin-top: 8px;
+}
+
+.lingkup-item .jawaban-isi {
+    min-height: 66px;
+}
+
+.lingkup-item .lampiran-kotak {
+    margin-top: 8px;
+    padding-top: 8px;
+}
+
+/* ---------------------------------------------------------------------------
+   Catatan auditor per butir lingkup: Kelebihan & Peluang untuk peningkatan
+   (halaman auditor -> daftar audit -> detail)
+   --------------------------------------------------------------------------- */
+
+.catatan-kotak {
+    margin-top: 8px;
+    padding: 8px 10px;
+    border: 1px dashed #dbe3ee;
+    border-radius: 6px;
+    background: #fbfcff;
+}
+
+.catatan-baris + .catatan-baris {
+    margin-top: 8px;
+}
+
+.catatan-label {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #616161;
+}
+
+.catatan-isi {
+    min-height: 58px;
+    font-size: 13px;
+}
+
+.catatan-aksi {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.catatan-pesan {
+    font-size: 12px;
+    color: #757575;
+}
+
+/* ---------------------------------------------------------------------------
+   Isi jawaban lewat Excel (tombol "Isi lewat Excel" pada halaman detail
+   audit auditee: unduh format -> isi -> unggah kembali)
+   --------------------------------------------------------------------------- */
+
+.excel-langkah {
+    padding-left: 18px;
+    margin-bottom: 14px;
+    font-size: 13px;
+    color: #616161;
+}
+
+.excel-langkah li {
+    margin-bottom: 4px;
+}
+
+.excel-unggah {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px dashed #e0e0e0;
+}
+
+.excel-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #616161;
+}
+
+.excel-berkas {
+    display: block;
+    max-width: 100%;
+    margin-bottom: 6px;
+    font-size: 13px;
+}
+
+.excel-info {
+    display: block;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.excel-hasil {
+    margin-top: 14px;
+    margin-bottom: 0;
+    font-size: 13px;
+}
+
+.excel-hasil .excel-daftar {
+    margin: 8px 0 0;
+    padding-left: 18px;
 }

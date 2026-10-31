@@ -89,7 +89,9 @@ $autoload['drivers'] = array();
 |
 |	$autoload['helper'] = array('url', 'file');
 */
-$autoload['helper'] = array('url', 'file','utility','captcha','tanggal');
+/* 'periode' = kotak saring periode (application/helpers/periode_helper.php),
+   dipakai kepala panel pada halaman PPM, auditor, dan auditee. */
+$autoload['helper'] = array('url', 'file','utility','captcha','tanggal','periode');
 
 /*
 | -------------------------------------------------------------------

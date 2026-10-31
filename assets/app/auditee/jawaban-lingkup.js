@@ -1,12 +1,15 @@
 /* =============================================================================
-   Halaman detail audit auditee: jawaban + lampiran tiap PERTANYAAN.
+   Halaman detail audit auditee: jawaban + lampiran tiap BUTIR LINGKUP.
 
-   - Butir tilik (mutu_auditjawabdetail) hanya ditampilkan sebagai penilaian
-     auditor - auditee tidak menjawabnya.
-   - Setiap pertanyaan wajib dijawab (tombol Simpan Jawaban).
-   - Lampiran opsional dan boleh lebih dari satu berkas per pertanyaan.
-   - Tombol "Kirim Hasil Evaluasi" ditolak server selama masih ada pertanyaan
-     yang belum dijawab, dan pesannya ditampilkan di sini.
+   - Daftar pertanyaan yang dijawab berasal dari tabel mutu_lingkup: satu
+     pertanyaan formulir bisa punya banyak butir lingkup dan TIAP butir
+     dijawab sendiri-sendiri (mutu_auditjawab.lingkup_id terisi).
+   - Pertanyaan yang belum punya butir lingkup memakai kotak jawaban tingkat
+     pertanyaan (data lama) - kotaknya bertanda data-wajib="1" juga.
+   - Penilaian auditor (hasil/temuan/catatan) hanya ditampilkan.
+   - Lampiran opsional dan boleh lebih dari satu berkas per butir lingkup.
+   - Tombol "Kirim Hasil Evaluasi" ditolak server selama masih ada butir
+     lingkup yang belum dijawab, dan pesannya ditampilkan di sini.
    ============================================================================= */
 $(function () {
 
@@ -24,7 +27,9 @@ $(function () {
     }
 
     function auditId() {
-        return $('#kirim_hasil').attr('audit_id') || $('.delik').first().attr('audit_id');
+        return $('#kirim_hasil').attr('audit_id')
+            || $('#topik_daftar').data('audit_id')
+            || $('.delik').first().attr('audit_id');
     }
 
     /* ------------------- indikator jumlah jawaban & lampiran -------------------
@@ -33,18 +38,24 @@ $(function () {
        yang berubah, supaya badge ringkasan ("N sudah dijawab", "N belum
        dijawab", "N lampiran") ikut bergerak tanpa memuat ulang halaman. */
 
-    function topikSudahDijawab(topik) {
-        return topik.attr('data-sudah-dijawab') === '1';
+    /* Satu "item wajib" = satu butir lingkup (.lingkup-item[data-wajib="1"]),
+       atau kotak jawaban pertanyaan bila pertanyaannya tanpa butir lingkup. */
+    function itemWajib() {
+        return $('#topik_daftar .lingkup-item[data-wajib="1"], #topik_daftar .jawaban-kotak[data-wajib="1"]');
+    }
+
+    function itemSudahDijawab(el) {
+        return $(el).attr('data-sudah-dijawab') === '1';
     }
 
     function hitungRingkas() {
-        var semua = $('#topik_daftar .topik');
+        var wajib = itemWajib();
 
         return {
-            pertanyaan: semua.length,
-            dijawab: semua.filter(function () { return topikSudahDijawab($(this)); }).length,
-            lampiran: $('#topik_daftar .lampiran[data-lampiran_id]').length,
-            butir: $('#topik_daftar .aktivitas').length
+            butir: $('#topik_daftar .lingkup-item[data-wajib="1"]').length,
+            total: wajib.length,
+            dijawab: wajib.filter(function () { return itemSudahDijawab(this); }).length,
+            lampiran: $('#topik_daftar .lampiran[data-lampiran_id]').length
         };
     }
 
@@ -57,11 +68,20 @@ $(function () {
         window.setTimeout(function () { el.removeClass('ringkas-berubah'); }, 700);
     }
 
+    function tandai(el, sudah) {
+        var kotak = $(el);
+        if (kotak.attr('data-sudah-dijawab') === (sudah ? '1' : '0')) {
+            return false;
+        }
+        kotak.attr('data-sudah-dijawab', sudah ? '1' : '0');
+        return true;
+    }
+
     function perbaruiRingkas() {
         var angka = hitungRingkas();
-        var belum = angka.pertanyaan - angka.dijawab;
+        var belum = angka.total - angka.dijawab;
 
-        ubahAngka('#jml_lingkup', angka.butir + ' butir tilik');
+        ubahAngka('#jml_lingkup', angka.butir + ' butir lingkup');
         ubahAngka('#jml_dijawab', angka.dijawab + ' sudah dijawab');
         ubahAngka('#sisa_belum', belum + ' belum dijawab');
         ubahAngka('#jml_lampiran', angka.lampiran + ' lampiran');
@@ -70,11 +90,48 @@ $(function () {
         $('#topik_daftar .topik').each(function () {
             var topik = $(this);
             var badge = topik.find('.topik-dijawab').first();
+            var punya = topik.attr('data-punya-lingkup') === '1';
+
+            if (punya) {
+                var semua = topik.find('.lingkup-item[data-wajib="1"]');
+                var selesai = semua.filter(function () { return itemSudahDijawab(this); }).length;
+                tandai(topik, semua.length > 0 && selesai === semua.length);
+
+                if (badge.length) {
+                    var teks = selesai + '/' + semua.length + ' dijawab';
+                    if (badge.text().trim() !== teks) {
+                        badge.text(teks).addClass('ringkas-berubah');
+                        window.setTimeout(function () { badge.removeClass('ringkas-berubah'); }, 700);
+                    }
+                }
+            } else {
+                var kotak = topik.find('.jawaban-kotak[data-wajib="1"]').first();
+                var sudah = kotak.length ? itemSudahDijawab(kotak) : topik.attr('data-sudah-dijawab') === '1';
+                tandai(topik, sudah);
+
+                if (badge.length) {
+                    var teksTopik = sudah ? 'sudah dijawab' : 'belum dijawab';
+                    if (badge.text().trim() !== teksTopik) {
+                        badge.text(teksTopik).addClass('ringkas-berubah');
+                        window.setTimeout(function () { badge.removeClass('ringkas-berubah'); }, 700);
+                    }
+                }
+            }
+
+            if (badge.length) {
+                badge.removeClass('badge-success badge-warning')
+                    .addClass(topik.attr('data-sudah-dijawab') === '1' ? 'badge-success' : 'badge-warning');
+            }
+        });
+
+        // Badge "sudah/belum dijawab" pada tiap butir lingkup.
+        $('#topik_daftar .lingkup-item[data-wajib="1"]').each(function () {
+            var item = $(this);
+            var badge = item.find('.lingkup-status').first();
             if (!badge.length) {
                 return;
             }
-
-            var sudah = topikSudahDijawab(topik);
+            var sudah = itemSudahDijawab(item);
             var teks = sudah ? 'sudah dijawab' : 'belum dijawab';
             if (badge.text().trim() !== teks) {
                 badge.text(teks).addClass('ringkas-berubah');
@@ -92,17 +149,21 @@ $(function () {
         return belum;
     }
 
-    /* ---------------------- simpan jawaban satu pertanyaan ---------------------- */
+    /* ---------------------- simpan jawaban satu butir lingkup ------------------ */
 
     $('#topik_daftar').on('click', '.jawaban-simpan', function () {
         var tombol = $(this);
         var kotak = tombol.closest('.jawaban-kotak');
         var topik = tombol.closest('.topik');
+        var item = tombol.closest('.lingkup-item');
+        var lingkup_id = tombol.attr('lingkup_id') || (item.length ? item.data('lingkup_id') : 0);
         var dtform_id = tombol.attr('dtform_id') || topik.data('dtform_id');
         var teks = String(kotak.find('.jawaban-isi').val() || '').trim();
 
         if (teks === '') {
-            pesan('Oops', 'Jawaban wajib diisi untuk setiap pertanyaan.', 'error');
+            pesan('Oops', item.length
+                ? 'Jawaban wajib diisi untuk setiap butir lingkup.'
+                : 'Jawaban wajib diisi untuk setiap pertanyaan.', 'error');
             kotak.find('.jawaban-isi').focus();
             return;
         }
@@ -110,7 +171,12 @@ $(function () {
         $.ajax({
             url: base_url + "/dashboard/jawablingkup",
             type: "POST",
-            data: { audit_id: auditId(), dtform_id: dtform_id, jwb_jawaban: teks },
+            data: {
+                audit_id: auditId(),
+                lingkup_id: lingkup_id,
+                dtform_id: dtform_id,
+                jwb_jawaban: teks
+            },
             dataType: "json",
             success: function (hasil) {
                 if (!hasil || !hasil.status) {
@@ -119,7 +185,11 @@ $(function () {
                 }
 
                 kotak.find('.jawaban-pesan').text('tersimpan ' + waktuSekarang());
-                topik.attr('data-sudah-dijawab', '1');
+                if (item.length) {
+                    tandai(item, true);
+                } else {
+                    tandai(kotak, true);
+                }
                 perbaruiRingkas();
                 pesan('Tersimpan', hasil.pesan, 'success');
             },
@@ -142,6 +212,7 @@ $(function () {
         var kotak = tombol.closest('.lampiran-kotak');
         var topik = tombol.closest('.topik');
         var masukan = kotak.find('.lampiran-berkas');
+        var lingkup_id = tombol.attr('lingkup_id') || 0;
         var dtform_id = tombol.attr('dtform_id') || topik.data('dtform_id');
 
         if (!masukan.length || !masukan[0].files.length) {
@@ -151,6 +222,7 @@ $(function () {
 
         var data = new FormData();
         data.append('audit_id', auditId());
+        data.append('lingkup_id', lingkup_id);
         data.append('dtform_id', dtform_id);
         $.each(masukan[0].files, function (i, berkas) {
             data.append('lampiran[]', berkas);
@@ -175,8 +247,9 @@ $(function () {
                     return;
                 }
 
+                var daftar = kotak.find('.lampiran-daftar').first();
                 $.each(hasil.lampiran, function (i, l) {
-                    kotak.find('.lampiran-daftar').first().append(barisLampiran(l));
+                    daftar.append(barisLampiran(l));
                 });
                 masukan.val('');
                 perbaruiRingkas();
@@ -242,6 +315,93 @@ $(function () {
         });
     });
 
+    /* --------------------------- isi jawaban lewat Excel ---------------------------
+
+       Alur: unduh format (sudah berisi butir lingkup formulir audit ini) ->
+       isi jawaban & tautan lampiran di Excel -> unggah kembali. Lampiran
+       tidak memakai berkas, cukup tautan (link) pada kolom Link Lampiran. */
+
+
+    function kotakHasil(tipe) {
+        return $('#excel_hasil').removeClass('alert-success alert-danger')
+            .addClass('alert alert-' + tipe).empty().show();
+    }
+
+    $('#isi_excel').on('click', function () {
+        $('#berkas_jawaban').val('');
+        $('#excel_hasil').hide().empty();
+        $('#excelModal').modal('show');
+    });
+
+    $('#unggah_jawaban').on('click', function () {
+        var masukan = $('#berkas_jawaban')[0];
+
+        if (!masukan || !masukan.files.length) {
+            pesan('Oops', 'Pilih berkas Excel yang sudah diisi terlebih dahulu.', 'error');
+            return;
+        }
+
+        var data = new FormData();
+        data.append('audit_id', auditId());
+        data.append('berkas', masukan.files[0]);
+
+        var tombol = $(this);
+        tombol.prop('disabled', true);
+        muat();
+
+        $.ajax({
+            url: base_url + "/dashboard/unggahjawaban",
+            type: "POST",
+            data: data,
+            processData: false,
+            contentType: false,
+            dataType: "json",
+            success: function (hasil) {
+                swal.close();
+                tombol.prop('disabled', false);
+
+                if (!hasil || !hasil.status) {
+                    var kotak = kotakHasil('danger');
+                    kotak.append($('<strong></strong>')
+                        .text(hasil && hasil.pesan ? hasil.pesan : 'Berkas gagal diproses.'));
+                    if (hasil && hasil.dilewati && hasil.dilewati.length) {
+                        var daftar = $('<ul class="excel-daftar"></ul>');
+                        $.each(hasil.dilewati, function (i, teks) {
+                            daftar.append($('<li></li>').text(teks));
+                        });
+                        kotak.append(daftar);
+                    }
+                    return;
+                }
+
+                var sukses = kotakHasil('success');
+                sukses.append($('<strong></strong>').text(hasil.pesan));
+                if (hasil.dilewati && hasil.dilewati.length) {
+                    var lewati = $('<ul class="excel-daftar"></ul>');
+                    $.each(hasil.dilewati, function (i, teks) {
+                        lewati.append($('<li></li>').text(teks));
+                    });
+                    sukses.append(lewati);
+                }
+
+                /* Muat ulang supaya jawaban & tautan baru langsung tampil. */
+                swal.fire({
+                    title: 'Tersimpan',
+                    text: hasil.pesan,
+                    type: 'success'
+                }).then(function () {
+                    window.location.reload();
+                });
+            },
+            error: function () {
+                swal.close();
+                tombol.prop('disabled', false);
+                kotakHasil('danger')
+                    .text('Tidak dapat menghubungi server. Pastikan ukuran berkas tidak melebihi 5 MB.');
+            }
+        });
+    });
+
     /* --------------------------- kirim hasil evaluasi --------------------------- */
 
     $('#kirim_hasil').on('click', function () {
@@ -249,7 +409,8 @@ $(function () {
         var belum = perbaruiRingkas();
 
         if (belum > 0) {
-            pesan('Belum lengkap', 'Masih ada ' + belum + ' pertanyaan yang belum dijawab. Setiap pertanyaan wajib dijawab sebelum hasil dikirim.', 'warning');
+            pesan('Belum lengkap', 'Masih ada ' + belum + ' butir lingkup yang belum dijawab. '
+                + 'Setiap butir lingkup wajib dijawab sebelum hasil dikirim.', 'warning');
             return;
         }
 
@@ -291,5 +452,9 @@ $(function () {
             });
         });
     });
+
+    /* Hitung ulang sekali saat halaman dibuka (berjaga-jaga bila hitungan
+       server dan tampilan berbeda, mis. setelah butir lingkup ditambah PPM). */
+    perbaruiRingkas();
 
 });

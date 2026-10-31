@@ -195,6 +195,10 @@ class AkunModel extends CI_Model {
     function getAllAuditor() {
         $this->db->from($this->table);
         $this->db->where("role","AUDITOR");
+        /* Akun yang dinonaktifkan tidak lagi ditawarkan sebagai auditor. */
+        if ($this->db->field_exists('valid', $this->table)) {
+            $this->db->where('(valid IS NULL OR valid = 1)', NULL, FALSE);
+        }
         $query = $this->db->get();
         return $query->result_array();
     }
@@ -202,6 +206,10 @@ class AkunModel extends CI_Model {
     function getAllAuditee() {
         $this->db->from($this->table);
         $this->db->where("role","AUDITEE");
+        /* Akun yang dinonaktifkan tidak lagi ditawarkan sebagai auditee. */
+        if ($this->db->field_exists('valid', $this->table)) {
+            $this->db->where('(valid IS NULL OR valid = 1)', NULL, FALSE);
+        }
         $query = $this->db->get();
         return $query->result_array();
     }

@@ -1,0 +1,223 @@
+/* PTK (Permintaan Tindakan Koreksi) - halaman PPM.
+ *
+ * Satu baris = satu butir tilik yang sudah dinilai auditor (OB / TS MINOR /
+ * TS MAYOR) pada seluruh unit. Rencana koreksi hanya DITAMPILKAN di sini;
+ * yang menulis tetap auditee.
+ *
+ * Data mengikuti saringan periode pada kepala panel (bawaan: periode aktif).
+ */
+$(function () {
+
+    var daftarptk = $('#ptk').DataTable({
+        /* Sama seperti PTK auditor & auditee: lebarnya diatur CSS dan
+           digeser mendatar, jadi tidak ada kolom yang disembunyikan. */
+        "responsive": false,
+        /* Lebar kolom diatur CSS (persentase + table-layout fixed pada
+           assets/app/ptk.css), bukan dihitung DataTables dari isi sel. */
+        "autoWidth": false,
+        "processing": true,
+        "serverSide": true,
+        "searching": true,
+        "order": [],
+        "columnDefs": [
+            /* Kolom No, Rencana Koreksi & Status tidak dapat diurutkan. */
+            {"targets": [0, 8, 9], "orderable": false},
+            /* Kelas kolom diambil dari header (lihat assets/app/ptk.css)
+               supaya lebarnya proporsional. */
+            {"targets": 0, "className": "ptk-kolom-no"},
+            {"targets": 1, "className": "ptk-kolom-formulir"},
+            {"targets": 2, "className": "ptk-kolom-auditee"},
+            {"targets": 3, "className": "ptk-kolom-unit"},
+            {"targets": 4, "className": "ptk-kolom-butir"},
+            {"targets": 5, "className": "ptk-kolom-hasil"},
+            {"targets": 6, "className": "ptk-kolom-temuan"},
+            {"targets": 7, "className": "ptk-kolom-catatan"},
+            {"targets": 8, "className": "ptk-kolom-koreksi"},
+            {"targets": 9, "className": "ptk-kolom-status"}
+        ],
+        "ajax": {
+            "url": base_url + "/ptk/listptk/",
+            "type": "POST",
+            /* Saringan periode ikut dikirim; kosong = semua periode. */
+            "data": function (d) {
+                d.periode_id = $('#filter_periode').val();
+            }
+        }
+    });
+
+    /* Kotak cari pada kepala panel (menggantikan kotak bawaan DataTables,
+       lihat aturan .ptk-tabel-kotak .dataTables_filter pada ptk.css). */
+    $('#cari_ptk').on('input', function () {
+        daftarptk.search(String(this.value || '').trim()).draw();
+    });
+
+    /* Saringan periode pada kepala panel: bawaan = periode aktif (dipilih
+       di halaman), kosong = semua periode. Tabel dimuat ulang dan angka
+       kartu statistik ikut diperbarui. */
+    $('#filter_periode').on('change', function () {
+        daftarptk.ajax.reload();
+        perbaruiKartu($(this).val());
+    });
+
+    function angka(nilai) {
+        return String(nilai === null || nilai === undefined ? 0 : nilai)
+            .replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
+    /* Batang kemajuan kartu: persen null -> batang disembunyikan. */
+    function aturBar(id, persen, ket) {
+        if (persen === null) {
+            $('#' + id + '_bar_kotak').hide();
+            $('#' + id + '_bar_ket').hide().text('');
+            return;
+        }
+        $('#' + id + '_bar_kotak').show().attr('aria-label', ket);
+        $('#' + id + '_bar').css('width', persen + '%');
+        $('#' + id + '_bar_ket').show().text(ket);
+    }
+
+    /* Angka kartu statistik untuk periode terpilih (ptk/statistik). */
+    function perbaruiKartu(periode_id) {
+        $.ajax({
+            url: base_url + "/ptk/statistik",
+            type: "POST",
+            dataType: "json",
+            data: {periode_id: periode_id}
+        }).done(function (data) {
+            if (!data || !data.status) {
+                return;
+            }
+
+            var total    = parseInt(data.total, 10) || 0;
+            var observasi = parseInt(data.observasi, 10) || 0;
+            var minor    = parseInt(data.minor, 10) || 0;
+            var mayor    = parseInt(data.mayor, 10) || 0;
+            var sudah    = parseInt(data.sudah_koreksi, 10) || 0;
+            var sisa     = parseInt(data.tanpa_koreksi, 10) || 0;
+
+            function persen(nilai) {
+                return total > 0 ? Math.round(nilai * 100 / total) : null;
+            }
+
+            $('#stat_total').text(angka(total));
+            $('#stat_observasi').text(angka(observasi));
+            $('#stat_minor').text(angka(minor));
+            $('#stat_mayor').text(angka(mayor));
+
+            $('#stat_total_ket').text(total > 0
+                ? sudah + ' sudah ditindaklanjuti, ' + sisa + ' belum'
+                : 'Belum ada temuan');
+
+            var p_total = total > 0 ? Math.round(sudah * 100 / total) : null;
+            aturBar('stat_total', p_total,
+                p_total === null ? '' : p_total + '% sudah ada rencana koreksi');
+
+            var kategori = [
+                {id: 'stat_observasi', nilai: observasi},
+                {id: 'stat_minor', nilai: minor},
+                {id: 'stat_mayor', nilai: mayor}
+            ];
+            $.each(kategori, function (i, k) {
+                var p = persen(k.nilai);
+                aturBar(k.id, p, p === null ? '' : p + '% dari total temuan');
+            });
+        });
+    }
+
+
+    /* ------------------------------------------------------------------
+       Kolom Status: TEKS BEBAS penanda tindak lanjut tiap temuan.
+       Sama seperti laman PTK auditor: tombol pensil -> modal -> textarea
+       -> simpan, sehingga PPM ikut dapat menulis statusnya.
+       ------------------------------------------------------------------ */
+    var status_dtjwb_id = 0;
+    var status_audit_id = 0;
+
+    $('#ptk').on('click', '.edit-status', function () {
+        var $btn = $(this);
+        status_dtjwb_id = $btn.attr('dtjwb_id');
+        status_audit_id = $btn.attr('audit_id');
+
+        $.ajax({
+            url: base_url + "/ptk/getbutir/" + status_audit_id + "/" + status_dtjwb_id,
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                if (!data.status) {
+                    swal.fire("Oops", data.pesan || "Data tidak ditemukan", "error");
+                    return;
+                }
+
+                $('#status_dtjwb_id').val(status_dtjwb_id);
+                $('#status_audit_id').val(status_audit_id);
+                $('#status_butir').text(data.lingkup_isi || '-');
+                $('#status_koreksi').text(data.jwb_koreksi || 'Belum ada rencana koreksi');
+                $('#ptk_status').val(data.jwb_status || '');
+                $('#statusModal').modal('show');
+            },
+            error: function () {
+                swal.fire("Oops", "No connection!", "error");
+            }
+        });
+    });
+
+    $('#formstatus').on('submit', function (e) {
+        e.preventDefault();
+
+        var teks = $('#ptk_status').val() || '';
+
+        $('#statusModal').modal('hide');
+        swal.fire({
+            title: 'Menyimpan...',
+            allowEscapeKey: false,
+            allowOutsideClick: false,
+            onOpen: function () {
+                swal.showLoading();
+            }
+        });
+
+        $.ajax({
+            url: base_url + "/ptk/updatestatus",
+            type: "POST",
+            dataType: "json",
+            data: {
+                audit_id: $('#status_audit_id').val(),
+                dtjwb_id: $('#status_dtjwb_id').val(),
+                ptk_status: teks
+            }
+        }).done(function (res) {
+            swal.close();
+
+            if (res && res.status) {
+                daftarptk.ajax.reload();
+                swal.fire({
+                    title: "Berhasil",
+                    text: res.pesan || "Status tersimpan.",
+                    type: "success",
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            } else {
+                swal.fire("Gagal", (res && res.pesan) ? res.pesan : "Gagal menyimpan status.", "error");
+            }
+        }).fail(function () {
+            swal.close();
+            swal.fire("Oops", "Gagal menghubungi server!", "error");
+        });
+    });
+
+    /* Unduh Form PTK: satu lembar per temuan pada saringan yang sedang
+       aktif, dengan kolom isian yang sudah terisi datanya (Formptk.php).
+       Saringan dikirim melalui query string supaya berkas dihasilkan
+       persis dari baris yang sedang tampil. */
+    $('#unduh_formptk').on('click', function (e) {
+        e.preventDefault();
+
+        var periode = String($('#filter_periode').val() || '');
+        var cari    = String($('#cari_ptk').val() || '').trim();
+
+        window.location.href = base_url + "/ptk/formexcel"
+            + "?periode_id=" + encodeURIComponent(periode)
+            + "&cari=" + encodeURIComponent(cari);
+    });
+});

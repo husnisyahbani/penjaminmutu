@@ -21,9 +21,11 @@ class AuditjawabModel extends CI_Model {
         parent::__construct();
     }
 
-    var $column_search = array('dtform_pertanyaan','jwb_jawaban','jwb_hasil','jwb_temuan','jwb_catatan');
+    /* Kolom penilaian (jwb_hasil/jwb_temuan/jwb_catatan) sudah dihapus
+       dari mutu_auditjawab. */
+    var $column_search = array('dtform_pertanyaan','jwb_jawaban');
     /* Lingkup kini berupa daftar butir (ditampilkan dari tabel lingkup). */
-    var $column_order = array(null,'dtform_pertanyaan','dtform_pertanyaan','jwb_jawaban','jwb_hasil','jwb_temuan','jwb_catatan');
+    var $column_order = array(null,'dtform_pertanyaan','dtform_pertanyaan','jwb_jawaban');
     var $order = array('audit_id' => 'asc');
 
     private function _get_datatables_query($search, $ordering) {
@@ -61,9 +63,6 @@ class AuditjawabModel extends CI_Model {
         $this->db->select("audit_status");
         $this->db->select("dt.dtform_id as dtform_id");
         $this->db->select("dt.dtform_pertanyaan as dtform_pertanyaan");
-        $this->db->select("(SELECT jwb_catatan from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id" . $this->_lingkupNull() . ") as jwb_catatan");
-        $this->db->select("(SELECT jwb_temuan from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id" . $this->_lingkupNull() . ") as jwb_temuan");
-        $this->db->select("(SELECT jwb_hasil from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id" . $this->_lingkupNull() . ") as jwb_hasil");
         $this->db->select("(SELECT jwb_jawaban from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id" . $this->_lingkupNull() . ") as jwb_jawaban");
         $this->db->from('audit au');
         $this->db->join('detailform dt', 'dt.form_id = au.form_id', 'left');
@@ -119,9 +118,6 @@ class AuditjawabModel extends CI_Model {
         $this->db->select("audit_status");
         $this->db->select("dt.dtform_id as dtform_id");
         $this->db->select("dt.dtform_pertanyaan as dtform_pertanyaan");
-        $this->db->select("(SELECT jwb_catatan from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id" . $this->_lingkupNull() . ") as jwb_catatan");
-        $this->db->select("(SELECT jwb_temuan from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id" . $this->_lingkupNull() . ") as jwb_temuan");
-        $this->db->select("(SELECT jwb_hasil from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id" . $this->_lingkupNull() . ") as jwb_hasil");
         $this->db->select("(SELECT jwb_jawaban from mutu_auditjawab where audit_id = au.audit_id AND dtform_id = dt.dtform_id" . $this->_lingkupNull() . ") as jwb_jawaban");
         $this->db->from('audit au');
         $this->db->join('detailform dt', 'dt.form_id = au.form_id', 'left');
@@ -244,6 +240,47 @@ class AuditjawabModel extends CI_Model {
 
 
     /**
+     * Penilaian auditor & rencana koreksi per butir lingkup pada satu
+     * pertanyaan, dibaca dari mutu_auditjawabdetail.
+     *
+     * Kolom penilaian pada mutu_auditjawab (jwb_hasil, jwb_temuan,
+     * jwb_catatan, jwb_koreksi) sudah dihapus, jadi satu-satunya sumber
+     * nilai adalah baris tilik (mutu_auditjawabdetail) yang
+     * lingkup_id-nya terisi.
+     *
+     * @param  int $audit_id
+     * @param  int $dtform_id
+     * @return array lingkup_id => array(dtjwb_hasil, dtjwb_temuan,
+     *               dtjwb_catatan, dtjwb_koreksi, dtjwb_referensi)
+     */
+    private function _nilaiPerLingkup($audit_id, $dtform_id) {
+        $nilai = array();
+        if (!$this->db->field_exists('lingkup_id', 'auditjawabdetail')) {
+            return $nilai;
+        }
+
+        $this->db->select('d.dtjwb_id, d.lingkup_id, d.dtjwb_referensi');
+        $this->db->select('d.dtjwb_hasil, d.dtjwb_temuan, d.dtjwb_catatan');
+        if ($this->db->field_exists('dtjwb_koreksi', 'auditjawabdetail')) {
+            $this->db->select('d.dtjwb_koreksi');
+        }
+        $this->db->from('auditjawabdetail d');
+        $this->db->join('auditjawab j', 'j.jwb_id = d.jwb_id', 'inner');
+        $this->db->where('j.audit_id', (int) $audit_id);
+        $this->db->where('j.dtform_id', (int) $dtform_id);
+        $this->db->where('d.lingkup_id IS NOT NULL', NULL, FALSE);
+        $this->db->order_by('d.dtjwb_id', 'ASC');
+        foreach ($this->db->get()->result_array() as $d) {
+            $lid = (int) $d['lingkup_id'];
+            if ($lid > 0 && !isset($nilai[$lid])) {
+                $nilai[$lid] = $d;
+            }
+        }
+
+        return $nilai;
+    }
+
+    /**
      * Baris daftar tilik satu pertanyaan, digabung dari struktur baru
      * (butir lingkup + auditjawab) dan sisa data lama yang belum terpetakan.
      * Kunci keluaran mengikuti nama lama (dtjwb_*) agar tampilan/ekspor tetap jalan.
@@ -252,11 +289,13 @@ class AuditjawabModel extends CI_Model {
         /* Bila tabel lingkup (struktur lama) belum ada, butir tilik dibaca
            dari mutu_auditjawabdetail dengan kunci lama (dtjwb_*). */
         if (!$this->db->table_exists('lingkup')) {
-            $kolom_koreksi = $this->db->field_exists('dtjwb_koreksi', 'auditjawabdetail')
-                ? 'd.dtjwb_koreksi' : 'j.jwb_koreksi';
+            /* Rencana koreksi tersimpan pada mutu_auditjawabdetail.dtjwb_koreksi;
+               kolom lama mutu_auditjawab.jwb_koreksi sudah dihapus. */
             $this->db->select('d.dtjwb_id, d.dtjwb_referensi, d.dtjwb_pertanyaan');
             $this->db->select('d.dtjwb_hasil, d.dtjwb_temuan, d.dtjwb_catatan');
-            $this->db->select($kolom_koreksi . ' AS dtjwb_koreksi', FALSE);
+            if ($this->db->field_exists('dtjwb_koreksi', 'auditjawabdetail')) {
+                $this->db->select('d.dtjwb_koreksi');
+            }
             $this->db->from('auditjawabdetail d');
             $this->db->join('auditjawab j', 'j.jwb_id = d.jwb_id', 'inner');
             $this->db->where('j.audit_id', $audit_id);
@@ -265,6 +304,9 @@ class AuditjawabModel extends CI_Model {
 
             $baris = array();
             foreach ($this->db->get()->result_array() as $b) {
+                if (!isset($b['dtjwb_koreksi'])) {
+                    $b['dtjwb_koreksi'] = '';
+                }
                 $b['lingkup_id'] = $b['dtjwb_id'];
                 $b['baris']      = 'butir';
                 $baris[]         = $b;
@@ -277,22 +319,27 @@ class AuditjawabModel extends CI_Model {
         $baris = array();
 
         // a) butir lingkup struktur baru
+        /* Penilaian (hasil/temuan/catatan) serta rencana koreksi tersimpan
+           pada mutu_auditjawabdetail; kolom penilaian pada mutu_auditjawab
+           (jwb_hasil/jwb_temuan/jwb_catatan/jwb_koreksi) sudah dihapus. */
+        $nilai = $this->_nilaiPerLingkup($audit_id, $dtform_id);
+
         $this->db->select('lg.lingkup_id, lg.lingkup_isi');
-        $this->db->select('jb.jwb_hasil, jb.jwb_temuan, jb.jwb_catatan, jb.jwb_koreksi');
         $this->db->from('lingkup lg');
-        $this->db->join('auditjawab jb', 'jb.audit_id = ' . (int) $audit_id . ' AND jb.lingkup_id = lg.lingkup_id', 'left');
         $this->db->where('lg.dtform_id', $dtform_id);
         $this->db->order_by('lg.lingkup_urut', 'asc');
         $this->db->order_by('lg.lingkup_id', 'asc');
         foreach ($this->db->get()->result_array() as $b) {
+            $lid = (int) $b['lingkup_id'];
+            $n   = isset($nilai[$lid]) ? $nilai[$lid] : array();
             $baris[] = array(
                 'dtjwb_id'         => $b['lingkup_id'],
-                'dtjwb_referensi'  => '',
+                'dtjwb_referensi'  => isset($n['dtjwb_referensi']) ? $n['dtjwb_referensi'] : '',
                 'dtjwb_pertanyaan' => $b['lingkup_isi'],
-                'dtjwb_hasil'      => $b['jwb_hasil'],
-                'dtjwb_temuan'     => $b['jwb_temuan'],
-                'dtjwb_catatan'    => $b['jwb_catatan'],
-                'dtjwb_koreksi'    => $b['jwb_koreksi'],
+                'dtjwb_hasil'      => isset($n['dtjwb_hasil']) ? $n['dtjwb_hasil'] : '',
+                'dtjwb_temuan'     => isset($n['dtjwb_temuan']) ? $n['dtjwb_temuan'] : '',
+                'dtjwb_catatan'    => isset($n['dtjwb_catatan']) ? $n['dtjwb_catatan'] : '',
+                'dtjwb_koreksi'    => isset($n['dtjwb_koreksi']) ? $n['dtjwb_koreksi'] : '',
                 'lingkup_id'       => $b['lingkup_id'],
                 'baris'            => 'butir',
             );
@@ -306,13 +353,12 @@ class AuditjawabModel extends CI_Model {
             $this->db->where('lingkup_id IS NULL', NULL, FALSE);
         }
             foreach ($this->db->get('auditjawabdetail')->result_array() as $d) {
-                /* Baris lama tidak punya kolom koreksi (kolom itu ada pada
-                   auditjawab.jwb_koreksi) dan boleh jadi tidak punya kolom
-                   referensi. Lengkapi kuncinya agar bentuknya sama dengan
-                   baris butir, sehingga pemakai tidak menemui "undefined
-                   index" dan koreksi lama tetap terbaca. */
+                /* Baris lama boleh jadi tidak punya kolom koreksi
+                   (mutu_auditjawabdetail.dtjwb_koreksi) dan kolom referensi.
+                   Lengkapi kuncinya agar bentuknya sama dengan baris butir,
+                   sehingga pemakai tidak menemui "undefined index". */
                 $d['dtjwb_referensi'] = isset($d['dtjwb_referensi']) ? $d['dtjwb_referensi'] : '';
-                $d['dtjwb_koreksi']   = isset($jwb['jwb_koreksi']) ? $jwb['jwb_koreksi'] : '';
+                $d['dtjwb_koreksi']   = isset($d['dtjwb_koreksi']) ? $d['dtjwb_koreksi'] : '';
                 $d['lingkup_id']      = isset($d['lingkup_id']) ? $d['lingkup_id'] : NULL;
                 $d['baris'] = 'lama';
                 $baris[] = $d;
@@ -387,7 +433,7 @@ class AuditjawabModel extends CI_Model {
 
         /* Jawaban tingkat pertanyaan (jawaban auditee + tujuan). */
         $induk = array();
-        $this->db->select('jwb_id, dtform_id, jwb_jawaban, jwb_tujuan, jwb_referensi');
+        $this->db->select('jwb_id, dtform_id, jwb_jawaban, jwb_tujuan');
         $this->db->where('audit_id', $audit_id);
         if ($this->db->field_exists('lingkup_id', 'auditjawab')) {
             $this->db->where('lingkup_id IS NULL', NULL, FALSE);
@@ -397,13 +443,15 @@ class AuditjawabModel extends CI_Model {
         }
 
         /* Butir tilik + penilaian auditor (read-only bagi auditee). */
-        $kolom_koreksi = $this->db->field_exists('dtjwb_koreksi', 'auditjawabdetail')
-            ? 'd.dtjwb_koreksi' : 'j.jwb_koreksi';
+        /* Kolom lama mutu_auditjawab.jwb_koreksi sudah dihapus: rencana
+           koreksi hanya ada pada mutu_auditjawabdetail.dtjwb_koreksi. */
 
         $this->db->select('d.dtjwb_id, d.dtjwb_referensi, d.dtjwb_pertanyaan');
         $this->db->select('d.dtjwb_hasil, d.dtjwb_temuan, d.dtjwb_catatan');
         $this->db->select('j.jwb_id, j.dtform_id');
-        $this->db->select($kolom_koreksi . ' AS jwb_koreksi', FALSE);
+        if ($this->db->field_exists('dtjwb_koreksi', 'auditjawabdetail')) {
+            $this->db->select('d.dtjwb_koreksi AS jwb_koreksi', FALSE);
+        }
         $this->db->from('auditjawabdetail d');
         $this->db->join('auditjawab j', 'j.jwb_id = d.jwb_id', 'inner');
         $this->db->where('j.audit_id', $audit_id);
@@ -445,7 +493,7 @@ class AuditjawabModel extends CI_Model {
                 $butir[$k]['jwb_hasil']    = $b['dtjwb_hasil'];
                 $butir[$k]['jwb_temuan']   = $b['dtjwb_temuan'];
                 $butir[$k]['jwb_catatan']  = $b['dtjwb_catatan'];
-                $butir[$k]['jwb_koreksi']  = $b['jwb_koreksi'];
+                $butir[$k]['jwb_koreksi']  = isset($b['jwb_koreksi']) ? $b['jwb_koreksi'] : '';
 
                 /* Nama kunci lama dipertahankan untuk penampil auditor/admin. */
                 $butir[$k]['lingkup_id']   = $dtjwb_id;
@@ -485,6 +533,396 @@ class AuditjawabModel extends CI_Model {
         }
 
         return $topik;
+    }
+
+
+    /* =====================================================================
+     | DAFTAR PERTANYAAN DARI TABEL mutu_lingkup
+     |
+     | Halaman detail audit auditee menampilkan BUTIR LINGKUP (mutu_lingkup)
+     | sebagai daftar pertanyaan, dan auditee menjawab TIAP butir lingkup.
+     | Jawaban per butir tersimpan pada mutu_auditjawab dengan kolom
+     | lingkup_id terisi; baris pertanyaan (lingkup_id NULL) tetap dipakai
+     | sebagai cadangan untuk pertanyaan yang belum punya butir lingkup.
+     * ================================================================== */
+
+    /** Tabel butir lingkup (mutu_lingkup) sudah siap dipakai? */
+    function lingkupSiap() {
+        return $this->db->table_exists('lingkup');
+    }
+
+    /**
+     * Satu butir lingkup, dipastikan termasuk formulir audit ini.
+     *
+     * @return array|NULL
+     */
+    function butirLingkupAudit($audit_id, $lingkup_id) {
+        if (!$this->lingkupSiap() || empty($lingkup_id)) {
+            return NULL;
+        }
+
+        $this->db->select('lg.lingkup_id, lg.dtform_id, lg.lingkup_isi, lg.lingkup_urut');
+        $this->db->from('lingkup lg');
+        $this->db->join('detailform dt', 'dt.dtform_id = lg.dtform_id', 'inner');
+        $this->db->join('audit au', 'au.form_id = dt.form_id', 'inner');
+        $this->db->where('au.audit_id', $audit_id);
+        $this->db->where('lg.lingkup_id', $lingkup_id);
+        return $this->db->get()->row_array();
+    }
+
+    /**
+     * Pastikan baris jawaban untuk satu butir lingkup ada, lalu kembalikan
+     * jwb_id-nya. Mengembalikan 0 bila butir bukan milik audit ini.
+     */
+    function pastikanButir($audit_id, $lingkup_id) {
+        if (!$this->_adaLingkup()) {
+            return 0;
+        }
+
+        $butir = $this->butirLingkupAudit($audit_id, $lingkup_id);
+        if (!$butir) {
+            return 0;
+        }
+
+        $this->db->where('audit_id', $audit_id);
+        $this->db->where('lingkup_id', $lingkup_id);
+        $this->db->order_by('jwb_id', 'asc');
+        $baris = $this->db->get('auditjawab')->row_array();
+        if ($baris) {
+            return (int) $baris['jwb_id'];
+        }
+
+        $isi = array(
+            'audit_id'   => $audit_id,
+            'dtform_id'  => $butir['dtform_id'],
+            'lingkup_id' => $lingkup_id,
+        );
+        if ($this->db->field_exists('jwb_create', 'auditjawab')) {
+            $isi['jwb_create'] = date('Y-m-d H:i:s');
+        }
+        $this->db->insert('auditjawab', $isi);
+
+        return (int) $this->db->insert_id();
+    }
+
+    /**
+     * Simpan jawaban auditee untuk SATU BUTIR LINGKUP (halaman detail audit).
+     */
+    function simpanJawabanButir($audit_id, $lingkup_id, $teks) {
+        $teks = trim((string) $teks);
+        if ($teks === '') {
+            return array('status' => FALSE, 'pesan' => 'Jawaban wajib diisi untuk setiap butir lingkup.');
+        }
+
+        $butir = $this->butirLingkupAudit($audit_id, $lingkup_id);
+        if (!$butir) {
+            return array('status' => FALSE, 'pesan' => 'Butir lingkup tidak ditemukan pada audit ini.');
+        }
+
+        /* Basis data belum punya kolom auditjawab.lingkup_id: simpan ke baris
+           pertanyaan supaya jawaban tetap tersimpan (struktur lama). */
+        if (!$this->_adaLingkup()) {
+            return $this->simpanJawabanPertanyaan($audit_id, $butir['dtform_id'], $teks);
+        }
+
+        $jwb_id = $this->pastikanButir($audit_id, $lingkup_id);
+        if (!$jwb_id) {
+            return array('status' => FALSE, 'pesan' => 'Baris jawaban butir lingkup gagal disiapkan.');
+        }
+
+        $allowed_tags = '<p><br><b><i><u><strong><em><ul><ol><li>';
+        $teks = trim(strip_tags($teks, $allowed_tags));
+
+        $isi = array('jwb_jawaban' => $teks);
+        if ($this->db->field_exists('jwb_update', 'auditjawab')) {
+            $isi['jwb_update'] = date('Y-m-d H:i:s');
+        }
+        $this->db->where('jwb_id', $jwb_id);
+        $this->db->update('auditjawab', $isi);
+
+        return array(
+            'status'      => TRUE,
+            'pesan'       => 'Jawaban tersimpan.',
+            'jwb_id'      => (int) $jwb_id,
+            'lingkup_id'  => (int) $lingkup_id,
+            'dtform_id'   => (int) $butir['dtform_id'],
+            'jwb_jawaban' => $teks,
+        );
+    }
+
+    /**
+     * Peta pertanyaan (topik) + butir lingkup dari tabel mutu_lingkup.
+     *
+     * Tiap butir lingkup adalah pertanyaan yang DIJAWAB AUDITEE. Selain
+     * jawaban, tiap butir memuat penilaian auditor (hasil/temuan/catatan) dan
+     * rencana koreksi - keduanya hanya ditampilkan, tidak diisi auditee.
+     *
+     * Baris tilik lama (auditjawabdetail) yang tidak berpasangan dengan butir
+     * lingkup mana pun tetap ditampilkan (tanpa kotak jawaban) supaya
+     * penilaian auditor tidak hilang.
+     *
+     * @return array daftar topik; tiap topik berisi 'butir', 'punya_lingkup'.
+     */
+    function petaLingkup($audit_id) {
+        $this->load->helper('lingkup');
+        $this->load->model('LingkupModel', 'lingkupmodel');
+        $this->load->model('LampiranModel', 'lampiranmodel');
+
+        $audit = $this->db->select('audit_id, form_id')
+            ->where('audit_id', $audit_id)
+            ->get('audit')->row_array();
+        if (!$audit) {
+            return array();
+        }
+
+        /* Pertanyaan (topik) formulir audit ini. */
+        $this->db->where('form_id', $audit['form_id']);
+        if ($this->db->field_exists('dtform_urut', 'detailform')) {
+            $this->db->order_by('dtform_urut', 'ASC');
+        }
+        $this->db->order_by('dtform_id', 'ASC');
+        $topik = $this->db->get('detailform')->result_array();
+        if (!$topik) {
+            return array();
+        }
+
+        $dtform_ids = array();
+        foreach ($topik as $t) {
+            $dtform_ids[] = (int) $t['dtform_id'];
+        }
+
+        /* Butir lingkup per pertanyaan (tabel mutu_lingkup). */
+        $peta_butir = $this->lingkupSiap()
+            ? $this->lingkupmodel->peta($dtform_ids)
+            : array();
+
+        /* Jawaban per butir (auditjawab.lingkup_id terisi). Halaman ini
+           hanya menampilkan lingkup + jawaban auditee, jadi kolom penilaian
+           auditor (jwb_hasil/jwb_temuan/jwb_catatan/jwb_koreksi) tidak
+           dibaca - penilaian auditor tidak ditampilkan di sini. */
+        $jawab_butir = array();
+        if ($this->_adaLingkup()) {
+            $this->db->select('jwb_id, dtform_id, lingkup_id, jwb_jawaban');
+            $this->db->where('audit_id', $audit_id);
+            $this->db->where('lingkup_id IS NOT NULL', NULL, FALSE);
+            foreach ($this->db->get('auditjawab')->result_array() as $j) {
+                $jawab_butir[(int) $j['lingkup_id']] = $j;
+            }
+        }
+
+        /* Jawaban tingkat pertanyaan (cadangan pertanyaan tanpa butir). */
+        $induk = array();
+        $this->db->select('jwb_id, dtform_id, jwb_jawaban, jwb_tujuan');
+        $this->db->where('audit_id', $audit_id);
+        if ($this->_adaLingkup()) {
+            $this->db->where('lingkup_id IS NULL', NULL, FALSE);
+        }
+        foreach ($this->db->get('auditjawab')->result_array() as $j) {
+            $induk[(int) $j['dtform_id']] = $j;
+        }
+
+        /* Baris tilik lama (auditjawabdetail) TIDAK ditampilkan di halaman
+           ini. Yang dipakai hanya penanda dtjwb_id untuk memetakan lampiran
+           lama (mutu_lampiran.dtjwb_id) ke butir lingkup yang bersesuaian,
+           supaya berkas yang pernah diunggah tidak menghilang. */
+        $lama = array();
+
+        $this->db->select('d.dtjwb_id, d.dtjwb_pertanyaan');
+        $this->db->select('j.dtform_id');
+        if ($this->db->field_exists('lingkup_id', 'auditjawabdetail')) {
+            $this->db->select('d.lingkup_id AS dtjwb_lingkup_id', FALSE);
+        }
+        $this->db->from('auditjawabdetail d');
+        $this->db->join('auditjawab j', 'j.jwb_id = d.jwb_id', 'inner');
+        $this->db->where('j.audit_id', $audit_id);
+        $this->db->order_by('j.dtform_id', 'ASC');
+        $this->db->order_by('d.dtjwb_id', 'ASC');
+        foreach ($this->db->get()->result_array() as $b) {
+            if (!isset($b['dtjwb_lingkup_id'])) {
+                $b['dtjwb_lingkup_id'] = NULL;
+            }
+            $lama[(int) $b['dtform_id']][] = $b;
+        }
+
+        /* Lampiran: per butir (lingkup_id), per baris tilik lama
+           (dtjwb_id), dan per jawaban pertanyaan (jwb_id). */
+        $lampiran_butir = array();
+        $lampiran_tilik = array();
+        $lampiran_jawab = array();
+        if ($this->lampiranmodel->siap()) {
+            if ($this->db->field_exists('lingkup_id', 'lampiran')) {
+                $lampiran_butir = $this->lampiranmodel->peta($audit_id, 'lingkup_id');
+            }
+            if ($this->db->field_exists('dtjwb_id', 'lampiran')) {
+                $lampiran_tilik = $this->lampiranmodel->peta($audit_id, 'dtjwb_id');
+            }
+            $lampiran_jawab = $this->lampiranmodel->petaJawaban($audit_id);
+        }
+
+        foreach ($topik as $i => $t) {
+            $tid              = (int) $t['dtform_id'];
+            $jawab_pertanyaan = isset($induk[$tid]) ? $induk[$tid] : NULL;
+
+            /* Pisahkan baris tilik lama: yang sudah punya lingkup_id dan
+               yang masih harus dicocokkan berdasar teks. */
+            $sisa        = isset($lama[$tid]) ? $lama[$tid] : array();
+            $berdasar_id = array();
+            foreach ($sisa as $kunci => $b) {
+                $lid = (int) $b['dtjwb_lingkup_id'];
+                if ($lid > 0) {
+                    $berdasar_id[$lid][] = $b;
+                    unset($sisa[$kunci]);
+                }
+            }
+
+            /* Butir lingkup = pertanyaan yang dijawab auditee. */
+            $butir = array();
+            if (isset($peta_butir[$tid])) {
+                foreach ($peta_butir[$tid] as $b) {
+                    /* Baris tilik lama hanya dipakai untuk memetakan lampiran
+                       lama (dtjwb_id) ke butir ini. */
+                    $tilik = $this->_cariBarisTilik((int) $b['lingkup_id'], $b['lingkup_isi'], $berdasar_id, $sisa);
+                    $dtjwb_id = $tilik ? (int) $tilik['dtjwb_id'] : 0;
+                    $butir[] = $this->_susunButir($tid, $b, $jawab_butir, $dtjwb_id, $lampiran_butir, $lampiran_tilik);
+                }
+            }
+
+            /* Baris tilik lama yang tidak berpasangan tidak ditampilkan.
+               Lampirannya (bila ada) dipindahkan ke daftar lampiran
+               pertanyaan supaya berkas tidak hilang dari halaman. */
+            $lampiran_sisa = array();
+            foreach (array_merge($berdasar_id, array($sisa)) as $kumpulan) {
+                foreach ($kumpulan as $b) {
+                    $dtjwb_id = (int) $b['dtjwb_id'];
+                    if ($dtjwb_id > 0 && isset($lampiran_tilik[$dtjwb_id])) {
+                        $lampiran_sisa = array_merge($lampiran_sisa, $lampiran_tilik[$dtjwb_id]);
+                    }
+                }
+            }
+
+            $jml_butir = 0;
+            $jml_dijawab = 0;
+            $jml_lampiran = 0;
+
+            foreach ($butir as $b) {
+                if ((int) $b['lingkup_id'] > 0) {
+                    $jml_butir++;
+                    if (!empty($b['sudah_dijawab'])) {
+                        $jml_dijawab++;
+                    }
+                }
+                $jml_lampiran += count($b['lampiran']);
+            }
+
+            $punya_lingkup = ($jml_butir > 0);
+            $jawaban_topik = $jawab_pertanyaan ? trim((string) $jawab_pertanyaan['jwb_jawaban']) : '';
+
+            $lampiran_topik = ($jawab_pertanyaan && isset($lampiran_jawab[(int) $jawab_pertanyaan['jwb_id']]))
+                ? $lampiran_jawab[(int) $jawab_pertanyaan['jwb_id']]
+                : array();
+            $lampiran_topik = array_merge($lampiran_topik, $lampiran_sisa);
+            $jml_lampiran += count($lampiran_topik);
+
+            $topik[$i]['butir']          = $butir;
+            $topik[$i]['jwb']            = $jawab_pertanyaan;
+            $topik[$i]['lampiran']       = $lampiran_topik;
+            $topik[$i]['punya_lingkup']  = $punya_lingkup;
+            $topik[$i]['sudah_dijawab']  = $punya_lingkup
+                ? ($jml_butir === $jml_dijawab)
+                : ($jawaban_topik !== '');
+            $topik[$i]['teks']           = lingkup_bersihkan($t['dtform_pertanyaan']);
+            $topik[$i]['jml_butir']      = $jml_butir;
+            $topik[$i]['jml_dijawab']    = $jml_dijawab;
+            $topik[$i]['jml_belum']      = $jml_butir - $jml_dijawab;
+            $topik[$i]['jml_wajib']      = $punya_lingkup ? $jml_butir : 1;
+            $topik[$i]['jml_lampiran']   = $jml_lampiran;
+        }
+
+        return $topik;
+    }
+
+    /**
+     * Ambil (dan tandai sudah dipakai) baris tilik lama yang cocok dengan
+     * butir lingkup ini: berdasar lingkup_id, lalu kemiripan teks.
+     *
+     * Dipakai hanya untuk memetakan lampiran lama (mutu_lampiran.dtjwb_id) ke
+     * butir lingkup - penilaian auditor tidak ditampilkan di halaman auditee.
+     */
+    private function _cariBarisTilik($lingkup_id, $teks, &$berdasar_id, &$sisa) {
+        if ($lingkup_id > 0 && !empty($berdasar_id[$lingkup_id])) {
+            return array_shift($berdasar_id[$lingkup_id]);
+        }
+
+        $kunci = lingkup_normal($teks);
+        if ($kunci === '') {
+            return NULL;
+        }
+
+        // Cocok persis lebih dahulu, baru kemiripan sebagian.
+        foreach ($sisa as $idx => $row) {
+            $banding = lingkup_normal($row['dtjwb_pertanyaan']);
+            if ($banding !== '' && $banding === $kunci) {
+                $hasil = $row;
+                unset($sisa[$idx]);
+                return $hasil;
+            }
+        }
+        foreach ($sisa as $idx => $row) {
+            $banding = lingkup_normal($row['dtjwb_pertanyaan']);
+            if ($banding === '' || hitung_potong($banding) <= 25) {
+                continue;
+            }
+            if (strpos($banding, $kunci) !== FALSE || strpos($kunci, $banding) !== FALSE) {
+                $hasil = $row;
+                unset($sisa[$idx]);
+                return $hasil;
+            }
+        }
+
+        return NULL;
+    }
+
+    /**
+     * Susun satu butir lingkup: teks lingkup, jawaban auditee, dan lampiran.
+     * Penilaian auditor tidak disertakan - halaman ini hanya menampilkan
+     * lingkup beserta jawabannya.
+     */
+    private function _susunButir($dtform_id, $b, $jawab_butir, $dtjwb_id, $lampiran_butir, $lampiran_tilik) {
+        $lid = (int) $b['lingkup_id'];
+        $jb  = isset($jawab_butir[$lid]) ? $jawab_butir[$lid] : NULL;
+
+        $jawaban = $jb ? trim((string) $jb['jwb_jawaban']) : '';
+
+        $item = array(
+            'lingkup_id'    => $lid,
+            'lingkup_isi'   => $b['lingkup_isi'],
+            'lingkup_teks'  => lingkup_bersihkan($b['lingkup_isi']),
+            'lingkup_urut'  => (int) $b['lingkup_urut'],
+            'dtform_id'     => (int) $dtform_id,
+            'jwb_id'        => $jb ? (int) $jb['jwb_id'] : 0,
+            'jwb_jawaban'   => $jawaban,
+            'sudah_dijawab' => ($jawaban !== ''),
+            'dtjwb_id'      => (int) $dtjwb_id,
+            'bisa_dijawab'  => TRUE,
+            'lampiran'      => array(),
+        );
+
+        /* Lampiran butir: yang menempel pada lingkup_id, ditambah lampiran
+           lama yang menempel pada baris tilik (dtjwb_id) butir ini. */
+        $kumpul = array();
+        if ($lid > 0 && isset($lampiran_butir[$lid])) {
+            foreach ($lampiran_butir[$lid] as $l) {
+                $kumpul[(int) $l['lampiran_id']] = $l;
+            }
+        }
+        if ($item['dtjwb_id'] > 0 && isset($lampiran_tilik[$item['dtjwb_id']])) {
+            foreach ($lampiran_tilik[$item['dtjwb_id']] as $l) {
+                $kumpul[(int) $l['lampiran_id']] = $l;
+            }
+        }
+        $item['lampiran'] = array_values($kumpul);
+
+        return $item;
     }
 
 
@@ -595,11 +1033,17 @@ class AuditjawabModel extends CI_Model {
     }
 
     /**
-     * Pertanyaan yang belum dijawab pada satu audit (dipakai sebelum
+     * Butir lingkup yang belum dijawab pada satu audit (dipakai sebelum
      * mengirim hasil evaluasi ke auditor). Kosong berarti semuanya terjawab.
-     * Butir tilik tidak dihitung - itu penilaian auditor.
+     *
+     * Yang dihitung adalah BUTIR LINGKUP (mutu_lingkup) - daftar pertanyaan
+     * yang dijawab auditee. Pertanyaan yang belum punya butir lingkup
+     * memakai jawaban tingkat pertanyaan seperti sebelumnya, supaya formulir
+     * lama tetap dapat dikirim.
      */
     function lingkupBelumDijawab($audit_id) {
+        $this->load->helper('lingkup');
+
         $audit = $this->db->select('audit_id, form_id')
             ->where('audit_id', $audit_id)
             ->get('audit')->row_array();
@@ -608,7 +1052,6 @@ class AuditjawabModel extends CI_Model {
         }
 
         $this->db->select('dt.dtform_id, dt.dtform_pertanyaan');
-        $this->db->select('dt.dtform_pertanyaan AS lingkup_isi', FALSE);
         $this->db->from('detailform dt');
         $this->db->where('dt.form_id', $audit['form_id']);
         if ($this->db->field_exists('dtform_urut', 'detailform')) {
@@ -617,9 +1060,34 @@ class AuditjawabModel extends CI_Model {
         $this->db->order_by('dt.dtform_id', 'ASC');
         $pertanyaan = $this->db->get()->result_array();
 
+        /* Butir lingkup per pertanyaan. */
+        $ids = array();
+        foreach ($pertanyaan as $p) {
+            $ids[] = (int) $p['dtform_id'];
+        }
+        $peta_butir = array();
+        if ($this->lingkupSiap()) {
+            $this->load->model('LingkupModel', 'lingkupmodel');
+            $peta_butir = $this->lingkupmodel->peta($ids);
+        }
+
+        /* Jawaban per butir yang sudah terisi. */
+        $terjawab_butir = array();
+        if ($this->_adaLingkup()) {
+            $this->db->select('lingkup_id, jwb_jawaban');
+            $this->db->where('audit_id', $audit_id);
+            $this->db->where('lingkup_id IS NOT NULL', NULL, FALSE);
+            foreach ($this->db->get('auditjawab')->result_array() as $j) {
+                if (trim((string) $j['jwb_jawaban']) !== '') {
+                    $terjawab_butir[(int) $j['lingkup_id']] = TRUE;
+                }
+            }
+        }
+
+        /* Jawaban tingkat pertanyaan (cadangan pertanyaan tanpa butir). */
         $this->db->select('jwb_id, dtform_id, jwb_jawaban');
         $this->db->where('audit_id', $audit_id);
-        if ($this->db->field_exists('lingkup_id', 'auditjawab')) {
+        if ($this->_adaLingkup()) {
             $this->db->where('lingkup_id IS NULL', NULL, FALSE);
         }
         $terjawab = array();
@@ -631,10 +1099,35 @@ class AuditjawabModel extends CI_Model {
 
         $kurang = array();
         foreach ($pertanyaan as $p) {
-            if (!isset($terjawab[(int) $p['dtform_id']])) {
-                $kurang[] = $p;
+            $tid    = (int) $p['dtform_id'];
+            $daftar = isset($peta_butir[$tid]) ? $peta_butir[$tid] : array();
+
+            if (!empty($daftar)) {
+                foreach ($daftar as $b) {
+                    $lid = (int) $b['lingkup_id'];
+                    if (isset($terjawab_butir[$lid])) {
+                        continue;
+                    }
+                    $kurang[] = array(
+                        'dtform_id'         => $tid,
+                        'dtform_pertanyaan' => $p['dtform_pertanyaan'],
+                        'lingkup_id'        => $lid,
+                        'lingkup_isi'       => lingkup_bersihkan($b['lingkup_isi']),
+                    );
+                }
+                continue;
+            }
+
+            if (!isset($terjawab[$tid])) {
+                $kurang[] = array(
+                    'dtform_id'         => $tid,
+                    'dtform_pertanyaan' => $p['dtform_pertanyaan'],
+                    'lingkup_id'        => 0,
+                    'lingkup_isi'       => lingkup_bersihkan($p['dtform_pertanyaan']),
+                );
             }
         }
+
         return $kurang;
     }
 
