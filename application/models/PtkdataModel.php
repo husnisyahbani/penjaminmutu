@@ -175,6 +175,11 @@ class PtkdataModel extends CI_Model {
             $this->db->select('dt.dtform_urut');
         }
         $this->db->select('dj.dtjwb_id, dj.dtjwb_pertanyaan, dj.dtjwb_hasil, dj.dtjwb_temuan, dj.dtjwb_catatan');
+        /* Tanggal butir tilik (delik) dibuat: dipakai mengisi "Tanggal Audit"
+           pada Form PTK (lihat application/libraries/Formptk.php). */
+        if ($this->db->field_exists('dtjwb_create', 'auditjawabdetail')) {
+            $this->db->select('dj.dtjwb_create');
+        }
         $this->db->select('jb.jwb_id');
         /* Nama kunci disamakan dengan kolom tabel (lingkup_isi, jwb_*) supaya
            isi kolom sama persis pada halaman PTK, halaman delik, dan ekspor. */

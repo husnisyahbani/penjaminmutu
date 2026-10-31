@@ -47,20 +47,22 @@ class Formptk {
         3 => 20, 4 => 20, 5 => 20, 6 => 20, 7 => 20,
         8 => 18, 9 => 18, 10 => 18,
         11 => 22, 12 => 26, 13 => 26, 14 => 26, 15 => 26, 16 => 26,
-        17 => 26,
-        18 => 22, 19 => 26, 20 => 26, 21 => 26, 22 => 26, 23 => 26, 24 => 26,
-        25 => 24, 26 => 24,
-        27 => 30, 28 => 26, 29 => 26, 30 => 26, 31 => 26, 32 => 26,
-        33 => 26,
-        34 => 6, 35 => 6,
-        36 => 16, 37 => 16, 38 => 16,
+        /* Blok tanda tangan (auditor maupun teraudit) memakai 2 baris. */
+        17 => 26, 18 => 26,
+        19 => 22, 20 => 26, 21 => 26, 22 => 26, 23 => 26, 24 => 26, 25 => 26,
+        26 => 24, 27 => 24,
+        28 => 30, 29 => 26, 30 => 26, 31 => 26, 32 => 26, 33 => 26,
+        34 => 26, 35 => 26,
+        36 => 6, 37 => 6,
+        38 => 16, 39 => 16, 40 => 16,
     );
+
 
     /** Warna biru muda untuk teks petunjuk dalam tanda kurung. */
     var $warna_petunjuk = '2E9BD6';
 
-    /** Baris terakhir form (footer berakhir di baris 38). */
-    var $baris_akhir = 38;
+    /** Baris terakhir form (footer berakhir di baris 40). */
+    var $baris_akhir = 40;
 
     function __construct() {
         require_once APPPATH . 'third_party/PHPExcel.php';
@@ -133,7 +135,7 @@ class Formptk {
                 'prodi_unit'    => $this->_bersih(isset($r->unit) ? $r->unit : ''),
                 'kaprodi'       => $this->_bersih(isset($r->auditee) ? $r->auditee : ''),
                 'auditor'       => $this->_bersih($auditor),
-                'tanggal_audit' => '',
+                'tanggal_audit' => $this->_tanggal(isset($r->dtjwb_create) ? $r->dtjwb_create : ''),
                 'kategori'      => strtoupper(trim((string) (isset($r->jwb_temuan) ? $r->jwb_temuan : ''))),
                 'referensi'     => implode("\n", $referensi),
                 'uraian'        => implode("\n\n", $uraian),
@@ -265,42 +267,45 @@ class Formptk {
         ), 'tengah');
         $this->_isiForm($sheet, 'A12:H16', $this->ambil($data, 'uraian'), 'atas');
 
-        $this->_blok($sheet, 'A17:B17', 'Tanda Tangan Auditor');
-        $this->_isiForm($sheet, 'C17:D17', '');
-        $this->_blok($sheet, 'E17', 'Tanggal');
-        $this->_isiForm($sheet, 'F17:H17', '');
+        /* Tanda tangan auditor memakai 2 baris, sama seperti blok
+           tanda tangan teraudit di bawah. */
+        $this->_blok($sheet, 'A17:B18', 'Tanda Tangan Auditor');
+        $this->_isiForm($sheet, 'C17:D18', '');
+        $this->_blok($sheet, 'E17:E18', 'Tanggal');
+        $this->_isiForm($sheet, 'F17:H18', '');
 
         /* ---- 4. rencana tindakan koreksi ---- */
-        $this->_blokKaya($sheet, 'A18:H18', array(
+        $this->_blokKaya($sheet, 'A19:H19', array(
             array('Rencana Tindakan Koreksi ', array('tebal' => TRUE, 'ukuran' => 10)),
             array('(diisi oleh teraudit & ditandatangani)', array('miring' => TRUE, 'ukuran' => 9, 'warna' => $this->warna_petunjuk)),
         ), 'tengah');
-        $this->_isiForm($sheet, 'A19:H24', $this->ambil($data, 'koreksi'), 'atas');
+        $this->_isiForm($sheet, 'A20:H25', $this->ambil($data, 'koreksi'), 'atas');
 
-        $this->_blok($sheet, 'A25:B26', 'Tanda Tangan Teraudit');
-        $this->_isiForm($sheet, 'C25:D26', '');
-        $this->_blok($sheet, 'E25:E26', 'Tanggal');
-        $this->_isiForm($sheet, 'F25:H26', '');
+        $this->_blok($sheet, 'A26:B27', 'Tanda Tangan Teraudit');
+        $this->_isiForm($sheet, 'C26:D27', '');
+        $this->_blok($sheet, 'E26:E27', 'Tanggal');
+        $this->_isiForm($sheet, 'F26:H27', '');
 
         /* ---- 5. tinjauan efektivitas ---- */
-        $this->_blokKaya($sheet, 'A27:H27', array(
+        $this->_blokKaya($sheet, 'A28:H28', array(
             array('Tinjauan Efektifitas Tindakan Koreksi ', array('tebal' => TRUE, 'ukuran' => 10)),
             array('(diisi oleh auditor pada audit berikutnya & ditandatangani)', array('miring' => TRUE, 'ukuran' => 9, 'warna' => $this->warna_petunjuk)),
         ), 'tengah');
-        $this->_isiForm($sheet, 'A28:H32', '', 'atas');
+        $this->_isiForm($sheet, 'A29:H33', '', 'atas');
 
-        $this->_blok($sheet, 'A33:B33', 'Tanda Tangan Auditor');
-        $this->_isiForm($sheet, 'C33:D33', '');
-        $this->_blok($sheet, 'E33', 'Tanggal');
-        $this->_isiForm($sheet, 'F33:H33', '');
+        /* Sama seperti blok pertama: 2 baris. */
+        $this->_blok($sheet, 'A34:B35', 'Tanda Tangan Auditor');
+        $this->_isiForm($sheet, 'C34:D35', '');
+        $this->_blok($sheet, 'E34:E35', 'Tanggal');
+        $this->_isiForm($sheet, 'F34:H35', '');
 
-        /* ---- 6. footer (baris 34-35 = jarak, tanpa border) ---- */
-        $this->_blokKaya($sheet, 'A36:F38', array(
+        /* ---- 6. footer (baris 36-37 = jarak, tanpa border) ---- */
+        $this->_blokKaya($sheet, 'A38:F40', array(
             array('Dokumen Mutu ini milik STIK Siti Khadijah dan ', array('ukuran' => 8)),
             array('TIDAK DIPERBOLEHKAN', array('tebal' => TRUE, 'ukuran' => 8)),
             array(' dengan cara dan alasan apapun membuat Salinan tanpa seizin Ketua Pusat Penjamin Mutu', array('ukuran' => 8)),
         ), 'tengah');
-        $this->_blok($sheet, 'G36:H38', 'Paraf PPM', array('ukuran' => 8, 'rata' => 'tengah', 'vertikal' => 'atas'));
+        $this->_blok($sheet, 'G38:H40', 'Paraf PPM', array('ukuran' => 8, 'rata' => 'tengah', 'vertikal' => 'atas'));
 
         $this->_aturCetak($sheet);
     }
@@ -308,6 +313,27 @@ class Formptk {
     /* ==================================================================
        BANTUAN SEL & TEKS
        ================================================================== */
+
+    /**
+     * Tanggal Audit diambil dari tanggal butir tilik (delik) DIBUAT, yaitu
+     * kolom mutu_auditjawabdetail.dtjwb_create, ditulis sebagai dd/mm/yyyy.
+     *
+     * @param  string $waktu nilai timestamp dari basis data
+     * @return string tanggal siap cetak, atau '' bila tidak tersedia
+     */
+    private function _tanggal($waktu) {
+        $waktu = trim((string) $waktu);
+        if ($waktu === '' || strpos($waktu, '0000-00-00') === 0) {
+            return '';
+        }
+
+        $waktu = strtotime($waktu);
+        if (!$waktu) {
+            return '';
+        }
+
+        return date('d/m/Y', $waktu);
+    }
 
     /** Ambil kunci dari array isian dengan aman. */
     private function ambil($data, $kunci) {
