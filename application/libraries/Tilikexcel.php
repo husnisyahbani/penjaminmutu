@@ -164,11 +164,14 @@ class Tilikexcel {
         $this->_isian($sheet, $baris, $jumlah, $tinggi);
         $this->_footer($sheet, $footer);
 
+        $total_tinggi = 0;
         foreach ($tinggi as $b => $h) {
             $sheet->getRowDimension($b)->setRowHeight($h);
+            $total_tinggi += $h;
         }
 
-        $this->_aturCetak($sheet, 'A1:K' . $footer, array_sum($tinggi));
+        $this->_halaman($sheet, $total_tinggi);
+        $this->_aturCetak($sheet, 'A1:K' . $footer, $total_tinggi);
 
         /* ---------------- kirim ---------------- */
         $nama = preg_replace('/[^A-Za-z0-9_\-]/', '-', (string) $nama_berkas);
@@ -213,10 +216,53 @@ class Tilikexcel {
 
         $this->_isi($sheet, 'F1:K1', 'KODE', $tengah);
         $this->_isi($sheet, 'F2:K2', 'STIK.SK-FORM.A.04.004', $tengah);
-        $this->_isi($sheet, 'F3:H3', 'Halaman 1 dari 145', $tengah);
+        /* F3:H3 = nomor halaman; diisi oleh _halaman() setelah tinggi
+           seluruh baris diketahui. */
+        $this->_kotak($sheet, 'F3:H3');
         $this->_isi($sheet, 'I3:K3', 'Tanggal: 20 Desember 2024', $tengah);
         $this->_isi($sheet, 'F4:H4', 'Revisi', $tengah);
         $this->_isi($sheet, 'I4:K4', '02', $tengah);
+    }
+
+    /**
+     * Nomor halaman pada blok header (F3:H3) dan pada footer halaman.
+     *
+     * Baris 1-4 diulang di setiap halaman cetak (setRowsToRepeatAtTop),
+     * jadi sel F3 selalu berisi teks yang sama: "Halaman 1 dari N" dengan N
+     * = jumlah halaman lembar ini. Nomor halaman yang benar per lembar
+     * ditulis pada footer memakai kode Excel &P (halaman ini) dan &N
+     * (total halaman), sehingga halaman 2 dan seterusnya ikut bernomor.
+     */
+    private function _halaman($sheet, $total_tinggi) {
+        $this->_isi($sheet, 'F3:H3', 'Halaman 1 dari ' . $this->_jumlahHalaman($total_tinggi),
+            array('tebal' => TRUE, 'rata' => 'tengah', 'vertikal' => 'tengah', 'bungkus' => TRUE));
+
+        $kepala = $sheet->getHeaderFooter();
+        $kepala->setDifferentOddEven(FALSE);
+        $kepala->setScaleWithDocument(TRUE);
+        $kepala->setOddFooter('&RHalaman &P dari &N');
+    }
+
+    /**
+     * Perkirakan jumlah halaman cetak lembar ini.
+     *
+     * Selama tinggi lembar masih di bawah batas, seluruhnya dikecilkan ke
+     * satu halaman (fit to one page). Selebihnya mengalir ke halaman
+     * berikutnya setinggi kertas A4 landscape dikurangi margin.
+     *
+     * @param  float $total_tinggi tinggi seluruh baris (poin)
+     * @return int
+     */
+    private function _jumlahHalaman($total_tinggi) {
+        if ($total_tinggi <= $this->tinggi_maks) {
+            return 1;
+        }
+
+        /* A4 landscape = 21 cm (~595,3 pt) dikurangi margin atas/bawah
+           (0,4") dan ruang header/footer cetak (0,3"). */
+        $bisa_cetak = max(60, 595.3 - ((0.4 + 0.4 + 0.3 + 0.3) * 72));
+
+        return max(1, (int) ceil($total_tinggi / $bisa_cetak));
     }
 
     /**
@@ -285,8 +331,10 @@ class Tilikexcel {
 
         foreach ($pasangan as $b => $isi) {
             $this->_isi($sheet, 'A' . $b . ':B' . $b, $isi[0], $label);
-            $this->_isi($sheet, 'C' . $b, ':', array('rata' => 'tengah', 'vertikal' => 'tengah'));
-            $this->_isi($sheet, 'D' . $b . ':K' . $b, $isi[1], $kiri);
+            /* Kolom titik dua menyatu dengan kolom isian: isian diawali ':'
+               supaya tanda bacanya tetap tampak seperti formulir kertas. */
+            $this->_isi($sheet, 'C' . $b . ':K' . $b,
+                ($isi[1] === '' ? ':' : ': ' . $isi[1]), $kiri);
         }
     }
 
@@ -523,6 +571,10 @@ class Tilikexcel {
         $atur->setHorizontalCentered(TRUE);
         $atur->setVerticalCentered(TRUE);
         $atur->setPrintArea($area);
+
+        /* Baris 1-4 adalah header identitas dokumen: diulang di setiap
+           halaman cetak supaya setiap lembar tetap berkepala. */
+        $atur->setRowsToRepeatAtTopByStartAndEnd(1, 4);
 
         $sheet->setShowGridlines(FALSE);
 
