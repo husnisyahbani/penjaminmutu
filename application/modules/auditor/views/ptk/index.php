@@ -107,6 +107,14 @@
                         <div class="panel-heading-isi">
                             <h3 class="panel-title"><?=$title?></h3>
                             <div class="panel-aksi">
+                                <?php /* Form PTK kosong (Excel): diunduh, diisi, lalu
+                                         dicetak dan ditandatangani sesuai bagiannya. */ ?>
+                                <a class="btn btn-sm btn-primary"
+                                   href="<?php echo base_url('assets/template/Form-PTK.xlsx'); ?>"
+                                   download target="_blank" rel="noopener"
+                                   title="Unduh Form PTK kosong (Excel)">
+                                    <i class="icon md-download" aria-hidden="true"></i> Form PTK
+                                </a>
                                 <?php /* Kotak saring periode memakai komponen bersama
                                          (application/helpers/periode_helper.php); bawaan =
                                          periode aktif dan hanya menampilkan tahun. */ ?>
