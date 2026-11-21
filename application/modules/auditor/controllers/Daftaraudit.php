@@ -5,7 +5,7 @@ class Daftaraudit extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->module = 'auditor';
-        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=2.4"));
+        $this->load->js(base_url("assets/app/auditor/daftaraudit.js?v=2.5"));
         // Informasi tombol aksi saat hover (lihat assets/app/tabel-aksi.css)
         $this->load->js(base_url("assets/app/tabel-aksi.js?v=1.0"));
         // Tampilan topik & activity pada halaman detail audit.
@@ -164,6 +164,265 @@ class Daftaraudit extends MY_Controller {
             'auditor'       => $this->timaudit->teks($tim, isset($audit['auditor']) ? $audit['auditor'] : ''),
             'auditee'       => isset($audit['auditee']) ? $audit['auditee'] : '',
             'baris'         => $daftar,
+        );
+    }
+
+    /**
+     * Unduh LAPORAN AUDIT MUTU INTERNAL (AMI) (.xlsx) satu audit.
+     *
+     * Dipanggil tombol unduh pada kolom Aksi daftar audit (audit berstatus
+     * SELESAI). Bila kesimpulan audit (Bagian VII) belum pernah diisi,
+     * halaman menampilkan modal untuk menjawabnya terlebih dahulu
+     * (lihat kesimpulan() dan simpankesimpulan()).
+     */
+    public function laporan($id) {
+        $audit = $this->mutu->getAuditById((int) $id);
+        if (!$this->_bolehLaporan($audit)) {
+            show_error('Audit tidak ditemukan atau tidak dapat diunduh.', 403);
+            return;
+        }
+        $this->load->model('KesimpulanModel', 'kesimpulan');
+        if (!$this->kesimpulan->siap() || !$this->kesimpulan->sudahDiisi($id)) {
+            show_error('Kesimpulan audit harus disimpan sebelum mengunduh.', 400);
+            return;
+        }
+
+        $this->load->library('laporanami');
+        $this->load->model('TimauditModel', 'timaudit');
+
+        $excel = $this->laporanami->buat($this->_laporanAudit($audit));
+
+        $nama = 'Laporan AMI';
+        if (!empty($audit['unit'])) {
+            $nama .= ' - ' . $audit['unit'];
+        }
+
+        $this->laporanami->kirim($excel, $nama);
+    }
+
+    /**
+     * Status kesimpulan audit (Bagian VII Laporan AMI) untuk modal.
+     *
+     * Mengembalikan JSON: sudah = kesimpulan sudah terisi lengkap,
+     * kesimpulan = jawaban tersimpan (bila ada).
+     */
+    public function kesimpulan($id) {
+        header('Content-Type: application/json');
+
+        $this->load->model('KesimpulanModel', 'kesimpulan');
+        if (!$this->_bolehLaporan($this->mutu->getAuditById((int) $id))) {
+            echo json_encode(array('status' => FALSE, 'pesan' => 'Audit tidak ditemukan atau tidak dapat diunduh.'));
+            return;
+        }
+        if (!$this->kesimpulan->siap()) {
+            echo json_encode(array('status' => FALSE, 'pesan' => 'Tabel kesimpulan belum tersedia. Minta PPM mengimpor database/kesimpulan_audit.sql.'));
+            return;
+        }
+
+        echo json_encode(array(
+            'status'     => TRUE,
+            'sudah'      => $this->kesimpulan->sudahDiisi($id),
+            'kesimpulan' => $this->kesimpulan->ambil($id),
+        ));
+    }
+
+    /**
+     * Simpan jawaban kesimpulan audit dari modal (POST).
+     */
+    public function simpankesimpulan() {
+        header('Content-Type: application/json');
+
+        $audit_id = (int) $this->input->post('audit_id');
+        $k1 = $this->input->post('kesimpulan1');
+        $k2 = $this->input->post('kesimpulan2');
+        $k3 = $this->input->post('kesimpulan3');
+
+        $boleh1 = array('Ya', 'Tidak', 'Lainnya');
+        $boleh3 = array('Mayor', 'Minor', 'Observasi');
+
+        if ($audit_id < 1 || !in_array($k1, $boleh1, TRUE) || !in_array($k2, $boleh1, TRUE) || !in_array($k3, $boleh3, TRUE)) {
+            echo json_encode(array('status' => FALSE, 'pesan' => 'Jawaban kesimpulan belum lengkap.'));
+            return;
+        }
+
+        if (!$this->_bolehLaporan($this->mutu->getAuditById($audit_id))) {
+            echo json_encode(array('status' => FALSE, 'pesan' => 'Audit tidak ditemukan atau tidak dapat diunduh.'));
+            return;
+        }
+        if (($k1 === 'Lainnya' && !trim(strip_tags((string) $this->input->post('kesimpulan1_lainnya')))) ||
+            ($k2 === 'Lainnya' && !trim(strip_tags((string) $this->input->post('kesimpulan2_lainnya'))))) {
+            echo json_encode(array('status' => FALSE, 'pesan' => 'Harap isi keterangan untuk pilihan Lainnya.'));
+            return;
+        }
+
+        $data = array(
+            'kesimpulan1'         => $k1,
+            'kesimpulan1_lainnya' => $k1 === 'Lainnya' ? trim(strip_tags((string) $this->input->post('kesimpulan1_lainnya'))) : NULL,
+            'kesimpulan2'         => $k2,
+            'kesimpulan2_lainnya' => $k2 === 'Lainnya' ? trim(strip_tags((string) $this->input->post('kesimpulan2_lainnya'))) : NULL,
+            'kesimpulan3'         => $k3,
+        );
+
+        $this->load->model('KesimpulanModel', 'kesimpulan');
+        if (!$this->kesimpulan->siap()) {
+            echo json_encode(array('status' => FALSE, 'pesan' => 'Tabel kesimpulan belum tersedia. Minta PPM mengimpor database/kesimpulan_audit.sql.'));
+            return;
+        }
+        $status = $this->kesimpulan->simpan($audit_id, $data);
+
+        echo json_encode(array(
+            'status' => $status,
+            'pesan'  => $status ? 'Kesimpulan tersimpan.' : 'Kesimpulan gagal disimpan.',
+        ));
+    }
+
+    /** Batasi laporan pada audit selesai yang dapat diakses pengguna. */
+    private function _bolehLaporan($audit) {
+        if (!$audit || $audit['audit_status'] !== 'SELESAI') {
+            return FALSE;
+        }
+        $uid = (int) $this->session->userdata('users_id');
+        if ($uid < 1) return FALSE;
+        if ((int) $audit['auditor_id'] === $uid) return TRUE;
+        $this->load->model('TimauditModel', 'timaudit');
+        foreach ($this->timaudit->daftar((int) $audit['audit_id']) as $anggota) {
+            if ((int) $anggota['users_id'] === $uid) return TRUE;
+        }
+        return FALSE;
+    }
+
+    /**
+     * Kumpulkan data Laporan AMI satu audit dari data yang sudah ada:
+     * identitas pelaksanaan, lingkup, temuan, peluang peningkatan, dan
+     * kesimpulan audit.
+     *
+     * @param  array $audit baris mutu_audit (MutuauditModel::getAuditById)
+     * @return array siap untuk Laporanami::buat()
+     */
+    private function _laporanAudit($audit) {
+        $audit_id = (int) $audit['audit_id'];
+
+        $lingkup_teks = array();   // teks butir lingkup (unik, berurutan)
+        $peta_lingkup = array();   // lingkup_id => teks butir
+        $temuan       = array();
+        $baris        = array();
+
+        $dtform = $this->dtform->getAllDtformByFormId($audit['form_id']);
+        $tujuan_lain = array();
+        foreach ($dtform as $row) {
+            $jawaban = $this->auditjawab->getAuditJawabFix($audit_id, $row['dtform_id']);
+            if (!empty($jawaban['jwb_tujuan'])) {
+                $tujuan_lain[] = trim(strip_tags($jawaban['jwb_tujuan']));
+            }
+            $detail = $this->auditjawab->barisTilik($audit_id, $row['dtform_id']);
+            foreach ($detail as $b) {
+                $baris[] = $b;
+
+                $teks = isset($b['dtjwb_pertanyaan']) ? trim(strip_tags((string) $b['dtjwb_pertanyaan'])) : '';
+                if ($teks !== '') {
+                    if (!in_array($teks, $lingkup_teks)) {
+                        $lingkup_teks[] = $teks;
+                    }
+                    if (isset($b['lingkup_id'])) {
+                        $peta_lingkup[(int) $b['lingkup_id']] = $teks;
+                    }
+                }
+
+                $kategori = isset($b['dtjwb_temuan']) ? strtoupper(trim((string) $b['dtjwb_temuan'])) : '';
+                if ($kategori !== '' && $kategori !== 'S') {
+                    $temuan[] = array(
+                        'kategori'   => $kategori,
+                        'indikator'  => $teks,
+                        'pernyataan' => isset($b['dtjwb_hasil']) ? trim(strip_tags((string) $b['dtjwb_hasil'])) : '',
+                    );
+                }
+            }
+        }
+
+        /* Tanggal Audit: tanggal butir tilik dibuat (dtjwb_create); bila
+           kolomnya belum ikut pada kueri ini, pakai tanggal pembaruan audit. */
+        $tanggal = '';
+        $paling_awal = 0;
+        foreach ($baris as $b) {
+            if (empty($b['dtjwb_create'])) {
+                continue;
+            }
+            $waktu = strtotime($b['dtjwb_create']);
+            if ($waktu && ($paling_awal === 0 || $waktu < $paling_awal)) {
+                $paling_awal = $waktu;
+            }
+        }
+        if ($paling_awal) {
+            $tanggal = date('d/m/Y', $paling_awal);
+        }
+        if ($tanggal === '' && !empty($audit['audit_update'])) {
+            $tanggal = date('d/m/Y', strtotime($audit['audit_update']));
+        }
+
+        /* Tanggal butir paling awal dari data audit yang tersimpan. */
+        if ($this->db->field_exists('dtjwb_create', 'auditjawabdetail')) {
+            $this->db->select_min('d.dtjwb_create', 'tanggal');
+            $this->db->from('auditjawabdetail d');
+            $this->db->join('auditjawab j', 'j.jwb_id = d.jwb_id');
+            $this->db->where('j.audit_id', $audit_id);
+            $tgl = $this->db->get()->row_array();
+            if (!empty($tgl['tanggal']) && strtotime($tgl['tanggal'])) {
+                $tanggal = date('d/m/Y', strtotime($tgl['tanggal']));
+            }
+        }
+
+        /* Anggota auditor: anggota tim selain ketua. */
+        $tim     = $this->timaudit->daftar($audit_id);
+        $anggota = array();
+        foreach ($tim as $t) {
+            if (isset($t['tim_peran']) && $t['tim_peran'] === 'KETUA') {
+                continue;
+            }
+            if (!empty($t['nama'])) {
+                $anggota[] = $t['nama'];
+            }
+        }
+
+        /* Peluang peningkatan: catatan auditor per butir lingkup. */
+        $peluang = array();
+        $this->load->model('LingkupnilaiModel', 'lingkupnilai');
+        if ($this->lingkupnilai->siap()) {
+            foreach ($this->lingkupnilai->peta($audit_id) as $lid => $n) {
+                $kelebihan = isset($n['kelebihan']) ? trim(strip_tags((string) $n['kelebihan'])) : '';
+                $peluang_teks = isset($n['peluang']) ? trim(strip_tags((string) $n['peluang'])) : '';
+                if ($kelebihan === '' && $peluang_teks === '') {
+                    continue;
+                }
+                $peluang[] = array(
+                    'aspek'     => isset($peta_lingkup[(int) $lid]) ? $peta_lingkup[(int) $lid] : '',
+                    'kelebihan' => $kelebihan,
+                    'peluang'   => $peluang_teks,
+                );
+            }
+        }
+
+        /* Kesimpulan audit (Bagian VII). */
+        $this->load->model('KesimpulanModel', 'kesimpulan');
+        $kesimpulan = $this->kesimpulan->ambil($audit_id);
+        if (!$kesimpulan) {
+            $kesimpulan = array();
+        }
+
+        return array(
+            'unit'          => isset($audit['unit']) ? $audit['unit'] : '',
+            'alamat'        => '',
+            'kabag'         => isset($audit['auditee']) ? $audit['auditee'] : '',
+            'tanggal_audit' => $tanggal,
+            'ketua_auditor' => isset($audit['auditor']) ? $audit['auditor'] : '',
+            'anggota'       => $anggota,
+            'tujuan'        => array(),
+            'tujuan_lain'   => implode("\n", array_unique($tujuan_lain)),
+            'lingkup'       => $lingkup_teks,
+            'jadwal'        => array(),
+            'temuan'        => $temuan,
+            'peluang'       => $peluang,
+            'kesimpulan'    => $kesimpulan,
+            'lampiran'      => array(),
         );
     }
 
@@ -492,8 +751,8 @@ class Daftaraudit extends MY_Controller {
                 . '<i class="icon md-book" aria-hidden="true"></i></button>';
 
             $btn_unduh = '<button type="button" class="download btn btn-sm btn-icon btn-success" '
-                . 'data-info="Unduh hasil audit" '
-                . 'aria-label="Unduh" id="' . $field->audit_id . '">'
+                . 'data-info="Unduh Laporan AMI" '
+                . 'aria-label="Unduh Laporan AMI" id="' . $field->audit_id . '">'
                 . '<i class="icon md-download" aria-hidden="true"></i></button>';
 
             $btn_proses = '<button type="button" class="proses btn btn-sm btn-icon btn-warning" '
