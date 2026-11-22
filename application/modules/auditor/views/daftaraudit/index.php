@@ -219,5 +219,3 @@
 </div>
 
 
-
-<?php $this->load->view('shared/modal_kesimpulan_ami'); ?>
