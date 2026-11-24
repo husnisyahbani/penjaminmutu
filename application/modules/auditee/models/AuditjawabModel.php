@@ -349,9 +349,9 @@ class AuditjawabModel extends CI_Model {
         $jwb = $this->getAuditJawabFix($audit_id, $dtform_id);
         if (!empty($jwb['jwb_id'])) {
             $this->db->where('jwb_id', $jwb['jwb_id']);
-            if ($this->_adaLingkup()) {
-            $this->db->where('lingkup_id IS NULL', NULL, FALSE);
-        }
+            if ($this->db->field_exists('lingkup_id', 'auditjawabdetail')) {
+                $this->db->where('lingkup_id IS NULL', NULL, FALSE);
+            }
             foreach ($this->db->get('auditjawabdetail')->result_array() as $d) {
                 /* Baris lama boleh jadi tidak punya kolom koreksi
                    (mutu_auditjawabdetail.dtjwb_koreksi) dan kolom referensi.

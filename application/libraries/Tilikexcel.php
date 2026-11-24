@@ -533,7 +533,7 @@ class Tilikexcel {
      * panjangnya dibatasi 31 karakter.
      */
     private function _namaSheet($nama) {
-        $nama = trim(preg_replace('/[\\\/\?\*\[\]:]+/', ' ', (string) $nama));
+        $nama = trim(preg_replace('#[\\\\/\?\*\[\]:]+#', ' ', (string) $nama));
         if ($nama === '') {
             $nama = 'Daftar Tilik AMI';
         }

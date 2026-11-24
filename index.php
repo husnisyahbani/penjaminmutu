@@ -67,7 +67,9 @@ if (
     strpos($host, 'localhost') !== false ||
     strpos($server_name, 'localhost') !== false ||
     strpos($host, '127.0.0.1') !== false ||
-    strpos($server_name, '127.0.0.1') !== false
+    strpos($server_name, '127.0.0.1') !== false ||
+    substr($host, -5) === '.test' ||
+    substr($server_name, -5) === '.test'
 ) {
     define('ENVIRONMENT', 'development');
 } else {
@@ -87,23 +89,22 @@ if (
 switch (ENVIRONMENT)
 {
 	case 'development':
-		 error_reporting(-1);
+		error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_USER_DEPRECATED);
 		ini_set('display_errors', 1);
 	break;
 
 	case 'testing':
 	case 'production':
-         //       error_reporting(-1);
-		 //ini_set('display_errors', 1);
-		 ini_set('display_errors', 0);
-		 if (version_compare(PHP_VERSION, '5.3', '>='))
-		 {
-		 	error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT & ~E_USER_NOTICE & ~E_USER_DEPRECATED);
-		 }
-		 else
-		 {
-		 	error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT & ~E_USER_NOTICE);
-		 }
+		ini_set('display_errors', 0);
+		if (version_compare(PHP_VERSION, '5.3', '>='))
+		{
+			$e_strict = (PHP_VERSION_ID < 80400 && defined('E_STRICT')) ? E_STRICT : 0;
+			error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~$e_strict & ~E_USER_NOTICE & ~E_USER_DEPRECATED);
+		}
+		else
+		{
+			error_reporting(E_ALL & ~E_NOTICE & ~E_USER_NOTICE);
+		}
 	break;
 
 	default:

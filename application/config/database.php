@@ -97,10 +97,6 @@ if (ENVIRONMENT === 'development') {
         'save_queries' => TRUE
     );
 
-// Kunci enkripsi aplikasi (wajib diisi di tiap environment).
-// Disarankan panjang 32 bytes (256 bit). Jangan pakai nilai statis di repo.
-$config['encryption_key'] = getenv('APP_ENCRYPTION_KEY') ?: 'REPLACE_WITH_STRONG_32_BYTE_OR_LONGER_RANDOM_STRING';
-
 } else if (ENVIRONMENT === 'production') {
     // 🚀 Koneksi production (hosting)
     $db['default'] = array(

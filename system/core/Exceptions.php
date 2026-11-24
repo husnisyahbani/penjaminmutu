@@ -72,7 +72,7 @@ class CI_Exceptions {
 		E_USER_ERROR		=>	'User Error',
 		E_USER_WARNING		=>	'User Warning',
 		E_USER_NOTICE		=>	'User Notice',
-		E_STRICT		=>	'Runtime Notice'
+		(PHP_VERSION_ID < 80400 ? E_STRICT : 2048)		=>	'Runtime Notice'
 	);
 
 	/**

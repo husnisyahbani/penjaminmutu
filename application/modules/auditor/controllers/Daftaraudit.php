@@ -309,7 +309,14 @@ class Daftaraudit extends MY_Controller {
 
         $dtform = $this->dtform->getAllDtformByFormId($audit['form_id']);
         $tujuan_lain = array();
+        $standar_list = array();
         foreach ($dtform as $row) {
+            if (!empty($row['dtform_pertanyaan'])) {
+                $st = trim(strip_tags((string) $row['dtform_pertanyaan']));
+                if (!in_array($st, $standar_list)) {
+                    $standar_list[] = $st;
+                }
+            }
             $jawaban = $this->auditjawab->getAuditJawabFix($audit_id, $row['dtform_id']);
             if (!empty($jawaban['jwb_tujuan'])) {
                 $tujuan_lain[] = trim(strip_tags($jawaban['jwb_tujuan']));
@@ -361,7 +368,7 @@ class Daftaraudit extends MY_Controller {
 
         /* Tanggal butir paling awal dari data audit yang tersimpan. */
         if ($this->db->field_exists('dtjwb_create', 'auditjawabdetail')) {
-            $this->db->select_min('d.dtjwb_create', 'tanggal');
+            $this->db->select_min('dtjwb_create', 'tanggal');
             $this->db->from('auditjawabdetail d');
             $this->db->join('auditjawab j', 'j.jwb_id = d.jwb_id');
             $this->db->where('j.audit_id', $audit_id);
@@ -410,19 +417,18 @@ class Daftaraudit extends MY_Controller {
 
         return array(
             'unit'          => isset($audit['unit']) ? $audit['unit'] : '',
-            'alamat'        => '',
+            'alamat'        => !empty($audit['alamat']) ? $audit['alamat'] : 'Jl. Demang Lebar Daun Pakjo Palembang',
             'kabag'         => isset($audit['auditee']) ? $audit['auditee'] : '',
             'tanggal_audit' => $tanggal,
             'ketua_auditor' => isset($audit['auditor']) ? $audit['auditor'] : '',
+            'pt'            => 'STIK Siti Khadijah',
             'anggota'       => $anggota,
-            'tujuan'        => array(),
+            'tujuan'        => range(0, 4),
             'tujuan_lain'   => implode("\n", array_unique($tujuan_lain)),
-            'lingkup'       => $lingkup_teks,
-            'jadwal'        => array(),
+            'lingkup'       => !empty($standar_list) ? $standar_list : $lingkup_teks,
             'temuan'        => $temuan,
             'peluang'       => $peluang,
             'kesimpulan'    => $kesimpulan,
-            'lampiran'      => array(),
         );
     }
 

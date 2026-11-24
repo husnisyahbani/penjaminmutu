@@ -24,7 +24,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |
 */
 if (ENVIRONMENT === 'development') {
-    $config['base_url'] = 'http://localhost:8080/mutu/';
+    $config['base_url'] = 'http://mutu.test/';
+    
 } else {
     $http = isset($_SERVER['HTTPS']) ? "https://" : "http://";
     $url = str_replace("index.php", "", $_SERVER['SCRIPT_NAME']);
