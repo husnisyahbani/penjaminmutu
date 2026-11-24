@@ -66,68 +66,51 @@ $(function () {
          window.location.href = base_url+"/delik?audit_id="+audit_id+"&dtform_id="+dtform_id;
     });
 
+    /* Tombol per audit selesai mengunduh Laporan AMI, bukan unduhan massal. */
     $('#daftaraudit').on('click', '.download', function () {
-        let id = $(this).attr('id');
-        let select = [id];
-
-        $.ajax({
-        url: base_url + "/daftaraudit/download",
-        type: "POST",
-        data: { ids: select },
-        xhrFields: {
-            responseType: 'blob'
-        },
-        beforeSend: function () {
-            swal.fire({
-                title: 'Loading...',
-                allowEscapeKey: false,
-                allowOutsideClick: false,
-                onOpen: () => {
-                    swal.showLoading();
+        var id = $(this).attr('id');
+        $.getJSON(base_url + '/daftaraudit/kesimpulan/' + encodeURIComponent(id))
+            .done(function (data) {
+                if (!data || !data.status) {
+                    swal.fire('Laporan AMI', (data && data.pesan) || 'Tidak dapat memeriksa kesimpulan.', 'error');
+                } else if (data.sudah) {
+                    window.location.href = base_url + '/daftaraudit/laporan/' + encodeURIComponent(id);
+                } else {
+                    var form = $('#formKesimpulanAmi')[0];
+                    form.reset();
+                    $('#kesimpulanAuditId').val(id);
+                    $('#kesimpulanAmiError').prop('hidden', true).hide().text('');
+                    $('#kesimpulan1, #kesimpulan2').trigger('change');
+                    $('#modalKesimpulanAmi').modal('show');
                 }
+            }).fail(function () {
+                swal.fire('Laporan AMI', 'Gagal memeriksa kesimpulan. Silakan coba lagi.', 'error');
             });
-        },
-        success: function (data, status, xhr) {
-            swal.close();
-
-            // ============================
-            // Ambil nama file dari header
-            // ============================
-            const cd = xhr.getResponseHeader('Content-Disposition');
-            let filename = 'download.pdf';
-
-            if (cd && cd.indexOf('filename=') !== -1) {
-                const regex = /filename="?([^"]+)"?/;
-                const matches = regex.exec(cd);
-                if (matches && matches.length > 1) {
-                    filename = matches[1];
-                }
-            }
-
-            // ============================
-            // Blob untuk download
-            // ============================
-            const contentType = xhr.getResponseHeader('Content-Type') || 'application/pdf';
-            const blob = new Blob([data], { type: contentType });
-            const url = URL.createObjectURL(blob);
-
-            // ============================
-            // Trigger download
-            // ============================
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-
-            URL.revokeObjectURL(url);
-        },
-        error: function () {
-            swal.fire("Oops", "No connection!", "error");
-        }
     });
-        
+
+    $('#kesimpulan1, #kesimpulan2').on('change', function () {
+        var lain = $('#' + this.id + '_lainnya');
+        var tampil = this.value === 'Lainnya';
+        lain.prop('hidden', !tampil).prop('required', tampil).toggle(tampil);
+        if (!tampil) lain.val('');
+    });
+
+    $('#formKesimpulanAmi').on('submit', function (event) {
+        event.preventDefault();
+        var form = $(this), id = $('#kesimpulanAuditId').val();
+        var tombol = $('#simpanKesimpulanAmi').prop('disabled', true);
+        $('#kesimpulanAmiError').prop('hidden', true).hide().text('');
+        $.ajax({url: base_url + '/daftaraudit/simpankesimpulan', type: 'POST', dataType: 'json', data: form.serialize()})
+            .done(function (data) {
+                if (data && data.status) {
+                    $('#modalKesimpulanAmi').modal('hide');
+                    window.location.href = base_url + '/daftaraudit/laporan/' + encodeURIComponent(id);
+                } else {
+                    $('#kesimpulanAmiError').text((data && data.pesan) || 'Kesimpulan gagal disimpan.').prop('hidden', false).show();
+                }
+            }).fail(function () {
+                $('#kesimpulanAmiError').text('Gagal menyimpan kesimpulan. Silakan coba lagi.').prop('hidden', false).show();
+            }).always(function () { tombol.prop('disabled', false); });
     });
 
     $("#daftaraudit").on("click", ".detail", function () {
