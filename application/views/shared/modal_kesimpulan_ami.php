@@ -13,9 +13,6 @@
           <select class="form-control" name="kesimpulan2" id="kesimpulan2" required><option value="">Pilih jawaban</option><option>Ya</option><option>Tidak</option><option>Lainnya</option></select>
           <input class="form-control mt-10" name="kesimpulan2_lainnya" id="kesimpulan2_lainnya" maxlength="255" placeholder="Sebutkan lainnya" hidden>
         </div>
-        <div class="form-group"><label for="kesimpulan3">3. Temuan pada periode audit ini adalah:</label>
-          <select class="form-control" name="kesimpulan3" id="kesimpulan3" required><option value="">Pilih kategori</option><option>Mayor</option><option>Minor</option><option>Observasi</option></select>
-        </div>
         <div id="kesimpulanAmiError" class="alert alert-danger" role="alert" hidden></div>
       </div>
       <div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Batal</button><button type="submit" class="btn btn-primary" id="simpanKesimpulanAmi">Simpan dan Unduh</button></div>

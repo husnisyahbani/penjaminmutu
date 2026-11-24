@@ -1,5 +1,6 @@
 <?php
 /* Jalankan: php tests/kesimpulan_ami_test.php admin|auditor */
+error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_USER_DEPRECATED);
 class MY_Controller {}
 class UjiMutu {
     function getAuditById($id) {

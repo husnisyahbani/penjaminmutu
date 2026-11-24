@@ -60,8 +60,7 @@ class KesimpulanModel extends CI_Model {
         }
 
         return trim((string) $k['kesimpulan1']) !== ''
-            && trim((string) $k['kesimpulan2']) !== ''
-            && trim((string) $k['kesimpulan3']) !== '';
+            && trim((string) $k['kesimpulan2']) !== '';
     }
 
     /**

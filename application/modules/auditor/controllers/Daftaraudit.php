@@ -238,9 +238,8 @@ class Daftaraudit extends MY_Controller {
         $k3 = $this->input->post('kesimpulan3');
 
         $boleh1 = array('Ya', 'Tidak', 'Lainnya');
-        $boleh3 = array('Mayor', 'Minor', 'Observasi');
 
-        if ($audit_id < 1 || !in_array($k1, $boleh1, TRUE) || !in_array($k2, $boleh1, TRUE) || !in_array($k3, $boleh3, TRUE)) {
+        if ($audit_id < 1 || !in_array($k1, $boleh1, TRUE) || !in_array($k2, $boleh1, TRUE)) {
             echo json_encode(array('status' => FALSE, 'pesan' => 'Jawaban kesimpulan belum lengkap.'));
             return;
         }
