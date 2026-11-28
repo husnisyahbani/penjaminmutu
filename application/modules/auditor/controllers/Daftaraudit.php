@@ -358,13 +358,24 @@ class Daftaraudit extends MY_Controller {
 
                 $kategori = isset($b['dtjwb_temuan']) ? strtoupper(trim((string) $b['dtjwb_temuan'])) : '';
                 if ($kategori !== '' && $kategori !== 'S') {
-                    $referensi = isset($b['dtjwb_referensi']) && trim((string) $b['dtjwb_referensi']) !== ''
+                    $referensi  = isset($b['dtjwb_referensi']) && trim((string) $b['dtjwb_referensi']) !== ''
                         ? trim(strip_tags((string) $b['dtjwb_referensi']))
-                        : $teks;
+                        : '';
+                    $pertanyaan = $st !== '' ? $st : (isset($b['lingkup_id']) && isset($peta_aspek[(int) $b['lingkup_id']]) ? $peta_aspek[(int) $b['lingkup_id']] : '');
+
+                    if ($pertanyaan !== '' && $referensi !== '') {
+                        $indikator = $pertanyaan . "\n" . $referensi;
+                    } elseif ($pertanyaan !== '') {
+                        $indikator = $pertanyaan;
+                    } elseif ($referensi !== '') {
+                        $indikator = $referensi;
+                    } else {
+                        $indikator = $teks;
+                    }
 
                     $temuan[] = array(
                         'kategori'   => $kategori,
-                        'indikator'  => $referensi,
+                        'indikator'  => $indikator,
                         'pernyataan' => isset($b['dtjwb_hasil']) ? trim(strip_tags((string) $b['dtjwb_hasil'])) : '',
                     );
                 }
