@@ -236,13 +236,13 @@ class PtkdataModel extends CI_Model {
      * @return array
      */
     public function daftarAuditee() {
-        $this->db->select('au.auditee_id, au.auditee, au.unit');
+        $this->db->select('au.auditee_id, MIN(au.auditee) AS auditee, MIN(au.unit) AS unit', FALSE);
         $this->db->from('audit au');
         $this->db->where('au.auditee_id IS NOT NULL', NULL, FALSE);
         $this->db->where('au.auditee_id > 0');
         $this->_saringPemilik('au');
         $this->db->group_by('au.auditee_id');
-        $this->db->order_by('au.auditee', 'asc');
+        $this->db->order_by('auditee', 'asc');
         return $this->db->get()->result_array();
     }
 
