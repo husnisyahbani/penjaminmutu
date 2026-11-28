@@ -162,8 +162,9 @@ class PtkdataModel extends CI_Model {
      * @param bool     $termasuk_s sertakan butir bernilai "S" (delik)
      * @param int|null $periode_id batasi ke satu periode audit (filter PTK);
      *                             kosong/NULL = semua periode
+     * @param int|null $auditee_id batasi ke auditee tertentu; kosong/NULL = semua
      */
-    private function _query_ptk($dtform_id = NULL, $termasuk_s = FALSE, $periode_id = NULL) {
+    private function _query_ptk($dtform_id = NULL, $termasuk_s = FALSE, $periode_id = NULL, $auditee_id = NULL) {
         $this->db->select('au.audit_id, au.audit_status, au.form_id');
         $this->db->select('au.auditee, au.unit, au.auditor');
         if ($this->db->field_exists('periode_id', 'audit')) {
@@ -219,8 +220,30 @@ class PtkdataModel extends CI_Model {
             $this->db->where('au.periode_id', (int) $periode_id);
         }
 
+        /* Saringan auditee: auditee_id pada tabel audit. Kosong = semua. */
+        if (!empty($auditee_id)) {
+            $this->db->where('au.auditee_id', (int) $auditee_id);
+        }
+
         /* Saringan pemilik: auditee / auditor / semua. */
         $this->_saringPemilik('au');
+    }
+
+    /**
+     * Daftar auditee yang memiliki data audit (untuk filter PTK).
+     * Terfilter sesuai pemilik: admin (semua auditee) atau auditor (auditee yang diaudit).
+     *
+     * @return array
+     */
+    public function daftarAuditee() {
+        $this->db->select('au.auditee_id, au.auditee, au.unit');
+        $this->db->from('audit au');
+        $this->db->where('au.auditee_id IS NOT NULL', NULL, FALSE);
+        $this->db->where('au.auditee_id > 0');
+        $this->_saringPemilik('au');
+        $this->db->group_by('au.auditee_id');
+        $this->db->order_by('au.auditee', 'asc');
+        return $this->db->get()->result_array();
     }
 
     /**
@@ -239,25 +262,25 @@ class PtkdataModel extends CI_Model {
         return $this->db->get()->result_array();
     }
 
-    function get_datatables($length, $start, $search, $ordering, $periode_id = NULL) {
+    function get_datatables($length, $start, $search, $ordering, $periode_id = NULL, $auditee_id = NULL) {
         $this->_get_datatables_query($search, $ordering);
         if ($length != -1) {
             $this->db->limit($length, $start);
         }
-        $this->_query_ptk(NULL, FALSE, $periode_id);
+        $this->_query_ptk(NULL, FALSE, $periode_id, $auditee_id);
         $query = $this->db->get();
         return $query->result();
     }
 
-    function count_filtered($search, $ordering, $periode_id = NULL) {
+    function count_filtered($search, $ordering, $periode_id = NULL, $auditee_id = NULL) {
         $this->_get_datatables_query($search, $ordering);
-        $this->_query_ptk(NULL, FALSE, $periode_id);
+        $this->_query_ptk(NULL, FALSE, $periode_id, $auditee_id);
         $query = $this->db->get();
         return $query->num_rows();
     }
 
-    public function count_all($periode_id = NULL) {
-        $this->_query_ptk(NULL, FALSE, $periode_id);
+    public function count_all($periode_id = NULL, $auditee_id = NULL) {
+        $this->_query_ptk(NULL, FALSE, $periode_id, $auditee_id);
         return $this->db->count_all_results();
     }
 
@@ -267,8 +290,9 @@ class PtkdataModel extends CI_Model {
      * halaman PTK - angkanya sama dengan isi tabel).
      *
      * @param int|null $periode_id batasi ke satu periode audit (filter PTK)
+     * @param int|null $auditee_id batasi ke auditee tertentu (filter PTK)
      */
-    public function ringkasan($periode_id = NULL) {
+    public function ringkasan($periode_id = NULL, $auditee_id = NULL) {
         $koreksi = $this->_koreksi_sql();
 
         $this->db->select('COUNT(*) AS total', FALSE);
@@ -286,6 +310,11 @@ class PtkdataModel extends CI_Model {
             $this->db->where('ma.periode_id', (int) $periode_id);
         }
 
+        /* Saringan auditee: kosong = semua. */
+        if (!empty($auditee_id)) {
+            $this->db->where('ma.auditee_id', (int) $auditee_id);
+        }
+
         /* Saringan pemilik (sama dengan _query_ptk). */
         $this->_saringPemilik('ma');
 
@@ -301,7 +330,7 @@ class PtkdataModel extends CI_Model {
     }
 
     /** Jumlah butir satu kategori temuan (kartu statistik). */
-    private function _totalTemuan($nilai, $periode_id = NULL) {
+    private function _totalTemuan($nilai, $periode_id = NULL, $auditee_id = NULL) {
         $this->db->from('auditjawabdetail dj');
         $this->db->join('auditjawab jb', 'jb.jwb_id = dj.jwb_id', 'inner');
         $this->db->join('audit ma', 'ma.audit_id = jb.audit_id', 'inner');
@@ -311,21 +340,25 @@ class PtkdataModel extends CI_Model {
             $this->db->where('ma.periode_id', (int) $periode_id);
         }
 
+        if (!empty($auditee_id)) {
+            $this->db->where('ma.auditee_id', (int) $auditee_id);
+        }
+
         $this->_saringPemilik('ma');
 
         return $this->db->count_all_results();
     }
 
-    public function totalObservasi($periode_id = NULL) {
-        return $this->_totalTemuan('OB', $periode_id);
+    public function totalObservasi($periode_id = NULL, $auditee_id = NULL) {
+        return $this->_totalTemuan('OB', $periode_id, $auditee_id);
     }
 
-    public function totalMinor($periode_id = NULL) {
-        return $this->_totalTemuan('TS MINOR', $periode_id);
+    public function totalMinor($periode_id = NULL, $auditee_id = NULL) {
+        return $this->_totalTemuan('TS MINOR', $periode_id, $auditee_id);
     }
 
-    public function totalMayor($periode_id = NULL) {
-        return $this->_totalTemuan('TS MAYOR', $periode_id);
+    public function totalMayor($periode_id = NULL, $auditee_id = NULL) {
+        return $this->_totalTemuan('TS MAYOR', $periode_id, $auditee_id);
     }
 
     /**

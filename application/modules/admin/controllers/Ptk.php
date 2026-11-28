@@ -54,6 +54,7 @@ class Ptk extends MY_Controller {
            belum ada), kotak saring tidak ditampilkan. */
         $this->data['list_periode'] = $this->periode->siap() ? $this->periode->getAll() : array();
         $this->data['periode_aktif'] = $this->periode->aktifId();
+        $this->data['list_auditee'] = $this->ptkdata->daftarAuditee();
         $filter = $this->data['periode_aktif'];
 
         /* Angka kartu statistik: satu kueri untuk total, per kategori, dan
@@ -78,7 +79,8 @@ class Ptk extends MY_Controller {
         $this->output->set_content_type('application/json');
 
         $periode_id = $this->input->post('periode_id');
-        $ringkasan  = $this->ptkdata->ringkasan($periode_id);
+        $auditee_id = $this->input->post('auditee_id');
+        $ringkasan  = $this->ptkdata->ringkasan($periode_id, $auditee_id);
 
         echo json_encode(array(
             'status'        => TRUE,
@@ -98,17 +100,18 @@ class Ptk extends MY_Controller {
      * Auditor, PTK No, Kategori (kotak yang sesuai dicentang), Referensi,
      * Uraian Temuan (hasil + catatan), serta Rencana Tindakan Koreksi.
      *
-     * Saringan periode dan kata cari dikirim lewat ?periode_id= dan ?cari=
+     * Saringan periode, auditee, dan kata cari dikirim lewat ?periode_id=, ?auditee_id= dan ?cari=
      * oleh tombol "Form PTK" (lihat assets/app/<modul>/ptk.js).
      * Baris yang diambil sama dengan yang tampil pada tabel: pemilik baris
      * sudah ditetapkan pada konstruktor (auditor / PPM / auditee).
      */
     public function formexcel() {
         $periode_id = $this->input->get('periode_id');
+        $auditee_id = $this->input->get('auditee_id');
         $cari       = $this->input->get('cari');
 
         /* -1 = tanpa paging: seluruh temuan pada saringan ini diambil. */
-        $list = $this->ptkdata->get_datatables(-1, 0, array('value' => $cari), array(), $periode_id);
+        $list = $this->ptkdata->get_datatables(-1, 0, array('value' => $cari), array(), $periode_id, $auditee_id);
 
         $this->load->library('formptk');
         $this->formptk->unduh('Form-PTK', $this->formptk->susun($list));
@@ -123,11 +126,12 @@ class Ptk extends MY_Controller {
         $post['start'] = $this->input->post('start');
         $post['draw'] = $this->input->post('draw');
 
-        /* Saringan periode (bawaan periode aktif dikirim ptk.js;
-           kosong = semua periode). */
+        /* Saringan periode & auditee (bawaan periode aktif dikirim ptk.js;
+           kosong = semua). */
         $periode_id = $this->input->post('periode_id');
+        $auditee_id = $this->input->post('auditee_id');
 
-        $list = $this->ptkdata->get_datatables($post['length'], $post['start'], $post['search'], $post['order'], $periode_id);
+        $list = $this->ptkdata->get_datatables($post['length'], $post['start'], $post['search'], $post['order'], $periode_id, $auditee_id);
         $data = array();
         $no = $this->input->post('start');
         /* Kolom status tersedia setelah database/status_ptk.sql diimpor; bila
@@ -195,8 +199,8 @@ class Ptk extends MY_Controller {
 
         $output = array(
             "draw" => $post['draw'],
-            "recordsTotal" => $this->ptkdata->count_all($periode_id),
-            "recordsFiltered" => $this->ptkdata->count_filtered($post['search'], $post['order'], $periode_id),
+            "recordsTotal" => $this->ptkdata->count_all($periode_id, $auditee_id),
+            "recordsFiltered" => $this->ptkdata->count_filtered($post['search'], $post['order'], $periode_id, $auditee_id),
             "data" => $data,
         );
         //output dalam format JSON

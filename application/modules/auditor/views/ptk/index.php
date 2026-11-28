@@ -117,6 +117,19 @@
                                          (application/helpers/periode_helper.php); bawaan =
                                          periode aktif dan hanya menampilkan tahun. */ ?>
                                 <?php echo filter_periode($list_periode, $periode_aktif); ?>
+                                <?php if (!empty($list_auditee)): ?>
+                                <div class="filter-kotak">
+                                    <label for="filter_auditee"><i class="icon md-account" aria-hidden="true"></i>Auditee</label>
+                                    <select class="form-control" id="filter_auditee" style="max-width:200px;">
+                                        <option value="">Semua Auditee</option>
+                                        <?php foreach ($list_auditee as $a): ?>
+                                            <option value="<?php echo (int) $a['auditee_id']; ?>">
+                                                <?php echo html_escape($a['auditee'] . (!empty($a['unit']) ? ' (' . $a['unit'] . ')' : '')); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <?php endif; ?>
                                 <div class="filter-kotak">
                                     <label for="cari_ptk"><i class="icon md-search" aria-hidden="true"></i>Cari</label>
                                     <input type="text" class="form-control" id="cari_ptk"

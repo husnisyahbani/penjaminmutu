@@ -36,9 +36,10 @@ $(function () {
         "ajax": {
             "url": base_url + "/ptk/listptk/",
             "type": "POST",
-            /* Saringan periode ikut dikirim; kosong = semua periode. */
+            /* Saringan periode & auditee ikut dikirim; kosong = semua. */
             "data": function (d) {
                 d.periode_id = $('#filter_periode').val();
+                d.auditee_id = $('#filter_auditee').val();
             }
         }
     });
@@ -49,12 +50,11 @@ $(function () {
         daftarptk.search(String(this.value || '').trim()).draw();
     });
 
-    /* Saringan periode pada kepala panel: bawaan = periode aktif (dipilih
-       di halaman), kosong = semua periode. Tabel dimuat ulang dan angka
+    /* Saringan periode & auditee pada kepala panel: tabel dimuat ulang dan angka
        kartu statistik ikut diperbarui. */
-    $('#filter_periode').on('change', function () {
+    $('#filter_periode, #filter_auditee').on('change', function () {
         daftarptk.ajax.reload();
-        perbaruiKartu($(this).val());
+        perbaruiKartu($('#filter_periode').val(), $('#filter_auditee').val());
     });
 
     function angka(nilai) {
@@ -75,12 +75,15 @@ $(function () {
     }
 
     /* Angka kartu statistik untuk periode terpilih (ptk/statistik). */
-    function perbaruiKartu(periode_id) {
+    function perbaruiKartu(periode_id, auditee_id) {
         $.ajax({
             url: base_url + "/ptk/statistik",
             type: "POST",
             dataType: "json",
-            data: {periode_id: periode_id}
+            data: {
+                periode_id: periode_id,
+                auditee_id: auditee_id
+            }
         }).done(function (data) {
             if (!data || !data.status) {
                 return;
@@ -213,10 +216,12 @@ $(function () {
         e.preventDefault();
 
         var periode = String($('#filter_periode').val() || '');
+        var auditee = String($('#filter_auditee').val() || '');
         var cari    = String($('#cari_ptk').val() || '').trim();
 
         window.location.href = base_url + "/ptk/formexcel"
             + "?periode_id=" + encodeURIComponent(periode)
+            + "&auditee_id=" + encodeURIComponent(auditee)
             + "&cari=" + encodeURIComponent(cari);
     });
 });

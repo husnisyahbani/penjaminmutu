@@ -263,19 +263,38 @@ class Daftaraudit extends MY_Controller {
 
         $lingkup_teks = array();   // teks butir lingkup (unik, berurutan)
         $peta_lingkup = array();   // lingkup_id => teks butir
+        $peta_aspek   = array();   // lingkup_id => dtform_pertanyaan
         $temuan       = array();
         $baris        = array();
+
+        // Peta langsung dari tabel lingkup ke detailform (dtform_pertanyaan)
+        if ($this->db->table_exists('lingkup')) {
+            $this->db->select('lg.lingkup_id, df.dtform_pertanyaan');
+            $this->db->from('lingkup lg');
+            $this->db->join('detailform df', 'df.dtform_id = lg.dtform_id', 'inner');
+            $this->db->where('df.form_id', (int) $audit['form_id']);
+            foreach ($this->db->get()->result_array() as $lg) {
+                if (!empty($lg['dtform_pertanyaan'])) {
+                    $peta_aspek[(int) $lg['lingkup_id']] = trim(strip_tags((string) $lg['dtform_pertanyaan']));
+                }
+            }
+        }
 
         $dtform = $this->dtform->getAllDtformByFormId($audit['form_id']);
         $tujuan_lain = array();
         $standar_list = array();
         foreach ($dtform as $row) {
+            $st = '';
             if (!empty($row['dtform_pertanyaan'])) {
                 $st = trim(strip_tags((string) $row['dtform_pertanyaan']));
                 if (!in_array($st, $standar_list)) {
                     $standar_list[] = $st;
                 }
             }
+            if (!empty($row['dtform_id']) && !isset($peta_aspek[(int) $row['dtform_id']])) {
+                $peta_aspek[(int) $row['dtform_id']] = $st;
+            }
+
             $jawaban = $this->auditjawab->getAuditJawabFix($audit_id, $row['dtform_id']);
             if (!empty($jawaban['jwb_tujuan'])) {
                 $tujuan_lain[] = trim(strip_tags($jawaban['jwb_tujuan']));
@@ -291,14 +310,21 @@ class Daftaraudit extends MY_Controller {
                     }
                     if (isset($b['lingkup_id'])) {
                         $peta_lingkup[(int) $b['lingkup_id']] = $teks;
+                        if (!isset($peta_aspek[(int) $b['lingkup_id']]) && $st !== '') {
+                            $peta_aspek[(int) $b['lingkup_id']] = $st;
+                        }
                     }
                 }
 
                 $kategori = isset($b['dtjwb_temuan']) ? strtoupper(trim((string) $b['dtjwb_temuan'])) : '';
                 if ($kategori !== '' && $kategori !== 'S') {
+                    $referensi = isset($b['dtjwb_referensi']) && trim((string) $b['dtjwb_referensi']) !== ''
+                        ? trim(strip_tags((string) $b['dtjwb_referensi']))
+                        : $teks;
+
                     $temuan[] = array(
                         'kategori'   => $kategori,
-                        'indikator'  => $teks,
+                        'indikator'  => $referensi,
                         'pernyataan' => isset($b['dtjwb_hasil']) ? trim(strip_tags((string) $b['dtjwb_hasil'])) : '',
                     );
                 }
@@ -359,8 +385,9 @@ class Daftaraudit extends MY_Controller {
                 if ($kelebihan === '' && $peluang_teks === '') {
                     continue;
                 }
+                $aspek = isset($peta_aspek[(int) $lid]) ? $peta_aspek[(int) $lid] : (isset($peta_lingkup[(int) $lid]) ? $peta_lingkup[(int) $lid] : '');
                 $peluang[] = array(
-                    'aspek'     => isset($peta_lingkup[(int) $lid]) ? $peta_lingkup[(int) $lid] : '',
+                    'aspek'     => $aspek,
                     'kelebihan' => $kelebihan,
                     'peluang'   => $peluang_teks,
                 );
